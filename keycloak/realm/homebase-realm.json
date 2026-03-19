@@ -37,7 +37,9 @@
   "revokeRefreshToken": true,
   "refreshTokenMaxReuse": 0,
   "internationalizationEnabled": true,
-  "supportedLocales": ["en"],
+  "supportedLocales": [
+    "en"
+  ],
   "defaultLocale": "en",
   "passwordPolicy": "length(8) and upperCase(1) and lowerCase(1) and digits(1) and specialChars(1)",
   "smtpServer": {},
@@ -124,7 +126,9 @@
         "description": "${role_default-roles}",
         "composite": true,
         "composites": {
-          "realm": ["CUSTOMER"]
+          "realm": [
+            "CUSTOMER"
+          ]
         },
         "clientRole": false
       }
@@ -135,33 +139,48 @@
     "description": "${role_default-roles}",
     "composite": true,
     "composites": {
-      "realm": ["CUSTOMER"]
+      "realm": [
+        "CUSTOMER"
+      ]
     }
   },
   "groups": [
     {
       "name": "customers",
-      "realmRoles": ["CUSTOMER"]
+      "realmRoles": [
+        "CUSTOMER"
+      ]
     },
     {
       "name": "sellers",
-      "realmRoles": ["SELLER"]
+      "realmRoles": [
+        "SELLER"
+      ]
     },
     {
       "name": "warehouse-team",
-      "realmRoles": ["WAREHOUSE_STAFF"]
+      "realmRoles": [
+        "WAREHOUSE_STAFF"
+      ]
     },
     {
       "name": "ops-team",
-      "realmRoles": ["OPS_AGENT"]
+      "realmRoles": [
+        "OPS_AGENT"
+      ]
     },
     {
       "name": "finance-team",
-      "realmRoles": ["FINANCE_ANALYST"]
+      "realmRoles": [
+        "FINANCE_ANALYST"
+      ]
     },
     {
       "name": "platform-admins",
-      "realmRoles": ["PLATFORM_ADMIN", "SUPER_ADMIN"]
+      "realmRoles": [
+        "PLATFORM_ADMIN",
+        "SUPER_ADMIN"
+      ]
     }
   ],
   "users": [
@@ -179,8 +198,13 @@
           "temporary": false
         }
       ],
-      "realmRoles": ["CUSTOMER", "default-roles-homebase"],
-      "groups": ["customers"]
+      "realmRoles": [
+        "CUSTOMER",
+        "default-roles-homebase"
+      ],
+      "groups": [
+        "customers"
+      ]
     },
     {
       "username": "seller@test.com",
@@ -196,8 +220,13 @@
           "temporary": false
         }
       ],
-      "realmRoles": ["SELLER", "default-roles-homebase"],
-      "groups": ["sellers"]
+      "realmRoles": [
+        "SELLER",
+        "default-roles-homebase"
+      ],
+      "groups": [
+        "sellers"
+      ]
     },
     {
       "username": "warehouse@test.com",
@@ -213,8 +242,13 @@
           "temporary": false
         }
       ],
-      "realmRoles": ["WAREHOUSE_STAFF", "default-roles-homebase"],
-      "groups": ["warehouse-team"]
+      "realmRoles": [
+        "WAREHOUSE_STAFF",
+        "default-roles-homebase"
+      ],
+      "groups": [
+        "warehouse-team"
+      ]
     },
     {
       "username": "ops@test.com",
@@ -230,8 +264,14 @@
           "temporary": false
         }
       ],
-      "realmRoles": ["OPS_AGENT", "OPS_MANAGER", "default-roles-homebase"],
-      "groups": ["ops-team"]
+      "realmRoles": [
+        "OPS_AGENT",
+        "OPS_MANAGER",
+        "default-roles-homebase"
+      ],
+      "groups": [
+        "ops-team"
+      ]
     },
     {
       "username": "finance@test.com",
@@ -247,8 +287,14 @@
           "temporary": false
         }
       ],
-      "realmRoles": ["FINANCE_ANALYST", "FINANCE_MANAGER", "default-roles-homebase"],
-      "groups": ["finance-team"]
+      "realmRoles": [
+        "FINANCE_ANALYST",
+        "FINANCE_MANAGER",
+        "default-roles-homebase"
+      ],
+      "groups": [
+        "finance-team"
+      ]
     },
     {
       "username": "admin@test.com",
@@ -264,8 +310,14 @@
           "temporary": false
         }
       ],
-      "realmRoles": ["PLATFORM_ADMIN", "SUPER_ADMIN", "default-roles-homebase"],
-      "groups": ["platform-admins"]
+      "realmRoles": [
+        "PLATFORM_ADMIN",
+        "SUPER_ADMIN",
+        "default-roles-homebase"
+      ],
+      "groups": [
+        "platform-admins"
+      ]
     }
   ],
   "clients": [
@@ -283,8 +335,12 @@
       "protocol": "openid-connect",
       "rootUrl": "http://localhost:3000",
       "baseUrl": "http://localhost:3000",
-      "redirectUris": ["http://localhost:3000/*"],
-      "webOrigins": ["http://localhost:3000"],
+      "redirectUris": [
+        "http://localhost:3000/*"
+      ],
+      "webOrigins": [
+        "http://localhost:3000"
+      ],
       "attributes": {
         "pkce.code.challenge.method": "S256",
         "post.logout.redirect.uris": "http://localhost:3000/*"
@@ -318,8 +374,12 @@
       "protocol": "openid-connect",
       "rootUrl": "http://localhost:3002",
       "baseUrl": "http://localhost:3002",
-      "redirectUris": ["http://localhost:3002/*"],
-      "webOrigins": ["http://localhost:3002"],
+      "redirectUris": [
+        "http://localhost:3002/*"
+      ],
+      "webOrigins": [
+        "http://localhost:3002"
+      ],
       "attributes": {
         "pkce.code.challenge.method": "S256",
         "post.logout.redirect.uris": "http://localhost:3002/*"
@@ -353,8 +413,12 @@
       "protocol": "openid-connect",
       "rootUrl": "http://localhost:3003",
       "baseUrl": "http://localhost:3003",
-      "redirectUris": ["http://localhost:3003/*"],
-      "webOrigins": ["http://localhost:3003"],
+      "redirectUris": [
+        "http://localhost:3003/*"
+      ],
+      "webOrigins": [
+        "http://localhost:3003"
+      ],
       "attributes": {
         "pkce.code.challenge.method": "S256",
         "post.logout.redirect.uris": "http://localhost:3003/*"
@@ -388,8 +452,12 @@
       "protocol": "openid-connect",
       "rootUrl": "http://localhost:3004",
       "baseUrl": "http://localhost:3004",
-      "redirectUris": ["http://localhost:3004/*"],
-      "webOrigins": ["http://localhost:3004"],
+      "redirectUris": [
+        "http://localhost:3004/*"
+      ],
+      "webOrigins": [
+        "http://localhost:3004"
+      ],
       "attributes": {
         "pkce.code.challenge.method": "S256",
         "post.logout.redirect.uris": "http://localhost:3004/*"
@@ -423,8 +491,12 @@
       "protocol": "openid-connect",
       "rootUrl": "http://localhost:3005",
       "baseUrl": "http://localhost:3005",
-      "redirectUris": ["http://localhost:3005/*"],
-      "webOrigins": ["http://localhost:3005"],
+      "redirectUris": [
+        "http://localhost:3005/*"
+      ],
+      "webOrigins": [
+        "http://localhost:3005"
+      ],
       "attributes": {
         "pkce.code.challenge.method": "S256",
         "post.logout.redirect.uris": "http://localhost:3005/*"
@@ -458,8 +530,12 @@
       "protocol": "openid-connect",
       "rootUrl": "http://localhost:3006",
       "baseUrl": "http://localhost:3006",
-      "redirectUris": ["http://localhost:3006/*"],
-      "webOrigins": ["http://localhost:3006"],
+      "redirectUris": [
+        "http://localhost:3006/*"
+      ],
+      "webOrigins": [
+        "http://localhost:3006"
+      ],
       "attributes": {
         "pkce.code.challenge.method": "S256",
         "post.logout.redirect.uris": "http://localhost:3006/*"

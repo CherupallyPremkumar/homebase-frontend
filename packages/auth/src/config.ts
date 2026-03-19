@@ -65,6 +65,7 @@ export function createAuthConfig(appConfig: AuthAppConfig): NextAuthConfig {
         return {
           ...session,
           accessToken: token.accessToken as string,
+          idToken: token.idToken as string | undefined,
           roles: (token.roles as string[]) || [],
           error: token.error as string | undefined,
           user: {
