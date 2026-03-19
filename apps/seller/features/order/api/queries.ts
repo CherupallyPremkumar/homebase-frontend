@@ -1,0 +1,23 @@
+'use client';
+
+import { useQuery } from '@tanstack/react-query';
+import { ordersApi } from '@homebase/api-client';
+import { CACHE_TIMES } from '@homebase/shared';
+import type { SearchRequest } from '@homebase/types';
+
+export function useSellerOrders(params: SearchRequest) {
+  return useQuery({
+    queryKey: ['seller-orders', 'list', params],
+    queryFn: () => ordersApi.search(params),
+    ...CACHE_TIMES.orderList,
+  });
+}
+
+export function useSellerOrderDetail(id: string) {
+  return useQuery({
+    queryKey: ['seller-orders', id],
+    queryFn: () => ordersApi.getById(id),
+    ...CACHE_TIMES.orderDetail,
+    enabled: !!id,
+  });
+}
