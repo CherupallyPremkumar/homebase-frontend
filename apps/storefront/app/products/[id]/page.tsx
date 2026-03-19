@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import { catalogApi } from '@homebase/api-client';
 import { buildProductMetadata, JsonLd, productJsonLd, breadcrumbJsonLd } from '@homebase/shared';
-import { ProductDetailClient } from './product-detail-client';
+import { ProductDetail } from '@/features/product/ui';
 
 export const revalidate = 300;
 
@@ -63,7 +63,7 @@ export default async function ProductDetailPage({ params }: Props) {
           { name: product.name, url: `${siteUrl}/products/${product.id}` },
         ])}
       />
-      <ProductDetailClient product={product} />
+      <ProductDetail product={product} />
     </>
   );
 }

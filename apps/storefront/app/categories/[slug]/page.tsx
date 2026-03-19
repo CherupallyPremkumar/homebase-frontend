@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 import { buildMetadata } from '@homebase/shared';
-import { ProductListingClient } from '@/app/products/product-listing-client';
+import { ProductListing } from '@/features/product/ui';
 
 export const revalidate = 120;
 
@@ -25,7 +25,7 @@ export default async function CategoryPage({ params }: Props) {
   return (
     <div className="container mx-auto px-4 py-6">
       <h1 className="mb-6 text-2xl font-bold text-gray-900">{name}</h1>
-      <ProductListingClient />
+      <ProductListing />
     </div>
   );
 }

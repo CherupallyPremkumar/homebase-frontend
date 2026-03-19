@@ -1,8 +1,8 @@
 import type { Metadata } from 'next';
-import { OrdersClient } from './orders-client';
+import { OrderList } from '@/features/order/ui';
 
 export const metadata: Metadata = { title: 'My Orders' };
 
 export default function OrdersPage() {
-  return <OrdersClient />;
+  return <OrderList />;
 }

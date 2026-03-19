@@ -1,10 +1,7 @@
 import Link from 'next/link';
 import { catalogApi } from '@homebase/api-client';
 import { JsonLd, organizationJsonLd, websiteJsonLd } from '@homebase/shared';
-import { HeroBanner } from '@/components/home/hero-banner';
-import { CategoryGrid } from '@/components/home/category-grid';
-import { FeaturedProducts } from '@/components/home/featured-products';
-import { TrustBar } from '@/components/home/trust-bar';
+import { HeroBanner, CategoryGrid, FeaturedProducts, TrustBar } from '@/features/catalog/ui';
 
 export const revalidate = 60;
 

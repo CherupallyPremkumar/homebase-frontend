@@ -1,8 +1,8 @@
 import type { Metadata } from 'next';
-import { ReturnsClient } from './returns-client';
+import { ReturnList } from '@/features/return/ui';
 
 export const metadata: Metadata = { title: 'My Returns' };
 
 export default function ReturnsPage() {
-  return <ReturnsClient />;
+  return <ReturnList />;
 }

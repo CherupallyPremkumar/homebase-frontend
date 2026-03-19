@@ -1,11 +1,11 @@
 import type { Metadata } from 'next';
-import { CheckoutClient } from './checkout-client';
+import { CheckoutPage } from '@/features/checkout/ui';
 
 export const metadata: Metadata = {
   title: 'Checkout',
   robots: { index: false, follow: false },
 };
 
-export default function CheckoutPage() {
-  return <CheckoutClient />;
+export default function CheckoutRoute() {
+  return <CheckoutPage />;
 }

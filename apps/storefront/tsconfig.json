@@ -3,8 +3,9 @@
   "compilerOptions": {
     "plugins": [{ "name": "next" }],
     "paths": {
-      "@/*": ["./src/*"],
+      "@/*": ["./*"],
       "@/components/*": ["./components/*"],
+      "@/features/*": ["./features/*"],
       "@/app/*": ["./app/*"]
     },
     "jsx": "preserve"

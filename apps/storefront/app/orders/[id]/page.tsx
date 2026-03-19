@@ -1,5 +1,5 @@
 import type { Metadata } from 'next';
-import { OrderDetailClient } from './order-detail-client';
+import { OrderDetail } from '@/features/order/ui';
 
 export const metadata: Metadata = { title: 'Order Details' };
 
@@ -9,5 +9,5 @@ interface Props {
 
 export default async function OrderDetailPage({ params }: Props) {
   const { id } = await params;
-  return <OrderDetailClient orderId={id} />;
+  return <OrderDetail orderId={id} />;
 }

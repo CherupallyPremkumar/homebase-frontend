@@ -1,5 +1,5 @@
 import type { Metadata } from 'next';
-import { CartPageClient } from './cart-client';
+import { CartPage as CartPageClient } from '@/features/cart/ui';
 
 export const metadata: Metadata = {
   title: 'Shopping Cart',

@@ -5,7 +5,8 @@
     "paths": {
       "@/*": ["./src/*"],
       "@/components/*": ["./components/*"],
-      "@/app/*": ["./app/*"]
+      "@/app/*": ["./app/*"],
+      "@/features/*": ["./features/*"]
     },
     "jsx": "preserve"
   },
