@@ -54,7 +54,12 @@ export function useAuth(): UseAuthReturn {
 
       // Redirect to Keycloak's end-session endpoint to kill the Keycloak session
       // This prevents auto-login on next visit
-      const issuer = process.env.NEXT_PUBLIC_KEYCLOAK_ISSUER || 'http://localhost:8180/realms/homebase';
+      const issuer = process.env.NEXT_PUBLIC_KEYCLOAK_ISSUER;
+      if (!issuer) {
+        // Fallback: just redirect to home without Keycloak logout
+        window.location.href = '/';
+        return;
+      }
       const params = new URLSearchParams({
         post_logout_redirect_uri: window.location.origin,
       });

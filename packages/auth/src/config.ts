@@ -9,14 +9,18 @@ export interface AuthAppConfig {
 }
 
 export function createAuthConfig(appConfig: AuthAppConfig): NextAuthConfig {
-  const keycloakIssuer = process.env.KEYCLOAK_ISSUER || 'http://localhost:8180/realms/homebase';
+  const envIssuer = process.env.KEYCLOAK_ISSUER;
+  if (!envIssuer && process.env.NODE_ENV === 'production') {
+    throw new Error('KEYCLOAK_ISSUER environment variable is required in production');
+  }
+  const issuerUrl = envIssuer || 'http://localhost:8180/realms/homebase';
 
   return {
     providers: [
       Keycloak({
         clientId: appConfig.clientId,
         clientSecret: '', // Public client — no secret needed
-        issuer: keycloakIssuer,
+        issuer: issuerUrl,
         authorization: {
           params: {
             scope: 'openid email profile',
@@ -52,7 +56,7 @@ export function createAuthConfig(appConfig: AuthAppConfig): NextAuthConfig {
         if (token.expiresAt && Date.now() / 1000 > (token.expiresAt as number)) {
           // Token expired — try to refresh
           try {
-            const refreshed = await refreshAccessToken(token, appConfig.clientId, keycloakIssuer);
+            const refreshed = await refreshAccessToken(token, appConfig.clientId, issuerUrl);
             return refreshed;
           } catch {
             return { ...token, error: 'RefreshAccessTokenError' };
