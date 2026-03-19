@@ -3,7 +3,7 @@ import { createAuthConfig } from '@homebase/auth';
 
 const config = createAuthConfig({
   clientId: 'oms-web',
-  allowedRoles: ['OPS_AGENT', 'OPS_MANAGER', 'SUPER_ADMIN'],
+  allowedRoles: ['AGENT', 'ADMIN'],
 });
 
 // NextAuth v5 beta has type inference issues — use explicit any

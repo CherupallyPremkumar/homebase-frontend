@@ -1,23 +1,37 @@
 import { createHttpClient, type HttpClient } from './http';
 
-let client: HttpClient | null = null;
+let browserClient: HttpClient | null = null;
+let serverClient: HttpClient | null = null;
 
-function getBaseUrl(): string {
-  const url = process.env.NEXT_PUBLIC_API_URL;
+function getServerBaseUrl(): string {
+  const url = process.env.BACKEND_URL;
   if (!url) {
     if (process.env.NODE_ENV === 'production') {
-      throw new Error('NEXT_PUBLIC_API_URL environment variable is required in production');
+      throw new Error('BACKEND_URL environment variable is required in production');
     }
     return 'http://localhost:8080';
   }
   return url;
 }
 
+/**
+ * Returns the shared API client.
+ *
+ * Browser: routes through /api/proxy (Next.js server injects JWT + Chenile headers).
+ * Server (SSR/ISR): calls backend directly via BACKEND_URL.
+ */
 export function getApiClient(): HttpClient {
-  if (!client) {
-    client = createHttpClient(getBaseUrl());
+  if (typeof window !== 'undefined') {
+    if (!browserClient) {
+      browserClient = createHttpClient('/api/proxy');
+    }
+    return browserClient;
   }
-  return client;
+
+  if (!serverClient) {
+    serverClient = createHttpClient(getServerBaseUrl());
+  }
+  return serverClient;
 }
 
 export function createApiClient(baseUrl: string): HttpClient {

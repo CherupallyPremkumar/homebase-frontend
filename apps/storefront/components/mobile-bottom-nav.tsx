@@ -5,12 +5,17 @@ import { usePathname } from 'next/navigation';
 import { Home, LayoutGrid, ShoppingCart, Package, User, LogIn } from 'lucide-react';
 import { cn } from '@homebase/ui/src/lib/utils';
 import { useCartStore } from '@homebase/shared';
-import { useAuth } from '@homebase/auth';
 
-export function MobileBottomNav() {
+interface MobileBottomNavProps {
+  isAuthenticated: boolean;
+}
+
+/**
+ * Receives auth state as props from server layout — no API call needed.
+ */
+export function MobileBottomNav({ isAuthenticated }: MobileBottomNavProps) {
   const pathname = usePathname();
   const itemCount = useCartStore((s) => s.itemCount());
-  const { isAuthenticated, login } = useAuth();
 
   const NAV_ITEMS = [
     { href: '/', label: 'Home', icon: Home },
@@ -22,7 +27,7 @@ export function MobileBottomNav() {
           { href: '/profile', label: 'Account', icon: User },
         ]
       : [
-          { href: '#login', label: 'Login', icon: LogIn, isLogin: true },
+          { href: '/api/auth/signin/keycloak', label: 'Login', icon: LogIn },
         ]),
   ];
 
@@ -30,21 +35,8 @@ export function MobileBottomNav() {
     <nav className="fixed bottom-0 left-0 right-0 z-50 border-t bg-white md:hidden">
       <div className="flex h-14 items-center justify-around">
         {NAV_ITEMS.map((item) => {
-          const isActive = pathname === item.href || (item.href !== '/' && item.href !== '#login' && pathname.startsWith(item.href));
+          const isActive = pathname === item.href || (item.href !== '/' && !item.href.startsWith('/api') && pathname.startsWith(item.href));
           const Icon = item.icon;
-
-          if ('isLogin' in item && item.isLogin) {
-            return (
-              <button
-                key="login"
-                onClick={() => login()}
-                className="flex min-w-[44px] flex-col items-center gap-0.5 px-3 py-1 text-primary"
-              >
-                <Icon className="h-5 w-5" />
-                <span className="text-[10px] font-medium">Login</span>
-              </button>
-            );
-          }
 
           return (
             <Link

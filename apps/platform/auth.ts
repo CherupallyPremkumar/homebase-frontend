@@ -3,7 +3,7 @@ import { createAuthConfig } from '@homebase/auth';
 
 const config = createAuthConfig({
   clientId: 'platform-web',
-  allowedRoles: ['PLATFORM_ADMIN', 'SUPER_ADMIN'],
+  allowedRoles: ['ADMIN'],
 });
 
 // NextAuth v5 beta has type inference issues — use explicit any

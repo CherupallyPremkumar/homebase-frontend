@@ -63,74 +63,31 @@
     "realm": [
       {
         "name": "CUSTOMER",
-        "description": "End customer / buyer",
-        "composite": false,
-        "clientRole": false
+        "description": "End customer / buyer"
       },
       {
-        "name": "SELLER",
-        "description": "Supplier / seller on marketplace",
-        "composite": false,
-        "clientRole": false
+        "name": "ADMIN",
+        "description": "Platform administrator (full access)"
       },
       {
-        "name": "WAREHOUSE_STAFF",
-        "description": "Warehouse floor worker",
-        "composite": false,
-        "clientRole": false
+        "name": "SUPPLIER",
+        "description": "Supplier / seller on marketplace"
       },
       {
-        "name": "WAREHOUSE_MANAGER",
-        "description": "Warehouse supervisor",
-        "composite": false,
-        "clientRole": false
+        "name": "WAREHOUSE",
+        "description": "Warehouse staff (pick/pack/receive)"
       },
       {
-        "name": "OPS_AGENT",
-        "description": "Operations support agent",
-        "composite": false,
-        "clientRole": false
+        "name": "SYSTEM",
+        "description": "System / batch operations (internal only)"
       },
       {
-        "name": "OPS_MANAGER",
-        "description": "Operations manager",
-        "composite": false,
-        "clientRole": false
+        "name": "AGENT",
+        "description": "Customer support agent"
       },
       {
-        "name": "FINANCE_ANALYST",
-        "description": "Finance team member",
-        "composite": false,
-        "clientRole": false
-      },
-      {
-        "name": "FINANCE_MANAGER",
-        "description": "Finance team lead",
-        "composite": false,
-        "clientRole": false
-      },
-      {
-        "name": "PLATFORM_ADMIN",
-        "description": "Platform administrator",
-        "composite": false,
-        "clientRole": false
-      },
-      {
-        "name": "SUPER_ADMIN",
-        "description": "Full system access",
-        "composite": false,
-        "clientRole": false
-      },
-      {
-        "name": "default-roles-homebase",
-        "description": "${role_default-roles}",
-        "composite": true,
-        "composites": {
-          "realm": [
-            "CUSTOMER"
-          ]
-        },
-        "clientRole": false
+        "name": "QUALITY_CHECKER",
+        "description": "Quality inspection for returns"
       }
     ]
   },
@@ -154,32 +111,32 @@
     {
       "name": "sellers",
       "realmRoles": [
-        "SELLER"
+        "SUPPLIER"
       ]
     },
     {
       "name": "warehouse-team",
       "realmRoles": [
-        "WAREHOUSE_STAFF"
+        "WAREHOUSE"
       ]
     },
     {
       "name": "ops-team",
       "realmRoles": [
-        "OPS_AGENT"
+        "AGENT",
+        "ADMIN"
       ]
     },
     {
       "name": "finance-team",
       "realmRoles": [
-        "FINANCE_ANALYST"
+        "ADMIN"
       ]
     },
     {
       "name": "platform-admins",
       "realmRoles": [
-        "PLATFORM_ADMIN",
-        "SUPER_ADMIN"
+        "ADMIN"
       ]
     }
   ],

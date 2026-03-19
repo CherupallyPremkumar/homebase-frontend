@@ -16,9 +16,10 @@ export function createAuthMiddleware(config: MiddlewareConfig) {
   return function middleware(request: NextRequest) {
     const { pathname } = request.nextUrl;
 
-    // Always skip: auth routes, static assets, Next.js internals
+    // Always skip: auth routes, API proxy, static assets, Next.js internals
     if (
       pathname.startsWith('/api/auth') ||
+      pathname.startsWith('/api/proxy') ||
       pathname.startsWith('/_next') ||
       pathname.startsWith('/auth') ||
       pathname.includes('.')

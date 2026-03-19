@@ -102,8 +102,15 @@ export class HttpClient {
       : controller.signal;
 
     try {
+      const correlationId =
+        typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function'
+          ? crypto.randomUUID()
+          : Math.random().toString(36).substring(2);
+
       const headers: Record<string, string> = {
         'Content-Type': 'application/json',
+        'x-chenile-tenant-id': 'homebase',
+        'X-Correlation-Id': correlationId,
         ...this.defaultHeaders,
         ...options?.headers,
       };

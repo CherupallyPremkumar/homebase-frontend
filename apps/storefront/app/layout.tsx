@@ -6,6 +6,7 @@ import { Navbar } from '@/components/navbar';
 import { Footer } from '@/components/footer';
 import { MobileBottomNav } from '@/components/mobile-bottom-nav';
 import { Toaster } from '@homebase/ui';
+import { auth } from '@/auth';
 
 const inter = Inter({
   subsets: ['latin'],
@@ -27,7 +28,10 @@ export const metadata: Metadata = {
   },
 };
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default async function RootLayout({ children }: { children: React.ReactNode }) {
+  const session = await auth();
+  const isAuthenticated = !!session?.user;
+
   return (
     <html lang="en" className={inter.variable}>
       <body className="flex min-h-screen flex-col">
@@ -35,7 +39,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <Navbar />
           <main className="flex-1 pb-14 md:pb-0">{children}</main>
           <Footer />
-          <MobileBottomNav />
+          <MobileBottomNav isAuthenticated={isAuthenticated} />
           <Toaster position="top-right" />
         </Providers>
       </body>

@@ -3,7 +3,7 @@ import { createAuthConfig } from '@homebase/auth';
 
 const config = createAuthConfig({
   clientId: 'warehouse-web',
-  allowedRoles: ['WAREHOUSE_STAFF', 'WAREHOUSE_MANAGER', 'SUPER_ADMIN'],
+  allowedRoles: ['WAREHOUSE', 'ADMIN'],
 });
 
 // NextAuth v5 beta has type inference issues — use explicit any
