@@ -12,6 +12,7 @@
   },
   "dependencies": {
     "@homebase/api-client": "workspace:*",
+    "@homebase/auth": "workspace:*",
     "@homebase/shared": "workspace:*",
     "@homebase/types": "workspace:*",
     "@homebase/ui": "workspace:*",
@@ -19,6 +20,7 @@
     "@tanstack/react-table": "^8.20.6",
     "lucide-react": "^0.468.0",
     "next": "^15.1.0",
+    "next-auth": "^5.0.0-beta.25",
     "nuqs": "^2.2.3",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
