@@ -66,10 +66,11 @@ export function createAuthConfig(appConfig: AuthAppConfig): NextAuthConfig {
         return token;
       },
       async session({ session, token }) {
+        // SECURITY: Never expose tokens to the browser.
+        // accessToken and idToken stay in the server-side JWT only.
+        // The API proxy (server-side) reads them from the JWT, not from the client session.
         return {
           ...session,
-          accessToken: token.accessToken as string,
-          idToken: token.idToken as string | undefined,
           roles: (token.roles as string[]) || [],
           error: token.error as string | undefined,
           user: {

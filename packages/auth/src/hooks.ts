@@ -17,7 +17,6 @@ export interface UseAuthReturn {
   hasAnyRole: (roles: string[]) => boolean;
   login: () => void;
   logout: () => void;
-  accessToken: string | null;
 }
 
 export function useAuth(): UseAuthReturn {
@@ -47,28 +46,10 @@ export function useAuth(): UseAuthReturn {
     hasAnyRole: (checkRoles: string[]) => checkRoles.some((r) => roles.includes(r)),
     login: () => signIn('keycloak'),
     logout: async () => {
-      const idToken = s?.idToken as string | undefined;
-
-      // Clear NextAuth session first
-      await signOut({ redirect: false });
-
-      // Redirect to Keycloak's end-session endpoint to kill the Keycloak session
-      // This prevents auto-login on next visit
-      const issuer = process.env.NEXT_PUBLIC_KEYCLOAK_ISSUER;
-      if (!issuer) {
-        // Fallback: just redirect to home without Keycloak logout
-        window.location.href = '/';
-        return;
-      }
-      const params = new URLSearchParams({
-        post_logout_redirect_uri: window.location.origin,
-      });
-      if (idToken) {
-        params.set('id_token_hint', idToken);
-      }
-      window.location.href = `${issuer}/protocol/openid-connect/logout?${params.toString()}`;
+      // Call our server-side logout API which has access to the idToken
+      // (tokens never touch the browser)
+      window.location.href = '/api/auth/logout';
     },
-    accessToken: (s?.accessToken as string) || null,
   };
 }
 
