@@ -11,13 +11,26 @@ export interface MiddlewareConfig {
  * and redirects to login if not.
  */
 export function createAuthMiddleware(config: MiddlewareConfig) {
-  const publicPaths = new Set(config.publicPaths || []);
+  const publicPrefixes = config.publicPaths || [];
 
   return function middleware(request: NextRequest) {
     const { pathname } = request.nextUrl;
 
-    // Skip public paths
-    if (publicPaths.has(pathname) || pathname.startsWith('/api/auth') || pathname.startsWith('/_next') || pathname.includes('.')) {
+    // Always skip: auth routes, static assets, Next.js internals
+    if (
+      pathname.startsWith('/api/auth') ||
+      pathname.startsWith('/_next') ||
+      pathname.startsWith('/auth') ||
+      pathname.includes('.')
+    ) {
+      return NextResponse.next();
+    }
+
+    // Skip public paths (prefix match — /products matches /products/123)
+    const isPublic = publicPrefixes.some(
+      (p) => pathname === p || pathname.startsWith(p + '/'),
+    );
+    if (isPublic) {
       return NextResponse.next();
     }
 
@@ -27,8 +40,9 @@ export function createAuthMiddleware(config: MiddlewareConfig) {
       request.cookies.get('authjs.session-token');
 
     if (!sessionCookie) {
-      const signInUrl = new URL(config.loginUrl, request.url);
-      signInUrl.searchParams.set('callbackUrl', request.url);
+      // Redirect to NextAuth's Keycloak sign-in
+      const signInUrl = new URL('/api/auth/signin/keycloak', request.url);
+      signInUrl.searchParams.set('callbackUrl', pathname);
       return NextResponse.redirect(signInUrl);
     }
 
