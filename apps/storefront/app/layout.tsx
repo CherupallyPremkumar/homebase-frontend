@@ -4,7 +4,7 @@ import './globals.css';
 import { Providers } from './providers';
 import { Navbar } from '@/components/navbar';
 import { Footer } from '@/components/footer';
-import { MobileBottomNav } from '@homebase/shared';
+import { MobileBottomNav } from '@/components/mobile-bottom-nav';
 import { Toaster } from '@homebase/ui';
 
 const inter = Inter({

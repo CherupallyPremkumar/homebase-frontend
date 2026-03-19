@@ -2,16 +2,27 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { ShoppingCart, Search, Menu, X, Heart, User } from 'lucide-react';
-import { Button, Input, Sheet, SheetContent, SheetTrigger, SheetHeader, SheetTitle } from '@homebase/ui';
-import { useCartStore, useUIStore, useDebounce } from '@homebase/shared';
-import { cn } from '@homebase/ui/src/lib/utils';
+import { ShoppingCart, Search, Menu, X, Heart, LogIn, ChevronDown } from 'lucide-react';
+import {
+  Button,
+  Input,
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+  Avatar,
+  AvatarFallback,
+} from '@homebase/ui';
+import { useCartStore, useUIStore } from '@homebase/shared';
+import { useAuth } from '@homebase/auth';
 
 export function Navbar() {
   const [searchQuery, setSearchQuery] = useState('');
   const [searchOpen, setSearchOpen] = useState(false);
   const itemCount = useCartStore((s) => s.itemCount());
   const { mobileMenuOpen, setMobileMenuOpen } = useUIStore();
+  const { user, isAuthenticated, isLoading, login, logout } = useAuth();
 
   return (
     <header className="sticky top-0 z-50 border-b bg-white">
@@ -28,7 +39,6 @@ export function Navbar() {
           <Link href="/" className="text-xl font-bold text-primary">
             HomeBase
           </Link>
-          {/* Desktop nav links */}
           <nav className="hidden items-center gap-6 md:flex">
             <Link href="/products" className="text-sm font-medium text-gray-600 hover:text-gray-900">
               Products
@@ -53,8 +63,9 @@ export function Navbar() {
           </form>
         </div>
 
-        {/* Right: Icons */}
+        {/* Right: Auth-aware actions */}
         <div className="flex items-center gap-2">
+          {/* Mobile search toggle */}
           <button
             className="p-2 md:hidden"
             onClick={() => setSearchOpen(!searchOpen)}
@@ -62,9 +73,15 @@ export function Navbar() {
           >
             <Search className="h-5 w-5" />
           </button>
-          <Link href="/profile" className="hidden p-2 md:block" aria-label="Wishlist">
-            <Heart className="h-5 w-5 text-gray-600" />
-          </Link>
+
+          {/* Wishlist — only show if logged in */}
+          {isAuthenticated && (
+            <Link href="/profile#wishlist" className="hidden p-2 md:block" aria-label="Wishlist">
+              <Heart className="h-5 w-5 text-gray-600 hover:text-red-500 transition-colors" />
+            </Link>
+          )}
+
+          {/* Cart — always visible (even when not logged in) */}
           <Link href="/cart" className="relative p-2" aria-label="Cart">
             <ShoppingCart className="h-5 w-5 text-gray-600" />
             {itemCount > 0 && (
@@ -73,9 +90,63 @@ export function Navbar() {
               </span>
             )}
           </Link>
-          <Link href="/profile" className="hidden p-2 md:block" aria-label="Account">
-            <User className="h-5 w-5 text-gray-600" />
-          </Link>
+
+          {/* Auth section */}
+          {isLoading ? (
+            // Loading state — show nothing (avoids flash)
+            <div className="h-8 w-8" />
+          ) : isAuthenticated && user ? (
+            // Logged in — show user dropdown
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <button className="flex items-center gap-1.5 rounded-full p-1 hover:bg-gray-100 transition-colors">
+                  <Avatar className="h-8 w-8">
+                    <AvatarFallback className="bg-primary/10 text-sm font-semibold text-primary">
+                      {user.name?.charAt(0)?.toUpperCase() || user.email?.charAt(0)?.toUpperCase() || 'U'}
+                    </AvatarFallback>
+                  </Avatar>
+                  <span className="hidden text-sm font-medium text-gray-700 md:block">
+                    {user.name?.split(' ')[0] || 'Account'}
+                  </span>
+                  <ChevronDown className="hidden h-3.5 w-3.5 text-gray-400 md:block" />
+                </button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-48">
+                <div className="px-2 py-1.5">
+                  <p className="text-sm font-medium">{user.name || 'User'}</p>
+                  <p className="text-xs text-gray-500 truncate">{user.email}</p>
+                </div>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem asChild>
+                  <Link href="/profile">My Profile</Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link href="/orders">My Orders</Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link href="/returns">My Returns</Link>
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem
+                  onClick={() => logout()}
+                  className="text-red-600 focus:text-red-600"
+                >
+                  Sign Out
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          ) : (
+            // Not logged in — show Login button
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => login()}
+              className="gap-1.5"
+            >
+              <LogIn className="h-4 w-4" />
+              <span className="hidden sm:inline">Login</span>
+            </Button>
+          )}
         </div>
       </div>
 
