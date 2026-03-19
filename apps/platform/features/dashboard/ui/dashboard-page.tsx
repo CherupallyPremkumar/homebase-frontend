@@ -1,0 +1,40 @@
+'use client';
+
+import { SectionSkeleton, ErrorSection, formatNumber } from '@homebase/shared';
+import { Package, Users, Building2, Star } from 'lucide-react';
+import { usePlatformStats } from '../api/queries';
+import { StatCard } from './stat-card';
+import { PlatformHealth } from './platform-health';
+import { RecentActivity } from './recent-activity';
+
+export function DashboardPage() {
+  const { data: stats, isLoading: statsLoading, error: statsError } = usePlatformStats();
+
+  if (statsError) return <ErrorSection error={statsError} />;
+
+  return (
+    <div className="space-y-6">
+      <h1 className="text-2xl font-bold text-gray-900">Platform Dashboard</h1>
+
+      {/* Stats row */}
+      {statsLoading ? (
+        <div className="grid gap-4 md:grid-cols-4">
+          <SectionSkeleton rows={4} variant="card" />
+        </div>
+      ) : stats ? (
+        <div className="grid gap-4 md:grid-cols-4">
+          <StatCard title="Active Products" value={formatNumber(stats.activeProducts)} change={stats.productsChange} icon={Package} />
+          <StatCard title="Active Users" value={formatNumber(stats.activeUsers)} change={stats.usersChange} icon={Users} />
+          <StatCard title="Active Suppliers" value={formatNumber(stats.totalOrders)} change={stats.ordersChange} icon={Building2} />
+          <StatCard title="Pending Reviews" value={formatNumber(stats.totalRevenue)} change={stats.revenueChange} icon={Star} />
+        </div>
+      ) : null}
+
+      {/* Health + Activity */}
+      <div className="grid gap-6 lg:grid-cols-2">
+        <PlatformHealth />
+        <RecentActivity />
+      </div>
+    </div>
+  );
+}
