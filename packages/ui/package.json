@@ -33,11 +33,16 @@
   "peerDependencies": {
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
-    "react-hook-form": "^7.54.0"
+    "react-hook-form": "^7.54.0",
+    "@tanstack/react-query": "^5.62.0",
+    "next": "^15.1.0"
   },
   "devDependencies": {
+    "@tanstack/react-query": "^5.62.0",
+    "@types/node": "^22.0.0",
     "@types/react": "^19.0.0",
     "@types/react-dom": "^19.0.0",
+    "next": "^15.1.0",
     "typescript": "^5.7.3"
   }
 }

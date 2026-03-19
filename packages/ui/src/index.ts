@@ -29,3 +29,9 @@ export { Table, TableHeader, TableBody, TableFooter, TableHead, TableRow, TableC
 export { Tabs, TabsList, TabsTrigger, TabsContent } from './tabs';
 export { Textarea, type TextareaProps } from './textarea';
 export { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from './tooltip';
+
+// Display components
+export * from './display';
+
+// Generic components
+export * from './generic';

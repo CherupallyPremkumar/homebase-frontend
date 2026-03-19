@@ -525,6 +525,15 @@ importers:
         specifier: ^5.7.3
         version: 5.9.3
 
+  packages/design-system:
+    devDependencies:
+      tailwindcss:
+        specifier: ^3.4.16
+        version: 3.4.19
+      typescript:
+        specifier: ^5.7.3
+        version: 5.9.3
+
   packages/shared:
     dependencies:
       '@homebase/api-client':
@@ -670,12 +679,21 @@ importers:
         specifier: ^2.6.0
         version: 2.6.1
     devDependencies:
+      '@tanstack/react-query':
+        specifier: ^5.62.0
+        version: 5.91.2(react@19.2.4)
+      '@types/node':
+        specifier: ^22.0.0
+        version: 22.19.15
       '@types/react':
         specifier: ^19.0.0
         version: 19.2.14
       '@types/react-dom':
         specifier: ^19.0.0
         version: 19.2.3(@types/react@19.2.14)
+      next:
+        specifier: ^15.1.0
+        version: 15.5.13(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
       typescript:
         specifier: ^5.7.3
         version: 5.9.3
