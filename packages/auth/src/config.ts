@@ -66,17 +66,15 @@ export function createAuthConfig(appConfig: AuthAppConfig): NextAuthConfig {
         return token;
       },
       async session({ session, token }) {
-        // SECURITY: Never expose tokens to the browser.
-        // accessToken and idToken stay in the server-side JWT only.
-        // The API proxy (server-side) reads them from the JWT, not from the client session.
+        // SECURITY: Minimal session — only what the UI absolutely needs.
+        // No tokens, no roles, no IDs in the browser-visible session.
+        // Roles stay in the server-side JWT for middleware/server component checks.
         return {
           ...session,
-          roles: (token.roles as string[]) || [],
-          error: token.error as string | undefined,
           user: {
             ...session.user,
-            id: token.sub || '',
-            roles: (token.roles as string[]) || [],
+            name: session.user?.name || null,
+            email: session.user?.email || null,
           },
         };
       },
@@ -84,13 +82,11 @@ export function createAuthConfig(appConfig: AuthAppConfig): NextAuthConfig {
         const isLoggedIn = !!auth?.user;
         if (!isLoggedIn) return false;
 
-        // Check role-based access
-        const userRoles = (auth as unknown as { roles?: string[] })?.roles || [];
-        const session = auth as unknown as { roles?: string[] };
-        const roles = session?.roles || userRoles;
+        // Check role-based access — roles are in user.roles only
+        const userRoles = (auth?.user as { roles?: string[] })?.roles || [];
 
         if (appConfig.allowedRoles.length > 0) {
-          const hasRole = appConfig.allowedRoles.some((role) => roles.includes(role));
+          const hasRole = appConfig.allowedRoles.some((role) => userRoles.includes(role));
           if (!hasRole) return false;
         }
 

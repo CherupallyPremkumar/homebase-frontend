@@ -4,17 +4,11 @@ import { useSession, signIn, signOut } from 'next-auth/react';
 
 export interface UseAuthReturn {
   user: {
-    id: string;
     name?: string | null;
     email?: string | null;
-    image?: string | null;
-    roles: string[];
   } | null;
   isAuthenticated: boolean;
   isLoading: boolean;
-  roles: string[];
-  hasRole: (role: string) => boolean;
-  hasAnyRole: (roles: string[]) => boolean;
   login: () => void;
   logout: () => void;
 }
@@ -22,32 +16,20 @@ export interface UseAuthReturn {
 export function useAuth(): UseAuthReturn {
   const { data: session, status } = useSession();
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const s = session as any;
-
-  const user = s?.user
+  const user = session?.user
     ? {
-        id: s.user.id as string || '',
-        name: s.user.name as string | null,
-        email: s.user.email as string | null,
-        image: s.user.image as string | null,
-        roles: (s.roles as string[]) || [],
+        name: session.user.name,
+        email: session.user.email,
       }
     : null;
-
-  const roles = user?.roles || [];
 
   return {
     user,
     isAuthenticated: status === 'authenticated',
     isLoading: status === 'loading',
-    roles,
-    hasRole: (role: string) => roles.includes(role),
-    hasAnyRole: (checkRoles: string[]) => checkRoles.some((r) => roles.includes(r)),
     login: () => signIn('keycloak'),
-    logout: async () => {
-      // Call our server-side logout API which has access to the idToken
-      // (tokens never touch the browser)
+    logout: () => {
+      // Server-side logout — clears cookies + ends Keycloak session
       window.location.href = '/api/auth/logout';
     },
   };
