@@ -13,6 +13,7 @@
   "dependencies": {
     "@homebase/api-client": "workspace:*",
     "@homebase/auth": "workspace:*",
+    "@homebase/design-system": "workspace:*",
     "@homebase/shared": "workspace:*",
     "@homebase/types": "workspace:*",
     "@homebase/ui": "workspace:*",

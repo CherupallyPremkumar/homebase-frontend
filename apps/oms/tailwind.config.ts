@@ -1,6 +1,8 @@
 import type { Config } from 'tailwindcss';
+import { homebasePreset } from '@homebase/design-system/tailwind-preset';
 
 const config: Config = {
+  presets: [homebasePreset as Config],
   content: [
     './app/**/*.{ts,tsx}',
     './components/**/*.{ts,tsx}',
@@ -8,30 +10,6 @@ const config: Config = {
     '../../packages/ui/src/**/*.{ts,tsx}',
     '../../packages/shared/src/**/*.{ts,tsx}',
   ],
-  theme: {
-    extend: {
-      colors: {
-        primary: {
-          DEFAULT: '#ea580c',
-          50: '#fff7ed',
-          100: '#ffedd5',
-          200: '#fed7aa',
-          300: '#fdba74',
-          400: '#fb923c',
-          500: '#f97316',
-          600: '#ea580c',
-          700: '#c2410c',
-          800: '#9a3412',
-          900: '#7c2d12',
-          950: '#431407',
-        },
-      },
-      fontFamily: {
-        sans: ['var(--font-inter)', 'system-ui', 'sans-serif'],
-      },
-    },
-  },
-  plugins: [],
 };
 
 export default config;

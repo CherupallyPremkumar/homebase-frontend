@@ -15,16 +15,25 @@ export const homebasePreset: Partial<Config> = {
   theme: {
     extend: {
       colors: {
-        primary: colors.primary,
-        accent: colors.accent,
-        success: colors.success,
-        warning: colors.warning,
-        error: colors.error,
-        gray: colors.gray,
+        primary: { ...colors.primary },
+        accent: { ...colors.accent },
+        success: { ...colors.success },
+        warning: { ...colors.warning },
+        error: { ...colors.error },
+        gray: { ...colors.gray },
       },
-      fontFamily: typography.fontFamily,
-      fontSize: typography.fontSize,
-      fontWeight: typography.fontWeight,
+      fontFamily: {
+        sans: [...typography.fontFamily.sans],
+        mono: [...typography.fontFamily.mono],
+      },
+      fontSize: {
+        xs: [typography.fontSize.xs[0], { ...typography.fontSize.xs[1] }],
+        sm: [typography.fontSize.sm[0], { ...typography.fontSize.sm[1] }],
+        base: [typography.fontSize.base[0], { ...typography.fontSize.base[1] }],
+        lg: [typography.fontSize.lg[0], { ...typography.fontSize.lg[1] }],
+        xl: [typography.fontSize.xl[0], { ...typography.fontSize.xl[1] }],
+      },
+      fontWeight: { ...typography.fontWeight },
       borderRadius: {
         sm: radius.sm,
         DEFAULT: radius.md,
