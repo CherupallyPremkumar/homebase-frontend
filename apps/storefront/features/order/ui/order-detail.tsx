@@ -2,10 +2,9 @@
 
 import { useQuery } from '@tanstack/react-query';
 import { ordersApi } from '@homebase/api-client';
-import { useStmMutation, EntityDetailLayout, StateBadge, PriceDisplay, SectionSkeleton, ErrorSection, formatDate, formatPriceRupees, CACHE_TIMES } from '@homebase/shared';
-import { Card, CardContent, CardHeader, CardTitle, Separator } from '@homebase/ui';
+import { useStmMutation, CACHE_TIMES } from '@homebase/shared';
+import { EntityDetail, InfoGrid, ActivityTimeline, formatPrice, formatDate } from '@homebase/ui';
 import type { Order } from '@homebase/types';
-import { OrderStatusTimeline } from './order-status-timeline';
 
 export function OrderDetail({ orderId }: { orderId: string }) {
   const { data, isLoading, error, refetch } = useQuery({
@@ -19,84 +18,85 @@ export function OrderDetail({ orderId }: { orderId: string }) {
     mutationFn: ordersApi.processEvent,
   });
 
-  if (isLoading) return <SectionSkeleton rows={6} />;
-  if (error) return <ErrorSection error={error} onRetry={() => refetch()} />;
-  if (!data) return null;
-
-  const order = data.mutatedEntity;
+  const order = data?.mutatedEntity;
 
   return (
     <div className="container mx-auto px-4 py-6">
-      <EntityDetailLayout
+      <EntityDetail
         breadcrumbs={[
           { label: 'Orders', href: '/orders' },
-          { label: `#${order.orderNumber}` },
+          { label: order ? `#${order.orderNumber}` : '...' },
         ]}
-        title={`Order #${order.orderNumber}`}
-        subtitle={`Placed on ${formatDate(order.createdTime)}`}
-        state={order.stateId}
-        allowedActions={data.allowedActionsAndMetadata}
+        title={order ? `Order #${order.orderNumber}` : 'Order'}
+        subtitle={order ? `Placed ${formatDate(order.createdTime)}` : undefined}
+        state={order?.stateId}
+        allowedActions={data?.allowedActionsAndMetadata}
         onAction={(eventId) => mutation.mutate({ id: orderId, eventId })}
         actionLoading={mutation.isPending}
-      >
-        <div className="grid gap-6 md:grid-cols-2">
-          {/* Items */}
-          <Card>
-            <CardHeader><CardTitle>Items</CardTitle></CardHeader>
-            <CardContent className="space-y-3">
-              {order.items.map((item) => (
-                <div key={item.id} className="flex items-center gap-3 text-sm">
-                  <div className="h-12 w-12 flex-shrink-0 rounded bg-gray-100">
-                    {item.imageUrl && <img src={item.imageUrl} alt="" className="h-full w-full rounded object-cover" />}
-                  </div>
-                  <div className="flex-1">
-                    <p className="font-medium">{item.productName}</p>
-                    <p className="text-gray-500">Qty: {item.quantity} x {formatPriceRupees(item.unitPrice)}</p>
-                  </div>
-                  <span className="font-medium">{formatPriceRupees(item.totalPrice)}</span>
+        loading={isLoading}
+        error={error ? 'Failed to load order' : null}
+        onRetry={() => refetch()}
+        tabs={order ? [
+          {
+            key: 'items',
+            label: 'Items',
+            badge: order.items.length,
+            content: (
+              <div className="rounded-md border border-gray-200 bg-white">
+                <div className="divide-y divide-gray-100">
+                  {order.items.map((item) => (
+                    <div key={item.id} className="flex items-center gap-3 p-3">
+                      <div className="h-14 w-14 flex-shrink-0 rounded bg-gray-50">
+                        {item.imageUrl && <img src={item.imageUrl} alt="" className="h-full w-full rounded object-contain" />}
+                      </div>
+                      <div className="flex-1">
+                        <p className="text-sm font-medium text-gray-900">{item.productName}</p>
+                        <p className="text-xs text-gray-500">Qty: {item.quantity} x {formatPrice(item.unitPrice)}</p>
+                      </div>
+                      <span className="text-sm font-semibold">{formatPrice(item.totalPrice)}</span>
+                    </div>
+                  ))}
                 </div>
-              ))}
-              <Separator />
-              <div className="space-y-1 text-sm">
-                <div className="flex justify-between"><span className="text-gray-500">Subtotal</span><span>{formatPriceRupees(order.subtotal)}</span></div>
-                <div className="flex justify-between"><span className="text-gray-500">Shipping</span><span>{formatPriceRupees(order.shippingCost)}</span></div>
-                <div className="flex justify-between"><span className="text-gray-500">Tax</span><span>{formatPriceRupees(order.taxAmount)}</span></div>
-                {order.discount > 0 && <div className="flex justify-between text-green-600"><span>Discount</span><span>-{formatPriceRupees(order.discount)}</span></div>}
-                <Separator />
-                <div className="flex justify-between text-base font-bold"><span>Total</span><span>{formatPriceRupees(order.total)}</span></div>
+                <div className="border-t border-gray-200 p-3 space-y-1 text-sm">
+                  <div className="flex justify-between"><span className="text-gray-500">Subtotal</span><span>{formatPrice(order.subtotal)}</span></div>
+                  <div className="flex justify-between"><span className="text-gray-500">Shipping</span><span>{formatPrice(order.shippingCost)}</span></div>
+                  <div className="flex justify-between"><span className="text-gray-500">Tax</span><span>{formatPrice(order.taxAmount)}</span></div>
+                  {order.discount > 0 && <div className="flex justify-between text-success-600"><span>Discount</span><span>-{formatPrice(order.discount)}</span></div>}
+                  <div className="flex justify-between border-t border-gray-100 pt-1 text-base font-bold"><span>Total</span><span>{formatPrice(order.total)}</span></div>
+                </div>
               </div>
-            </CardContent>
-          </Card>
-
-          {/* Shipping */}
-          <Card>
-            <CardHeader><CardTitle>Shipping Details</CardTitle></CardHeader>
-            <CardContent className="text-sm">
-              <p className="font-medium">{order.shippingAddress?.fullName}</p>
-              <p className="text-gray-500">{order.shippingAddress?.addressLine1}</p>
-              {order.shippingAddress?.addressLine2 && <p className="text-gray-500">{order.shippingAddress.addressLine2}</p>}
-              <p className="text-gray-500">{order.shippingAddress?.city}, {order.shippingAddress?.state} {order.shippingAddress?.pincode}</p>
-              <p className="text-gray-500">{order.shippingAddress?.phone}</p>
-              {order.trackingNumber && (
-                <p className="mt-4"><span className="text-gray-500">Tracking:</span> {order.trackingNumber}</p>
-              )}
-              {order.estimatedDelivery && (
-                <p className="mt-1"><span className="text-gray-500">Est. delivery:</span> {formatDate(order.estimatedDelivery)}</p>
-              )}
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* Order status timeline */}
-        {order.activities.length > 0 && (
-          <Card className="mt-6">
-            <CardHeader><CardTitle>Order Timeline</CardTitle></CardHeader>
-            <CardContent>
-              <OrderStatusTimeline activities={order.activities} />
-            </CardContent>
-          </Card>
-        )}
-      </EntityDetailLayout>
+            ),
+          },
+          {
+            key: 'shipping',
+            label: 'Shipping',
+            content: order.shippingAddress ? (
+              <div className="rounded-md border border-gray-200 bg-white p-4">
+                <InfoGrid fields={[
+                  { label: 'Name', value: order.shippingAddress.fullName },
+                  { label: 'Phone', value: order.shippingAddress.phone },
+                  { label: 'Address', value: `${order.shippingAddress.addressLine1}${order.shippingAddress.addressLine2 ? ', ' + order.shippingAddress.addressLine2 : ''}`, span: 2 },
+                  { label: 'City', value: order.shippingAddress.city },
+                  { label: 'State', value: order.shippingAddress.state },
+                  { label: 'Pincode', value: order.shippingAddress.pincode },
+                  { label: 'Tracking', value: order.trackingNumber },
+                  { label: 'Est. Delivery', value: order.estimatedDelivery, type: 'date' },
+                ]} />
+              </div>
+            ) : <p className="text-sm text-gray-400">No shipping info</p>,
+          },
+          {
+            key: 'activity',
+            label: 'Activity',
+            badge: order.activities?.length,
+            content: (
+              <div className="rounded-md border border-gray-200 bg-white p-4">
+                <ActivityTimeline activities={order.activities || []} />
+              </div>
+            ),
+          },
+        ] : [{ key: 'loading', label: '', content: null }]}
+      />
     </div>
   );
 }

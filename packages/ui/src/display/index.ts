@@ -1,3 +1,5 @@
+export { ActivityTimeline } from './activity-timeline';
+export { InfoGrid } from './info-grid';
 export { PriceDisplay } from './price-display';
 export { StarRating } from './star-rating';
 export { StateBadge } from './state-badge';
