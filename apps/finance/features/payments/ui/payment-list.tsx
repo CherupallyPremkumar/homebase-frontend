@@ -1,63 +1,40 @@
 'use client';
 
+import { EntityList, formatPrice } from '@homebase/ui';
 import { getApiClient } from '@homebase/api-client';
-import { DataTable, StateBadge, formatPriceRupees, formatDate } from '@homebase/shared';
-import type { ColumnDef } from '@tanstack/react-table';
-import type { Payment, SearchRequest, SearchResponse } from '@homebase/types';
-import Link from 'next/link';
+import type { SearchRequest, SearchResponse } from '@homebase/types';
 
-const columns: ColumnDef<Payment, unknown>[] = [
-  {
-    accessorKey: 'orderId',
-    header: 'Order',
-    cell: ({ row }) => (
-      <Link href={`/payments/${row.original.id}`} className="font-medium text-primary hover:underline">
-        {row.original.orderId}
-      </Link>
-    ),
-  },
-  {
-    accessorKey: 'amount',
-    header: 'Amount',
-    cell: ({ row }) => <span className="font-semibold">{formatPriceRupees(row.original.amount)}</span>,
-  },
-  {
-    accessorKey: 'paymentMethod',
-    header: 'Method',
-    cell: ({ row }) => row.original.paymentMethod?.replace(/_/g, ' ') || 'N/A',
-  },
-  {
-    accessorKey: 'gatewayName',
-    header: 'Gateway',
-    cell: ({ row }) => row.original.gatewayName || 'N/A',
-  },
-  {
-    accessorKey: 'createdTime',
-    header: 'Date',
-    cell: ({ row }) => formatDate(row.original.createdTime),
-  },
-  {
-    accessorKey: 'stateId',
-    header: 'Status',
-    cell: ({ row }) => <StateBadge state={row.original.stateId} />,
-  },
-];
+interface Payment { id: string; orderId: string; amount: number; paymentMethod?: string; gatewayName?: string; createdTime: string; stateId: string; }
 
 const searchPayments = (params: SearchRequest) =>
   getApiClient().post<SearchResponse<Payment>>('/api/v1/payments/search', params);
 
 export function PaymentList() {
   return (
-    <div className="space-y-6">
-      <h1 className="text-2xl font-bold">Payments</h1>
-      <DataTable
-        columns={columns}
-        queryKey="finance-payments"
-        queryFn={searchPayments}
-        searchable
-        emptyTitle="No payments"
-        emptyDescription="Payment records will appear here as transactions are processed."
-      />
-    </div>
+    <EntityList<Payment>
+      title="Payments"
+      queryKey="finance-payments"
+      queryFn={searchPayments}
+      display="table"
+      searchable
+      emptyTitle="No payments"
+      emptyDescription="Payment records will appear here as transactions are processed."
+      columns={[
+        { key: 'orderId', header: 'Order', linkTo: (item) => `/payments/${item.id}` },
+        {
+          key: 'amount',
+          header: 'Amount',
+          render: (item) => <span className="font-semibold">{formatPrice(item.amount)}</span>,
+        },
+        {
+          key: 'paymentMethod',
+          header: 'Method',
+          render: (item) => <span>{item.paymentMethod?.replace(/_/g, ' ') || 'N/A'}</span>,
+        },
+        { key: 'gatewayName', header: 'Gateway' },
+        { key: 'createdTime', header: 'Date', type: 'date' },
+        { key: 'stateId', header: 'Status', type: 'state' },
+      ]}
+    />
   );
 }

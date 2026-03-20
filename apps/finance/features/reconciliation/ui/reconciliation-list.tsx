@@ -1,61 +1,43 @@
 'use client';
 
+import { EntityList, formatDate, formatNumber } from '@homebase/ui';
 import { reconciliationApi } from '@homebase/api-client';
-import { DataTable, StateBadge, formatDate, formatNumber } from '@homebase/shared';
-import type { ColumnDef } from '@tanstack/react-table';
-import type { ReconciliationBatch } from '@homebase/types';
-import Link from 'next/link';
-
-const columns: ColumnDef<ReconciliationBatch, unknown>[] = [
-  {
-    accessorKey: 'batchDate',
-    header: 'Date',
-    cell: ({ row }) => (
-      <Link href={`/reconciliation/${row.original.id}`} className="font-medium text-primary hover:underline">
-        {formatDate(row.original.batchDate)}
-      </Link>
-    ),
-  },
-  { accessorKey: 'gatewayName', header: 'Gateway' },
-  {
-    accessorKey: 'totalTransactions',
-    header: 'Total Txns',
-    cell: ({ row }) => formatNumber(row.original.totalTransactions),
-  },
-  {
-    accessorKey: 'matchedCount',
-    header: 'Matched',
-    cell: ({ row }) => (
-      <span className="text-green-600">{formatNumber(row.original.matchedCount)}</span>
-    ),
-  },
-  {
-    accessorKey: 'mismatchedCount',
-    header: 'Mismatches',
-    cell: ({ row }) => {
-      const count = row.original.mismatchedCount;
-      return <span className={count > 0 ? 'font-medium text-red-600' : ''}>{formatNumber(count)}</span>;
-    },
-  },
-  {
-    accessorKey: 'stateId',
-    header: 'Status',
-    cell: ({ row }) => <StateBadge state={row.original.stateId} />,
-  },
-];
 
 export function ReconciliationList() {
   return (
-    <div className="space-y-6">
-      <h1 className="text-2xl font-bold">Reconciliation</h1>
-      <DataTable
-        columns={columns}
-        queryKey="finance-reconciliation"
-        queryFn={reconciliationApi.search}
-        searchable
-        emptyTitle="No reconciliation batches"
-        emptyDescription="Batches will appear here after daily reconciliation runs."
-      />
-    </div>
+    <EntityList
+      title="Reconciliation"
+      queryKey="finance-reconciliation"
+      queryFn={reconciliationApi.search}
+      display="table"
+      searchable
+      emptyTitle="No reconciliation batches"
+      emptyDescription="Batches will appear here after daily reconciliation runs."
+      columns={[
+        {
+          key: 'batchDate',
+          header: 'Date',
+          linkTo: (item) => `/reconciliation/${item.id}`,
+          render: (item) => <span>{formatDate(item.batchDate)}</span>,
+        },
+        { key: 'gatewayName', header: 'Gateway' },
+        { key: 'totalTransactions', header: 'Total Txns', type: 'number' },
+        {
+          key: 'matchedCount',
+          header: 'Matched',
+          render: (item) => <span className="text-green-600">{formatNumber(item.matchedCount)}</span>,
+        },
+        {
+          key: 'mismatchedCount',
+          header: 'Mismatches',
+          render: (item) => (
+            <span className={item.mismatchedCount > 0 ? 'font-medium text-red-600' : ''}>
+              {formatNumber(item.mismatchedCount)}
+            </span>
+          ),
+        },
+        { key: 'stateId', header: 'Status', type: 'state' },
+      ]}
+    />
   );
 }

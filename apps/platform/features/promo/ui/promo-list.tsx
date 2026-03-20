@@ -1,63 +1,42 @@
 'use client';
 
-import Link from 'next/link';
+import { EntityList, formatPrice } from '@homebase/ui';
 import { promosApi } from '@homebase/api-client';
-import { DataTable, StateBadge, formatDate, formatPriceRupees } from '@homebase/shared';
-import { Button } from '@homebase/ui';
-import type { ColumnDef } from '@tanstack/react-table';
-import type { Coupon } from '@homebase/types';
-import { Plus } from 'lucide-react';
-
-const columns: ColumnDef<Coupon, unknown>[] = [
-  {
-    accessorKey: 'code',
-    header: 'Code',
-    cell: ({ row }) => <span className="font-mono font-medium">{row.original.code}</span>,
-  },
-  { accessorKey: 'discountType', header: 'Type' },
-  {
-    accessorKey: 'discountValue',
-    header: 'Discount',
-    cell: ({ row }) =>
-      row.original.discountType === 'PERCENTAGE'
-        ? `${row.original.discountValue}%`
-        : formatPriceRupees(row.original.discountValue),
-  },
-  {
-    accessorKey: 'usedCount',
-    header: 'Usage',
-    cell: ({ row }) =>
-      `${row.original.usedCount}${row.original.usageLimit ? `/${row.original.usageLimit}` : ''}`,
-  },
-  {
-    accessorKey: 'validUntil',
-    header: 'Expires',
-    cell: ({ row }) => formatDate(row.original.validUntil),
-  },
-  {
-    accessorKey: 'stateId',
-    header: 'Status',
-    cell: ({ row }) => <StateBadge state={row.original.stateId} />,
-  },
-];
 
 export function PromoList() {
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold">Promotions</h1>
-        <Link href="/promotions/new">
-          <Button><Plus className="mr-1 h-4 w-4" />New Coupon</Button>
-        </Link>
-      </div>
-      <DataTable
-        columns={columns}
-        queryKey="platform-promotions"
-        queryFn={promosApi.search}
-        searchable
-        searchPlaceholder="Search coupons..."
-        emptyTitle="No coupons found"
-      />
-    </div>
+    <EntityList
+      title="Promotions"
+      queryKey="platform-promotions"
+      queryFn={promosApi.search}
+      display="table"
+      searchable
+      searchPlaceholder="Search coupons..."
+      createAction={{ label: 'New Coupon', href: '/promotions/new' }}
+      emptyTitle="No coupons found"
+      columns={[
+        {
+          key: 'code',
+          header: 'Code',
+          render: (item) => <span className="font-mono font-medium">{item.code}</span>,
+        },
+        { key: 'discountType', header: 'Type' },
+        {
+          key: 'discountValue',
+          header: 'Discount',
+          render: (item) =>
+            item.discountType === 'PERCENTAGE'
+              ? <span>{item.discountValue}%</span>
+              : <span>{formatPrice(item.discountValue)}</span>,
+        },
+        {
+          key: 'usedCount',
+          header: 'Usage',
+          render: (item) => <span>{item.usedCount}{item.usageLimit ? `/${item.usageLimit}` : ''}</span>,
+        },
+        { key: 'validUntil', header: 'Expires', type: 'date' },
+        { key: 'stateId', header: 'Status', type: 'state' },
+      ]}
+    />
   );
 }
