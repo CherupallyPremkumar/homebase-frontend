@@ -10,16 +10,21 @@ export interface AuthAppConfig {
 
 export function createAuthConfig(appConfig: AuthAppConfig): NextAuthConfig {
   const envIssuer = process.env.KEYCLOAK_ISSUER;
-  if (!envIssuer && process.env.NODE_ENV === 'production') {
-    throw new Error('KEYCLOAK_ISSUER environment variable is required in production');
+  const envSecret = process.env.KEYCLOAK_CLIENT_SECRET;
+
+  if (process.env.NODE_ENV === 'production') {
+    if (!envIssuer) throw new Error('KEYCLOAK_ISSUER is required in production');
+    if (!envSecret) throw new Error('KEYCLOAK_CLIENT_SECRET is required in production');
   }
+
   const issuerUrl = envIssuer || 'http://localhost:8180/realms/homebase';
+  const clientSecret = envSecret || 'homebase-dev-secret';
 
   return {
     providers: [
       Keycloak({
         clientId: appConfig.clientId,
-        clientSecret: '', // Public client — no secret needed
+        clientSecret,
         issuer: issuerUrl,
         authorization: {
           params: {
@@ -30,8 +35,7 @@ export function createAuthConfig(appConfig: AuthAppConfig): NextAuthConfig {
     ],
     basePath: appConfig.basePath || '/api/auth',
     pages: {
-      signIn: appConfig.signInPage || '/api/auth/signin',
-      error: '/auth/error',
+      signIn: appConfig.signInPage || '/login',
     },
     session: {
       strategy: 'jwt',
@@ -45,19 +49,16 @@ export function createAuthConfig(appConfig: AuthAppConfig): NextAuthConfig {
           token.expiresAt = account.expires_at;
           token.idToken = account.id_token;
 
-          // Extract realm roles from Keycloak token
           if (profile) {
             const realmAccess = (profile as Record<string, unknown>).realm_access as { roles?: string[] } | undefined;
             token.roles = realmAccess?.roles || [];
           }
         }
 
-        // Check if token is expired
+        // Token refresh — use refresh_token before access_token expires
         if (token.expiresAt && Date.now() / 1000 > (token.expiresAt as number)) {
-          // Token expired — try to refresh
           try {
-            const refreshed = await refreshAccessToken(token, appConfig.clientId, issuerUrl);
-            return refreshed;
+            return await refreshAccessToken(token, appConfig.clientId, clientSecret, issuerUrl);
           } catch {
             return { ...token, error: 'RefreshAccessTokenError' };
           }
@@ -65,10 +66,9 @@ export function createAuthConfig(appConfig: AuthAppConfig): NextAuthConfig {
 
         return token;
       },
-      async session({ session, token }) {
-        // SECURITY: Minimal session — only what the UI absolutely needs.
-        // No tokens, no roles, no IDs in the browser-visible session.
-        // Roles stay in the server-side JWT for middleware/server component checks.
+      async session({ session }) {
+        // SECURITY: Minimal session — no tokens, no roles in browser.
+        // Roles stay in server-side JWT for middleware/server component checks.
         return {
           ...session,
           user: {
@@ -78,21 +78,23 @@ export function createAuthConfig(appConfig: AuthAppConfig): NextAuthConfig {
           },
         };
       },
-      async authorized({ auth, request }) {
-        const isLoggedIn = !!auth?.user;
-        if (!isLoggedIn) return false;
-
-        // Check role-based access — roles are in user.roles only
-        const userRoles = (auth?.user as { roles?: string[] })?.roles || [];
-
-        if (appConfig.allowedRoles.length > 0) {
-          const hasRole = appConfig.allowedRoles.some((role) => userRoles.includes(role));
-          if (!hasRole) return false;
-        }
-
-        return true;
+      async authorized({ auth }) {
+        return !!auth?.user;
       },
     },
+    events: {
+      async signOut(message) {
+        // End Keycloak SSO session when NextAuth signs out
+        if ('token' in message && message.token?.idToken) {
+          const params = new URLSearchParams({
+            id_token_hint: message.token.idToken as string,
+            client_id: appConfig.clientId,
+          });
+          await fetch(`${issuerUrl}/protocol/openid-connect/logout?${params}`).catch(() => {});
+        }
+      },
+    },
+    debug: false,
     trustHost: true,
   };
 }
@@ -100,6 +102,7 @@ export function createAuthConfig(appConfig: AuthAppConfig): NextAuthConfig {
 async function refreshAccessToken(
   token: Record<string, unknown>,
   clientId: string,
+  clientSecret: string,
   issuer: string,
 ): Promise<Record<string, unknown>> {
   const tokenEndpoint = `${issuer}/protocol/openid-connect/token`;
@@ -110,6 +113,7 @@ async function refreshAccessToken(
     body: new URLSearchParams({
       grant_type: 'refresh_token',
       client_id: clientId,
+      client_secret: clientSecret,
       refresh_token: token.refreshToken as string,
     }),
   });

@@ -3,6 +3,8 @@ import type { StateEntity, Address, ActivityLog } from './common';
 export interface Order extends StateEntity {
   orderNumber: string;
   userId: string;
+  customerId?: string;
+  customerEmail?: string;
   items: OrderItem[];
   shippingAddress: Address;
   billingAddress?: Address;
@@ -11,6 +13,7 @@ export interface Order extends StateEntity {
   taxAmount: number;
   discount: number;
   total: number;
+  totalAmount?: number;
   currency: string;
   paymentMethod?: string;
   paymentId?: string;
@@ -19,6 +22,8 @@ export interface Order extends StateEntity {
   deliveredAt?: string;
   cancelledAt?: string;
   cancellationReason?: string;
+  createdAt?: string;
+  itemCount?: number;
   activities: ActivityLog[];
 }
 

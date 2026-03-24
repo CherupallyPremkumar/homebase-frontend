@@ -21,10 +21,9 @@ export function SellerProductList() {
         map: (item) => ({
           title: item.name,
           href: `/products/${item.id}`,
-          image: item.media?.[0]?.url ? { src: item.media[0].url, alt: item.name } : undefined,
           fields: [
-            { type: 'price', value: item.sellingPrice, extra: item.mrp > item.sellingPrice ? item.mrp : undefined },
-            { type: 'text', value: `SKU: ${item.sku || 'N/A'}` },
+            { type: 'text', value: `Brand: ${item.brand || 'N/A'}` },
+            { type: 'text', value: `Category: ${item.categoryId || 'N/A'}` },
           ],
           state: item.stateId,
         }),

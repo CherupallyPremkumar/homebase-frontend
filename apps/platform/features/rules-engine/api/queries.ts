@@ -8,7 +8,7 @@ import type { RuleSet } from '@homebase/types';
 export function useRuleSetDetail(id: string) {
   return useQuery({
     queryKey: ['platform-ruleset', id],
-    queryFn: () => rulesEngineApi.getRuleSet(id),
+    queryFn: () => rulesEngineApi.retrieve(id),
     ...CACHE_TIMES.productDetail,
     enabled: !!id,
   });
@@ -17,7 +17,8 @@ export function useRuleSetDetail(id: string) {
 export function useFactDefinitions() {
   return useQuery({
     queryKey: ['platform-fact-definitions'],
-    queryFn: () => rulesEngineApi.getFactDefinitions(),
+    queryFn: () => rulesEngineApi.factDefinitions(),
+    select: (data) => data.list?.map(r => r.row) ?? [],
     ...CACHE_TIMES.productList,
   });
 }
@@ -25,6 +26,6 @@ export function useFactDefinitions() {
 export function useRuleSetMutation() {
   return useStmMutation<RuleSet>({
     entityType: 'platform-ruleset',
-    mutationFn: rulesEngineApi.processEvent,
+    mutationFn: rulesEngineApi.processById,
   });
 }

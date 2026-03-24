@@ -17,17 +17,17 @@ export function SellerInventoryList() {
       emptyDescription="Add products and stock to see inventory here."
       columns={[
         { key: 'sku', header: 'SKU', render: (item) => <span className="font-mono text-sm">{item.sku}</span> },
-        { key: 'productName', header: 'Product' },
-        { key: 'warehouseName', header: 'Warehouse' },
+        { key: 'productId', header: 'Product ID' },
+        { key: 'primaryFc', header: 'Fulfillment Center' },
         { key: 'quantity', header: 'Total Stock', type: 'number' },
-        { key: 'reservedQuantity', header: 'Reserved', type: 'number' },
+        { key: 'reserved', header: 'Reserved', type: 'number' },
         {
           key: 'availableQuantity',
           header: 'Available',
           render: (item) => {
-            const qty = item.availableQuantity;
-            const reorder = item.reorderLevel;
-            const color = qty === 0 ? 'text-red-600' : qty <= reorder ? 'text-yellow-600' : 'text-green-600';
+            const qty = item.availableQuantity ?? 0;
+            const threshold = item.lowStockThreshold ?? 0;
+            const color = qty === 0 ? 'text-red-600' : qty <= threshold ? 'text-yellow-600' : 'text-green-600';
             return <span className={`font-medium ${color}`}>{formatNumber(qty)}</span>;
           },
         },

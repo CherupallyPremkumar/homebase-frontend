@@ -15,14 +15,16 @@ export function ReviewList() {
       emptyTitle="No reviews found"
       columns={[
         { key: 'productId', header: 'Product', linkTo: (item) => `/reviews/${item.id}` },
-        { key: 'userName', header: 'User' },
+        { key: 'customerId', header: 'Customer' },
         { key: 'rating', header: 'Rating', type: 'rating' },
         {
-          key: 'isVerifiedPurchase',
+          key: 'verifiedPurchase',
           header: 'Verified',
-          render: (item) => <span>{item.isVerifiedPurchase ? 'Yes' : 'No'}</span>,
+          render: (item) => <span>{item.verifiedPurchase ? 'Yes' : 'No'}</span>,
         },
+        { key: 'reportCount', header: 'Reports', type: 'number' },
         { key: 'stateId', header: 'Status', type: 'state' },
+        { key: 'createdAt', header: 'Date', type: 'date' },
       ]}
     />
   );

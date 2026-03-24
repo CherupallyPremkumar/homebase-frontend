@@ -28,10 +28,10 @@ export function StmActionBar({
   if (!allowedActions.length) return null;
 
   const handleAction = (action: AllowedAction) => {
-    if (DANGEROUS_EVENTS.has(action.eventId)) {
+    if (DANGEROUS_EVENTS.has(action.allowedAction)) {
       setConfirmAction(action);
     } else {
-      onAction(action.eventId);
+      onAction(action.allowedAction);
     }
   };
 
@@ -39,16 +39,16 @@ export function StmActionBar({
     <>
       <div className={`flex flex-wrap gap-2 ${className ?? ''}`}>
         {allowedActions.map((action) => {
-          const isDangerous = DANGEROUS_EVENTS.has(action.eventId);
+          const isDangerous = DANGEROUS_EVENTS.has(action.allowedAction);
           return (
             <Button
-              key={action.eventId}
+              key={action.allowedAction}
               variant={isDangerous ? 'destructive' : 'default'}
               size="sm"
               onClick={() => handleAction(action)}
               disabled={loading}
             >
-              {action.eventId.replace(/_/g, ' ')}
+              {action.allowedAction.replace(/_/g, ' ')}
             </Button>
           );
         })}
@@ -58,12 +58,12 @@ export function StmActionBar({
         <ConfirmDialog
           open={!!confirmAction}
           onOpenChange={(open) => !open && setConfirmAction(null)}
-          title={`Confirm ${confirmAction.eventId.replace(/_/g, ' ')}`}
-          description={`Are you sure you want to ${confirmAction.eventId.toLowerCase().replace(/_/g, ' ')}? This action may not be reversible.`}
-          confirmLabel={confirmAction.eventId.replace(/_/g, ' ')}
+          title={`Confirm ${confirmAction.allowedAction.replace(/_/g, ' ')}`}
+          description={`Are you sure you want to ${confirmAction.allowedAction.toLowerCase().replace(/_/g, ' ')}? This action may not be reversible.`}
+          confirmLabel={confirmAction.allowedAction.replace(/_/g, ' ')}
           variant="destructive"
           onConfirm={() => {
-            onAction(confirmAction.eventId);
+            onAction(confirmAction.allowedAction);
             setConfirmAction(null);
           }}
           loading={loading}

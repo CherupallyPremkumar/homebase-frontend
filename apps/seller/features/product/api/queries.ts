@@ -16,7 +16,7 @@ export function useSellerProducts(params: SearchRequest) {
 export function useSellerProductDetail(id: string) {
   return useQuery({
     queryKey: ['seller-products', id],
-    queryFn: () => productsApi.getById(id),
+    queryFn: () => productsApi.retrieve(id),
     ...CACHE_TIMES.productDetail,
     enabled: !!id,
   });
@@ -25,6 +25,6 @@ export function useSellerProductDetail(id: string) {
 export function useSellerProductMutation() {
   return useStmMutation<Product>({
     entityType: 'seller-products',
-    mutationFn: productsApi.processEvent,
+    mutationFn: productsApi.processById,
   });
 }

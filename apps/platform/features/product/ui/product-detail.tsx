@@ -17,6 +17,8 @@ export function ProductDetail({ id }: ProductDetailProps) {
   if (!data) return null;
 
   const product = data.mutatedEntity;
+  const variants = product.variants ?? [];
+  const activities = product.activities ?? [];
 
   return (
     <EntityDetailLayout
@@ -34,17 +36,17 @@ export function ProductDetail({ id }: ProductDetailProps) {
       <Tabs defaultValue="details">
         <TabsList>
           <TabsTrigger value="details">Details</TabsTrigger>
-          <TabsTrigger value="variants">Variants</TabsTrigger>
+          <TabsTrigger value="variants">Variants ({variants.length})</TabsTrigger>
           <TabsTrigger value="activity">Activity</TabsTrigger>
         </TabsList>
         <TabsContent value="details" className="mt-4">
           <Card>
             <CardContent className="grid gap-4 p-6 md:grid-cols-2">
               <div><p className="text-sm text-gray-500">Name</p><p className="font-medium">{product.name}</p></div>
-              <div><p className="text-sm text-gray-500">Brand</p><p className="font-medium">{product.brandName || 'N/A'}</p></div>
+              <div><p className="text-sm text-gray-500">Brand</p><p className="font-medium">{product.brandName || product.brand || 'N/A'}</p></div>
               <div><p className="text-sm text-gray-500">Category</p><p className="font-medium">{product.categoryName || 'N/A'}</p></div>
-              <div><p className="text-sm text-gray-500">Selling Price</p><p className="font-medium">{formatPriceRupees(product.sellingPrice)}</p></div>
-              <div><p className="text-sm text-gray-500">MRP</p><p className="font-medium">{formatPriceRupees(product.mrp)}</p></div>
+              <div><p className="text-sm text-gray-500">Selling Price</p><p className="font-medium">{formatPriceRupees(product.sellingPrice || product.basePrice)}</p></div>
+              <div><p className="text-sm text-gray-500">MRP</p><p className="font-medium">{formatPriceRupees(product.mrp || product.basePrice)}</p></div>
               <div><p className="text-sm text-gray-500">HSN Code</p><p className="font-medium">{product.hsnCode || 'N/A'}</p></div>
               <div className="md:col-span-2"><p className="text-sm text-gray-500">Description</p><p className="mt-1 text-sm">{product.description || 'No description'}</p></div>
             </CardContent>
@@ -53,17 +55,17 @@ export function ProductDetail({ id }: ProductDetailProps) {
         <TabsContent value="variants" className="mt-4">
           <Card>
             <CardContent className="p-6">
-              {product.variants.length ? (
+              {variants.length > 0 ? (
                 <div className="space-y-3">
-                  {product.variants.map((v) => (
+                  {variants.map((v: any) => (
                     <div key={v.id} className="flex items-center justify-between rounded border p-3 text-sm">
                       <div>
-                        <p className="font-medium">{v.name}</p>
-                        <p className="text-gray-500">SKU: {v.sku}</p>
+                        <p className="font-medium">{v.name || v.sku || 'Variant'}</p>
+                        <p className="text-gray-500">SKU: {v.sku || 'N/A'}</p>
                       </div>
                       <div className="text-right">
-                        <p className="font-medium">{formatPriceRupees(v.price)}</p>
-                        <p className="text-gray-500">Stock: {v.stockQuantity}</p>
+                        {v.price != null && <p className="font-medium">{formatPriceRupees(v.price)}</p>}
+                        {v.stockQuantity != null && <p className="text-gray-500">Stock: {v.stockQuantity}</p>}
                       </div>
                     </div>
                   ))}
@@ -77,15 +79,15 @@ export function ProductDetail({ id }: ProductDetailProps) {
         <TabsContent value="activity" className="mt-4">
           <Card>
             <CardContent className="p-6">
-              {product.activities.length ? (
+              {activities.length > 0 ? (
                 <div className="space-y-3">
-                  {product.activities.map((a, i) => (
+                  {activities.map((a: any, i: number) => (
                     <div key={i} className="flex items-start gap-3 text-sm">
                       <div className="mt-1 h-2 w-2 flex-shrink-0 rounded-full bg-gray-400" />
                       <div>
                         <p className="font-medium">{a.name}</p>
                         {a.comment && <p className="text-gray-500">{a.comment}</p>}
-                        <p className="text-xs text-gray-400">{a.timestamp}</p>
+                        {a.timestamp && <p className="text-xs text-gray-400">{a.timestamp}</p>}
                       </div>
                     </div>
                   ))}

@@ -16,7 +16,7 @@ export function useSupportSearch(params: SearchRequest) {
 export function useSupportDetail(id: string) {
   return useQuery({
     queryKey: ['oms-support', id],
-    queryFn: () => supportApi.getById(id),
+    queryFn: () => supportApi.retrieve(id),
     ...CACHE_TIMES.orderDetail,
     enabled: !!id,
   });
@@ -25,6 +25,6 @@ export function useSupportDetail(id: string) {
 export function useSupportMutation() {
   return useStmMutation<SupportTicket>({
     entityType: 'oms-support',
-    mutationFn: supportApi.processEvent,
+    mutationFn: supportApi.processById,
   });
 }

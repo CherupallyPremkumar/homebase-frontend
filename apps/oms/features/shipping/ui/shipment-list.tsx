@@ -27,8 +27,9 @@ export function ShipmentList() {
           render: (item) => <span>{item.orderId?.slice(0, 8)}...</span>,
         },
         { key: 'carrier', header: 'Carrier' },
-        { key: 'estimatedDelivery', header: 'Est. Delivery', type: 'date' },
+        { key: 'shippingMethod', header: 'Method' },
         { key: 'stateId', header: 'State', type: 'state' },
+        { key: 'createdAt', header: 'Created', type: 'date' },
       ]}
     />
   );

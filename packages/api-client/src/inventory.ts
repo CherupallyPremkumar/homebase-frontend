@@ -2,20 +2,30 @@ import type { InventoryItem, StockAlert, SearchRequest, SearchResponse, StateEnt
 import { getApiClient } from './client';
 
 export const inventoryApi = {
+  // Query endpoints
   search(params: SearchRequest) {
-    return getApiClient().post<SearchResponse<InventoryItem>>('/api/v1/inventory/search', params);
+    return getApiClient().post<SearchResponse<InventoryItem>>('/inventory/inventoryItems', params);
   },
-  getById(id: string) {
-    return getApiClient().get<StateEntityServiceResponse<InventoryItem>>(`/api/v1/inventory/${id}`);
+  lowStockAlerts(params?: SearchRequest) {
+    return getApiClient().post<SearchResponse<StockAlert>>('/inventory/lowStockAlerts', params ?? {
+      pageNum: 1,
+      pageSize: 20,
+    });
   },
-  processEvent(id: string, eventId: string, payload?: unknown) {
-    return getApiClient().patch<StateEntityServiceResponse<InventoryItem>>(`/api/v1/inventory/${id}/${eventId}`, payload ?? {});
+
+  // Query-based retrieve (works with query-build)
+  async retrieve(id: string) {
+    const response = await getApiClient().post<SearchResponse<InventoryItem>>('/inventory/inventory', {
+      filters: { id },
+    });
+    const item = response.list?.[0];
+    if (!item) throw new Error('Inventory item not found');
+    return { mutatedEntity: item.row, allowedActionsAndMetadata: item.allowedActions ?? [] } as StateEntityServiceResponse<InventoryItem>;
   },
-  lowStockAlerts() {
-    return getApiClient().get<StockAlert[]>('/api/v1/inventory/alerts/low-stock');
+  create(entity: Partial<InventoryItem>) {
+    return getApiClient().post<StateEntityServiceResponse<InventoryItem>>('/inventory', entity);
   },
-  checkStock(productId: string, variantId?: string) {
-    const params = variantId ? `?variantId=${variantId}` : '';
-    return getApiClient().get<{ available: number; reserved: number }>(`/api/v1/inventory/stock/${productId}${params}`);
+  processById(id: string, eventId: string, payload?: unknown) {
+    return getApiClient().patch<StateEntityServiceResponse<InventoryItem>>('/inventory/' + id + '/' + eventId, payload ?? {});
   },
 };

@@ -1,1 +1,1 @@
-export type { WarehouseStats } from '../api/queries';
+export type { Warehouse, WarehouseLocation, DashboardData } from '../api/queries';

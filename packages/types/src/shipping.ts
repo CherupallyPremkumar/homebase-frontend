@@ -7,7 +7,9 @@ export interface Shipment extends StateEntity {
   carrierTrackingUrl?: string;
   shippingAddress: Address;
   estimatedDelivery?: string;
+  estimatedDeliveryDate?: string;
   actualDelivery?: string;
+  actualDeliveryDate?: string;
   weight?: number;
   dimensions?: ShipmentDimensions;
   shippingCost: number;

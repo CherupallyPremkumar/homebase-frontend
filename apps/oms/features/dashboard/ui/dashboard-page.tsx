@@ -25,10 +25,10 @@ export function DashboardPage() {
         <div className="grid gap-4 md:grid-cols-4"><SectionSkeleton rows={4} variant="card" /></div>
       ) : stats ? (
         <div className="grid gap-4 md:grid-cols-4">
-          <StatCard title="Orders Today" value={formatNumber(stats.totalOrders)} change={stats.ordersChange} icon={ShoppingCart} />
-          <StatCard title="Pending Fulfillment" value={formatNumber(stats.activeProducts)} icon={Clock} accent="bg-yellow-500" />
-          <StatCard title="In Transit" value={formatNumber(stats.activeUsers)} icon={Truck} accent="bg-blue-500" />
-          <StatCard title="Active Shipments" value={formatNumber(stats.totalRevenue)} icon={PackageOpen} accent="bg-green-500" />
+          <StatCard title="Total Orders" value={formatNumber(stats.totalOrders ?? 0)} icon={ShoppingCart} />
+          <StatCard title="Active Orders" value={formatNumber(stats.activeOrders ?? 0)} icon={Clock} accent="bg-yellow-500" />
+          <StatCard title="Open Tickets" value={formatNumber(stats.openTickets ?? 0)} icon={Truck} accent="bg-blue-500" />
+          <StatCard title="Active Suppliers" value={formatNumber(stats.activeSuppliers ?? 0)} icon={PackageOpen} accent="bg-green-500" />
         </div>
       ) : null}
 

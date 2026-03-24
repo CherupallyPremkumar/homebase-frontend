@@ -22,8 +22,8 @@ export function UserList() {
         },
         { key: 'email', header: 'Email' },
         { key: 'phone', header: 'Phone' },
+        { key: 'role', header: 'Role' },
         { key: 'stateId', header: 'Status', type: 'state' },
-        { key: 'createdTime', header: 'Joined', type: 'date' },
       ]}
     />
   );

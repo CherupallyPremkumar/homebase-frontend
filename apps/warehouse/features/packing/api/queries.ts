@@ -1,73 +1,42 @@
 'use client';
 
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useQuery } from '@tanstack/react-query';
 import { getApiClient } from '@homebase/api-client';
-import { toast } from 'sonner';
+import type { SearchResponse } from '@homebase/types';
 
-export interface PackTask {
+export interface FulfillmentOrder {
   id: string;
   orderId: string;
-  orderNumber: string;
-  status: 'READY_TO_PACK' | 'PACKING' | 'PACKED' | 'LABELED';
-  totalItems: number;
-  packedItems: number;
-  items: PackItem[];
-  shippingLabel?: string;
-  carrier?: string;
-  trackingNumber?: string;
+  warehouseId: string;
+  userId: string;
+  priority: string;
+  fulfillmentType: string;
+  carrier: string;
+  stateId: string;
+  trackingNumber: string;
 }
 
-export interface PackItem {
-  id: string;
-  sku: string;
-  productName: string;
-  quantity: number;
-  packedQuantity: number;
-  packed: boolean;
-  weight?: number;
-}
-
+/**
+ * Fetches fulfillment orders that are in packing-related states
+ * via the Chenile query endpoint POST /fulfillment/fulfillments.
+ */
 export function usePendingPacks() {
   return useQuery({
     queryKey: ['wms-packing', 'pending'],
-    queryFn: () => getApiClient().get<PackTask[]>('/api/v1/warehouse/packing/pending'),
+    queryFn: async (): Promise<FulfillmentOrder[]> => {
+      const api = getApiClient();
+      // Fulfillment orders in SHIPMENT_CREATED state need packing
+      const res = await api.post<SearchResponse<FulfillmentOrder>>(
+        '/fulfillment/fulfillments',
+        {
+          filters: { stateId: 'SHIPMENT_CREATED' },
+          pageNum: 1,
+          pageSize: 50,
+        },
+      );
+      return res?.list?.map((entry) => entry.row) ?? [];
+    },
     staleTime: 10_000,
     refetchInterval: 15_000,
-  });
-}
-
-export function usePackTaskDetail(id: string) {
-  return useQuery({
-    queryKey: ['wms-packing', id],
-    queryFn: () => getApiClient().get<PackTask>(`/api/v1/warehouse/packing/${id}`),
-    staleTime: 5_000,
-    enabled: !!id,
-  });
-}
-
-export function useConfirmPackItem() {
-  const queryClient = useQueryClient();
-  return useMutation({
-    mutationFn: ({ taskId, itemId }: { taskId: string; itemId: string }) =>
-      getApiClient().post<void>(`/api/v1/warehouse/packing/${taskId}/items/${itemId}/pack`, {}),
-    onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({ queryKey: ['wms-packing', variables.taskId] });
-      queryClient.invalidateQueries({ queryKey: ['wms-packing', 'pending'] });
-      toast.success('Item packed');
-    },
-    onError: () => toast.error('Failed to confirm pack'),
-  });
-}
-
-export function useCompletePacking() {
-  const queryClient = useQueryClient();
-  return useMutation({
-    mutationFn: (taskId: string) =>
-      getApiClient().post<PackTask>(`/api/v1/warehouse/packing/${taskId}/complete`, {}),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['wms-packing'] });
-      toast.success('Packing complete — label generated');
-    },
-    onError: () => toast.error('Failed to complete packing'),
   });
 }

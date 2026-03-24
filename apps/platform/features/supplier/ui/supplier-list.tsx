@@ -15,14 +15,14 @@ export function SupplierList() {
       emptyTitle="No suppliers found"
       columns={[
         { key: 'businessName', header: 'Business', linkTo: (item) => `/suppliers/${item.id}` },
-        { key: 'contactPerson', header: 'Contact' },
-        { key: 'email', header: 'Email' },
+        { key: 'businessType', header: 'Type' },
+        { key: 'contactEmail', header: 'Email' },
         {
           key: 'rating',
           header: 'Rating',
-          render: (item) => <span>{item.rating ? `${item.rating.toFixed(1)} / 5` : 'N/A'}</span>,
+          render: (item) => <span>{item.rating ? `${Number(item.rating).toFixed(1)} / 5` : 'N/A'}</span>,
         },
-        { key: 'productCount', header: 'Products', type: 'number' },
+        { key: 'totalOrders', header: 'Orders', type: 'number' },
         { key: 'stateId', header: 'Status', type: 'state' },
       ]}
     />

@@ -2,19 +2,27 @@ import type { ReturnRequest, SearchRequest, SearchResponse, StateEntityServiceRe
 import { getApiClient } from './client';
 
 export const returnRequestsApi = {
+  // Query endpoints
   search(params: SearchRequest) {
-    return getApiClient().post<SearchResponse<ReturnRequest>>('/api/v1/returns/search', params);
-  },
-  getById(id: string) {
-    return getApiClient().get<StateEntityServiceResponse<ReturnRequest>>(`/api/v1/returns/${id}`);
-  },
-  create(returnRequest: Partial<ReturnRequest>) {
-    return getApiClient().post<StateEntityServiceResponse<ReturnRequest>>('/api/v1/returns', returnRequest);
-  },
-  processEvent(id: string, eventId: string, payload?: unknown) {
-    return getApiClient().patch<StateEntityServiceResponse<ReturnRequest>>(`/api/v1/returns/${id}/${eventId}`, payload ?? {});
+    return getApiClient().post<SearchResponse<ReturnRequest>>('/returnrequest/returnrequests', params);
   },
   myReturns(params: SearchRequest) {
-    return getApiClient().post<SearchResponse<ReturnRequest>>('/api/v1/returns/my-returns', params);
+    return getApiClient().post<SearchResponse<ReturnRequest>>('/returnrequest/myReturns', params);
+  },
+
+  // Query-based retrieve (works with query-build)
+  async retrieve(id: string) {
+    const response = await getApiClient().post<SearchResponse<ReturnRequest>>('/returnrequest/returnrequestById', {
+      filters: { id },
+    });
+    const item = response.list?.[0];
+    if (!item) throw new Error('Return request not found');
+    return { mutatedEntity: item.row, allowedActionsAndMetadata: item.allowedActions ?? [] } as StateEntityServiceResponse<ReturnRequest>;
+  },
+  create(entity: Partial<ReturnRequest>) {
+    return getApiClient().post<StateEntityServiceResponse<ReturnRequest>>('/returnrequest', entity);
+  },
+  processById(id: string, eventId: string, payload?: unknown) {
+    return getApiClient().patch<StateEntityServiceResponse<ReturnRequest>>('/returnrequest/' + id + '/' + eventId, payload ?? {});
   },
 };

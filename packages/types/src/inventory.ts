@@ -7,11 +7,17 @@ export interface InventoryItem extends StateEntity {
   productName?: string;
   warehouseId?: string;
   warehouseName?: string;
+  primaryFc?: string;
   quantity: number;
   reservedQuantity: number;
+  reserved?: number;
   availableQuantity: number;
+  damagedQuantity?: number;
+  inboundQuantity?: number;
   reorderLevel: number;
+  lowStockThreshold?: number;
   reorderQuantity: number;
+  status?: string;
   activities: ActivityLog[];
 }
 

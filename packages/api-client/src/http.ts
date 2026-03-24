@@ -152,7 +152,7 @@ export class HttpClient {
         );
       }
 
-      return json.data;
+      return json.payload;
     } finally {
       clearTimeout(timeoutId);
     }

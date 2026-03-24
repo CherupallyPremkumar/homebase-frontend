@@ -5,12 +5,13 @@ import { Package, ShoppingCart, DollarSign, Star } from 'lucide-react';
 import { useTopProducts, useRecentSellerOrders } from '../api/queries';
 import { getApiClient } from '@homebase/api-client';
 import dynamic from 'next/dynamic';
+import type { SearchResponse } from '@homebase/types';
 
 const SalesChart = dynamic(() => import('./sales-chart'), { ssr: false });
 
 // Seller dashboard stat fetcher
 async function fetchSellerStats() {
-  return getApiClient().get<{
+  const response = await getApiClient().post<SearchResponse<{
     activeProducts: number;
     totalOrders: number;
     totalRevenue: number;
@@ -18,7 +19,11 @@ async function fetchSellerStats() {
     productsChange: number;
     ordersChange: number;
     revenueChange: number;
-  }>('/api/v1/seller/dashboard/stats');
+  }>>('/dashboard/sellerStats', {
+    pageNum: 1,
+    pageSize: 1,
+  });
+  return response.list?.[0]?.row ?? response.data?.row ?? {} as any;
 }
 
 export function SellerDashboard() {
@@ -98,15 +103,15 @@ export function SellerDashboard() {
           title: 'Recent Orders',
           content: recentOrders?.length ? (
             <div className="space-y-3">
-              {recentOrders.slice(0, 5).map((o) => (
-                <div key={o.orderId} className="flex items-center justify-between text-sm">
+              {recentOrders.slice(0, 5).map((o, i) => (
+                <div key={o.orderId ?? i} className="flex items-center justify-between text-sm">
                   <div>
-                    <p className="font-medium">#{o.orderNumber}</p>
-                    <p className="text-xs text-gray-400">{o.productName} x {o.quantity}</p>
+                    <p className="font-medium">Order #{o.orderId?.slice(-6) ?? '—'}</p>
+                    <p className="text-xs text-gray-400">{o.itemCount ?? 0} items</p>
                   </div>
                   <div className="flex items-center gap-2">
-                    <span className="font-medium">{formatPrice(o.amount)}</span>
-                    <StateBadge state={o.state} />
+                    <span className="font-medium">{formatPrice(o.totalAmount ?? 0)}</span>
+                    <StateBadge state={o.orderState ?? 'UNKNOWN'} />
                   </div>
                 </div>
               ))}

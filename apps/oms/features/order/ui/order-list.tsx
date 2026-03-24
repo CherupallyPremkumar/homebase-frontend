@@ -22,18 +22,18 @@ export function OrderList() {
           render: (item) => `#${item.orderNumber}`,
         },
         {
-          key: 'userId',
+          key: 'customerId',
           header: 'Customer',
-          render: (item) => item.shippingAddress?.fullName ?? 'N/A',
+          render: (item) => item.customerId ?? 'N/A',
         },
         {
-          key: 'items',
-          header: 'Items',
-          render: (item) => `${item.items.length} item(s)`,
+          key: 'customerEmail',
+          header: 'Email',
+          render: (item) => item.customerEmail ?? 'N/A',
         },
-        { key: 'total', header: 'Total', type: 'price', align: 'right' },
+        { key: 'totalAmount', header: 'Total', type: 'price', align: 'right' },
         { key: 'stateId', header: 'Status', type: 'state' },
-        { key: 'createdTime', header: 'Date', type: 'date' },
+        { key: 'createdAt', header: 'Date', type: 'date' },
       ]}
       tabs={[
         { label: 'All', filter: {} },

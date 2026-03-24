@@ -1,3 +1,3 @@
-import { createLogoutHandler } from '@homebase/auth/src/logout-handler';
+import { createLogoutHandler } from '@homebase/auth';
 
 export const GET = createLogoutHandler();

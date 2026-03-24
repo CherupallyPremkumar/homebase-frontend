@@ -16,7 +16,7 @@ export function useFulfillmentSearch(params: SearchRequest) {
 export function useFulfillmentDetail(id: string) {
   return useQuery({
     queryKey: ['oms-fulfillment', id],
-    queryFn: () => fulfillmentApi.getById(id),
+    queryFn: () => fulfillmentApi.retrieve(id),
     ...CACHE_TIMES.orderDetail,
     enabled: !!id,
   });
@@ -25,6 +25,6 @@ export function useFulfillmentDetail(id: string) {
 export function useFulfillmentMutation() {
   return useStmMutation<FulfillmentOrder>({
     entityType: 'oms-fulfillment',
-    mutationFn: fulfillmentApi.processEvent,
+    mutationFn: fulfillmentApi.processById,
   });
 }

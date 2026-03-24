@@ -8,6 +8,7 @@ export function usePlatformStats() {
   return useQuery({
     queryKey: ['platform-stats'],
     queryFn: () => dashboardApi.overviewStats(),
+    select: (data) => data.list?.[0]?.row,
     ...CACHE_TIMES.dashboard,
     refetchInterval: 30_000,
   });
@@ -16,7 +17,8 @@ export function usePlatformStats() {
 export function usePlatformActivity() {
   return useQuery({
     queryKey: ['platform-recent-orders'],
-    queryFn: () => dashboardApi.recentOrders(10),
+    queryFn: () => dashboardApi.recentOrders({ pageNum: 1, pageSize: 10 }),
+    select: (data) => data.list?.map(r => r.row) ?? [],
     ...CACHE_TIMES.dashboard,
     refetchInterval: 30_000,
   });
@@ -26,6 +28,7 @@ export function usePlatformLowStock() {
   return useQuery({
     queryKey: ['platform-low-stock'],
     queryFn: () => dashboardApi.lowStockAlerts(),
+    select: (data) => data.list?.map(r => r.row) ?? [],
     ...CACHE_TIMES.dashboard,
   });
 }

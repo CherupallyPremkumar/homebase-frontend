@@ -16,6 +16,6 @@ export function useInventorySearch(params: SearchRequest) {
 export function useInventoryMutation() {
   return useStmMutation<InventoryItem>({
     entityType: 'platform-inventory',
-    mutationFn: inventoryApi.processEvent,
+    mutationFn: inventoryApi.processById,
   });
 }

@@ -10,7 +10,7 @@ import { toast } from 'sonner';
 export function usePaymentSearch(params: SearchRequest) {
   return useQuery({
     queryKey: ['finance-payments', 'list', params],
-    queryFn: () => getApiClient().post<SearchResponse<Payment>>('/api/v1/payments/search', params),
+    queryFn: () => getApiClient().post<SearchResponse<Payment>>('/payment/payments', params),
     ...CACHE_TIMES.productList,
   });
 }
@@ -18,7 +18,7 @@ export function usePaymentSearch(params: SearchRequest) {
 export function usePaymentDetail(id: string) {
   return useQuery({
     queryKey: ['finance-payment', id],
-    queryFn: () => getApiClient().get<StateEntityServiceResponse<Payment>>(`/api/v1/payments/${id}`),
+    queryFn: () => getApiClient().get<StateEntityServiceResponse<Payment>>(`/payment/${id}`),
     ...CACHE_TIMES.orderDetail,
     enabled: !!id,
   });
@@ -27,7 +27,12 @@ export function usePaymentDetail(id: string) {
 export function usePaymentRefunds(paymentId: string) {
   return useQuery({
     queryKey: ['finance-payment-refunds', paymentId],
-    queryFn: () => getApiClient().get<PaymentRefund[]>(`/api/v1/payments/${paymentId}/refunds`),
+    queryFn: () => getApiClient().post<SearchResponse<PaymentRefund>>('/payment/refunds', {
+      pageNum: 1,
+      pageSize: 50,
+      filters: { paymentId },
+    }),
+    select: (data) => data.list?.map(r => r.row) ?? [],
     ...CACHE_TIMES.orderDetail,
     enabled: !!paymentId,
   });
@@ -36,7 +41,12 @@ export function usePaymentRefunds(paymentId: string) {
 export function usePaymentWebhookLog(paymentId: string) {
   return useQuery({
     queryKey: ['finance-payment-webhooks', paymentId],
-    queryFn: () => getApiClient().get<PaymentWebhookLog[]>(`/api/v1/payments/${paymentId}/webhooks`),
+    queryFn: () => getApiClient().post<SearchResponse<PaymentWebhookLog>>('/payment/webhookLogs', {
+      pageNum: 1,
+      pageSize: 50,
+      filters: { paymentId },
+    }),
+    select: (data) => data.list?.map(r => r.row) ?? [],
     ...CACHE_TIMES.orderDetail,
     enabled: !!paymentId,
   });
@@ -46,7 +56,7 @@ export function usePaymentMutation() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: ({ id, eventId, payload }: { id: string; eventId: string; payload?: unknown }) =>
-      getApiClient().patch<StateEntityServiceResponse<Payment>>(`/api/v1/payments/${id}/${eventId}`, payload ?? {}),
+      getApiClient().patch<StateEntityServiceResponse<Payment>>(`/payment/${id}/${eventId}`, payload ?? {}),
     onSuccess: (_data, variables) => {
       toast.success('Payment action completed');
       queryClient.invalidateQueries({ queryKey: ['finance-payment', variables.id] });

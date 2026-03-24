@@ -1,1 +1,1 @@
-export type { InboundShipment, InboundItem, ReceiveItemPayload } from '../api/queries';
+export type { InventoryItem } from '../api/queries';

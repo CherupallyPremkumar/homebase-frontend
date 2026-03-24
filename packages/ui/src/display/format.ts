@@ -9,7 +9,8 @@ export function formatPrice(amount: number): string {
   return inrFormatter.format(amount);
 }
 
-export function formatDate(dateString: string): string {
+export function formatDate(dateString: string | undefined | null): string {
+  if (!dateString) return '—';
   return new Date(dateString).toLocaleDateString('en-IN', {
     day: 'numeric',
     month: 'short',
@@ -21,7 +22,8 @@ export function formatNumber(num: number): string {
   return new Intl.NumberFormat('en-IN').format(num);
 }
 
-export function formatRelativeTime(dateString: string): string {
+export function formatRelativeTime(dateString: string | undefined | null): string {
+  if (!dateString) return '—';
   const diff = Date.now() - new Date(dateString).getTime();
   const mins = Math.floor(diff / 60000);
   if (mins < 1) return 'just now';

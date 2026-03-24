@@ -1,7 +1,7 @@
 'use client';
 
 import { useQuery } from '@tanstack/react-query';
-import { getApiClient } from '@homebase/api-client';
+import { suppliersApi } from '@homebase/api-client';
 import { CACHE_TIMES } from '@homebase/shared';
 
 export interface SellerPerformance {
@@ -18,7 +18,8 @@ export interface SellerPerformance {
 export function useSellerPerformance() {
   return useQuery({
     queryKey: ['seller-performance'],
-    queryFn: () => getApiClient().get<SellerPerformance>('/api/v1/seller/performance'),
+    queryFn: () => suppliersApi.getPerformance('me'),
+    select: (data) => data.list?.[0]?.row,
     ...CACHE_TIMES.dashboard,
   });
 }

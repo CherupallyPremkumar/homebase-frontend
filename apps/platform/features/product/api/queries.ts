@@ -8,7 +8,7 @@ import type { Product } from '@homebase/types';
 export function useProductDetail(id: string) {
   return useQuery({
     queryKey: ['platform-product', id],
-    queryFn: () => productsApi.getById(id),
+    queryFn: () => productsApi.retrieve(id),
     ...CACHE_TIMES.productDetail,
     enabled: !!id,
   });
@@ -17,6 +17,6 @@ export function useProductDetail(id: string) {
 export function useProductMutation() {
   return useStmMutation<Product>({
     entityType: 'platform-product',
-    mutationFn: productsApi.processEvent,
+    mutationFn: productsApi.processById,
   });
 }

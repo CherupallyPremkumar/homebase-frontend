@@ -2,16 +2,26 @@ import type { Shipment, ShippingRate, DeliveryEstimateRequest, SearchRequest, Se
 import { getApiClient } from './client';
 
 export const shippingApi = {
+  // Query endpoints
   search(params: SearchRequest) {
-    return getApiClient().post<SearchResponse<Shipment>>('/api/v1/shipping/search', params);
+    return getApiClient().post<SearchResponse<Shipment>>('/shipping/shipments', params);
   },
-  getById(id: string) {
-    return getApiClient().get<StateEntityServiceResponse<Shipment>>(`/api/v1/shipping/${id}`);
+
+  // Query-based retrieve (works with query-build)
+  async retrieve(id: string) {
+    const response = await getApiClient().post<SearchResponse<Shipment>>('/shipping/shippingById', {
+      pageNum: 1,
+      pageSize: 1,
+      filters: { id },
+    });
+    const item = response.list?.[0];
+    if (!item) throw new Error('Shipment not found');
+    return { mutatedEntity: item.row, allowedActionsAndMetadata: item.allowedActions ?? [] } as StateEntityServiceResponse<Shipment>;
   },
-  processEvent(id: string, eventId: string, payload?: unknown) {
-    return getApiClient().patch<StateEntityServiceResponse<Shipment>>(`/api/v1/shipping/${id}/${eventId}`, payload ?? {});
+  processById(id: string, eventId: string, payload?: unknown) {
+    return getApiClient().patch<StateEntityServiceResponse<Shipment>>('/shipping/' + id + '/' + eventId, payload ?? {});
   },
   estimateDelivery(request: DeliveryEstimateRequest) {
-    return getApiClient().post<ShippingRate[]>('/api/v1/shipping/estimate', request);
+    return getApiClient().post<ShippingRate[]>('/shipping/estimate', request);
   },
 };

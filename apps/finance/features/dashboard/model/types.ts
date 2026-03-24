@@ -1,24 +1,28 @@
 export type { Settlement, SearchResponse } from '@homebase/types';
 
+// Matches Dashboard.financeStats SQL output
 export interface FinanceStats {
   totalRevenue: number;
-  revenueChange: number;
+  todayRevenue: number;
+  disbursedSettlements: number;
+  totalPayouts: number;
   pendingSettlements: number;
-  pendingSettlementsChange: number;
-  completedPayouts: number;
-  completedPayoutsChange: number;
-  activeDisputes: number;
-  disputesChange: number;
+  pendingPayoutAmount: number;
+  disputedSettlements: number;
+  totalRefunds: number;
+  totalRefundAmount: number;
 }
 
+// Matches Dashboard.revenueTrend SQL output
 export interface RevenueTrend {
   date: string;
   revenue: number;
-  settlements: number;
+  orderCount: number;
 }
 
+// Matches Dashboard.settlementsByState SQL output
 export interface SettlementsByState {
   state: string;
   count: number;
-  amount: number;
+  totalAmount: number;
 }

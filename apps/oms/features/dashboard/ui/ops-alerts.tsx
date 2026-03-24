@@ -8,7 +8,7 @@ import { formatDate } from '@homebase/shared';
 
 export function OpsAlerts() {
   const { data: delayed } = useDelayedShipments();
-  const shipments = delayed?.content ?? [];
+  const shipments = delayed?.list?.map((entry) => entry.row) ?? [];
 
   return (
     <Card>
@@ -32,7 +32,7 @@ export function OpsAlerts() {
                   <div>
                     <p className="font-medium">Delayed: {shipment.trackingNumber || 'Pending'}</p>
                     <p className="text-xs text-gray-500">
-                      Est. {shipment.estimatedDelivery ? formatDate(shipment.estimatedDelivery) : 'N/A'}
+                      Est. {shipment.estimatedDeliveryDate ? formatDate(shipment.estimatedDeliveryDate) : 'N/A'}
                     </p>
                   </div>
                 </div>

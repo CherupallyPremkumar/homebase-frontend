@@ -21,12 +21,9 @@ export function FulfillmentList() {
           render: (item) => <span>{item.orderId?.slice(0, 8)}...</span>,
         },
         { key: 'warehouseId', header: 'Warehouse' },
-        {
-          key: 'lineItems',
-          header: 'Items',
-          render: (item) => <span>{item.lineItems?.length || 0} item(s)</span>,
-        },
+        { key: 'priority', header: 'Priority' },
         { key: 'carrier', header: 'Carrier' },
+        { key: 'trackingNumber', header: 'Tracking #' },
         { key: 'stateId', header: 'State', type: 'state' },
       ]}
     />

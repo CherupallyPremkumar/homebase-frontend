@@ -2,16 +2,24 @@ import type { Product, SearchRequest, SearchResponse, StateEntityServiceResponse
 import { getApiClient } from './client';
 
 export const productsApi = {
+  // Query endpoints
   search(params: SearchRequest) {
-    return getApiClient().post<SearchResponse<Product>>('/api/v1/products/search', params);
+    return getApiClient().post<SearchResponse<Product>>('/product/products', params);
   },
-  getById(id: string) {
-    return getApiClient().get<StateEntityServiceResponse<Product>>(`/api/v1/products/${id}`);
+
+  // Query-based retrieve (works with query-build)
+  async retrieve(id: string) {
+    const response = await getApiClient().post<SearchResponse<Product>>('/product/product', {
+      filters: { id },
+    });
+    const item = response.list?.[0];
+    if (!item) throw new Error('Product not found');
+    return { mutatedEntity: item.row, allowedActionsAndMetadata: item.allowedActions ?? [] } as StateEntityServiceResponse<Product>;
   },
-  create(product: Partial<Product>) {
-    return getApiClient().post<StateEntityServiceResponse<Product>>('/api/v1/products', product);
+  create(entity: Partial<Product>) {
+    return getApiClient().post<StateEntityServiceResponse<Product>>('/product', entity);
   },
-  processEvent(id: string, eventId: string, payload?: unknown) {
-    return getApiClient().patch<StateEntityServiceResponse<Product>>(`/api/v1/products/${id}/${eventId}`, payload ?? {});
+  processById(id: string, eventId: string, payload?: unknown) {
+    return getApiClient().patch<StateEntityServiceResponse<Product>>('/product/' + id + '/' + eventId, payload ?? {});
   },
 };

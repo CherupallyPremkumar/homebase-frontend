@@ -32,8 +32,8 @@ export function TicketList() {
             </span>
           ),
         },
-        { key: 'userId', header: 'Customer' },
-        { key: 'createdTime', header: 'Created', type: 'date' },
+        { key: 'customerId', header: 'Customer' },
+        { key: 'createdAt', header: 'Created', type: 'date' },
         { key: 'stateId', header: 'Status', type: 'state' },
       ]}
     />

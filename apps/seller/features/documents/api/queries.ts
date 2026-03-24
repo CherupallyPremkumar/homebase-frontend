@@ -2,6 +2,7 @@
 
 import { useQuery } from '@tanstack/react-query';
 import { getApiClient } from '@homebase/api-client';
+import type { SearchResponse } from '@homebase/types';
 
 export interface SellerDocument {
   id: string;
@@ -16,7 +17,11 @@ export interface SellerDocument {
 export function useSellerDocuments() {
   return useQuery({
     queryKey: ['seller-documents'],
-    queryFn: () => getApiClient().get<SellerDocument[]>('/api/v1/seller/documents'),
+    queryFn: () => getApiClient().post<SearchResponse<SellerDocument>>('/onboarding/sellerDocuments', {
+      pageNum: 1,
+      pageSize: 50,
+    }),
+    select: (data) => data.list?.map(r => r.row) ?? [],
     staleTime: 120_000,
   });
 }

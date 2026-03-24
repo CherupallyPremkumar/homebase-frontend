@@ -2,22 +2,42 @@ import type { Review, ReviewSummary, SearchRequest, SearchResponse, StateEntityS
 import { getApiClient } from './client';
 
 export const reviewsApi = {
+  // Query endpoints
   search(params: SearchRequest) {
-    return getApiClient().post<SearchResponse<Review>>('/api/v1/reviews/search', params);
+    return getApiClient().post<SearchResponse<Review>>('/review/reviews', params);
   },
-  getByProduct(productId: string, params: SearchRequest) {
-    return getApiClient().post<SearchResponse<Review>>(`/api/v1/reviews/product/${productId}`, params);
+  byProduct(productId: string, params: SearchRequest) {
+    return getApiClient().post<SearchResponse<Review>>('/review/productReviews', {
+      ...params,
+      filters: { ...params.filters, productId },
+    });
   },
-  getSummary(productId: string) {
-    return getApiClient().get<ReviewSummary>(`/api/v1/reviews/product/${productId}/summary`);
+  summary(productId: string) {
+    return getApiClient().post<SearchResponse<ReviewSummary>>('/review/reviewSummary', {
+      pageNum: 1,
+      pageSize: 1,
+      filters: { productId },
+    });
   },
-  create(review: Partial<Review>) {
-    return getApiClient().post<StateEntityServiceResponse<Review>>('/api/v1/reviews', review);
+
+  // Query-based retrieve (works with query-build)
+  async retrieve(id: string) {
+    const response = await getApiClient().post<SearchResponse<Review>>('/review/review', {
+      pageNum: 1,
+      pageSize: 1,
+      filters: { id },
+    });
+    const item = response.list?.[0];
+    if (!item) throw new Error('Review not found');
+    return { mutatedEntity: item.row, allowedActionsAndMetadata: item.allowedActions ?? [] } as StateEntityServiceResponse<Review>;
   },
-  processEvent(id: string, eventId: string, payload?: unknown) {
-    return getApiClient().patch<StateEntityServiceResponse<Review>>(`/api/v1/reviews/${id}/${eventId}`, payload ?? {});
+  create(entity: Partial<Review>) {
+    return getApiClient().post<StateEntityServiceResponse<Review>>('/review', entity);
+  },
+  processById(id: string, eventId: string, payload?: unknown) {
+    return getApiClient().patch<StateEntityServiceResponse<Review>>('/review/' + id + '/' + eventId, payload ?? {});
   },
   vote(reviewId: string, helpful: boolean) {
-    return getApiClient().post<void>(`/api/v1/reviews/${reviewId}/vote`, { helpful });
+    return getApiClient().post<void>('/review/' + reviewId + '/vote', { helpful });
   },
 };

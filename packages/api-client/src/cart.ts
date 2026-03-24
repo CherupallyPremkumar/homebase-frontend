@@ -1,26 +1,38 @@
-import type { Cart, StateEntityServiceResponse, AddToCartPayload, UpdateCartItemPayload, ApplyCouponPayload } from '@homebase/types';
+import type { Cart, StateEntityServiceResponse, SearchRequest, SearchResponse, AddToCartPayload, UpdateCartItemPayload, ApplyCouponPayload } from '@homebase/types';
 import { getApiClient } from './client';
 
 export const cartApi = {
-  get() {
-    return getApiClient().get<StateEntityServiceResponse<Cart>>('/api/v1/cart');
+  // Query endpoints
+  search(params: SearchRequest) {
+    return getApiClient().post<SearchResponse<Cart>>('/cart/carts', params);
   },
-  addItem(payload: AddToCartPayload) {
-    return getApiClient().post<StateEntityServiceResponse<Cart>>('/api/v1/cart/items', payload);
+  storefrontCart(params: SearchRequest) {
+    return getApiClient().post<SearchResponse<Cart>>('/cart/storefrontCart', params);
   },
-  updateItem(itemId: string, payload: UpdateCartItemPayload) {
-    return getApiClient().put<StateEntityServiceResponse<Cart>>(`/api/v1/cart/items/${itemId}`, payload);
+
+  // Command (STM) endpoints
+  retrieve(id: string) {
+    return getApiClient().get<StateEntityServiceResponse<Cart>>('/cart/' + id);
   },
-  removeItem(itemId: string) {
-    return getApiClient().delete<StateEntityServiceResponse<Cart>>(`/api/v1/cart/items/${itemId}`);
+  create(entity: Partial<Cart>) {
+    return getApiClient().post<StateEntityServiceResponse<Cart>>('/cart', entity);
   },
-  applyCoupon(payload: ApplyCouponPayload) {
-    return getApiClient().post<StateEntityServiceResponse<Cart>>('/api/v1/cart/coupon', payload);
+  processById(id: string, eventId: string, payload?: unknown) {
+    return getApiClient().patch<StateEntityServiceResponse<Cart>>('/cart/' + id + '/' + eventId, payload ?? {});
   },
-  removeCoupon() {
-    return getApiClient().delete<StateEntityServiceResponse<Cart>>('/api/v1/cart/coupon');
+  addItem(id: string, payload: AddToCartPayload) {
+    return getApiClient().patch<StateEntityServiceResponse<Cart>>('/cart/' + id + '/ADD_ITEM', payload);
   },
-  processEvent(id: string, eventId: string, payload?: unknown) {
-    return getApiClient().patch<StateEntityServiceResponse<Cart>>(`/api/v1/cart/${id}/${eventId}`, payload ?? {});
+  updateItem(id: string, payload: UpdateCartItemPayload) {
+    return getApiClient().patch<StateEntityServiceResponse<Cart>>('/cart/' + id + '/UPDATE_ITEM', payload);
+  },
+  removeItem(id: string, payload: { itemId: string }) {
+    return getApiClient().patch<StateEntityServiceResponse<Cart>>('/cart/' + id + '/REMOVE_ITEM', payload);
+  },
+  applyCoupon(id: string, payload: ApplyCouponPayload) {
+    return getApiClient().patch<StateEntityServiceResponse<Cart>>('/cart/' + id + '/APPLY_COUPON', payload);
+  },
+  removeCoupon(id: string) {
+    return getApiClient().patch<StateEntityServiceResponse<Cart>>('/cart/' + id + '/REMOVE_COUPON', {});
   },
 };

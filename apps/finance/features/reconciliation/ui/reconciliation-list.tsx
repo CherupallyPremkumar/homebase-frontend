@@ -20,19 +20,18 @@ export function ReconciliationList() {
           linkTo: (item) => `/reconciliation/${item.id}`,
           render: (item) => <span>{formatDate(item.batchDate)}</span>,
         },
-        { key: 'gatewayName', header: 'Gateway' },
-        { key: 'totalTransactions', header: 'Total Txns', type: 'number' },
+        { key: 'gatewayType', header: 'Gateway' },
         {
           key: 'matchedCount',
           header: 'Matched',
-          render: (item) => <span className="text-green-600">{formatNumber(item.matchedCount)}</span>,
+          render: (item) => <span className="text-green-600">{formatNumber(item.matchedCount ?? 0)}</span>,
         },
         {
-          key: 'mismatchedCount',
+          key: 'mismatchCount',
           header: 'Mismatches',
           render: (item) => (
-            <span className={item.mismatchedCount > 0 ? 'font-medium text-red-600' : ''}>
-              {formatNumber(item.mismatchedCount)}
+            <span className={(item.mismatchCount ?? 0) > 0 ? 'font-medium text-red-600' : ''}>
+              {formatNumber(item.mismatchCount ?? 0)}
             </span>
           ),
         },

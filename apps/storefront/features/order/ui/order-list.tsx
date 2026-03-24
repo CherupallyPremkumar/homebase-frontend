@@ -18,7 +18,7 @@ export function OrderList() {
           variant: 'horizontal',
           map: (order) => ({
             title: `Order #${order.orderNumber}`,
-            subtitle: formatDate(order.createdTime),
+            subtitle: order.createdTime ? formatDate(order.createdTime) : '',
             href: `/orders/${order.id}`,
             state: order.stateId,
             fields: [

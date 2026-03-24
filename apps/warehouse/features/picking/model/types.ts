@@ -1,1 +1,1 @@
-export type { PickList, PickItem } from '../api/queries';
+export type { FulfillmentOrder } from '../api/queries';

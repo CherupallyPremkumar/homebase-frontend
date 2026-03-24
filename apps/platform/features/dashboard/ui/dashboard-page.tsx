@@ -23,10 +23,10 @@ export function DashboardPage() {
         </div>
       ) : stats ? (
         <div className="grid gap-4 md:grid-cols-4">
-          <StatCard title="Active Products" value={formatNumber(stats.activeProducts)} change={stats.productsChange} icon={Package} />
-          <StatCard title="Active Users" value={formatNumber(stats.activeUsers)} change={stats.usersChange} icon={Users} />
-          <StatCard title="Active Suppliers" value={formatNumber(stats.totalOrders)} change={stats.ordersChange} icon={Building2} />
-          <StatCard title="Pending Reviews" value={formatNumber(stats.totalRevenue)} change={stats.revenueChange} icon={Star} />
+          <StatCard title="Published Products" value={formatNumber(stats.publishedProducts ?? 0)} icon={Package} />
+          <StatCard title="Total Customers" value={formatNumber(stats.totalCustomers ?? 0)} icon={Users} />
+          <StatCard title="Active Suppliers" value={formatNumber(stats.activeSuppliers ?? 0)} icon={Building2} />
+          <StatCard title="Pending Reviews" value={formatNumber(stats.pendingReviewProducts ?? 0)} icon={Star} />
         </div>
       ) : null}
 

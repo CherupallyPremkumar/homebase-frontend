@@ -16,7 +16,7 @@ export function useReturnSearch(params: SearchRequest) {
 export function useReturnDetail(id: string) {
   return useQuery({
     queryKey: ['oms-return', id],
-    queryFn: () => returnRequestsApi.getById(id),
+    queryFn: () => returnRequestsApi.retrieve(id),
     ...CACHE_TIMES.orderDetail,
     enabled: !!id,
   });
@@ -25,6 +25,6 @@ export function useReturnDetail(id: string) {
 export function useReturnMutation() {
   return useStmMutation<ReturnRequest>({
     entityType: 'oms-return',
-    mutationFn: returnRequestsApi.processEvent,
+    mutationFn: returnRequestsApi.processById,
   });
 }

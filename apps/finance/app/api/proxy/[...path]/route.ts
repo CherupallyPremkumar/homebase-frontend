@@ -1,5 +1,5 @@
 import { type NextRequest } from 'next/server';
-import { createApiProxy } from '@homebase/auth/src/api-proxy';
+import { createApiProxy } from '@homebase/auth';
 
 const proxy = createApiProxy();
 

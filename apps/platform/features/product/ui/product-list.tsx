@@ -16,10 +16,9 @@ export function ProductList() {
       emptyTitle="No products found"
       columns={[
         { key: 'name', header: 'Product', linkTo: (item) => `/products/${item.id}` },
-        { key: 'sku', header: 'SKU' },
-        { key: 'sellingPrice', header: 'Price', type: 'price' },
+        { key: 'brand', header: 'Brand' },
+        { key: 'categoryId', header: 'Category' },
         { key: 'stateId', header: 'Status', type: 'state' },
-        { key: 'createdTime', header: 'Created', type: 'date' },
       ]}
     />
   );

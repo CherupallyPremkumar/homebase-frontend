@@ -17,9 +17,9 @@ export function SellerOrderList() {
       emptyDescription="Orders will appear here when customers buy your products."
       columns={[
         { key: 'orderNumber', header: 'Order', linkTo: (item) => `/orders/${item.id}`, render: (item) => <span>#{item.orderNumber}</span> },
-        { key: 'total', header: 'Amount', type: 'price', align: 'right' },
+        { key: 'totalAmount', header: 'Amount', type: 'price', align: 'right' },
         { key: 'stateId', header: 'Status', type: 'state' },
-        { key: 'createdTime', header: 'Date', type: 'date' },
+        { key: 'createdAt', header: 'Date', type: 'date' },
       ]}
     />
   );

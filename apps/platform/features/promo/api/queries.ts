@@ -16,6 +16,6 @@ export function usePromoSearch(params: SearchRequest) {
 export function usePromoMutation() {
   return useStmMutation<Coupon>({
     entityType: 'platform-promo',
-    mutationFn: promosApi.processEvent,
+    mutationFn: promosApi.processById,
   });
 }

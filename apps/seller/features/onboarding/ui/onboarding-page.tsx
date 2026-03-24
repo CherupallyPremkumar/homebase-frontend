@@ -7,6 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@homebase/ui';
 import { Check, Circle, FileText, Building2, GraduationCap } from 'lucide-react';
 import { cn } from '@homebase/ui/src/lib/utils';
 import { useOnboardingMutation } from '../api/queries';
+import type { SearchResponse } from '@homebase/types';
 
 const STEPS = [
   { key: 'documentsUploaded', label: 'Upload Documents', description: 'Business registration, GSTIN, PAN, bank details', icon: FileText },
@@ -18,8 +19,13 @@ export function OnboardingPage() {
   const { data, isLoading, error, refetch } = useQuery({
     queryKey: ['seller-onboarding-detail'],
     queryFn: async () => {
-      const status = await getApiClient().get<{ id: string }>('/api/v1/seller/onboarding/status');
-      return suppliersApi.getOnboarding(status.id);
+      const statusResponse = await getApiClient().post<SearchResponse<{ id: string }>>('/onboarding/myOnboarding', {
+        pageNum: 1,
+        pageSize: 1,
+      });
+      const id = statusResponse.list?.[0]?.row?.id ?? statusResponse.data?.row?.id;
+      if (!id) throw new Error('No onboarding found');
+      return suppliersApi.retrieveOnboarding(id);
     },
     staleTime: 30_000,
   });

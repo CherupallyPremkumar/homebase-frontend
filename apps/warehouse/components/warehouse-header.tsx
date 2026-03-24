@@ -1,11 +1,25 @@
 'use client';
 
-import { Wifi, WifiOff } from 'lucide-react';
+import { signOut } from 'next-auth/react';
+import { Wifi, WifiOff, LogOut } from 'lucide-react';
 import { useOnlineStatus } from '@homebase/shared';
-import { Avatar, AvatarFallback } from '@homebase/ui';
+import {
+  Avatar,
+  AvatarFallback,
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+  Button,
+} from '@homebase/ui';
 import { cn } from '@homebase/ui/src/lib/utils';
 
-export function WarehouseHeader() {
+interface HeaderProps {
+  user?: { name?: string | null; email?: string | null } | null;
+}
+
+export function WarehouseHeader({ user }: HeaderProps) {
   const isOnline = useOnlineStatus();
 
   return (
@@ -21,9 +35,32 @@ export function WarehouseHeader() {
           {isOnline ? <Wifi className="h-4 w-4" /> : <WifiOff className="h-4 w-4" />}
           {isOnline ? 'Online' : 'Offline'}
         </div>
-        <Avatar className="h-8 w-8">
-          <AvatarFallback className="bg-primary/10 text-sm text-primary">WH</AvatarFallback>
-        </Avatar>
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="ghost" size="icon" className="rounded-full">
+              <Avatar className="h-8 w-8">
+                <AvatarFallback className="bg-primary/10 text-sm text-primary">
+                  {user?.name?.[0]?.toUpperCase() || user?.email?.[0]?.toUpperCase() || 'W'}
+                </AvatarFallback>
+              </Avatar>
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end" className="w-56">
+            {user && (
+              <>
+                <div className="px-2 py-1.5">
+                  <p className="text-sm font-medium">{user.name || 'User'}</p>
+                  <p className="text-xs text-gray-500">{user.email}</p>
+                </div>
+                <DropdownMenuSeparator />
+              </>
+            )}
+            <DropdownMenuItem onClick={() => { signOut({ callbackUrl: '/login' }); }}>
+              <LogOut className="mr-2 h-4 w-4" />
+              Sign out
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
       </div>
     </header>
   );

@@ -3,7 +3,6 @@
 import { SectionSkeleton, ErrorSection } from '@homebase/shared';
 import { Card, CardContent, CardHeader, CardTitle } from '@homebase/ui';
 import { useSellerPerformance } from '../api/queries';
-import { TrendingUp, TrendingDown, Minus } from 'lucide-react';
 import { cn } from '@homebase/ui/src/lib/utils';
 
 export function PerformancePage() {
@@ -21,20 +20,20 @@ export function PerformancePage() {
       </div>
 
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <MetricCard title="Fulfillment Rate" value={`${data.fulfillmentRate}%`} target={95} actual={data.fulfillmentRate} description="Orders fulfilled on time" />
+        <MetricCard title="Fulfillment Rate" value={`${data.orderFulfillmentRate}%`} target={95} actual={data.orderFulfillmentRate} description="Orders fulfilled on time" />
         <MetricCard title="Customer Rating" value={`${data.customerRating.toFixed(1)} ★`} target={4.0} actual={data.customerRating} description="Average product rating" />
         <MetricCard title="Return Rate" value={`${data.returnRate}%`} target={5} actual={data.returnRate} inverse description="Lower is better" />
-        <MetricCard title="Response Time" value={`${data.responseTimeHours}h`} target={24} actual={data.responseTimeHours} inverse description="Avg reply to queries" />
+        <MetricCard title="Response Time" value={`${data.responseTime}h`} target={24} actual={data.responseTime} inverse description="Avg reply to queries" />
       </div>
 
       <Card>
         <CardHeader><CardTitle>Detailed Metrics</CardTitle></CardHeader>
         <CardContent>
           <div className="grid gap-4 sm:grid-cols-2">
-            <MetricRow label="Late Shipment Rate" value={`${data.lateShipmentRate}%`} target="< 4%" ok={data.lateShipmentRate < 4} />
-            <MetricRow label="Cancellation Rate" value={`${data.cancellationRate}%`} target="< 2.5%" ok={data.cancellationRate < 2.5} />
-            <MetricRow label="Defect Rate" value={`${data.defectRate}%`} target="< 1%" ok={data.defectRate < 1} />
-            <MetricRow label="Avg Shipping Days" value={`${data.averageShippingDays} days`} target="< 3 days" ok={data.averageShippingDays < 3} />
+            <MetricRow label="Avg Shipping Time" value={`${data.averageShippingTime} days`} target="< 3 days" ok={data.averageShippingTime < 3} />
+            <MetricRow label="Return Rate" value={`${data.returnRate}%`} target="< 5%" ok={data.returnRate < 5} />
+            <MetricRow label="Customer Rating" value={`${data.customerRating.toFixed(1)} ★`} target="> 4.0" ok={data.customerRating >= 4.0} />
+            <MetricRow label="Response Time" value={`${data.responseTime}h`} target="< 24h" ok={data.responseTime < 24} />
           </div>
         </CardContent>
       </Card>

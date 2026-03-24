@@ -16,7 +16,7 @@ export function useOrderSearch(params: SearchRequest) {
 export function useOrderDetail(id: string) {
   return useQuery({
     queryKey: ['oms-order', id],
-    queryFn: () => ordersApi.getById(id),
+    queryFn: () => ordersApi.retrieve(id),
     ...CACHE_TIMES.orderDetail,
     enabled: !!id,
   });
@@ -25,6 +25,6 @@ export function useOrderDetail(id: string) {
 export function useOrderMutation() {
   return useStmMutation<Order>({
     entityType: 'oms-order',
-    mutationFn: ordersApi.processEvent,
+    mutationFn: ordersApi.processById,
   });
 }

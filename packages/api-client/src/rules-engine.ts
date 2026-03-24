@@ -2,22 +2,33 @@ import type { RuleSet, FactDefinition, Decision, SearchRequest, SearchResponse, 
 import { getApiClient } from './client';
 
 export const rulesEngineApi = {
+  // Query endpoints
   searchRuleSets(params: SearchRequest) {
-    return getApiClient().post<SearchResponse<RuleSet>>('/api/v1/rules/search', params);
+    return getApiClient().post<SearchResponse<RuleSet>>('/rules-engine/ruleSets', params);
   },
-  getRuleSet(id: string) {
-    return getApiClient().get<StateEntityServiceResponse<RuleSet>>(`/api/v1/rules/${id}`);
+  factDefinitions(params?: SearchRequest) {
+    return getApiClient().post<SearchResponse<FactDefinition>>('/rules-engine/factDefinitions', params ?? {
+      pageNum: 1,
+      pageSize: 100,
+    });
   },
-  createRuleSet(ruleSet: Partial<RuleSet>) {
-    return getApiClient().post<StateEntityServiceResponse<RuleSet>>('/api/v1/rules', ruleSet);
+
+  // Query-based retrieve (works with query-build)
+  async retrieve(id: string) {
+    const response = await getApiClient().post<SearchResponse<RuleSet>>('/rules-engine/ruleSets', {
+      filters: { id },
+    });
+    const item = response.list?.[0];
+    if (!item) throw new Error('RuleSet not found');
+    return { mutatedEntity: item.row, allowedActionsAndMetadata: item.allowedActions ?? [] } as StateEntityServiceResponse<RuleSet>;
   },
-  processEvent(id: string, eventId: string, payload?: unknown) {
-    return getApiClient().patch<StateEntityServiceResponse<RuleSet>>(`/api/v1/rules/${id}/${eventId}`, payload ?? {});
+  create(entity: Partial<RuleSet>) {
+    return getApiClient().post<StateEntityServiceResponse<RuleSet>>('/rules-engine', entity);
   },
-  getFactDefinitions() {
-    return getApiClient().get<FactDefinition[]>('/api/v1/rules/facts');
+  processById(id: string, eventId: string, payload?: unknown) {
+    return getApiClient().patch<StateEntityServiceResponse<RuleSet>>('/rules-engine/' + id + '/' + eventId, payload ?? {});
   },
   evaluate(ruleSetId: string, facts: Record<string, unknown>) {
-    return getApiClient().post<Decision>(`/api/v1/rules/${ruleSetId}/evaluate`, facts);
+    return getApiClient().post<Decision>('/rules-engine/' + ruleSetId + '/evaluate', facts);
   },
 };

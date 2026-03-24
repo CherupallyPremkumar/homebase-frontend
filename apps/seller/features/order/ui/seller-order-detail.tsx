@@ -12,7 +12,7 @@ interface SellerOrderDetailProps {
 export function SellerOrderDetail({ orderId }: SellerOrderDetailProps) {
   const { data, isLoading, error, refetch } = useQuery({
     queryKey: ['seller-orders', orderId],
-    queryFn: () => ordersApi.getById(orderId),
+    queryFn: () => ordersApi.retrieve(orderId),
     ...CACHE_TIMES.orderDetail,
   });
 

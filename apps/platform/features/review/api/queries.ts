@@ -8,7 +8,7 @@ import type { Review } from '@homebase/types';
 export function useReviewDetail(id: string) {
   return useQuery({
     queryKey: ['platform-review', id],
-    queryFn: () => reviewsApi.processEvent(id, 'RETRIEVE'),
+    queryFn: () => reviewsApi.processById(id, 'RETRIEVE'),
     ...CACHE_TIMES.productDetail,
     enabled: !!id,
   });
@@ -17,6 +17,6 @@ export function useReviewDetail(id: string) {
 export function useReviewMutation() {
   return useStmMutation<Review>({
     entityType: 'platform-review',
-    mutationFn: reviewsApi.processEvent,
+    mutationFn: reviewsApi.processById,
   });
 }

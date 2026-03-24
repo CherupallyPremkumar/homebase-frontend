@@ -30,11 +30,11 @@ export function PromoList() {
               : <span>{formatPrice(item.discountValue)}</span>,
         },
         {
-          key: 'usedCount',
+          key: 'usageCount',
           header: 'Usage',
-          render: (item) => <span>{item.usedCount}{item.usageLimit ? `/${item.usageLimit}` : ''}</span>,
+          render: (item) => <span>{item.usageCount ?? 0}{item.usageLimit ? `/${item.usageLimit}` : ''}</span>,
         },
-        { key: 'validUntil', header: 'Expires', type: 'date' },
+        { key: 'endDate', header: 'Expires', type: 'date' },
         { key: 'stateId', header: 'Status', type: 'state' },
       ]}
     />

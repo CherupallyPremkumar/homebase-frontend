@@ -21,7 +21,8 @@ export function formatPriceRupees(amount: number, showDecimal = false): string {
   return showDecimal ? INR_DECIMAL_FORMATTER.format(amount) : INR_FORMATTER.format(amount);
 }
 
-export function formatDate(dateString: string): string {
+export function formatDate(dateString: string | undefined | null): string {
+  if (!dateString) return '—';
   return new Date(dateString).toLocaleDateString('en-IN', {
     day: 'numeric',
     month: 'short',
@@ -29,7 +30,8 @@ export function formatDate(dateString: string): string {
   });
 }
 
-export function formatDateTime(dateString: string): string {
+export function formatDateTime(dateString: string | undefined | null): string {
+  if (!dateString) return '—';
   return new Date(dateString).toLocaleString('en-IN', {
     day: 'numeric',
     month: 'short',
@@ -39,7 +41,8 @@ export function formatDateTime(dateString: string): string {
   });
 }
 
-export function formatRelativeTime(dateString: string): string {
+export function formatRelativeTime(dateString: string | undefined | null): string {
+  if (!dateString) return '—';
   const now = Date.now();
   const date = new Date(dateString).getTime();
   const diff = now - date;

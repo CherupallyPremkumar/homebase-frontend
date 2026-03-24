@@ -27,28 +27,24 @@ export function DashboardPage() {
         <div className="grid gap-4 md:grid-cols-4">
           <StatCard
             title="Total Revenue"
-            value={formatPriceRupees(stats.totalRevenue)}
-            change={stats.revenueChange}
+            value={formatPriceRupees(stats.totalRevenue ?? 0)}
             icon={IndianRupee}
           />
           <StatCard
             title="Pending Settlements"
-            value={formatNumber(stats.pendingSettlements)}
-            change={stats.pendingSettlementsChange}
+            value={formatNumber(stats.pendingSettlements ?? 0)}
             icon={Clock}
             accent="bg-yellow-500"
           />
           <StatCard
-            title="Completed Payouts"
-            value={formatPriceRupees(stats.completedPayouts)}
-            change={stats.completedPayoutsChange}
+            title="Total Payouts"
+            value={formatPriceRupees(stats.totalPayouts ?? 0)}
             icon={CheckCircle}
             accent="bg-green-500"
           />
           <StatCard
-            title="Active Disputes"
-            value={formatNumber(stats.activeDisputes)}
-            change={stats.disputesChange}
+            title="Disputed Settlements"
+            value={formatNumber(stats.disputedSettlements ?? 0)}
             icon={AlertTriangle}
             accent="bg-red-500"
           />

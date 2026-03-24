@@ -29,7 +29,7 @@ const columns: ColumnDef<SupplierOnboarding, unknown>[] = [
 ];
 
 async function searchOnboarding(params: SearchRequest): Promise<SearchResponse<SupplierOnboarding>> {
-  return { content: [], totalElements: 0, totalPages: 0, page: 1, size: 20, hasNext: false, hasPrevious: false };
+  return { list: [], currentPage: 1, maxPages: 0, maxRows: 0, numRowsInPage: 0, numRowsReturned: 0, startRow: 0, endRow: 0, columnMetadata: {}, hiddenColumns: [], availableCannedReports: [] };
 }
 
 export function OnboardingList() {

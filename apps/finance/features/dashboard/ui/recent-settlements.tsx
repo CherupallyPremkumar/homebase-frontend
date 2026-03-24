@@ -28,13 +28,13 @@ export function RecentSettlements() {
                 className="flex items-center justify-between rounded p-2 text-sm hover:bg-gray-50"
               >
                 <div>
-                  <p className="font-medium">{settlement.supplierName || settlement.supplierId}</p>
+                  <p className="font-medium">{settlement.supplierId ?? 'N/A'}</p>
                   <p className="text-xs text-gray-500">
-                    {formatDate(settlement.periodStart)} &mdash; {formatDate(settlement.periodEnd)}
+                    {formatDate(settlement.settlementPeriodStart)} &mdash; {formatDate(settlement.settlementPeriodEnd)}
                   </p>
                 </div>
                 <div className="flex items-center gap-3">
-                  <span className="font-medium">{formatPriceRupees(settlement.netPayout)}</span>
+                  <span className="font-medium">{formatPriceRupees(settlement.netAmount ?? 0)}</span>
                   <StateBadge state={settlement.stateId} />
                 </div>
               </Link>

@@ -16,7 +16,7 @@ export function useReconciliationSearch(params: SearchRequest) {
 export function useReconciliationDetail(id: string) {
   return useQuery({
     queryKey: ['finance-reconciliation', id],
-    queryFn: () => reconciliationApi.getById(id),
+    queryFn: () => reconciliationApi.retrieve(id),
     ...CACHE_TIMES.orderDetail,
     enabled: !!id,
   });
@@ -25,7 +25,8 @@ export function useReconciliationDetail(id: string) {
 export function useReconciliationMismatches(batchId: string) {
   return useQuery({
     queryKey: ['finance-reconciliation-mismatches', batchId],
-    queryFn: () => reconciliationApi.getMismatches(batchId),
+    queryFn: () => reconciliationApi.mismatches({ pageNum: 1, pageSize: 100, filters: { batchId } }),
+    select: (data) => data.list?.map(r => r.row) ?? [],
     ...CACHE_TIMES.orderDetail,
     enabled: !!batchId,
   });
@@ -34,6 +35,6 @@ export function useReconciliationMismatches(batchId: string) {
 export function useReconciliationMutation() {
   return useStmMutation<ReconciliationBatch>({
     entityType: 'finance-reconciliation',
-    mutationFn: reconciliationApi.processEvent,
+    mutationFn: reconciliationApi.processById,
   });
 }

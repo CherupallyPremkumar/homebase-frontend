@@ -12,7 +12,7 @@ interface Props {
 export function SellerSettlementDetail({ settlementId }: Props) {
   const { data, isLoading, error, refetch } = useQuery({
     queryKey: ['seller-settlements', settlementId],
-    queryFn: () => settlementsApi.getById(settlementId),
+    queryFn: () => settlementsApi.retrieve(settlementId),
     ...CACHE_TIMES.orderDetail,
   });
 

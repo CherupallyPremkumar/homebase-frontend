@@ -5,6 +5,7 @@ export interface Product extends StateEntity {
   slug?: string;
   description?: string;
   shortDescription?: string;
+  brand?: string;
   brandId?: string;
   brandName?: string;
   categoryId?: string;

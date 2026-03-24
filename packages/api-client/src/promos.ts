@@ -2,19 +2,27 @@ import type { Coupon, ValidateCouponResponse, SearchRequest, SearchResponse, Sta
 import { getApiClient } from './client';
 
 export const promosApi = {
+  // Query endpoints
   search(params: SearchRequest) {
-    return getApiClient().post<SearchResponse<Coupon>>('/api/v1/promos/search', params);
+    return getApiClient().post<SearchResponse<Coupon>>('/promo/promos', params);
   },
-  getById(id: string) {
-    return getApiClient().get<StateEntityServiceResponse<Coupon>>(`/api/v1/promos/${id}`);
+
+  // Query-based retrieve (works with query-build)
+  async retrieve(id: string) {
+    const response = await getApiClient().post<SearchResponse<Coupon>>('/promo/promo', {
+      filters: { id },
+    });
+    const item = response.list?.[0];
+    if (!item) throw new Error('Promo not found');
+    return { mutatedEntity: item.row, allowedActionsAndMetadata: item.allowedActions ?? [] } as StateEntityServiceResponse<Coupon>;
   },
-  create(coupon: Partial<Coupon>) {
-    return getApiClient().post<StateEntityServiceResponse<Coupon>>('/api/v1/promos', coupon);
+  create(entity: Partial<Coupon>) {
+    return getApiClient().post<StateEntityServiceResponse<Coupon>>('/promo', entity);
   },
-  processEvent(id: string, eventId: string, payload?: unknown) {
-    return getApiClient().patch<StateEntityServiceResponse<Coupon>>(`/api/v1/promos/${id}/${eventId}`, payload ?? {});
+  processById(id: string, eventId: string, payload?: unknown) {
+    return getApiClient().patch<StateEntityServiceResponse<Coupon>>('/promo/' + id + '/' + eventId, payload ?? {});
   },
   validate(code: string, cartTotal: number) {
-    return getApiClient().post<ValidateCouponResponse>('/api/v1/promos/validate', { code, cartTotal });
+    return getApiClient().post<ValidateCouponResponse>('/promo/validate', { code, cartTotal });
   },
 };

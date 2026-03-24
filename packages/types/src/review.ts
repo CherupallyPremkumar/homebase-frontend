@@ -10,6 +10,9 @@ export interface Review extends StateEntity {
   body: string;
   images: ReviewImage[];
   isVerifiedPurchase: boolean;
+  verifiedPurchase?: boolean | string;
+  customerId?: string;
+  createdAt?: string;
   helpfulCount: number;
   reportCount: number;
   activities: ActivityLog[];

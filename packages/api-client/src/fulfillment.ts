@@ -2,13 +2,21 @@ import type { FulfillmentOrder, SearchRequest, SearchResponse, StateEntityServic
 import { getApiClient } from './client';
 
 export const fulfillmentApi = {
+  // Query endpoints
   search(params: SearchRequest) {
-    return getApiClient().post<SearchResponse<FulfillmentOrder>>('/api/v1/fulfillment/search', params);
+    return getApiClient().post<SearchResponse<FulfillmentOrder>>('/fulfillment/fulfillments', params);
   },
-  getById(id: string) {
-    return getApiClient().get<StateEntityServiceResponse<FulfillmentOrder>>(`/api/v1/fulfillment/${id}`);
+
+  // Query-based retrieve (works with query-build)
+  async retrieve(id: string) {
+    const response = await getApiClient().post<SearchResponse<FulfillmentOrder>>('/fulfillment/fulfillment', {
+      filters: { id },
+    });
+    const item = response.list?.[0];
+    if (!item) throw new Error('Fulfillment order not found');
+    return { mutatedEntity: item.row, allowedActionsAndMetadata: item.allowedActions ?? [] } as StateEntityServiceResponse<FulfillmentOrder>;
   },
-  processEvent(id: string, eventId: string, payload?: unknown) {
-    return getApiClient().patch<StateEntityServiceResponse<FulfillmentOrder>>(`/api/v1/fulfillment/${id}/${eventId}`, payload ?? {});
+  processById(id: string, eventId: string, payload?: unknown) {
+    return getApiClient().patch<StateEntityServiceResponse<FulfillmentOrder>>('/fulfillment/' + id + '/' + eventId, payload ?? {});
   },
 };

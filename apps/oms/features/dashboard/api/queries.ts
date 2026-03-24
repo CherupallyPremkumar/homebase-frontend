@@ -8,6 +8,7 @@ export function useDashboardStats() {
   return useQuery({
     queryKey: ['oms-dashboard-stats'],
     queryFn: () => dashboardApi.overviewStats(),
+    select: (data) => data.list?.[0]?.row,
     ...CACHE_TIMES.dashboard,
     refetchInterval: 30_000,
   });
@@ -17,6 +18,7 @@ export function useOrdersByState() {
   return useQuery({
     queryKey: ['oms-orders-by-state'],
     queryFn: () => dashboardApi.ordersByState(),
+    select: (data) => data.list?.map(r => r.row) ?? [],
     ...CACHE_TIMES.dashboard,
     refetchInterval: 30_000,
   });
@@ -25,7 +27,8 @@ export function useOrdersByState() {
 export function useRecentOrders(limit = 10) {
   return useQuery({
     queryKey: ['oms-recent-orders', limit],
-    queryFn: () => dashboardApi.recentOrders(limit),
+    queryFn: () => dashboardApi.recentOrders({ pageNum: 1, pageSize: limit }),
+    select: (data) => data.list?.map(r => r.row) ?? [],
     ...CACHE_TIMES.dashboard,
     refetchInterval: 30_000,
   });
@@ -34,7 +37,7 @@ export function useRecentOrders(limit = 10) {
 export function useDelayedShipments() {
   return useQuery({
     queryKey: ['oms-delayed-shipments'],
-    queryFn: () => shippingApi.search({ filters: { delayed: true }, page: 0, size: 5 }),
+    queryFn: () => shippingApi.search({ filters: { delayed: true }, pageNum: 1, pageSize: 5 }),
     ...CACHE_TIMES.dashboard,
     refetchInterval: 30_000,
   });
@@ -43,7 +46,7 @@ export function useDelayedShipments() {
 export function usePendingOrders() {
   return useQuery({
     queryKey: ['oms-pending-orders'],
-    queryFn: () => ordersApi.search({ filters: { stateId: 'CREATED' }, page: 0, size: 100 }),
+    queryFn: () => ordersApi.search({ filters: { stateId: 'CREATED' }, pageNum: 1, pageSize: 100 }),
     ...CACHE_TIMES.dashboard,
     refetchInterval: 30_000,
   });

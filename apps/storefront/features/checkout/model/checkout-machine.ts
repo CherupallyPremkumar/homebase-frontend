@@ -54,7 +54,7 @@ export const initialCheckoutState: CheckoutState = {
 export function deriveStepFromActions(allowedActions: AllowedAction[]): CheckoutUIStep {
   // Check allowed events in priority order
   for (const action of allowedActions) {
-    const step = EVENT_TO_STEP[action.eventId];
+    const step = EVENT_TO_STEP[action.allowedAction];
     if (step) return step;
   }
   // If no recognized events, we're in an unknown state
@@ -65,7 +65,7 @@ export function deriveStepFromActions(allowedActions: AllowedAction[]): Checkout
  * Checks if a specific backend event is currently allowed.
  */
 export function isEventAllowed(allowedActions: AllowedAction[], eventId: string): boolean {
-  return allowedActions.some((a) => a.eventId === eventId);
+  return allowedActions.some((a) => a.allowedAction === eventId);
 }
 
 /**

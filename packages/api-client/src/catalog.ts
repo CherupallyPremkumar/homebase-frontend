@@ -1,27 +1,56 @@
-import type { CatalogItem, CategoryMenu, SearchSuggestion, ProductFilter, Banner, SearchRequest, SearchResponse } from '@homebase/types';
+import type { CatalogItem, Category, SearchSuggestion, ProductFilter, Banner, SearchRequest, SearchResponse } from '@homebase/types';
 import { getApiClient } from './client';
 
 export const catalogApi = {
+  // Query endpoints
   search(params: SearchRequest) {
-    return getApiClient().post<SearchResponse<CatalogItem>>('/api/v1/catalog/search', params);
+    return getApiClient().post<SearchResponse<CatalogItem>>('/catalog/catalogItems', params);
   },
-  getProduct(id: string) {
-    return getApiClient().get<CatalogItem>(`/api/v1/catalog/products/${id}`);
+  categories(params: SearchRequest) {
+    return getApiClient().post<SearchResponse<Category>>('/catalog/catalogCategories', params);
   },
-  categoryMenu() {
-    return getApiClient().get<CategoryMenu>('/api/v1/catalog/categories/menu');
+
+  // Storefront query endpoints
+  storefrontProducts(params: SearchRequest) {
+    return getApiClient().post<SearchResponse<CatalogItem>>('/storefront/storefront-products', params);
   },
-  getFilters(categoryId?: string) {
-    const params = categoryId ? `?categoryId=${categoryId}` : '';
-    return getApiClient().get<ProductFilter>(`/api/v1/catalog/filters${params}`);
+  storefrontCategories(params: SearchRequest) {
+    return getApiClient().post<SearchResponse<Category>>('/storefront/storefront-categories', params);
   },
   suggestions(q: string) {
-    return getApiClient().get<SearchSuggestion[]>(`/api/v1/catalog/suggestions?q=${encodeURIComponent(q)}`);
+    return getApiClient().post<SearchResponse<SearchSuggestion>>('/storefront/suggestions', {
+      pageNum: 1,
+      pageSize: 10,
+      filters: { q },
+    });
   },
-  featuredProducts() {
-    return getApiClient().get<CatalogItem[]>('/api/v1/catalog/featured');
+  featuredProducts(params?: SearchRequest) {
+    return getApiClient().post<SearchResponse<CatalogItem>>('/storefront/featured-products', params ?? {
+      pageNum: 1,
+      pageSize: 20,
+    });
   },
-  banners() {
-    return getApiClient().get<Banner[]>('/api/v1/catalog/banners');
+  banners(params?: SearchRequest) {
+    return getApiClient().post<SearchResponse<Banner>>('/storefront/banners', params ?? {
+      pageNum: 1,
+      pageSize: 10,
+    });
+  },
+  filters(params: SearchRequest) {
+    return getApiClient().post<SearchResponse<ProductFilter>>('/storefront/filters', params);
+  },
+  async getProduct(id: string) {
+    const response = await getApiClient().post<SearchResponse<CatalogItem>>('/storefront/storefront-products', {
+      pageNum: 1,
+      pageSize: 1,
+      filters: { id },
+    });
+    const item = response.list?.[0]?.row;
+    if (!item) throw new Error('Product not found');
+    return item;
+  },
+  // Aliases for backward compatibility
+  categoryMenu(params?: SearchRequest) {
+    return getApiClient().post<SearchResponse<Category>>('/catalog/categoryMenu', params ?? { pageNum: 1, pageSize: 100 });
   },
 };

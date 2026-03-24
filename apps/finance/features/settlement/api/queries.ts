@@ -16,7 +16,7 @@ export function useSettlementSearch(params: SearchRequest) {
 export function useSettlementDetail(id: string) {
   return useQuery({
     queryKey: ['finance-settlement', id],
-    queryFn: () => settlementsApi.getById(id),
+    queryFn: () => settlementsApi.retrieve(id),
     ...CACHE_TIMES.orderDetail,
     enabled: !!id,
   });
@@ -25,6 +25,6 @@ export function useSettlementDetail(id: string) {
 export function useSettlementMutation() {
   return useStmMutation<Settlement>({
     entityType: 'finance-settlement',
-    mutationFn: settlementsApi.processEvent,
+    mutationFn: settlementsApi.processById,
   });
 }

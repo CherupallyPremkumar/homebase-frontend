@@ -8,7 +8,7 @@ import type { Supplier } from '@homebase/types';
 export function useSupplierDetail(id: string) {
   return useQuery({
     queryKey: ['platform-supplier', id],
-    queryFn: () => suppliersApi.getById(id),
+    queryFn: () => suppliersApi.retrieve(id),
     ...CACHE_TIMES.productDetail,
     enabled: !!id,
   });
@@ -17,6 +17,6 @@ export function useSupplierDetail(id: string) {
 export function useSupplierMutation() {
   return useStmMutation<Supplier>({
     entityType: 'platform-supplier',
-    mutationFn: suppliersApi.processEvent,
+    mutationFn: suppliersApi.processById,
   });
 }

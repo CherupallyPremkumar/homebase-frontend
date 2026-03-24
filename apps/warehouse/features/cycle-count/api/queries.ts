@@ -1,61 +1,42 @@
 'use client';
 
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useQuery } from '@tanstack/react-query';
 import { getApiClient } from '@homebase/api-client';
-import { toast } from 'sonner';
+import type { SearchResponse } from '@homebase/types';
 
-export interface CycleCountTask {
+export interface WarehouseLocation {
   id: string;
-  binLocation: string;
+  warehouseId: string;
+  locationCode: string;
   zone: string;
-  status: 'PENDING' | 'IN_PROGRESS' | 'COMPLETED' | 'DISCREPANCY';
-  scheduledDate: string;
-  items: CycleCountItem[];
+  aisle: string;
+  shelf: string;
+  bin: string;
+  locationType: string;
+  capacityUnits: number;
+  currentUnits: number;
+  isActive: boolean;
 }
 
-export interface CycleCountItem {
-  id: string;
-  sku: string;
-  productName: string;
-  expectedQuantity: number;
-  actualQuantity?: number;
-  counted: boolean;
-  discrepancy: boolean;
-}
-
-export interface RecordCountPayload {
-  taskId: string;
-  itemId: string;
-  actualQuantity: number;
-}
-
-export function usePendingCounts() {
+/**
+ * Fetches warehouse locations to display as potential cycle-count targets.
+ * Actual cycle-count scheduling will be added when the backend API is ready.
+ */
+export function useCountLocations() {
   return useQuery({
-    queryKey: ['wms-cycle-count', 'pending'],
-    queryFn: () => getApiClient().get<CycleCountTask[]>('/api/v1/warehouse/cycle-counts/pending'),
-    staleTime: 30_000,
-  });
-}
-
-export function useCycleCountDetail(id: string) {
-  return useQuery({
-    queryKey: ['wms-cycle-count', id],
-    queryFn: () => getApiClient().get<CycleCountTask>(`/api/v1/warehouse/cycle-counts/${id}`),
-    staleTime: 5_000,
-    enabled: !!id,
-  });
-}
-
-export function useRecordCount() {
-  const queryClient = useQueryClient();
-  return useMutation({
-    mutationFn: (payload: RecordCountPayload) =>
-      getApiClient().post<void>(`/api/v1/warehouse/cycle-counts/${payload.taskId}/count`, payload),
-    onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({ queryKey: ['wms-cycle-count', variables.taskId] });
-      queryClient.invalidateQueries({ queryKey: ['wms-cycle-count', 'pending'] });
-      toast.success('Count recorded');
+    queryKey: ['wms-cycle-count', 'locations'],
+    queryFn: async (): Promise<WarehouseLocation[]> => {
+      const api = getApiClient();
+      const res = await api.post<SearchResponse<WarehouseLocation>>(
+        '/warehouse/warehouse-locations',
+        {
+          filters: { isActive: 'true' },
+          pageNum: 1,
+          pageSize: 50,
+        },
+      );
+      return res?.list?.map((entry) => entry.row) ?? [];
     },
-    onError: () => toast.error('Failed to record count'),
+    staleTime: 30_000,
   });
 }

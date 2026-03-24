@@ -1,20 +1,36 @@
-import type { DashboardStats, DailyOrderStats, OrdersByState, StockAlert, Order } from '@homebase/types';
+import type { DashboardStats, DailyOrderStats, OrdersByState, StockAlert, Order, SearchRequest, SearchResponse } from '@homebase/types';
 import { getApiClient } from './client';
 
 export const dashboardApi = {
-  overviewStats() {
-    return getApiClient().get<DashboardStats>('/api/v1/dashboard/stats');
+  // Query endpoints — all use Chenile query format
+  overviewStats(params?: SearchRequest) {
+    return getApiClient().post<SearchResponse<DashboardStats>>('/dashboard/overviewStats', params ?? {
+      pageNum: 1,
+      pageSize: 1,
+    });
   },
-  dailyOrderStats(days = 30) {
-    return getApiClient().get<DailyOrderStats[]>(`/api/v1/dashboard/daily-orders?days=${days}`);
+  dailyOrderStats(params?: SearchRequest) {
+    return getApiClient().post<SearchResponse<DailyOrderStats>>('/dashboard/dailyOrderStats', params ?? {
+      pageNum: 1,
+      pageSize: 30,
+    });
   },
-  ordersByState() {
-    return getApiClient().get<OrdersByState[]>('/api/v1/dashboard/orders-by-state');
+  ordersByState(params?: SearchRequest) {
+    return getApiClient().post<SearchResponse<OrdersByState>>('/dashboard/ordersByState', params ?? {
+      pageNum: 1,
+      pageSize: 50,
+    });
   },
-  recentOrders(limit = 10) {
-    return getApiClient().get<Order[]>(`/api/v1/dashboard/recent-orders?limit=${limit}`);
+  recentOrders(params?: SearchRequest) {
+    return getApiClient().post<SearchResponse<Order>>('/dashboard/recentOrders', params ?? {
+      pageNum: 1,
+      pageSize: 10,
+    });
   },
-  lowStockAlerts() {
-    return getApiClient().get<StockAlert[]>('/api/v1/dashboard/low-stock-alerts');
+  lowStockAlerts(params?: SearchRequest) {
+    return getApiClient().post<SearchResponse<StockAlert>>('/dashboard/lowStockAlerts', params ?? {
+      pageNum: 1,
+      pageSize: 20,
+    });
   },
 };

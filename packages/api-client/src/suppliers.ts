@@ -2,23 +2,48 @@ import type { Supplier, SupplierOnboarding, SupplierPerformanceMetrics, SearchRe
 import { getApiClient } from './client';
 
 export const suppliersApi = {
+  // Query endpoints
   search(params: SearchRequest) {
-    return getApiClient().post<SearchResponse<Supplier>>('/api/v1/suppliers/search', params);
+    return getApiClient().post<SearchResponse<Supplier>>('/supplier/suppliers', params);
   },
-  getById(id: string) {
-    return getApiClient().get<StateEntityServiceResponse<Supplier>>(`/api/v1/suppliers/${id}`);
+
+  // Query-based retrieve (works with query-build)
+  async retrieve(id: string) {
+    const response = await getApiClient().post<SearchResponse<Supplier>>('/supplier/supplierById', {
+      pageNum: 1,
+      pageSize: 1,
+      filters: { id },
+    });
+    const item = response.list?.[0];
+    if (!item) throw new Error('Supplier not found');
+    return { mutatedEntity: item.row, allowedActionsAndMetadata: item.allowedActions ?? [] } as StateEntityServiceResponse<Supplier>;
   },
-  processEvent(id: string, eventId: string, payload?: unknown) {
-    return getApiClient().patch<StateEntityServiceResponse<Supplier>>(`/api/v1/suppliers/${id}/${eventId}`, payload ?? {});
+  create(entity: Partial<Supplier>) {
+    return getApiClient().post<StateEntityServiceResponse<Supplier>>('/supplier', entity);
+  },
+  processById(id: string, eventId: string, payload?: unknown) {
+    return getApiClient().patch<StateEntityServiceResponse<Supplier>>('/supplier/' + id + '/' + eventId, payload ?? {});
   },
   getPerformance(supplierId: string) {
-    return getApiClient().get<SupplierPerformanceMetrics>(`/api/v1/suppliers/${supplierId}/performance`);
+    return getApiClient().post<SearchResponse<SupplierPerformanceMetrics>>('/supplier/performance', {
+      pageNum: 1,
+      pageSize: 1,
+      filters: { supplierId },
+    });
   },
-  // Onboarding
-  getOnboarding(id: string) {
-    return getApiClient().get<StateEntityServiceResponse<SupplierOnboarding>>(`/api/v1/onboarding/${id}`);
+
+  // Onboarding — query-based retrieve
+  async retrieveOnboarding(id: string) {
+    const response = await getApiClient().post<SearchResponse<SupplierOnboarding>>('/onboarding/onboarding', {
+      pageNum: 1,
+      pageSize: 1,
+      filters: { id },
+    });
+    const item = response.list?.[0];
+    if (!item) throw new Error('Onboarding not found');
+    return { mutatedEntity: item.row, allowedActionsAndMetadata: item.allowedActions ?? [] } as StateEntityServiceResponse<SupplierOnboarding>;
   },
-  processOnboardingEvent(id: string, eventId: string, payload?: unknown) {
-    return getApiClient().patch<StateEntityServiceResponse<SupplierOnboarding>>(`/api/v1/onboarding/${id}/${eventId}`, payload ?? {});
+  processOnboardingById(id: string, eventId: string, payload?: unknown) {
+    return getApiClient().patch<StateEntityServiceResponse<SupplierOnboarding>>('/onboarding/' + id + '/' + eventId, payload ?? {});
   },
 };

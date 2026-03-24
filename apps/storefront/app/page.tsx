@@ -18,21 +18,21 @@ export default async function HomePage() {
       <JsonLd data={websiteJsonLd()} />
 
       <div className="space-y-8">
-        {banners.status === 'fulfilled' && banners.value.length > 0 && (
-          <HeroBanner banners={banners.value} />
+        {banners.status === 'fulfilled' && banners.value.list?.length > 0 && (
+          <HeroBanner banners={banners.value.list.map(r => r.row)} />
         )}
 
         {categories.status === 'fulfilled' && (
           <section className="container mx-auto px-4">
             <h2 className="mb-4 text-xl font-bold text-gray-900">Shop by Category</h2>
-            <CategoryGrid categories={categories.value.categories} />
+            <CategoryGrid categories={categories.value.list?.map(r => r.row) ?? []} />
           </section>
         )}
 
-        {featured.status === 'fulfilled' && featured.value.length > 0 && (
+        {featured.status === 'fulfilled' && featured.value.list?.length > 0 && (
           <section className="container mx-auto px-4">
             <h2 className="mb-4 text-xl font-bold text-gray-900">Featured Products</h2>
-            <FeaturedProducts products={featured.value} />
+            <FeaturedProducts products={featured.value.list.map(r => r.row)} />
           </section>
         )}
 

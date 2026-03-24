@@ -16,7 +16,7 @@ export function useSellerOrders(params: SearchRequest) {
 export function useSellerOrderDetail(id: string) {
   return useQuery({
     queryKey: ['seller-orders', id],
-    queryFn: () => ordersApi.getById(id),
+    queryFn: () => ordersApi.retrieve(id),
     ...CACHE_TIMES.orderDetail,
     enabled: !!id,
   });

@@ -15,22 +15,22 @@ export function SellerSettlementList() {
       emptyDescription="Settlements will appear after your first order is delivered."
       columns={[
         {
-          key: 'periodStart',
+          key: 'settlementPeriodStart',
           header: 'Period',
           render: (item) => (
-            <span className="text-sm">{formatDate(item.periodStart)} -- {formatDate(item.periodEnd)}</span>
+            <span className="text-sm">{formatDate(item.settlementPeriodStart)} -- {formatDate(item.settlementPeriodEnd)}</span>
           ),
         },
-        { key: 'grossAmount', header: 'Gross Sales', type: 'price' },
+        { key: 'orderAmount', header: 'Order Amount', type: 'price' },
         {
-          key: 'commission',
+          key: 'commissionAmount',
           header: 'Commission',
-          render: (item) => <span className="text-red-600">-{formatPrice(item.commission)}</span>,
+          render: (item) => <span className="text-red-600">-{formatPrice(item.commissionAmount ?? 0)}</span>,
         },
         {
-          key: 'netPayout',
+          key: 'netAmount',
           header: 'Net Payout',
-          render: (item) => <span className="font-bold text-green-600">{formatPrice(item.netPayout)}</span>,
+          render: (item) => <span className="font-bold text-green-600">{formatPrice(item.netAmount ?? 0)}</span>,
         },
         { key: 'stateId', header: 'Status', type: 'state' },
       ]}

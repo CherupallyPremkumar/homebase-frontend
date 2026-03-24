@@ -9,13 +9,13 @@ import type { Order } from '@homebase/types';
 export function OrderDetail({ orderId }: { orderId: string }) {
   const { data, isLoading, error, refetch } = useQuery({
     queryKey: ['orders', orderId],
-    queryFn: () => ordersApi.getById(orderId),
+    queryFn: () => ordersApi.retrieve(orderId),
     ...CACHE_TIMES.orderDetail,
   });
 
   const mutation = useStmMutation<Order>({
     entityType: 'orders',
-    mutationFn: ordersApi.processEvent,
+    mutationFn: ordersApi.processById,
   });
 
   const order = data?.mutatedEntity;
@@ -28,7 +28,7 @@ export function OrderDetail({ orderId }: { orderId: string }) {
           { label: order ? `#${order.orderNumber}` : '...' },
         ]}
         title={order ? `Order #${order.orderNumber}` : 'Order'}
-        subtitle={order ? `Placed ${formatDate(order.createdTime)}` : undefined}
+        subtitle={order?.createdTime ? `Placed ${formatDate(order.createdTime)}` : undefined}
         state={order?.stateId}
         allowedActions={data?.allowedActionsAndMetadata}
         onAction={(eventId) => mutation.mutate({ id: orderId, eventId })}

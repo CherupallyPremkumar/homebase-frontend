@@ -1,9 +1,14 @@
 'use client';
 
+import { signOut } from 'next-auth/react';
 import { Bell, Search } from 'lucide-react';
-import { Button, Input, DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, Avatar, AvatarFallback } from '@homebase/ui';
+import { Button, Input, DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger, Avatar, AvatarFallback } from '@homebase/ui';
 
-export function PlatformHeader() {
+interface HeaderProps {
+  user?: { name?: string | null; email?: string | null } | null;
+}
+
+export function PlatformHeader({ user }: HeaderProps) {
   return (
     <header className="flex h-16 items-center justify-between border-b bg-white px-6">
       {/* Search */}
@@ -24,14 +29,28 @@ export function PlatformHeader() {
           <DropdownMenuTrigger asChild>
             <Button variant="ghost" size="icon" className="rounded-full">
               <Avatar className="h-8 w-8">
-                <AvatarFallback>PA</AvatarFallback>
+                <AvatarFallback className="bg-primary/10 text-primary">
+                  {user?.name?.[0]?.toUpperCase() || user?.email?.[0]?.toUpperCase() || 'P'}
+                </AvatarFallback>
               </Avatar>
             </Button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
+          <DropdownMenuContent align="end" className="w-56">
+            {user && (
+              <>
+                <div className="px-2 py-1.5">
+                  <p className="text-sm font-medium">{user.name || 'User'}</p>
+                  <p className="text-xs text-gray-500">{user.email}</p>
+                </div>
+                <DropdownMenuSeparator />
+              </>
+            )}
             <DropdownMenuItem>Profile</DropdownMenuItem>
             <DropdownMenuItem>Settings</DropdownMenuItem>
-            <DropdownMenuItem>Sign out</DropdownMenuItem>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem onClick={() => { signOut({ callbackUrl: '/login' }); }}>
+              Sign out
+            </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
       </div>

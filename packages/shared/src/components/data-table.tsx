@@ -60,7 +60,10 @@ export function DataTable<T>({
 
   const effectiveRequest: SearchRequest = {
     ...searchRequest,
-    q: debouncedSearch || undefined,
+    filters: {
+      ...searchRequest.filters,
+      ...(debouncedSearch ? { q: debouncedSearch } : {}),
+    },
   };
 
   const { data, isLoading, error, refetch } = useQuery({
@@ -71,12 +74,12 @@ export function DataTable<T>({
   });
 
   const table = useReactTable({
-    data: data?.content ?? [],
+    data: data?.list?.map((entry: { row: T }) => entry.row) ?? [],
     columns,
     getCoreRowModel: getCoreRowModel(),
     manualPagination: true,
     manualSorting: true,
-    pageCount: data?.totalPages ?? 0,
+    pageCount: data?.maxPages ?? 0,
     state: {
       pagination: { pageIndex: page - 1, pageSize: size },
     },
@@ -106,7 +109,7 @@ export function DataTable<T>({
 
       {isLoading ? (
         <SectionSkeleton variant="table" rows={size} />
-      ) : !data?.content.length ? (
+      ) : !data?.numRowsReturned ? (
         <EmptyState title={emptyTitle} description={emptyDescription} />
       ) : (
         <>
@@ -141,8 +144,8 @@ export function DataTable<T>({
 
           <div className="flex items-center justify-between">
             <p className="text-sm text-gray-500">
-              Showing {(page - 1) * size + 1}–{Math.min(page * size, data.totalElements)} of{' '}
-              {data.totalElements}
+              Showing {data.startRow}–{data.endRow} of{' '}
+              {data.maxRows}
             </p>
             <div className="flex items-center gap-2">
               <Select value={String(size)} onValueChange={(v) => { setSize(Number(v)); setPage(1); }}>
@@ -159,18 +162,18 @@ export function DataTable<T>({
                 variant="outline"
                 size="sm"
                 onClick={() => setPage(page - 1)}
-                disabled={!data.hasPrevious}
+                disabled={data.currentPage <= 1}
               >
                 Previous
               </Button>
               <span className="text-sm">
-                Page {page} of {data.totalPages}
+                Page {data.currentPage} of {data.maxPages}
               </span>
               <Button
                 variant="outline"
                 size="sm"
                 onClick={() => setPage(page + 1)}
-                disabled={!data.hasNext}
+                disabled={data.currentPage >= data.maxPages}
               >
                 Next
               </Button>

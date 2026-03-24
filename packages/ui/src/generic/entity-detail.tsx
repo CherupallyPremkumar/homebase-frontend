@@ -3,8 +3,40 @@
 import * as React from 'react';
 import { useState, useMemo } from 'react';
 import Link from 'next/link';
+import {
+  MoreVertical,
+  AlertTriangle,
+  Pencil,
+  ChevronRight,
+  Loader2,
+} from 'lucide-react';
 import { cn } from '../lib/utils';
+import {
+  categorizeActions,
+  formatEventLabel,
+  type CategorizedActions,
+} from '../lib/action-utils';
 import { StateBadge } from '../display/state-badge';
+import { Button } from '../button';
+import {
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuLabel,
+} from '../dropdown-menu';
+import {
+  AlertDialog,
+  AlertDialogContent,
+  AlertDialogHeader,
+  AlertDialogFooter,
+  AlertDialogTitle,
+  AlertDialogDescription,
+  AlertDialogAction,
+  AlertDialogCancel,
+} from '../alert-dialog';
+import type { AllowedAction } from '@homebase/types';
 
 // --- Sub-types ---
 
@@ -19,18 +51,6 @@ interface TabConfig {
   content: React.ReactNode;
   badge?: number;
 }
-
-interface AllowedAction {
-  eventId: string;
-  metadata: Record<string, string>;
-  bodyType?: string;
-}
-
-// Dangerous events that require confirmation
-const DANGEROUS_EVENTS = new Set([
-  'CANCEL', 'DELETE', 'REJECT', 'SUSPEND', 'DEACTIVATE',
-  'DEPRECATE', 'BLOCK', 'TERMINATE', 'CLOSE', 'DISCARD',
-]);
 
 // --- Props ---
 
@@ -85,47 +105,112 @@ export function EntityDetail({
   const [activeTab, setActiveTab] = useState(defaultTab || tabs[0]?.key || '');
   const [confirmAction, setConfirmAction] = useState<AllowedAction | null>(null);
 
-  const isDangerous = useMemo(() => {
-    const set = dangerousEvents ? new Set(dangerousEvents) : DANGEROUS_EVENTS;
-    return (eventId: string) => set.has(eventId);
-  }, [dangerousEvents]);
+  const overrideDangerousSet = useMemo(
+    () => (dangerousEvents ? new Set(dangerousEvents) : undefined),
+    [dangerousEvents],
+  );
 
-  // Loading skeleton
+  const categorized: CategorizedActions = useMemo(() => {
+    if (!allowedActions?.length) {
+      return { primary: [], secondary: [], dangerous: [], edit: [] };
+    }
+    return categorizeActions(allowedActions, overrideDangerousSet);
+  }, [allowedActions, overrideDangerousSet]);
+
+  const hasDropdownItems =
+    categorized.secondary.length > 0 ||
+    categorized.dangerous.length > 0 ||
+    categorized.edit.length > 0;
+
+  // --- Loading skeleton ---
   if (loading) {
     return (
-      <div className="space-y-4">
-        <div className="h-6 w-48 animate-pulse rounded bg-gray-100" />
-        <div className="h-8 w-72 animate-pulse rounded bg-gray-100" />
-        <div className="h-10 w-full animate-pulse rounded bg-gray-100" />
-        <div className="h-64 w-full animate-pulse rounded-md bg-gray-50" />
+      <div className="space-y-6">
+        {/* Breadcrumb skeleton */}
+        <div className="flex items-center gap-2">
+          <div className="h-4 w-20 animate-pulse rounded bg-gray-100" />
+          <div className="h-4 w-3 animate-pulse rounded bg-gray-100" />
+          <div className="h-4 w-24 animate-pulse rounded bg-gray-100" />
+        </div>
+        {/* Header skeleton */}
+        <div className="flex items-start justify-between">
+          <div className="space-y-2">
+            <div className="flex items-center gap-3">
+              <div className="h-7 w-56 animate-pulse rounded bg-gray-100" />
+              <div className="h-6 w-20 animate-pulse rounded-full bg-gray-100" />
+            </div>
+            <div className="h-4 w-36 animate-pulse rounded bg-gray-100" />
+          </div>
+          <div className="flex items-center gap-2">
+            <div className="h-9 w-24 animate-pulse rounded-md bg-gray-100" />
+            <div className="h-9 w-9 animate-pulse rounded-md bg-gray-100" />
+          </div>
+        </div>
+        {/* Tab bar skeleton */}
+        <div className="flex gap-4 border-b border-gray-200 pb-px">
+          <div className="h-5 w-16 animate-pulse rounded bg-gray-100" />
+          <div className="h-5 w-16 animate-pulse rounded bg-gray-100" />
+          <div className="h-5 w-16 animate-pulse rounded bg-gray-100" />
+        </div>
+        {/* Content skeleton */}
+        <div className={cn(sidebar ? 'grid gap-6 lg:grid-cols-3' : '')}>
+          <div className={cn(sidebar ? 'lg:col-span-2' : '', 'space-y-3')}>
+            <div className="h-48 w-full animate-pulse rounded-lg border border-gray-100 bg-gray-50" />
+            <div className="h-32 w-full animate-pulse rounded-lg border border-gray-100 bg-gray-50" />
+          </div>
+          {sidebar && (
+            <div className="space-y-3">
+              <div className="h-24 w-full animate-pulse rounded-lg border border-gray-100 bg-gray-50" />
+              <div className="h-32 w-full animate-pulse rounded-lg border border-gray-100 bg-gray-50" />
+            </div>
+          )}
+        </div>
       </div>
     );
   }
 
-  // Error state
+  // --- Error state ---
   if (error) {
     return (
-      <div className="flex flex-col items-center justify-center rounded-lg border border-red-200 bg-red-50 p-8">
-        <p className="text-sm font-medium text-red-700">{error}</p>
+      <div className="flex flex-col items-center justify-center rounded-lg border border-red-200 bg-red-50 px-8 py-16">
+        <div className="mb-3 rounded-full bg-red-100 p-3">
+          <AlertTriangle className="h-6 w-6 text-red-600" />
+        </div>
+        <p className="text-sm font-medium text-red-800">{error}</p>
         {onRetry && (
-          <button onClick={onRetry} className="mt-3 rounded-md border border-red-300 bg-white px-4 py-2 text-sm font-medium text-red-700 hover:bg-red-50">
+          <Button variant="outline" size="sm" onClick={onRetry} className="mt-4 border-red-300 text-red-700 hover:bg-red-50">
             Try again
-          </button>
+          </Button>
         )}
       </div>
     );
   }
 
+  function handleAction(eventId: string) {
+    onAction?.(eventId);
+  }
+
+  function handleDangerousAction(action: AllowedAction) {
+    setConfirmAction(action);
+  }
+
   return (
     <div className="space-y-6">
-      {/* Breadcrumbs */}
+      {/* === Breadcrumbs === */}
       <nav aria-label="Breadcrumb">
         <ol className="flex items-center gap-1.5 text-sm">
           {breadcrumbs.map((crumb, i) => (
             <li key={i} className="flex items-center gap-1.5">
-              {i > 0 && <span className="text-gray-300" aria-hidden="true">/</span>}
+              {i > 0 && (
+                <ChevronRight className="h-3.5 w-3.5 text-gray-400" aria-hidden="true" />
+              )}
               {crumb.href ? (
-                <Link href={crumb.href} className="text-gray-500 hover:text-primary-600">{crumb.label}</Link>
+                <Link
+                  href={crumb.href}
+                  className="text-gray-500 transition-colors hover:text-gray-900"
+                >
+                  {crumb.label}
+                </Link>
               ) : (
                 <span className="font-medium text-gray-900">{crumb.label}</span>
               )}
@@ -134,89 +219,164 @@ export function EntityDetail({
         </ol>
       </nav>
 
-      {/* Header: title + state + actions */}
+      {/* === Header: title + state + actions === */}
       <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-        <div>
+        {/* Left: title, state, subtitle */}
+        <div className="min-w-0 flex-1">
           <div className="flex items-center gap-3">
-            <h1 className="text-xl font-bold text-gray-900">{title}</h1>
+            <h1 className="truncate text-2xl font-bold tracking-tight text-gray-900">
+              {title}
+            </h1>
             {state && <StateBadge state={state} />}
           </div>
-          {subtitle && <p className="mt-1 text-sm text-gray-500">{subtitle}</p>}
+          {subtitle && (
+            <p className="mt-1 text-sm text-gray-500">{subtitle}</p>
+          )}
           {headerExtra}
         </div>
 
-        {/* STM Action Buttons */}
-        {allowedActions && allowedActions.length > 0 && onAction && (
-          <div className="flex flex-wrap gap-2">
-            {allowedActions.map((action) => {
-              const dangerous = isDangerous(action.eventId);
-              return (
-                <button
-                  key={action.eventId}
-                  onClick={() => {
-                    if (dangerous) {
-                      setConfirmAction(action);
-                    } else {
-                      onAction(action.eventId);
-                    }
-                  }}
-                  disabled={actionLoading}
-                  className={cn(
-                    'inline-flex items-center rounded-md px-3 py-1.5 text-sm font-medium transition-colors',
-                    dangerous
-                      ? 'border border-red-200 bg-white text-red-600 hover:bg-red-50'
-                      : 'bg-primary-600 text-white hover:bg-primary-700',
-                    actionLoading && 'opacity-50 cursor-not-allowed',
+        {/* Right: action buttons */}
+        {onAction && (
+          <div className="flex flex-shrink-0 items-center gap-2">
+            {/* Primary action buttons — visible and prominent */}
+            {categorized.primary.map((action) => (
+              <Button
+                key={action.allowedAction}
+                onClick={() => handleAction(action.allowedAction)}
+                disabled={actionLoading}
+                size="sm"
+              >
+                {actionLoading && (
+                  <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                )}
+                {formatEventLabel(action.allowedAction)}
+              </Button>
+            ))}
+
+            {/* Kebab / More Actions dropdown — edit, secondary, dangerous */}
+            {hasDropdownItems && (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button
+                    variant="outline"
+                    size="icon"
+                    className="h-9 w-9"
+                    disabled={actionLoading}
+                    aria-label="More actions"
+                  >
+                    <MoreVertical className="h-4 w-4" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-48">
+                  {/* Edit actions */}
+                  {categorized.edit.length > 0 && (
+                    <>
+                      {categorized.edit.map((action) => (
+                        <DropdownMenuItem
+                          key={action.allowedAction}
+                          onClick={() => handleAction(action.allowedAction)}
+                          disabled={actionLoading}
+                        >
+                          <Pencil className="mr-2 h-4 w-4 text-gray-500" />
+                          {formatEventLabel(action.allowedAction)}
+                        </DropdownMenuItem>
+                      ))}
+                      {(categorized.secondary.length > 0 || categorized.dangerous.length > 0) && (
+                        <DropdownMenuSeparator />
+                      )}
+                    </>
                   )}
-                >
-                  {actionLoading && (
-                    <span className="mr-1.5 h-3.5 w-3.5 animate-spin rounded-full border-2 border-current border-t-transparent" />
+
+                  {/* Secondary actions */}
+                  {categorized.secondary.length > 0 && (
+                    <>
+                      {categorized.secondary.map((action) => (
+                        <DropdownMenuItem
+                          key={action.allowedAction}
+                          onClick={() => handleAction(action.allowedAction)}
+                          disabled={actionLoading}
+                        >
+                          {formatEventLabel(action.allowedAction)}
+                        </DropdownMenuItem>
+                      ))}
+                      {categorized.dangerous.length > 0 && (
+                        <DropdownMenuSeparator />
+                      )}
+                    </>
                   )}
-                  {action.eventId.replace(/_/g, ' ')}
-                </button>
-              );
-            })}
+
+                  {/* Dangerous actions — red text, requires confirmation */}
+                  {categorized.dangerous.length > 0 && (
+                    <>
+                      <DropdownMenuLabel className="text-xs font-normal text-gray-400">
+                        Destructive
+                      </DropdownMenuLabel>
+                      {categorized.dangerous.map((action) => (
+                        <DropdownMenuItem
+                          key={action.allowedAction}
+                          onClick={() => handleDangerousAction(action)}
+                          disabled={actionLoading}
+                          className="text-red-600 focus:bg-red-50 focus:text-red-700"
+                        >
+                          <AlertTriangle className="mr-2 h-4 w-4" />
+                          {formatEventLabel(action.allowedAction)}
+                        </DropdownMenuItem>
+                      ))}
+                    </>
+                  )}
+                </DropdownMenuContent>
+              </DropdownMenu>
+            )}
           </div>
         )}
       </div>
 
-      {/* Confirmation Dialog */}
-      {confirmAction && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50" onClick={() => setConfirmAction(null)}>
-          <div className="mx-4 w-full max-w-md rounded-lg bg-white p-6 shadow-lg" onClick={(e) => e.stopPropagation()}>
-            <h3 className="text-lg font-semibold text-gray-900">
-              Confirm {confirmAction.eventId.replace(/_/g, ' ')}
-            </h3>
-            <p className="mt-2 text-sm text-gray-500">
-              Are you sure? This action may not be reversible.
-            </p>
-            <div className="mt-4 flex justify-end gap-2">
-              <button
-                onClick={() => setConfirmAction(null)}
-                className="rounded-md border border-gray-200 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={() => {
-                  onAction?.(confirmAction.eventId);
-                  setConfirmAction(null);
-                }}
-                className="rounded-md bg-red-600 px-4 py-2 text-sm font-medium text-white hover:bg-red-700"
-              >
-                {confirmAction.eventId.replace(/_/g, ' ')}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      {/* === Confirmation Dialog for Dangerous Actions === */}
+      <AlertDialog
+        open={confirmAction !== null}
+        onOpenChange={(open) => {
+          if (!open) setConfirmAction(null);
+        }}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>
+              {confirmAction
+                ? `Confirm: ${formatEventLabel(confirmAction.allowedAction)}`
+                : ''}
+            </AlertDialogTitle>
+            <AlertDialogDescription>
+              This action may not be reversible. Are you sure you want to proceed?
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => {
+                if (confirmAction) {
+                  handleAction(confirmAction.allowedAction);
+                }
+                setConfirmAction(null);
+              }}
+              className="bg-red-600 text-white hover:bg-red-700 focus:ring-red-600"
+            >
+              {confirmAction
+                ? formatEventLabel(confirmAction.allowedAction)
+                : ''}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
 
-      {/* Content: Tabs + optional sidebar */}
+      {/* === Content: Tabs + optional sidebar === */}
       <div className={cn(sidebar ? 'grid gap-6 lg:grid-cols-3' : '')}>
         <div className={cn(sidebar ? 'lg:col-span-2' : '')}>
           {/* Tab bar */}
           {tabs.length > 1 && (
-            <div className="mb-4 flex gap-1 border-b border-gray-200" role="tablist">
+            <div
+              className="mb-4 flex gap-1 border-b border-gray-200"
+              role="tablist"
+            >
               {tabs.map((tab) => (
                 <button
                   key={tab.key}
@@ -224,15 +384,24 @@ export function EntityDetail({
                   aria-selected={activeTab === tab.key}
                   onClick={() => setActiveTab(tab.key)}
                   className={cn(
-                    'flex items-center gap-1.5 px-4 py-2 text-sm font-medium transition-colors',
+                    'flex items-center gap-1.5 px-4 py-2.5 text-sm font-medium transition-colors',
                     activeTab === tab.key
                       ? 'border-b-2 border-primary-600 text-primary-600'
                       : 'text-gray-500 hover:text-gray-700',
                   )}
                 >
                   {tab.label}
-                  {tab.badge != null && (
-                    <span className="rounded-full bg-gray-100 px-1.5 py-0.5 text-xs text-gray-500">{tab.badge}</span>
+                  {tab.badge != null && tab.badge > 0 && (
+                    <span
+                      className={cn(
+                        'rounded-full px-1.5 py-0.5 text-xs font-medium',
+                        activeTab === tab.key
+                          ? 'bg-primary-100 text-primary-700'
+                          : 'bg-gray-100 text-gray-500',
+                      )}
+                    >
+                      {tab.badge}
+                    </span>
                   )}
                 </button>
               ))}
@@ -241,11 +410,7 @@ export function EntityDetail({
 
           {/* Tab content */}
           {tabs.map((tab) => (
-            <div
-              key={tab.key}
-              role="tabpanel"
-              hidden={activeTab !== tab.key}
-            >
+            <div key={tab.key} role="tabpanel" hidden={activeTab !== tab.key}>
               {activeTab === tab.key && tab.content}
             </div>
           ))}
@@ -255,11 +420,7 @@ export function EntityDetail({
         </div>
 
         {/* Sidebar */}
-        {sidebar && (
-          <aside className="space-y-4">
-            {sidebar}
-          </aside>
-        )}
+        {sidebar && <aside className="space-y-4">{sidebar}</aside>}
       </div>
     </div>
   );

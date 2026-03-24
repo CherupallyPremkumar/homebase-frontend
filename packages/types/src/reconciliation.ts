@@ -3,9 +3,11 @@ import type { StateEntity, ActivityLog } from './common';
 export interface ReconciliationBatch extends StateEntity {
   batchDate: string;
   gatewayName: string;
+  gatewayType?: string;
   totalTransactions: number;
   matchedCount: number;
   mismatchedCount: number;
+  mismatchCount?: number;
   duplicateCount: number;
   totalAmount: number;
   matchedAmount: number;

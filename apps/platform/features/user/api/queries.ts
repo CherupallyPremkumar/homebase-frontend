@@ -8,7 +8,7 @@ import type { User } from '@homebase/types';
 export function useUserDetail(id: string) {
   return useQuery({
     queryKey: ['platform-user', id],
-    queryFn: () => usersApi.getById(id),
+    queryFn: () => usersApi.retrieve(id),
     ...CACHE_TIMES.productDetail,
     enabled: !!id,
   });
@@ -17,6 +17,6 @@ export function useUserDetail(id: string) {
 export function useUserMutation() {
   return useStmMutation<User>({
     entityType: 'platform-user',
-    mutationFn: usersApi.processEvent,
+    mutationFn: usersApi.processById,
   });
 }

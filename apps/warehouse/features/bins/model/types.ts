@@ -1,1 +1,1 @@
-export type { WarehouseBin, BinItem, WarehouseZone } from '../api/queries';
+export type { WarehouseLocation, ZoneSummary } from '../api/queries';

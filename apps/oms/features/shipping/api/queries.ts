@@ -16,7 +16,7 @@ export function useShipmentSearch(params: SearchRequest) {
 export function useShipmentDetail(id: string) {
   return useQuery({
     queryKey: ['oms-shipment', id],
-    queryFn: () => shippingApi.getById(id),
+    queryFn: () => shippingApi.retrieve(id),
     ...CACHE_TIMES.orderDetail,
     enabled: !!id,
   });
@@ -25,6 +25,6 @@ export function useShipmentDetail(id: string) {
 export function useShipmentMutation() {
   return useStmMutation<Shipment>({
     entityType: 'oms-shipment',
-    mutationFn: shippingApi.processEvent,
+    mutationFn: shippingApi.processById,
   });
 }

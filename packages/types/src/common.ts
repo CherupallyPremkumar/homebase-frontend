@@ -1,9 +1,13 @@
-// Generic response wrapper from backend
+/**
+ * Mirrors Chenile's GenericResponse<T>.
+ * Java field is "data" but serialized as "payload" via @JsonProperty("payload").
+ */
 export interface GenericResponse<T> {
   success: boolean;
   code: number;
-  data: T;
+  payload: T;
   description?: string;
+  subErrorCode?: number;
   severity?: 'ERROR' | 'WARNING' | 'INFO';
   errors?: ResponseError[];
   warningMessages?: ResponseWarning[];
@@ -19,59 +23,111 @@ export interface ResponseError {
 
 export interface ResponseWarning {
   code: number;
+  subErrorCode?: number;
   description: string;
+  severity?: string;
 }
 
-// Search/Query types (CQRS read side)
-export interface SearchRequest {
+/**
+ * Chenile query SearchRequest — sent to query endpoints.
+ * Pagination is 1-based: pageNum=1 is the first page.
+ */
+export interface SearchRequest<F = Record<string, unknown>> {
   queryName?: string;
-  page: number;
-  size: number;
-  sort?: string;
-  sortOrder?: 'ASC' | 'DESC';
-  filters?: Record<string, unknown>;
-  q?: string;
+  pageNum: number;
+  pageSize: number;
+  filters?: F;
+  sortCriteria?: SortCriterion[];
 }
 
-export interface SearchResponse<T> {
-  content: T[];
-  totalElements: number;
-  totalPages: number;
-  page: number;
-  size: number;
-  hasNext: boolean;
-  hasPrevious: boolean;
+export interface SortCriterion {
+  field: string;
+  order: 'ASC' | 'DESC';
 }
 
-// STM types
+/**
+ * Chenile query SearchResponse — returned inside GenericResponse.payload.
+ */
+export interface SearchResponse<R = Record<string, unknown>> {
+  list: ResponseRow<R>[];
+  currentPage: number;
+  maxPages: number;
+  maxRows: number;
+  numRowsInPage: number;
+  numRowsReturned: number;
+  startRow: number;
+  endRow: number;
+  columnMetadata: Record<string, ColumnMetadata>;
+  hiddenColumns: string[];
+  cannedReportName?: string;
+  availableCannedReports: CannedReport[];
+  data?: ResponseRow<R>;
+}
+
+export interface ResponseRow<R = Record<string, unknown>> {
+  row: R;
+  allowedActions: AllowedAction[];
+}
+
+export interface AllowedAction {
+  allowedAction: string;
+  acls?: string;
+  bodyType?: string;
+  mainPath?: string;
+}
+
+export interface ColumnMetadata {
+  name: string;
+  columnType: 'Text' | 'Number' | 'Date' | 'CheckBox';
+  filterable: boolean;
+  sortable: boolean;
+  display: boolean;
+  likeQuery: boolean;
+  betweenQuery: boolean;
+  containsQuery: boolean;
+  customRender: boolean;
+  group: string;
+  columnName?: string;
+  dropDownQuery?: string;
+  dropDownValues?: Record<string, string>;
+}
+
+export interface CannedReport {
+  name: string;
+  description?: string;
+}
+
+/**
+ * STM state entity response — returned by command (mutation) endpoints.
+ * Wrapped in GenericResponse.payload.
+ */
 export interface StateEntityServiceResponse<T> {
   mutatedEntity: T;
   allowedActionsAndMetadata: AllowedAction[];
 }
 
-export interface AllowedAction {
-  eventId: string;
-  metadata: Record<string, string>;
-  bodyType?: string;
-}
-
-// Base entity fields matching backend BaseEntity/BaseJpaEntity
+// Base entity fields matching backend BaseJpaEntity
 export interface BaseEntity {
   id: string;
-  createdTime: string;
-  lastModifiedTime: string;
+  createdTime?: string;
+  lastModifiedTime?: string;
   createdBy?: string;
   lastModifiedBy?: string;
-  version: number;
+  tenant?: string;
+  version?: number;
 }
 
-// STM entity fields matching backend AbstractExtendedStateEntity
+// STM entity fields matching backend AbstractJpaStateEntity
 export interface StateEntity extends BaseEntity {
   stateId: string;
   flowId: string;
+  currentState?: {
+    stateId: string;
+    flowId: string;
+  };
   stateEntryTime?: string;
-  slaLate?: boolean;
-  slaTendingLate?: boolean;
+  slaLate?: number;
+  slaTendingLate?: number;
 }
 
 // Activity log entry
@@ -82,7 +138,7 @@ export interface ActivityLog {
   performedBy?: string;
 }
 
-// Address (used across user, order, checkout, shipping)
+// Address
 export interface Address {
   id?: string;
   fullName: string;
@@ -97,16 +153,15 @@ export interface Address {
   type?: 'HOME' | 'WORK' | 'OTHER';
 }
 
-// Money type
+// Money
 export interface Money {
   amount: number;
   currency: string;
 }
 
-// Pagination params for URL state
+// Pagination params for URL state (maps to SearchRequest)
 export interface PaginationParams {
-  page: number;
-  size: number;
-  sort?: string;
-  sortOrder?: 'ASC' | 'DESC';
+  pageNum: number;
+  pageSize: number;
+  sortCriteria?: SortCriterion[];
 }

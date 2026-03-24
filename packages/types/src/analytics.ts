@@ -1,25 +1,26 @@
+// Matches Dashboard.overviewStats SQL output
 export interface DashboardStats {
   totalOrders: number;
+  activeOrders: number;
   totalRevenue: number;
-  activeProducts: number;
-  activeUsers: number;
-  ordersChange: number;
-  revenueChange: number;
-  productsChange: number;
-  usersChange: number;
+  totalCustomers: number;
+  publishedProducts: number;
+  pendingReviewProducts: number;
+  activeSuppliers: number;
+  openTickets: number;
 }
 
+// Matches Dashboard.dailyOrderStats SQL output
 export interface DailyOrderStats {
   date: string;
-  orders: number;
+  orderCount: number;
   revenue: number;
-  averageOrderValue: number;
 }
 
+// Matches Dashboard.ordersByState SQL output
 export interface OrdersByState {
   state: string;
   count: number;
-  percentage: number;
 }
 
 export interface ProductPerformance {

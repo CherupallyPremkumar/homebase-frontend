@@ -16,7 +16,7 @@ export function useSellerSettlements(params: SearchRequest) {
 export function useSellerSettlementDetail(id: string) {
   return useQuery({
     queryKey: ['seller-settlements', id],
-    queryFn: () => settlementsApi.getById(id),
+    queryFn: () => settlementsApi.retrieve(id),
     ...CACHE_TIMES.orderDetail,
     enabled: !!id,
   });

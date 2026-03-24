@@ -29,8 +29,8 @@ export function RevenueTrendChart() {
         <YAxis tickFormatter={formatCurrency} tick={{ fontSize: 12 }} />
         <Tooltip
           formatter={(value: number, name: string) => [
-            `Rs. ${value.toLocaleString('en-IN')}`,
-            name === 'revenue' ? 'Revenue' : 'Settlements',
+            name === 'Revenue' ? `Rs. ${value.toLocaleString('en-IN')}` : value,
+            name,
           ]}
           labelFormatter={(label: string) =>
             new Date(label).toLocaleDateString('en-IN', { day: '2-digit', month: 'long', year: 'numeric' })
@@ -38,7 +38,7 @@ export function RevenueTrendChart() {
         />
         <Legend />
         <Line type="monotone" dataKey="revenue" stroke="#059669" strokeWidth={2} dot={false} name="Revenue" />
-        <Line type="monotone" dataKey="settlements" stroke="#10b981" strokeWidth={2} dot={false} name="Settlements" strokeDasharray="5 5" />
+        <Line type="monotone" dataKey="orderCount" stroke="#10b981" strokeWidth={2} dot={false} name="Orders" strokeDasharray="5 5" />
       </LineChart>
     </ResponsiveContainer>
   );

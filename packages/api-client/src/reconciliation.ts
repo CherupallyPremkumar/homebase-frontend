@@ -2,16 +2,24 @@ import type { ReconciliationBatch, TransactionMismatch, SearchRequest, SearchRes
 import { getApiClient } from './client';
 
 export const reconciliationApi = {
+  // Query endpoints
   search(params: SearchRequest) {
-    return getApiClient().post<SearchResponse<ReconciliationBatch>>('/api/v1/reconciliation/search', params);
+    return getApiClient().post<SearchResponse<ReconciliationBatch>>('/reconciliation/batches', params);
   },
-  getById(id: string) {
-    return getApiClient().get<StateEntityServiceResponse<ReconciliationBatch>>(`/api/v1/reconciliation/${id}`);
+  mismatches(params: SearchRequest) {
+    return getApiClient().post<SearchResponse<TransactionMismatch>>('/reconciliation/mismatches', params);
   },
-  processEvent(id: string, eventId: string, payload?: unknown) {
-    return getApiClient().patch<StateEntityServiceResponse<ReconciliationBatch>>(`/api/v1/reconciliation/${id}/${eventId}`, payload ?? {});
+
+  // Query-based retrieve (works with query-build)
+  async retrieve(id: string) {
+    const response = await getApiClient().post<SearchResponse<ReconciliationBatch>>('/reconciliation/batch', {
+      filters: { id },
+    });
+    const item = response.list?.[0];
+    if (!item) throw new Error('Reconciliation batch not found');
+    return { mutatedEntity: item.row, allowedActionsAndMetadata: item.allowedActions ?? [] } as StateEntityServiceResponse<ReconciliationBatch>;
   },
-  getMismatches(batchId: string) {
-    return getApiClient().get<TransactionMismatch[]>(`/api/v1/reconciliation/${batchId}/mismatches`);
+  processById(id: string, eventId: string, payload?: unknown) {
+    return getApiClient().patch<StateEntityServiceResponse<ReconciliationBatch>>('/reconciliation/' + id + '/' + eventId, payload ?? {});
   },
 };
