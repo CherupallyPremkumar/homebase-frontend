@@ -2,7 +2,6 @@ import type { Checkout, StateEntityServiceResponse, CheckoutAddressPayload, Chec
 import { getApiClient } from './client';
 
 export const checkoutApi = {
-  // Command (STM) endpoints
   retrieve(id: string) {
     return getApiClient().get<StateEntityServiceResponse<Checkout>>('/checkout/' + id);
   },

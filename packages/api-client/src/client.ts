@@ -9,7 +9,7 @@ function getServerBaseUrl(): string {
     if (process.env.NODE_ENV === 'production') {
       throw new Error('BACKEND_URL environment variable is required in production');
     }
-    return 'http://localhost:8000';
+    return 'http://localhost:8080';
   }
   return url;
 }

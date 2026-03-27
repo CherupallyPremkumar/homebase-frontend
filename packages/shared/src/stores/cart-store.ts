@@ -2,13 +2,18 @@
 
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import type { CartItem } from '@homebase/types';
+import type { CartItem, Cart } from '@homebase/types';
 
 interface CartState {
   items: CartItem[];
   couponCode: string | null;
   lastSyncedAt: string | null;
   isHydrated: boolean;
+
+  /** Backend cart ID when authenticated — null for guest mode */
+  backendCartId: string | null;
+  /** Whether the user is currently authenticated */
+  isAuthenticated: boolean;
 
   // Actions
   addItem: (item: CartItem) => void;
@@ -20,6 +25,13 @@ interface CartState {
   setItems: (items: CartItem[]) => void;
   setHydrated: (hydrated: boolean) => void;
   syncFromServer: (items: CartItem[], couponCode: string | null) => void;
+
+  /** Sync backend cart data into the store (used after fetch or mutation) */
+  setBackendCart: (cart: Cart) => void;
+  /** Set the authentication state */
+  setAuthenticated: (authenticated: boolean) => void;
+  /** Returns guest cart items for server-side merge, then clears guest cart */
+  mergeGuestCart: () => CartItem[];
 
   // Computed
   itemCount: () => number;
@@ -33,6 +45,8 @@ export const useCartStore = create<CartState>()(
       couponCode: null,
       lastSyncedAt: null,
       isHydrated: false,
+      backendCartId: null,
+      isAuthenticated: false,
 
       addItem: (item) =>
         set((state) => {
@@ -65,7 +79,7 @@ export const useCartStore = create<CartState>()(
 
       applyCoupon: (code) => set({ couponCode: code }),
       removeCoupon: () => set({ couponCode: null }),
-      clear: () => set({ items: [], couponCode: null }),
+      clear: () => set({ items: [], couponCode: null, backendCartId: null }),
       setItems: (items) => set({ items }),
       setHydrated: (hydrated) => set({ isHydrated: hydrated }),
 
@@ -76,6 +90,25 @@ export const useCartStore = create<CartState>()(
           lastSyncedAt: new Date().toISOString(),
           isHydrated: true,
         }),
+
+      setBackendCart: (cart: Cart) =>
+        set({
+          backendCartId: cart.id,
+          items: cart.items,
+          couponCode: cart.couponCode ?? null,
+          lastSyncedAt: new Date().toISOString(),
+          isHydrated: true,
+        }),
+
+      setAuthenticated: (authenticated) => set({ isAuthenticated: authenticated }),
+
+      mergeGuestCart: () => {
+        const { items } = get();
+        const guestItems = [...items];
+        // Clear guest cart items after extracting them
+        set({ items: [], couponCode: null });
+        return guestItems;
+      },
 
       itemCount: () => get().items.reduce((sum, item) => sum + item.quantity, 0),
       subtotal: () => get().items.reduce((sum, item) => sum + item.totalPrice, 0),

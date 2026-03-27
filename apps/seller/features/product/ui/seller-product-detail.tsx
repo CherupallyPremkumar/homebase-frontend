@@ -5,6 +5,7 @@ import { productsApi } from '@homebase/api-client';
 import { EntityDetail, Badge, formatPrice } from '@homebase/ui';
 import { CACHE_TIMES } from '@homebase/shared';
 import { useSellerProductMutation } from '../api/queries';
+import type { ProductVariant, ProductMedia, ActivityLog } from '@homebase/types';
 
 interface SellerProductDetailProps {
   productId: string;
@@ -77,14 +78,14 @@ export function SellerProductDetail({ productId }: SellerProductDetailProps) {
             <div className="rounded-md border p-6">
               {variants.length > 0 ? (
                 <div className="space-y-3">
-                  {variants.map((v: any) => (
+                  {variants.map((v: ProductVariant) => (
                     <div key={v.id} className="flex items-center justify-between rounded-lg border p-4">
                       <div>
                         <p className="font-medium">{v.name || v.sku || 'Variant'}</p>
                         <p className="text-sm text-gray-500">SKU: {v.sku || 'N/A'}</p>
                         {v.attributes?.length > 0 && (
                           <div className="mt-1 flex gap-2">
-                            {v.attributes.map((a: any) => (
+                            {v.attributes.map((a) => (
                               <Badge key={a.name} variant="outline">{a.name}: {a.value}</Badge>
                             ))}
                           </div>
@@ -115,9 +116,9 @@ export function SellerProductDetail({ productId }: SellerProductDetailProps) {
             <div className="rounded-md border p-6">
               {media.length > 0 ? (
                 <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
-                  {media.map((m: any) => (
-                    <div key={m.id || m.assetId} className="overflow-hidden rounded-lg border">
-                      <img src={m.url || m.cdnUrl || ''} alt={m.altText || ''} className="aspect-square w-full object-cover" />
+                  {media.map((m: ProductMedia) => (
+                    <div key={m.id} className="overflow-hidden rounded-lg border">
+                      <img src={m.url} alt={m.altText || ''} className="aspect-square w-full object-cover" />
                       {m.isPrimary && <p className="bg-primary/10 p-1 text-center text-xs font-medium text-primary">Primary</p>}
                     </div>
                   ))}
@@ -135,7 +136,7 @@ export function SellerProductDetail({ productId }: SellerProductDetailProps) {
             <div className="rounded-md border p-6">
               {activities.length > 0 ? (
                 <div className="space-y-3">
-                  {activities.map((a: any, i: number) => (
+                  {activities.map((a: ActivityLog, i: number) => (
                     <div key={i} className="flex items-start gap-3 text-sm">
                       <div className="mt-1 h-2 w-2 flex-shrink-0 rounded-full bg-gray-400" />
                       <div>

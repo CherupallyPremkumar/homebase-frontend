@@ -5,18 +5,74 @@ import Link from 'next/link';
 import { Button, Input, Separator } from '@homebase/ui';
 import { formatPriceRupees, FREE_SHIPPING_THRESHOLD } from '@homebase/shared';
 import { toast } from 'sonner';
+import { useApplyCoupon, useRemoveCoupon } from '../api/queries';
 
 interface CartSummaryProps {
   subtotal: number;
   couponCode: string | null;
+  /** Backend cart ID — required when authenticated */
+  cartId?: string;
+  /** Whether the user is authenticated (determines coupon mutation source) */
+  isAuthenticated: boolean;
+  /** Guest-mode coupon apply callback */
   onApplyCoupon: (code: string) => void;
+  /** Guest-mode coupon remove callback */
   onRemoveCoupon: () => void;
 }
 
-export function CartSummary({ subtotal, couponCode, onApplyCoupon, onRemoveCoupon }: CartSummaryProps) {
+export function CartSummary({
+  subtotal,
+  couponCode,
+  cartId,
+  isAuthenticated,
+  onApplyCoupon,
+  onRemoveCoupon,
+}: CartSummaryProps) {
   const [couponInput, setCouponInput] = useState('');
+  const applyCoupon = useApplyCoupon();
+  const removeCoupon = useRemoveCoupon();
   const shipping = subtotal >= FREE_SHIPPING_THRESHOLD ? 0 : 49;
   const total = subtotal + shipping;
+
+  const isCouponPending = applyCoupon.isPending || removeCoupon.isPending;
+
+  const handleApplyCoupon = () => {
+    if (!couponInput) return;
+
+    if (isAuthenticated && cartId) {
+      applyCoupon.mutate(
+        { cartId, couponCode: couponInput },
+        {
+          onSuccess: () => {
+            setCouponInput('');
+            toast.success('Coupon applied');
+          },
+          onError: () => {
+            toast.error('Invalid coupon code');
+          },
+        },
+      );
+    } else {
+      onApplyCoupon(couponInput);
+      setCouponInput('');
+      toast.success('Coupon applied');
+    }
+  };
+
+  const handleRemoveCoupon = () => {
+    if (isAuthenticated && cartId) {
+      removeCoupon.mutate(
+        { cartId },
+        {
+          onSuccess: () => {
+            toast.success('Coupon removed');
+          },
+        },
+      );
+    } else {
+      onRemoveCoupon();
+    }
+  };
 
   return (
     <div className="rounded-lg border p-6">
@@ -39,13 +95,16 @@ export function CartSummary({ subtotal, couponCode, onApplyCoupon, onRemoveCoupo
         )}
       </div>
 
-      {/* Coupon */}
       <div className="mt-4">
         {couponCode ? (
           <div className="flex items-center justify-between rounded bg-green-50 px-3 py-2 text-sm">
             <span className="font-medium text-green-700">{couponCode} applied</span>
-            <button onClick={onRemoveCoupon} className="text-xs text-red-500 hover:underline">
-              Remove
+            <button
+              onClick={handleRemoveCoupon}
+              disabled={isCouponPending}
+              className="text-xs text-red-500 hover:underline disabled:opacity-50"
+            >
+              {removeCoupon.isPending ? 'Removing...' : 'Remove'}
             </button>
           </div>
         ) : (
@@ -59,15 +118,10 @@ export function CartSummary({ subtotal, couponCode, onApplyCoupon, onRemoveCoupo
             <Button
               variant="outline"
               size="sm"
-              onClick={() => {
-                if (couponInput) {
-                  onApplyCoupon(couponInput);
-                  setCouponInput('');
-                  toast.success('Coupon applied');
-                }
-              }}
+              onClick={handleApplyCoupon}
+              disabled={!couponInput || isCouponPending}
             >
-              Apply
+              {applyCoupon.isPending ? 'Applying...' : 'Apply'}
             </Button>
           </div>
         )}

@@ -1,4 +1,5 @@
 import type { NextConfig } from 'next';
+import { createSecurityHeaders } from '@homebase/shared/src/lib/security-headers';
 
 const nextConfig: NextConfig = {
   reactStrictMode: true,
@@ -16,13 +17,7 @@ const nextConfig: NextConfig = {
     return [
       {
         source: '/(.*)',
-        headers: [
-          { key: 'X-Frame-Options', value: 'DENY' },
-          { key: 'X-Content-Type-Options', value: 'nosniff' },
-          { key: 'Referrer-Policy', value: 'strict-origin-when-cross-origin' },
-          { key: 'X-XSS-Protection', value: '1; mode=block' },
-          { key: 'Permissions-Policy', value: 'camera=(), microphone=(), geolocation=()' },
-        ],
+        headers: createSecurityHeaders(),
       },
     ];
   },

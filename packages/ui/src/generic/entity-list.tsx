@@ -216,12 +216,13 @@ export function EntityList<T extends { id?: string }>({
           <div className="flex items-center gap-2">
             {searchable && (
               <div className="relative">
-                <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
+                <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" aria-hidden="true" />
                 <input
                   type="search"
                   value={search}
                   onChange={(e) => setSearch(e.target.value)}
                   placeholder={searchPlaceholder}
+                  aria-label={searchPlaceholder}
                   className="h-9 rounded-md border border-gray-300 bg-white pl-9 pr-3 text-sm outline-none transition-colors placeholder:text-gray-400 focus:border-primary-500 focus:ring-1 focus:ring-primary-500"
                 />
               </div>
@@ -240,10 +241,12 @@ export function EntityList<T extends { id?: string }>({
 
       {/* === List Tabs === */}
       {tabs && tabs.length > 0 && (
-        <div className="flex gap-1 border-b border-gray-200">
+        <div className="flex gap-1 border-b border-gray-200" role="tablist">
           {tabs.map((tab, i) => (
             <button
               key={i}
+              role="tab"
+              aria-selected={i === activeTab}
               onClick={() => {
                 setActiveTab(i);
                 setPage(1);

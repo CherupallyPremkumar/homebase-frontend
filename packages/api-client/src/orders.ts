@@ -2,7 +2,6 @@ import type { Order, SearchRequest, SearchResponse, StateEntityServiceResponse }
 import { getApiClient } from './client';
 
 export const ordersApi = {
-  // Query endpoints
   search(params: SearchRequest) {
     return getApiClient().post<SearchResponse<Order>>('/order/orders', params);
   },
@@ -10,7 +9,6 @@ export const ordersApi = {
     return getApiClient().post<SearchResponse<Order>>('/order/myOrders', params);
   },
 
-  // Query-based retrieve (works with query-build)
   async retrieve(id: string) {
     const response = await getApiClient().post<SearchResponse<Order>>('/order/order', {
       pageNum: 1,

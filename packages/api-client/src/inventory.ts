@@ -2,7 +2,6 @@ import type { InventoryItem, StockAlert, SearchRequest, SearchResponse, StateEnt
 import { getApiClient } from './client';
 
 export const inventoryApi = {
-  // Query endpoints
   search(params: SearchRequest) {
     return getApiClient().post<SearchResponse<InventoryItem>>('/inventory/inventoryItems', params);
   },
@@ -13,7 +12,6 @@ export const inventoryApi = {
     });
   },
 
-  // Query-based retrieve (works with query-build)
   async retrieve(id: string) {
     const response = await getApiClient().post<SearchResponse<InventoryItem>>('/inventory/inventory', {
       filters: { id },

@@ -16,7 +16,6 @@ export function AddressStep({ onSubmit, loading, savedAddresses = [] }: AddressS
   );
   const [showNew, setShowNew] = useState(savedAddresses.length === 0);
 
-  // New address form state
   const [form, setForm] = useState({
     fullName: '',
     phone: '',
@@ -33,11 +32,12 @@ export function AddressStep({ onSubmit, loading, savedAddresses = [] }: AddressS
       const addr = savedAddresses.find((a) => a.id === selectedId);
       if (addr) onSubmit(addr);
     } else {
-      onSubmit({ ...form, type: 'HOME' } as Address);
+      const newAddress: Address = { ...form, type: 'HOME' };
+      onSubmit(newAddress);
     }
   };
 
-  const updateField = (field: string, value: string) => {
+  const updateField = (field: keyof typeof form, value: string) => {
     setForm((prev) => ({ ...prev, [field]: value }));
   };
 
@@ -47,7 +47,6 @@ export function AddressStep({ onSubmit, loading, savedAddresses = [] }: AddressS
         <CardTitle>Shipping Address</CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
-        {/* Saved addresses */}
         {savedAddresses.length > 0 && !showNew && (
           <div className="space-y-3">
             {savedAddresses.map((addr) => (
@@ -80,7 +79,6 @@ export function AddressStep({ onSubmit, loading, savedAddresses = [] }: AddressS
           </div>
         )}
 
-        {/* New address form */}
         {showNew && (
           <>
             {savedAddresses.length > 0 && (

@@ -54,7 +54,7 @@ export function DataTable<T>({
   emptyTitle = 'No results found',
   emptyDescription,
 }: DataTableProps<T>) {
-  const { searchRequest, page, setPage, size, setSize, q, setQ, sort, setSort, sortOrder, setSortOrder } = useSearchQuery();
+  const { searchRequest, page, setPage, size, setSize, q, setQ } = useSearchQuery();
   const [searchInput, setSearchInput] = useState(q || '');
   const debouncedSearch = useDebounce(searchInput, 300);
 

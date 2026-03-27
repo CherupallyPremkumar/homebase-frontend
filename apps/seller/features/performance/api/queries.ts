@@ -5,11 +5,11 @@ import { suppliersApi } from '@homebase/api-client';
 import { CACHE_TIMES } from '@homebase/shared';
 
 export interface SellerPerformance {
-  fulfillmentRate: number;
-  averageShippingDays: number;
+  orderFulfillmentRate: number;
+  averageShippingTime: number;
   returnRate: number;
   customerRating: number;
-  responseTimeHours: number;
+  responseTime: number;
   defectRate: number;
   lateShipmentRate: number;
   cancellationRate: number;

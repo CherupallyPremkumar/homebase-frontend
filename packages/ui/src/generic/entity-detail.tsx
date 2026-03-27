@@ -381,7 +381,10 @@ export function EntityDetail({
                 <button
                   key={tab.key}
                   role="tab"
+                  id={`tab-${tab.key}`}
                   aria-selected={activeTab === tab.key}
+                  aria-controls={`tabpanel-${tab.key}`}
+                  tabIndex={activeTab === tab.key ? 0 : -1}
                   onClick={() => setActiveTab(tab.key)}
                   className={cn(
                     'flex items-center gap-1.5 px-4 py-2.5 text-sm font-medium transition-colors',
@@ -410,7 +413,7 @@ export function EntityDetail({
 
           {/* Tab content */}
           {tabs.map((tab) => (
-            <div key={tab.key} role="tabpanel" hidden={activeTab !== tab.key}>
+            <div key={tab.key} role="tabpanel" id={`tabpanel-${tab.key}`} aria-labelledby={`tab-${tab.key}`} hidden={activeTab !== tab.key}>
               {activeTab === tab.key && tab.content}
             </div>
           ))}

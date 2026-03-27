@@ -2,12 +2,10 @@ import type { Coupon, ValidateCouponResponse, SearchRequest, SearchResponse, Sta
 import { getApiClient } from './client';
 
 export const promosApi = {
-  // Query endpoints
   search(params: SearchRequest) {
     return getApiClient().post<SearchResponse<Coupon>>('/promo/promos', params);
   },
 
-  // Query-based retrieve (works with query-build)
   async retrieve(id: string) {
     const response = await getApiClient().post<SearchResponse<Coupon>>('/promo/promo', {
       filters: { id },

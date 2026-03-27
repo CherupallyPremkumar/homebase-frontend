@@ -3,14 +3,50 @@
 import Link from 'next/link';
 import { Button } from '@homebase/ui';
 import { useCartStore, EmptyState } from '@homebase/shared';
-import { ShoppingCart } from 'lucide-react';
+import { useAuth } from '@homebase/auth';
+import { ShoppingCart, Loader2 } from 'lucide-react';
 import { CartItem } from './cart-item';
 import { CartSummary } from './cart-summary';
+import { useActiveCart, useRemoveFromCart, useUpdateCartItem } from '../api/queries';
 
 export function CartPage() {
-  const { items, couponCode, removeItem, updateQuantity, applyCoupon, removeCoupon, subtotal } = useCartStore();
+  const { isAuthenticated } = useAuth();
+  const guestStore = useCartStore();
+  const { data: backendCart, isLoading: isCartLoading } = useActiveCart();
+  const removeFromCart = useRemoveFromCart();
+  const updateCartItem = useUpdateCartItem();
 
-  const sub = subtotal();
+  // Determine data source based on authentication
+  const items = isAuthenticated ? (backendCart?.items ?? []) : guestStore.items;
+  const couponCode = isAuthenticated ? (backendCart?.couponCode ?? null) : guestStore.couponCode;
+  const subtotalValue = isAuthenticated
+    ? (backendCart?.subtotal ?? 0)
+    : guestStore.subtotal();
+  const cartId = backendCart?.id;
+
+  const handleRemove = (itemId: string) => {
+    if (isAuthenticated && cartId) {
+      removeFromCart.mutate({ cartId, itemId });
+    } else {
+      guestStore.removeItem(itemId);
+    }
+  };
+
+  const handleUpdateQuantity = (itemId: string, quantity: number) => {
+    if (isAuthenticated && cartId) {
+      updateCartItem.mutate({ cartId, itemId, quantity });
+    } else {
+      guestStore.updateQuantity(itemId, quantity);
+    }
+  };
+
+  if (isAuthenticated && isCartLoading) {
+    return (
+      <div className="container mx-auto flex items-center justify-center px-4 py-12">
+        <Loader2 className="h-8 w-8 animate-spin text-gray-400" />
+      </div>
+    );
+  }
 
   if (!items.length) {
     return (
@@ -34,24 +70,26 @@ export function CartPage() {
       <h1 className="mb-6 text-2xl font-bold text-gray-900">Shopping Cart</h1>
 
       <div className="grid gap-8 lg:grid-cols-3">
-        {/* Items */}
         <div className="space-y-4 lg:col-span-2">
           {items.map((item) => (
             <CartItem
               key={item.id}
               item={item}
-              onRemove={removeItem}
-              onUpdateQuantity={updateQuantity}
+              onRemove={handleRemove}
+              onUpdateQuantity={handleUpdateQuantity}
+              isRemoving={removeFromCart.isPending}
+              isUpdating={updateCartItem.isPending}
             />
           ))}
         </div>
 
-        {/* Order summary */}
         <CartSummary
-          subtotal={sub}
+          subtotal={subtotalValue}
           couponCode={couponCode}
-          onApplyCoupon={applyCoupon}
-          onRemoveCoupon={removeCoupon}
+          cartId={cartId}
+          isAuthenticated={isAuthenticated}
+          onApplyCoupon={guestStore.applyCoupon}
+          onRemoveCoupon={guestStore.removeCoupon}
         />
       </div>
     </div>

@@ -1,20 +1,16 @@
 'use client';
 
-import { useQuery } from '@tanstack/react-query';
-import { ordersApi } from '@homebase/api-client';
 import { EntityDetail, Separator, formatPrice, formatDate } from '@homebase/ui';
-import { CACHE_TIMES } from '@homebase/shared';
+import type { OrderItem } from '@homebase/types';
+import { useSellerOrderDetail, useSellerOrderMutation } from '../api/queries';
 
 interface SellerOrderDetailProps {
   orderId: string;
 }
 
 export function SellerOrderDetail({ orderId }: SellerOrderDetailProps) {
-  const { data, isLoading, error, refetch } = useQuery({
-    queryKey: ['seller-orders', orderId],
-    queryFn: () => ordersApi.retrieve(orderId),
-    ...CACHE_TIMES.orderDetail,
-  });
+  const { data, isLoading, error, refetch } = useSellerOrderDetail(orderId);
+  const mutation = useSellerOrderMutation();
 
   const order = data?.mutatedEntity;
 
@@ -27,6 +23,9 @@ export function SellerOrderDetail({ orderId }: SellerOrderDetailProps) {
       title={order ? `Order #${order.orderNumber}` : ''}
       subtitle={order ? `Placed ${formatDate(order.createdTime)}` : undefined}
       state={order?.stateId}
+      allowedActions={data?.allowedActionsAndMetadata}
+      onAction={(eventId) => mutation.mutate({ id: orderId, eventId })}
+      actionLoading={mutation.isPending}
       loading={isLoading}
       error={error ? 'Failed to load order' : null}
       onRetry={() => refetch()}
@@ -36,7 +35,7 @@ export function SellerOrderDetail({ orderId }: SellerOrderDetailProps) {
           label: 'Order Items',
           content: order ? (
             <div className="rounded-md border p-6 space-y-3">
-              {order.items.map((item: any) => (
+              {order.items.map((item: OrderItem) => (
                 <div key={item.id} className="flex items-center gap-3">
                   <div className="h-12 w-12 flex-shrink-0 rounded bg-gray-100">
                     {item.imageUrl && <img src={item.imageUrl} alt="" className="h-full w-full rounded object-cover" />}

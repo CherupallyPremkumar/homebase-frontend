@@ -5,7 +5,6 @@ import { getApiClient } from '@homebase/api-client';
 import { CACHE_TIMES } from '@homebase/shared';
 import type { SearchResponse } from '@homebase/types';
 
-// Seller-specific dashboard endpoints — use Chenile query format
 const sellerDashboard = {
   stats: () => getApiClient().post<SearchResponse<SellerStats>>('/dashboard/sellerStats', {
     pageNum: 1,
@@ -40,7 +39,6 @@ export interface SellerStats {
   revenueChange: number;
 }
 
-// Matches Dashboard.sellerDailySales SQL output
 export interface DailySales {
   date: string;
   orderCount: number;
@@ -55,7 +53,6 @@ export interface TopProduct {
   rating: number;
 }
 
-// Matches Dashboard.sellerRecentOrders SQL output
 export interface RecentSellerOrder {
   orderId: string;
   orderState: string;

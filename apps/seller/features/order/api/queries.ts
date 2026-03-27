@@ -2,8 +2,8 @@
 
 import { useQuery } from '@tanstack/react-query';
 import { ordersApi } from '@homebase/api-client';
-import { CACHE_TIMES } from '@homebase/shared';
-import type { SearchRequest } from '@homebase/types';
+import { useStmMutation, CACHE_TIMES } from '@homebase/shared';
+import type { SearchRequest, Order } from '@homebase/types';
 
 export function useSellerOrders(params: SearchRequest) {
   return useQuery({
@@ -19,5 +19,12 @@ export function useSellerOrderDetail(id: string) {
     queryFn: () => ordersApi.retrieve(id),
     ...CACHE_TIMES.orderDetail,
     enabled: !!id,
+  });
+}
+
+export function useSellerOrderMutation() {
+  return useStmMutation<Order>({
+    entityType: 'seller-orders',
+    mutationFn: ordersApi.processById,
   });
 }

@@ -1,7 +1,7 @@
 'use client';
 
 import { signOut } from 'next-auth/react';
-import { Bell, HelpCircle, User } from 'lucide-react';
+import { Bell, HelpCircle } from 'lucide-react';
 import {
   Button,
   Input,

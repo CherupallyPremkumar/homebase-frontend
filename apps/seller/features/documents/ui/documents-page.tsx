@@ -4,7 +4,6 @@ import { SectionSkeleton, ErrorSection, formatDate } from '@homebase/shared';
 import { Card, CardContent, CardHeader, CardTitle, Button, Badge } from '@homebase/ui';
 import { FileText, Upload, CheckCircle, XCircle, Clock } from 'lucide-react';
 import { useSellerDocuments } from '../api/queries';
-import { cn } from '@homebase/ui/src/lib/utils';
 
 const DOC_LABELS: Record<string, string> = {
   GSTIN_CERTIFICATE: 'GSTIN Certificate',
@@ -23,7 +22,6 @@ export function DocumentsPage() {
   if (error) return <ErrorSection error={error} onRetry={() => refetch()} />;
 
   const docs = data ?? [];
-  const uploadedTypes = new Set(docs.map((d) => d.type));
 
   return (
     <div className="space-y-6">

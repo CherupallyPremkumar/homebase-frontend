@@ -2,12 +2,10 @@ import type { Notification, NotificationPreference, SearchRequest, SearchRespons
 import { getApiClient } from './client';
 
 export const notificationsApi = {
-  // Query endpoints
   search(params: SearchRequest) {
     return getApiClient().post<SearchResponse<Notification>>('/notification/notifications', params);
   },
 
-  // Query-based retrieve (works with query-build)
   async retrieve(id: string) {
     const response = await getApiClient().post<SearchResponse<Notification>>('/notification/notification', {
       filters: { id },
@@ -30,5 +28,24 @@ export const notificationsApi = {
   },
   updatePreference(preference: Partial<NotificationPreference>) {
     return getApiClient().put<NotificationPreference>('/notification/preferences', preference);
+  },
+
+  /** Storefront query: search customer notifications via Chenile query service */
+  searchNotifications(params: SearchRequest) {
+    return getApiClient().post<SearchResponse<Notification>>('/storefront/my-notifications', params);
+  },
+
+  /** Mark a single notification as read via STM event */
+  markAsRead(id: string) {
+    return getApiClient().patch<StateEntityServiceResponse<Notification>>('/notification/' + id + '/MARK_READ', {});
+  },
+
+  /** Get unread notification count using storefront query with isRead=false filter */
+  getUnreadCount() {
+    return getApiClient().post<SearchResponse<Notification>>('/storefront/my-notifications', {
+      pageNum: 1,
+      pageSize: 1,
+      filters: { isRead: 'false' },
+    }).then(response => response.maxRows ?? 0);
   },
 };

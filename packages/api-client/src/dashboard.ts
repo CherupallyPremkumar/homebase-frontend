@@ -2,7 +2,6 @@ import type { DashboardStats, DailyOrderStats, OrdersByState, StockAlert, Order,
 import { getApiClient } from './client';
 
 export const dashboardApi = {
-  // Query endpoints — all use Chenile query format
   overviewStats(params?: SearchRequest) {
     return getApiClient().post<SearchResponse<DashboardStats>>('/dashboard/overviewStats', params ?? {
       pageNum: 1,

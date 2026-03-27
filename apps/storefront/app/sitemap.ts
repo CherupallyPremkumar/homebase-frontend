@@ -9,14 +9,5 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${siteUrl}/search`, lastModified: new Date(), changeFrequency: 'weekly', priority: 0.5 },
   ];
 
-  // TODO: Fetch product and category slugs from API for dynamic pages
-  // const products = await catalogApi.search({ page: 1, size: 1000 });
-  // const productPages = products.content.map(p => ({
-  //   url: `${siteUrl}/products/${p.id}`,
-  //   lastModified: new Date(),
-  //   changeFrequency: 'weekly' as const,
-  //   priority: 0.8,
-  // }));
-
   return [...staticPages];
 }

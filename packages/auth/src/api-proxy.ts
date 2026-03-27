@@ -46,8 +46,11 @@ export function createApiProxy() {
 
     const isMutation = !['GET', 'HEAD', 'OPTIONS'].includes(request.method);
 
-    // Reject unauthenticated mutation requests
-    if (isMutation && !token?.accessToken) {
+    // Chenile uses POST for search queries — these are safe and may be unauthenticated.
+    // Only reject unauthenticated true mutations (PUT/PATCH/DELETE).
+    // POST requests are allowed without auth (backend enforces per-query ACLs).
+    const requiresAuth = isMutation && request.method !== 'POST';
+    if (requiresAuth && !token?.accessToken) {
       return NextResponse.json(
         { success: false, code: 401, description: 'Authentication required' },
         { status: 401 },
@@ -63,8 +66,13 @@ export function createApiProxy() {
       'X-Correlation-Id': correlationId,
     };
 
-    if (token?.accessToken) {
-      headers['Authorization'] = `Bearer ${token.accessToken as string}`;
+    // Only send Bearer token if it exists, hasn't failed refresh, and isn't expired
+    const isTokenValid = token?.accessToken
+      && !token.error
+      && (!token.expiresAt || Date.now() / 1000 < (token.expiresAt as number));
+
+    if (isTokenValid) {
+      headers['Authorization'] = `Bearer ${token!.accessToken as string}`;
     }
 
     // Forward request body for mutations

@@ -2,12 +2,10 @@ import type { User, Address, SearchRequest, SearchResponse, StateEntityServiceRe
 import { getApiClient } from './client';
 
 export const usersApi = {
-  // Query endpoints
   search(params: SearchRequest) {
     return getApiClient().post<SearchResponse<User>>('/user/users', params);
   },
 
-  // Query-based retrieve (works with query-build)
   async retrieve(id: string) {
     const response = await getApiClient().post<SearchResponse<User>>('/user/user', {
       filters: { id },
@@ -23,15 +21,16 @@ export const usersApi = {
     return getApiClient().patch<StateEntityServiceResponse<User>>('/user/' + id + '/' + eventId, payload ?? {});
   },
 
-  // Profile (convenience — uses current user's ID from JWT)
-  getProfile() {
-    return getApiClient().get<StateEntityServiceResponse<User>>('/user/me');
+  async getProfile() {
+    const response = await getApiClient().post<SearchResponse<User>>('/storefront/my-profile', {});
+    const item = response.list?.[0];
+    if (!item) throw new Error('Profile not found');
+    return { mutatedEntity: item.row, allowedActionsAndMetadata: [] } as StateEntityServiceResponse<User>;
   },
   updateProfile(payload: Partial<User>) {
     return getApiClient().put<StateEntityServiceResponse<User>>('/user/me', payload);
   },
 
-  // Addresses
   getAddresses() {
     return getApiClient().get<Address[]>('/user/me/addresses');
   },
@@ -45,9 +44,9 @@ export const usersApi = {
     return getApiClient().delete<void>('/user/me/addresses/' + addressId);
   },
 
-  // Wishlist
-  getWishlist() {
-    return getApiClient().get<WishlistItem[]>('/user/me/wishlist');
+  async getWishlist() {
+    const response = await getApiClient().post<SearchResponse<WishlistItem>>('/storefront/my-wishlist', {});
+    return response.list?.map((item) => item.row) ?? [];
   },
   addToWishlist(productId: string) {
     return getApiClient().post<WishlistItem>('/user/me/wishlist', { productId });

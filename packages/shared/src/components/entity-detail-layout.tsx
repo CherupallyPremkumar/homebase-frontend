@@ -2,7 +2,7 @@ import type { AllowedAction } from '@homebase/types';
 import {
   Breadcrumb,
   BreadcrumbList,
-  BreadcrumbItem,
+  BreadcrumbItem as BreadcrumbItemUI,
   BreadcrumbLink,
   BreadcrumbPage,
   BreadcrumbSeparator,
@@ -10,13 +10,13 @@ import {
 import { StateBadge } from './state-badge';
 import { StmActionBar } from './stm-action-bar';
 
-interface BreadcrumbItem {
+interface BreadcrumbEntry {
   label: string;
   href?: string;
 }
 
 interface EntityDetailLayoutProps {
-  breadcrumbs: BreadcrumbItem[];
+  breadcrumbs: BreadcrumbEntry[];
   title: string;
   subtitle?: string;
   state?: string;
@@ -41,16 +41,19 @@ export function EntityDetailLayout({
       <div>
         <Breadcrumb>
           <BreadcrumbList>
-            {breadcrumbs.map((crumb, i) => (
-              <BreadcrumbItem key={i}>
-                {i > 0 && <BreadcrumbSeparator />}
-                {crumb.href ? (
-                  <BreadcrumbLink href={crumb.href}>{crumb.label}</BreadcrumbLink>
-                ) : (
-                  <BreadcrumbPage>{crumb.label}</BreadcrumbPage>
-                )}
-              </BreadcrumbItem>
-            ))}
+            {breadcrumbs.map((crumb, i) => {
+              const isNotFirst = i > 0;
+              return (
+                <BreadcrumbItemUI key={i}>
+                  {isNotFirst && <BreadcrumbSeparator />}
+                  {crumb.href ? (
+                    <BreadcrumbLink href={crumb.href}>{crumb.label}</BreadcrumbLink>
+                  ) : (
+                    <BreadcrumbPage>{crumb.label}</BreadcrumbPage>
+                  )}
+                </BreadcrumbItemUI>
+              );
+            })}
           </BreadcrumbList>
         </Breadcrumb>
 

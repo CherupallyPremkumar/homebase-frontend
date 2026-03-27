@@ -16,7 +16,6 @@ export function DashboardPage() {
     <div className="space-y-6">
       <h1 className="text-2xl font-bold text-gray-900">Platform Dashboard</h1>
 
-      {/* Stats row */}
       {statsLoading ? (
         <div className="grid gap-4 md:grid-cols-4">
           <SectionSkeleton rows={4} variant="card" />
@@ -30,7 +29,6 @@ export function DashboardPage() {
         </div>
       ) : null}
 
-      {/* Health + Activity */}
       <div className="grid gap-6 lg:grid-cols-2">
         <PlatformHealth />
         <RecentActivity />

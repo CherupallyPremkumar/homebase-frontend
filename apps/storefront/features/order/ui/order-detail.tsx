@@ -3,6 +3,8 @@
 import { useQuery } from '@tanstack/react-query';
 import { ordersApi } from '@homebase/api-client';
 import { useStmMutation, CACHE_TIMES } from '@homebase/shared';
+import Link from 'next/link';
+import { MapPin } from 'lucide-react';
 import { EntityDetail, InfoGrid, ActivityTimeline, formatPrice, formatDate } from '@homebase/ui';
 import type { Order } from '@homebase/types';
 
@@ -30,6 +32,16 @@ export function OrderDetail({ orderId }: { orderId: string }) {
         title={order ? `Order #${order.orderNumber}` : 'Order'}
         subtitle={order?.createdTime ? `Placed ${formatDate(order.createdTime)}` : undefined}
         state={order?.stateId}
+        headerExtra={
+          order ? (
+            <Link href={`/orders/${orderId}/track`}>
+              <button className="inline-flex items-center gap-1.5 rounded-md border border-gray-200 bg-white px-3 py-1.5 text-sm font-medium text-gray-700 shadow-sm transition-colors hover:bg-gray-50">
+                <MapPin className="h-4 w-4" />
+                Track Order
+              </button>
+            </Link>
+          ) : null
+        }
         allowedActions={data?.allowedActionsAndMetadata}
         onAction={(eventId) => mutation.mutate({ id: orderId, eventId })}
         actionLoading={mutation.isPending}

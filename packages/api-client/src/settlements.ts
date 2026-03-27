@@ -2,12 +2,10 @@ import type { Settlement, SearchRequest, SearchResponse, StateEntityServiceRespo
 import { getApiClient } from './client';
 
 export const settlementsApi = {
-  // Query endpoints
   search(params: SearchRequest) {
     return getApiClient().post<SearchResponse<Settlement>>('/settlement/settlements', params);
   },
 
-  // Query-based retrieve (works with query-build)
   async retrieve(id: string) {
     const response = await getApiClient().post<SearchResponse<Settlement>>('/settlement/settlementById', {
       pageNum: 1,

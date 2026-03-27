@@ -30,3 +30,9 @@ pnpm-debug.log*
 
 # sentry
 .sentryclirc
+
+# playwright
+playwright-report/
+test-results/
+e2e/.auth/
+blob-report/

@@ -2,12 +2,10 @@ import type { Supplier, SupplierOnboarding, SupplierPerformanceMetrics, SearchRe
 import { getApiClient } from './client';
 
 export const suppliersApi = {
-  // Query endpoints
   search(params: SearchRequest) {
     return getApiClient().post<SearchResponse<Supplier>>('/supplier/suppliers', params);
   },
 
-  // Query-based retrieve (works with query-build)
   async retrieve(id: string) {
     const response = await getApiClient().post<SearchResponse<Supplier>>('/supplier/supplierById', {
       pageNum: 1,
@@ -32,7 +30,6 @@ export const suppliersApi = {
     });
   },
 
-  // Onboarding — query-based retrieve
   async retrieveOnboarding(id: string) {
     const response = await getApiClient().post<SearchResponse<SupplierOnboarding>>('/onboarding/onboarding', {
       pageNum: 1,

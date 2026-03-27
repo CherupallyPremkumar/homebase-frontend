@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { ShoppingCart, Search, Menu, X, Heart, LogIn, ChevronDown } from 'lucide-react';
+import { NotificationBell } from './notification-bell';
 import {
   Button,
   Input,
@@ -14,17 +15,13 @@ import {
   Avatar,
   AvatarFallback,
 } from '@homebase/ui';
+import { signOut } from 'next-auth/react';
 import { useCartStore, useUIStore } from '@homebase/shared';
 
 interface NavbarClientProps {
   user: { name?: string | null; email?: string | null } | null;
 }
 
-/**
- * Client Component — handles interactivity (search, cart, dropdown).
- * Receives user data as props from the Server Component (Navbar).
- * No useAuth(), no /api/auth/session call, nothing in Network tab.
- */
 export function NavbarClient({ user }: NavbarClientProps) {
   const [searchQuery, setSearchQuery] = useState('');
   const [searchOpen, setSearchOpen] = useState(false);
@@ -36,7 +33,6 @@ export function NavbarClient({ user }: NavbarClientProps) {
   return (
     <header className="sticky top-0 z-50 border-b bg-white">
       <div className="container mx-auto flex h-16 items-center justify-between px-4">
-        {/* Left: Logo + menu */}
         <div className="flex items-center gap-4">
           <button
             className="md:hidden"
@@ -58,7 +54,6 @@ export function NavbarClient({ user }: NavbarClientProps) {
           </nav>
         </div>
 
-        {/* Center: Search bar (desktop) */}
         <div className="hidden max-w-md flex-1 px-8 md:block">
           <form action="/search" className="relative">
             <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
@@ -72,9 +67,7 @@ export function NavbarClient({ user }: NavbarClientProps) {
           </form>
         </div>
 
-        {/* Right: Auth-aware actions */}
         <div className="flex items-center gap-2">
-          {/* Mobile search toggle */}
           <button
             className="p-2 md:hidden"
             onClick={() => setSearchOpen(!searchOpen)}
@@ -83,14 +76,18 @@ export function NavbarClient({ user }: NavbarClientProps) {
             <Search className="h-5 w-5" />
           </button>
 
-          {/* Wishlist — only show if logged in */}
           {isAuthenticated && (
             <Link href="/profile#wishlist" className="hidden p-2 md:block" aria-label="Wishlist">
               <Heart className="h-5 w-5 text-gray-600 hover:text-red-500 transition-colors" />
             </Link>
           )}
 
-          {/* Cart — always visible */}
+          {isAuthenticated && (
+            <div className="hidden md:block">
+              <NotificationBell />
+            </div>
+          )}
+
           <Link href="/cart" className="relative p-2" aria-label="Cart">
             <ShoppingCart className="h-5 w-5 text-gray-600" />
             {itemCount > 0 && (
@@ -100,7 +97,6 @@ export function NavbarClient({ user }: NavbarClientProps) {
             )}
           </Link>
 
-          {/* Auth section */}
           {isAuthenticated && user ? (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
@@ -132,13 +128,16 @@ export function NavbarClient({ user }: NavbarClientProps) {
                   <Link href="/returns">My Returns</Link>
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem asChild>
-                  <a href="/api/auth/logout" className="text-red-600">Sign Out</a>
+                <DropdownMenuItem
+                  className="text-red-600 cursor-pointer"
+                  onClick={() => signOut({ callbackUrl: '/' })}
+                >
+                  Sign Out
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
           ) : (
-            <a href="/api/auth/signin/keycloak">
+            <a href="/login">
               <Button variant="outline" size="sm" className="gap-1.5">
                 <LogIn className="h-4 w-4" />
                 <span className="hidden sm:inline">Login</span>
@@ -148,7 +147,6 @@ export function NavbarClient({ user }: NavbarClientProps) {
         </div>
       </div>
 
-      {/* Mobile search bar */}
       {searchOpen && (
         <div className="border-t px-4 py-2 md:hidden">
           <form action="/search" className="relative">

@@ -2,7 +2,6 @@ import type { RuleSet, FactDefinition, Decision, SearchRequest, SearchResponse, 
 import { getApiClient } from './client';
 
 export const rulesEngineApi = {
-  // Query endpoints
   searchRuleSets(params: SearchRequest) {
     return getApiClient().post<SearchResponse<RuleSet>>('/rules-engine/ruleSets', params);
   },
@@ -13,7 +12,6 @@ export const rulesEngineApi = {
     });
   },
 
-  // Query-based retrieve (works with query-build)
   async retrieve(id: string) {
     const response = await getApiClient().post<SearchResponse<RuleSet>>('/rules-engine/ruleSets', {
       filters: { id },

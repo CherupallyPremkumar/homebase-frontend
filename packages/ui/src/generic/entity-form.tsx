@@ -1,10 +1,17 @@
 'use client';
 
 import * as React from 'react';
-import { useForm, useFieldArray, type FieldValues, type DefaultValues } from 'react-hook-form';
+import {
+  useForm,
+  useFieldArray,
+  type FieldValues,
+  type DefaultValues,
+  type UseFormRegister,
+  type FieldErrors,
+  type Control,
+  type Path,
+} from 'react-hook-form';
 import { cn } from '../lib/utils';
-
-// --- Schema Types ---
 
 export type FormFieldDef = SimpleFieldDef | GroupFieldDef | ArrayFieldDef;
 
@@ -50,8 +57,6 @@ export interface FormSchema {
   fields: FormFieldDef[];
 }
 
-// --- Component Props ---
-
 export interface EntityFormProps<T extends FieldValues = FieldValues> {
   schema: FormSchema;
   onSubmit: (data: T) => void | Promise<void>;
@@ -59,14 +64,9 @@ export interface EntityFormProps<T extends FieldValues = FieldValues> {
   submitLabel?: string;
   loading?: boolean;
   columns?: 1 | 2;
-
-  // Sections for visual grouping
   sections?: { title: string; description?: string; fieldNames: string[] }[];
-
-  // Escape hatch
-  renderField?: (field: FormFieldDef, register: any, errors: any) => React.ReactNode;
+  renderField?: (field: FormFieldDef, register: UseFormRegister<T>, errors: FieldErrors<T>) => React.ReactNode;
   footer?: React.ReactNode;
-
   className?: string;
 }
 
@@ -95,14 +95,12 @@ export function EntityForm<T extends FieldValues = FieldValues>({
   const isLoading = loading || isSubmitting;
   const watchAll = watch();
 
-  // Dev warnings
   if (process.env.NODE_ENV === 'development' && !schema.fields.length) {
     console.warn('[EntityForm] Schema has no fields');
   }
 
   const renderFields = (fields: FormFieldDef[]) => {
     return fields.map((field) => {
-      // Custom render escape hatch
       if (customRenderField) {
         const custom = customRenderField(field, register, errors);
         if (custom) return <React.Fragment key={field.name}>{custom}</React.Fragment>;
@@ -124,7 +122,7 @@ export function EntityForm<T extends FieldValues = FieldValues>({
           );
 
         case 'array':
-          return <ArrayField key={field.name} field={field} control={control} register={register} errors={errors} disabled={isLoading} />;
+          return <ArrayFieldComponent key={field.name} field={field} control={control as unknown as Control<FieldValues>} register={register as unknown as UseFormRegister<FieldValues>} errors={errors as unknown as FieldErrors<FieldValues>} disabled={isLoading} />;
 
         case 'simple':
           return renderSimpleField(field);
@@ -136,7 +134,6 @@ export function EntityForm<T extends FieldValues = FieldValues>({
   };
 
   const renderSimpleField = (field: SimpleFieldDef) => {
-    // Conditional visibility
     if (field.dependsOn) {
       const depValue = (watchAll as Record<string, unknown>)[field.dependsOn.field];
       if (depValue !== field.dependsOn.value) return null;
@@ -144,7 +141,7 @@ export function EntityForm<T extends FieldValues = FieldValues>({
 
     const fieldError = (errors as Record<string, { message?: string }>)[field.name];
     const commonProps = {
-      ...register(field.name as any, {
+      ...register(field.name as Path<T>, {
         required: field.required ? `${field.label} is required` : undefined,
         minLength: field.validation?.minLength ? { value: field.validation.minLength, message: `Min ${field.validation.minLength} characters` } : undefined,
         maxLength: field.validation?.maxLength ? { value: field.validation.maxLength, message: `Max ${field.validation.maxLength} characters` } : undefined,
@@ -197,7 +194,7 @@ export function EntityForm<T extends FieldValues = FieldValues>({
           <div className="space-y-2">
             {field.options.map((opt) => (
               <label key={opt.value} className="flex items-center gap-2 cursor-pointer">
-                <input type="radio" value={opt.value} {...register(field.name as any, { required: field.required ? `${field.label} is required` : undefined })} className="h-4 w-4 border-gray-300 text-primary-600 focus:ring-primary-500" />
+                <input type="radio" value={opt.value} {...register(field.name as Path<T>, { required: field.required ? `${field.label} is required` : undefined })} className="h-4 w-4 border-gray-300 text-primary-600 focus:ring-primary-500" />
                 <span className="text-sm text-gray-700">{opt.label}</span>
               </label>
             ))}
@@ -225,7 +222,7 @@ export function EntityForm<T extends FieldValues = FieldValues>({
   };
 
   return (
-    <form onSubmit={handleSubmit(onSubmit as any)} className={cn('space-y-6', className)}>
+    <form onSubmit={handleSubmit(onSubmit as (data: FieldValues) => void)} className={cn('space-y-6', className)}>
       {sections ? (
         sections.map((section, i) => {
           const sectionFields = schema.fields.filter((f) => section.fieldNames.includes(f.name));
@@ -260,13 +257,11 @@ export function EntityForm<T extends FieldValues = FieldValues>({
   );
 }
 
-// --- Array Field Sub-component ---
-
-function ArrayField({ field, control, register, errors, disabled }: {
+function ArrayFieldComponent({ field, control, register, errors, disabled }: {
   field: ArrayFieldDef;
-  control: any;
-  register: any;
-  errors: any;
+  control: Control<FieldValues>;
+  register: UseFormRegister<FieldValues>;
+  errors: FieldErrors<FieldValues>;
   disabled: boolean;
 }) {
   const { fields, append, remove } = useFieldArray({ control, name: field.name });
@@ -305,7 +300,8 @@ function ArrayField({ field, control, register, errors, disabled }: {
               <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
                 {field.itemFields.map((itemField) => {
                   const fieldName = `${field.name}.${index}.${itemField.name}`;
-                  const fieldError = errors?.[field.name]?.[index]?.[itemField.name];
+                  const arrayErrors = errors[field.name] as Record<string, Record<string, { message?: string }>> | undefined;
+                  const fieldError = arrayErrors?.[String(index)]?.[itemField.name];
 
                   return (
                     <div key={itemField.name}>

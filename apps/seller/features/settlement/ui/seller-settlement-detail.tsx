@@ -1,20 +1,16 @@
 'use client';
 
-import { useQuery } from '@tanstack/react-query';
-import { settlementsApi } from '@homebase/api-client';
-import { EntityDetailLayout, SectionSkeleton, ErrorSection, formatPriceRupees, formatDate, CACHE_TIMES } from '@homebase/shared';
+import { EntityDetailLayout, SectionSkeleton, ErrorSection, formatPriceRupees, formatDate } from '@homebase/shared';
 import { Card, CardContent, CardHeader, CardTitle, Separator, Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@homebase/ui';
+import { useSellerSettlementDetail, useSellerSettlementMutation } from '../api/queries';
 
 interface Props {
   settlementId: string;
 }
 
 export function SellerSettlementDetail({ settlementId }: Props) {
-  const { data, isLoading, error, refetch } = useQuery({
-    queryKey: ['seller-settlements', settlementId],
-    queryFn: () => settlementsApi.retrieve(settlementId),
-    ...CACHE_TIMES.orderDetail,
-  });
+  const { data, isLoading, error, refetch } = useSellerSettlementDetail(settlementId);
+  const mutation = useSellerSettlementMutation();
 
   if (isLoading) return <SectionSkeleton rows={6} />;
   if (error) return <ErrorSection error={error} onRetry={() => refetch()} />;
@@ -31,6 +27,9 @@ export function SellerSettlementDetail({ settlementId }: Props) {
       title="Settlement Details"
       subtitle={`Period: ${formatDate(settlement.periodStart)} — ${formatDate(settlement.periodEnd)}`}
       state={settlement.stateId}
+      allowedActions={data.allowedActionsAndMetadata}
+      onAction={(eventId) => mutation.mutate({ id: settlementId, eventId })}
+      actionLoading={mutation.isPending}
     >
       {/* Breakdown */}
       <Card>

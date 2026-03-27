@@ -33,6 +33,10 @@ export const CACHE_TIMES = {
   cconfig: { staleTime: 900_000, gcTime: 3_600_000 },
   dashboard: { staleTime: 30_000, gcTime: 120_000 },
   search: { staleTime: 0, gcTime: 60_000 },
+  reviews: { staleTime: 60_000, gcTime: 300_000 },
+  reviewSummary: { staleTime: 300_000, gcTime: 600_000 },
+  wishlist: { staleTime: 60_000, gcTime: 300_000 },
+  notifications: { staleTime: 30_000, gcTime: 120_000 },
 } as const;
 
 export const CURRENCY = {

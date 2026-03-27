@@ -10,9 +10,6 @@ interface MobileBottomNavProps {
   isAuthenticated: boolean;
 }
 
-/**
- * Receives auth state as props from server layout — no API call needed.
- */
 export function MobileBottomNav({ isAuthenticated }: MobileBottomNavProps) {
   const pathname = usePathname();
   const itemCount = useCartStore((s) => s.itemCount());
@@ -27,7 +24,7 @@ export function MobileBottomNav({ isAuthenticated }: MobileBottomNavProps) {
           { href: '/profile', label: 'Account', icon: User },
         ]
       : [
-          { href: '/api/auth/signin/keycloak', label: 'Login', icon: LogIn },
+          { href: '/login', label: 'Login', icon: LogIn },
         ]),
   ];
 
@@ -38,8 +35,11 @@ export function MobileBottomNav({ isAuthenticated }: MobileBottomNavProps) {
           const isActive = pathname === item.href || (item.href !== '/' && !item.href.startsWith('/api') && pathname.startsWith(item.href));
           const Icon = item.icon;
 
+          // Login link uses <a> for full page load so auto-submit gets a fresh JS context
+          const Tag = item.href === '/login' ? 'a' : Link;
+
           return (
-            <Link
+            <Tag
               key={item.href}
               href={item.href}
               className={cn(
@@ -56,7 +56,7 @@ export function MobileBottomNav({ isAuthenticated }: MobileBottomNavProps) {
                 )}
               </div>
               <span className="text-[10px] font-medium">{item.label}</span>
-            </Link>
+            </Tag>
           );
         })}
       </div>

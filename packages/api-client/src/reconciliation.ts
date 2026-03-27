@@ -2,7 +2,6 @@ import type { ReconciliationBatch, TransactionMismatch, SearchRequest, SearchRes
 import { getApiClient } from './client';
 
 export const reconciliationApi = {
-  // Query endpoints
   search(params: SearchRequest) {
     return getApiClient().post<SearchResponse<ReconciliationBatch>>('/reconciliation/batches', params);
   },
@@ -10,7 +9,6 @@ export const reconciliationApi = {
     return getApiClient().post<SearchResponse<TransactionMismatch>>('/reconciliation/mismatches', params);
   },
 
-  // Query-based retrieve (works with query-build)
   async retrieve(id: string) {
     const response = await getApiClient().post<SearchResponse<ReconciliationBatch>>('/reconciliation/batch', {
       filters: { id },

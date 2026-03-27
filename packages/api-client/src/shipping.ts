@@ -2,12 +2,10 @@ import type { Shipment, ShippingRate, DeliveryEstimateRequest, SearchRequest, Se
 import { getApiClient } from './client';
 
 export const shippingApi = {
-  // Query endpoints
   search(params: SearchRequest) {
     return getApiClient().post<SearchResponse<Shipment>>('/shipping/shipments', params);
   },
 
-  // Query-based retrieve (works with query-build)
   async retrieve(id: string) {
     const response = await getApiClient().post<SearchResponse<Shipment>>('/shipping/shippingById', {
       pageNum: 1,

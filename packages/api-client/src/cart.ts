@@ -2,7 +2,6 @@ import type { Cart, StateEntityServiceResponse, SearchRequest, SearchResponse, A
 import { getApiClient } from './client';
 
 export const cartApi = {
-  // Query endpoints
   search(params: SearchRequest) {
     return getApiClient().post<SearchResponse<Cart>>('/cart/carts', params);
   },
@@ -10,7 +9,6 @@ export const cartApi = {
     return getApiClient().post<SearchResponse<Cart>>('/cart/storefrontCart', params);
   },
 
-  // Command (STM) endpoints
   retrieve(id: string) {
     return getApiClient().get<StateEntityServiceResponse<Cart>>('/cart/' + id);
   },

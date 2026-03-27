@@ -48,12 +48,13 @@ export function ConfigEditor() {
   if (isLoading) return <SectionSkeleton rows={10} />;
   if (error) return <ErrorSection error={error} onRetry={() => refetch()} />;
 
-  const grouped = (data || []).reduce<Record<string, typeof data>>((acc, config) => {
-    const module = config.module || 'General';
-    if (!acc[module]) acc[module] = [];
-    acc[module]!.push(config);
-    return acc;
-  }, {});
+  const allConfigs = data || [];
+  const grouped: Record<string, typeof allConfigs> = {};
+  for (const config of allConfigs) {
+    const mod = config.module || 'General';
+    if (!grouped[mod]) grouped[mod] = [];
+    grouped[mod].push(config);
+  }
 
   return (
     <div className="space-y-6">
@@ -62,7 +63,7 @@ export function ConfigEditor() {
         <Card key={module}>
           <CardHeader><CardTitle>{module}</CardTitle></CardHeader>
           <CardContent className="space-y-4">
-            {configs!.map((config) => (
+            {(configs ?? []).map((config) => (
               <ConfigRow
                 key={config.key}
                 configKey={config.key}

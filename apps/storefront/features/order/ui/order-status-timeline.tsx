@@ -28,7 +28,6 @@ export function OrderStatusTimeline({ activities }: OrderStatusTimelineProps) {
 
   return (
     <div className="relative">
-      {/* Vertical line */}
       <div className="absolute left-[11px] top-3 bottom-3 w-0.5 bg-gray-200" />
 
       <div className="space-y-6">
@@ -38,7 +37,6 @@ export function OrderStatusTimeline({ activities }: OrderStatusTimelineProps) {
 
           return (
             <div key={i} className="relative flex gap-4 pl-8">
-              {/* Dot */}
               <div
                 className={cn(
                   'absolute left-0 top-1 h-6 w-6 rounded-full border-2 border-white shadow-sm flex items-center justify-center',
@@ -50,7 +48,6 @@ export function OrderStatusTimeline({ activities }: OrderStatusTimelineProps) {
                 )}
               </div>
 
-              {/* Content */}
               <div className="flex-1 pb-1">
                 <p className={cn('text-sm font-medium', isFirst ? 'text-gray-900' : 'text-gray-600')}>
                   {activity.name.replace(/_/g, ' ')}

@@ -2,12 +2,12 @@ import type { Product, SearchRequest, SearchResponse, StateEntityServiceResponse
 import { getApiClient } from './client';
 
 export const productsApi = {
-  // Query endpoints
+
   search(params: SearchRequest) {
     return getApiClient().post<SearchResponse<Product>>('/product/products', params);
   },
 
-  // Query-based retrieve (works with query-build)
+
   async retrieve(id: string) {
     const response = await getApiClient().post<SearchResponse<Product>>('/product/product', {
       filters: { id },

@@ -4,7 +4,7 @@ import { useQuery } from '@tanstack/react-query';
 import { suppliersApi, getApiClient } from '@homebase/api-client';
 import { SectionSkeleton, ErrorSection, StateBadge, StmActionBar } from '@homebase/shared';
 import { Card, CardContent, CardHeader, CardTitle } from '@homebase/ui';
-import { Check, Circle, FileText, Building2, GraduationCap } from 'lucide-react';
+import { Check, FileText, Building2, GraduationCap } from 'lucide-react';
 import { cn } from '@homebase/ui/src/lib/utils';
 import { useOnboardingMutation } from '../api/queries';
 import type { SearchResponse } from '@homebase/types';

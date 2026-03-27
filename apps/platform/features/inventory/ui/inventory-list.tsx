@@ -4,7 +4,6 @@ import { inventoryApi } from '@homebase/api-client';
 import { DataTable, StateBadge, formatNumber } from '@homebase/shared';
 import type { ColumnDef } from '@tanstack/react-table';
 
-// Use the actual fields returned by the inventory query, not the domain type
 interface InventoryRow {
   id: string;
   sku: string;
@@ -56,10 +55,10 @@ export function InventoryList() {
   return (
     <div className="space-y-6">
       <h1 className="text-2xl font-bold">Inventory</h1>
-      <DataTable
-        columns={columns as any}
+      <DataTable<InventoryRow>
+        columns={columns}
         queryKey="platform-inventory"
-        queryFn={inventoryApi.search as any}
+        queryFn={inventoryApi.search as unknown as (params: import('@homebase/types').SearchRequest) => Promise<import('@homebase/types').SearchResponse<InventoryRow>>}
         searchable
         searchPlaceholder="Search by SKU or product..."
         emptyTitle="No inventory items"

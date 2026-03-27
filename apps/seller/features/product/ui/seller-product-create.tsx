@@ -5,7 +5,6 @@ import { EntityForm, type FormSchema } from '@homebase/ui';
 import { productsApi } from '@homebase/api-client';
 import { toast } from 'sonner';
 
-// Product creation schema — in production this comes from cconfig API
 const productSchema: FormSchema = {
   fields: [
     { kind: 'simple', name: 'name', label: 'Product Name', type: 'text', required: true, placeholder: 'e.g., Wireless Bluetooth Headphones' },

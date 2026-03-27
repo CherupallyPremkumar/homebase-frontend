@@ -2,7 +2,6 @@ import type { Review, ReviewSummary, SearchRequest, SearchResponse, StateEntityS
 import { getApiClient } from './client';
 
 export const reviewsApi = {
-  // Query endpoints
   search(params: SearchRequest) {
     return getApiClient().post<SearchResponse<Review>>('/review/reviews', params);
   },
@@ -20,7 +19,6 @@ export const reviewsApi = {
     });
   },
 
-  // Query-based retrieve (works with query-build)
   async retrieve(id: string) {
     const response = await getApiClient().post<SearchResponse<Review>>('/review/review', {
       pageNum: 1,

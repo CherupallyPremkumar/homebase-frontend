@@ -2,7 +2,7 @@
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supportApi } from '@homebase/api-client';
-import { useStmMutation, CACHE_TIMES } from '@homebase/shared';
+import { CACHE_TIMES } from '@homebase/shared';
 import type { SearchRequest, SupportTicket } from '@homebase/types';
 import { toast } from 'sonner';
 

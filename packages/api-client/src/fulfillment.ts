@@ -2,12 +2,10 @@ import type { FulfillmentOrder, SearchRequest, SearchResponse, StateEntityServic
 import { getApiClient } from './client';
 
 export const fulfillmentApi = {
-  // Query endpoints
   search(params: SearchRequest) {
     return getApiClient().post<SearchResponse<FulfillmentOrder>>('/fulfillment/fulfillments', params);
   },
 
-  // Query-based retrieve (works with query-build)
   async retrieve(id: string) {
     const response = await getApiClient().post<SearchResponse<FulfillmentOrder>>('/fulfillment/fulfillment', {
       filters: { id },
@@ -18,5 +16,11 @@ export const fulfillmentApi = {
   },
   processById(id: string, eventId: string, payload?: unknown) {
     return getApiClient().patch<StateEntityServiceResponse<FulfillmentOrder>>('/fulfillment/' + id + '/' + eventId, payload ?? {});
+  },
+
+  getLineItems(fulfillmentId: string) {
+    return getApiClient().post<SearchResponse<Record<string, unknown>>>('/fulfillment/fulfillment-line-items', {
+      filters: { fulfillmentId },
+    });
   },
 };

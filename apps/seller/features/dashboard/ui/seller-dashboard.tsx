@@ -2,28 +2,25 @@
 
 import { EntityDashboard, StateBadge, formatPrice } from '@homebase/ui';
 import { Package, ShoppingCart, DollarSign, Star } from 'lucide-react';
-import { useTopProducts, useRecentSellerOrders } from '../api/queries';
+import { useTopProducts, useRecentSellerOrders, type SellerStats } from '../api/queries';
 import { getApiClient } from '@homebase/api-client';
 import dynamic from 'next/dynamic';
 import type { SearchResponse } from '@homebase/types';
 
 const SalesChart = dynamic(() => import('./sales-chart'), { ssr: false });
 
-// Seller dashboard stat fetcher
-async function fetchSellerStats() {
-  const response = await getApiClient().post<SearchResponse<{
-    activeProducts: number;
-    totalOrders: number;
-    totalRevenue: number;
-    averageRating: number;
-    productsChange: number;
-    ordersChange: number;
-    revenueChange: number;
-  }>>('/dashboard/sellerStats', {
+const EMPTY_STATS: SellerStats = {
+  totalProducts: 0, activeProducts: 0, totalOrders: 0, pendingOrders: 0,
+  totalRevenue: 0, pendingSettlement: 0, averageRating: 0, returnRate: 0,
+  productsChange: 0, ordersChange: 0, revenueChange: 0,
+};
+
+async function fetchSellerStats(): Promise<SellerStats> {
+  const response = await getApiClient().post<SearchResponse<SellerStats>>('/dashboard/sellerStats', {
     pageNum: 1,
     pageSize: 1,
   });
-  return response.list?.[0]?.row ?? response.data?.row ?? {} as any;
+  return response.list?.[0]?.row ?? response.data?.row ?? EMPTY_STATS;
 }
 
 export function SellerDashboard() {

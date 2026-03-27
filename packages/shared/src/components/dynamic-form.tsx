@@ -116,8 +116,15 @@ function DynamicFormInner({
   );
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-function renderField(field: CConfigFormField, formField: any) {
+interface FormFieldControlProps {
+  value: unknown;
+  onChange: (...event: unknown[]) => void;
+  onBlur: () => void;
+  name: string;
+  ref: React.Ref<HTMLElement>;
+}
+
+function renderField(field: CConfigFormField, formField: FormFieldControlProps) {
   switch (field.type) {
     case 'textarea':
       return (

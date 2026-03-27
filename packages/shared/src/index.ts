@@ -1,4 +1,5 @@
-// Components
+export { ErrorPage } from './components/error-page';
+export { NotFoundPage } from './components/not-found-page';
 export { StateBadge } from './components/state-badge';
 export { PriceDisplay } from './components/price-display';
 export { EmptyState } from './components/empty-state';
@@ -39,4 +40,5 @@ export { buildZodSchema } from './lib/schema-builder';
 export { track, trackPage, identifyUser, setAnalyticsProvider } from './lib/analytics';
 export { buildMetadata, buildProductMetadata } from './lib/seo';
 export { sanitizeHtml, sanitizeText } from './lib/sanitize';
+export { createSecurityHeaders } from './lib/security-headers';
 export * from './lib/constants';

@@ -10,7 +10,14 @@ export function createLogoutHandler() {
   return async function GET(request: NextRequest) {
     const origin = request.nextUrl.origin;
     const issuer = process.env.KEYCLOAK_ISSUER;
-    const clientId = process.env.KEYCLOAK_CLIENT_ID || 'storefront-web';
+    const clientId = process.env.KEYCLOAK_CLIENT_ID;
+
+    if (!clientId) {
+      throw new Error(
+        'KEYCLOAK_CLIENT_ID environment variable is required. ' +
+        'Set it to the OAuth client ID for this application (e.g. storefront-web, seller-web, backoffice-web, platform-web).',
+      );
+    }
 
     // Read id_token from JWT for proper Keycloak logout
     const token = await getToken({

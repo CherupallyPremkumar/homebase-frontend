@@ -2,7 +2,6 @@ import type { CatalogItem, Category, SearchSuggestion, ProductFilter, Banner, Se
 import { getApiClient } from './client';
 
 export const catalogApi = {
-  // Query endpoints
   search(params: SearchRequest) {
     return getApiClient().post<SearchResponse<CatalogItem>>('/catalog/catalogItems', params);
   },
@@ -10,7 +9,6 @@ export const catalogApi = {
     return getApiClient().post<SearchResponse<Category>>('/catalog/catalogCategories', params);
   },
 
-  // Storefront query endpoints
   storefrontProducts(params: SearchRequest) {
     return getApiClient().post<SearchResponse<CatalogItem>>('/storefront/storefront-products', params);
   },
@@ -49,7 +47,6 @@ export const catalogApi = {
     if (!item) throw new Error('Product not found');
     return item;
   },
-  // Aliases for backward compatibility
   categoryMenu(params?: SearchRequest) {
     return getApiClient().post<SearchResponse<Category>>('/catalog/categoryMenu', params ?? { pageNum: 1, pageSize: 100 });
   },

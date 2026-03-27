@@ -44,7 +44,6 @@ export function Footer() {
           ))}
         </div>
 
-        {/* Trust badges */}
         <div className="mt-8 flex flex-wrap justify-center gap-8 border-t pt-8 text-center text-xs text-gray-400">
           <span>Secure Payments</span>
           <span>Easy Returns</span>

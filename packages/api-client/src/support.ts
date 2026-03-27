@@ -2,7 +2,6 @@ import type { SupportTicket, TicketMessage, SearchRequest, SearchResponse, State
 import { getApiClient } from './client';
 
 export const supportApi = {
-  // Query endpoints
   search(params: SearchRequest) {
     return getApiClient().post<SearchResponse<SupportTicket>>('/support/tickets', params);
   },
@@ -10,7 +9,6 @@ export const supportApi = {
     return getApiClient().post<SearchResponse<SupportTicket>>('/support/myTickets', params);
   },
 
-  // Query-based retrieve (works with query-build)
   async retrieve(id: string) {
     const response = await getApiClient().post<SearchResponse<SupportTicket>>('/support/supportTicket', {
       pageNum: 1,

@@ -28,13 +28,11 @@ export function CheckoutPage() {
   const [state, dispatch] = useReducer(checkoutReducer, initialCheckoutState);
   const { items, subtotal, clear: clearCart } = useCartStore();
 
-  // Mutations
   const createCheckout = useCreateCheckout();
   const setAddress = useSetCheckoutAddress();
   const setPayment = useSetCheckoutPayment();
   const placeOrder = usePlaceOrder();
 
-  // Initialize: create checkout entity on mount
   useEffect(() => {
     if (items.length === 0) return;
 
@@ -53,7 +51,6 @@ export function CheckoutPage() {
     });
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
-  // Handlers — each calls backend, then dispatches result to state machine
   const handleAddressSubmit = (address: Address) => {
     if (!state.checkoutId || !isEventAllowed(state.allowedActions, 'SET_ADDRESS')) return;
 
@@ -119,12 +116,10 @@ export function CheckoutPage() {
 
   const handleBack = () => dispatch({ type: 'GO_BACK' });
 
-  // Cart total for sidebar
   const sub = subtotal();
   const shipping = sub >= FREE_SHIPPING_THRESHOLD ? 0 : 49;
   const total = sub + shipping;
 
-  // Empty cart
   if (items.length === 0 && state.step !== 'SUCCESS') {
     return (
       <div className="container mx-auto flex min-h-[50vh] flex-col items-center justify-center px-4">
@@ -140,15 +135,12 @@ export function CheckoutPage() {
     <div className="container mx-auto px-4 py-6">
       <h1 className="mb-6 text-2xl font-bold text-gray-900">Checkout</h1>
 
-      {/* Loading */}
       {state.step === 'LOADING' && <SectionSkeleton rows={4} />}
 
-      {/* Error */}
       {state.step === 'ERROR' && (
         <ErrorSection error={state.error} onRetry={() => dispatch({ type: 'RETRY' })} />
       )}
 
-      {/* Success */}
       {state.step === 'SUCCESS' && (
         <div className="flex flex-col items-center justify-center py-12 text-center">
           <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-green-100">
@@ -167,7 +159,6 @@ export function CheckoutPage() {
         </div>
       )}
 
-      {/* Active checkout steps */}
       {['ADDRESS', 'PAYMENT', 'REVIEW', 'SUBMITTING'].includes(state.step) && (
         <>
           <CheckoutProgress
@@ -204,7 +195,6 @@ export function CheckoutPage() {
               )}
             </div>
 
-            {/* Order summary sidebar */}
             <div className="rounded-lg border p-6">
               <h3 className="font-semibold">Order Summary</h3>
               <Separator className="my-3" />

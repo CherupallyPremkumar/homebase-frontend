@@ -2,7 +2,6 @@ import type { ReturnRequest, SearchRequest, SearchResponse, StateEntityServiceRe
 import { getApiClient } from './client';
 
 export const returnRequestsApi = {
-  // Query endpoints
   search(params: SearchRequest) {
     return getApiClient().post<SearchResponse<ReturnRequest>>('/returnrequest/returnrequests', params);
   },
@@ -10,7 +9,6 @@ export const returnRequestsApi = {
     return getApiClient().post<SearchResponse<ReturnRequest>>('/returnrequest/myReturns', params);
   },
 
-  // Query-based retrieve (works with query-build)
   async retrieve(id: string) {
     const response = await getApiClient().post<SearchResponse<ReturnRequest>>('/returnrequest/returnrequestById', {
       filters: { id },

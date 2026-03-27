@@ -3,6 +3,7 @@
 import { EntityDetailLayout, SectionSkeleton, ErrorSection, formatPriceRupees } from '@homebase/shared';
 import { Card, CardContent, Tabs, TabsContent, TabsList, TabsTrigger } from '@homebase/ui';
 import { useProductDetail, useProductMutation } from '../api/queries';
+import type { ProductVariant, ActivityLog } from '@homebase/types';
 
 interface ProductDetailProps {
   id: string;
@@ -57,7 +58,7 @@ export function ProductDetail({ id }: ProductDetailProps) {
             <CardContent className="p-6">
               {variants.length > 0 ? (
                 <div className="space-y-3">
-                  {variants.map((v: any) => (
+                  {variants.map((v: ProductVariant) => (
                     <div key={v.id} className="flex items-center justify-between rounded border p-3 text-sm">
                       <div>
                         <p className="font-medium">{v.name || v.sku || 'Variant'}</p>
@@ -81,7 +82,7 @@ export function ProductDetail({ id }: ProductDetailProps) {
             <CardContent className="p-6">
               {activities.length > 0 ? (
                 <div className="space-y-3">
-                  {activities.map((a: any, i: number) => (
+                  {activities.map((a: ActivityLog, i: number) => (
                     <div key={i} className="flex items-start gap-3 text-sm">
                       <div className="mt-1 h-2 w-2 flex-shrink-0 rounded-full bg-gray-400" />
                       <div>

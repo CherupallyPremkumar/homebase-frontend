@@ -1,6 +1,8 @@
 import { signIn } from '@/auth';
 import { AutoSubmitForm } from './auto-submit';
 
+export const dynamic = 'force-dynamic';
+
 export default function LoginPage({
   searchParams,
 }: {

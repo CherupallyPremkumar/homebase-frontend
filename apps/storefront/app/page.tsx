@@ -1,4 +1,3 @@
-import Link from 'next/link';
 import { catalogApi } from '@homebase/api-client';
 import { JsonLd, organizationJsonLd, websiteJsonLd } from '@homebase/shared';
 import { HeroBanner, CategoryGrid, FeaturedProducts, TrustBar } from '@/features/catalog/ui';

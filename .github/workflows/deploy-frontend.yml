@@ -1,0 +1,130 @@
+name: Deploy Frontend Apps
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      app:
+        description: 'App to deploy (leave empty to auto-detect changes)'
+        required: false
+        type: string
+
+env:
+  AWS_REGION: us-east-1
+
+jobs:
+  detect-changes:
+    name: Detect Changed Apps
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.set-matrix.outputs.matrix }}
+      has-changes: ${{ steps.set-matrix.outputs.has-changes }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+
+      - name: Detect changed apps
+        id: set-matrix
+        run: |
+          ALL_APPS='["storefront","seller","backoffice"]'
+
+          if [[ -n "${{ github.event.inputs.app }}" ]]; then
+            APPS='["${{ github.event.inputs.app }}"]'
+          else
+            CHANGED_FILES=$(git diff --name-only HEAD~1 HEAD)
+            # Also rebuild backoffice if any of the old apps change
+            SHARED_CHANGED=$(echo "$CHANGED_FILES" | grep -qE "^packages/|^apps/oms/|^apps/finance/|^apps/warehouse/" && echo "true" || echo "false")
+
+            if [[ "$SHARED_CHANGED" == "true" ]]; then
+              APPS="$ALL_APPS"
+            else
+              APPS=$(echo "$ALL_APPS" | jq -r '.[]' | while read app; do
+                if echo "$CHANGED_FILES" | grep -q "^apps/$app/"; then
+                  echo "$app"
+                fi
+              done | jq -R . | jq -sc .)
+            fi
+
+            if [[ "$APPS" == "[]" || -z "$APPS" ]]; then
+              echo "has-changes=false" >> $GITHUB_OUTPUT
+              echo "matrix={\"app\":[]}" >> $GITHUB_OUTPUT
+              exit 0
+            fi
+          fi
+
+          echo "matrix={\"app\":$APPS}" >> $GITHUB_OUTPUT
+          echo "has-changes=true" >> $GITHUB_OUTPUT
+          echo "Apps to deploy: $APPS"
+
+  build-and-deploy:
+    name: Build & Deploy ${{ matrix.app }}
+    needs: detect-changes
+    if: needs.detect-changes.outputs.has-changes == 'true'
+    runs-on: ubuntu-latest
+    strategy:
+      matrix: ${{ fromJSON(needs.detect-changes.outputs.matrix) }}
+      fail-fast: false
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build app
+        run: pnpm turbo build --filter=@homebase/${{ matrix.app }}
+        env:
+          NEXT_PUBLIC_API_URL: ${{ secrets.NEXT_PUBLIC_API_URL }}
+          NEXT_PUBLIC_QUERY_URL: ${{ secrets.NEXT_PUBLIC_QUERY_URL }}
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Build & Push Docker image
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          IMAGE_TAG: ${{ github.sha }}
+          APP: ${{ matrix.app }}
+        run: |
+          docker build \
+            -t $ECR_REGISTRY/homebase-frontend-$APP:$IMAGE_TAG \
+            -t $ECR_REGISTRY/homebase-frontend-$APP:latest \
+            -f apps/$APP/Dockerfile \
+            .
+          docker push $ECR_REGISTRY/homebase-frontend-$APP:$IMAGE_TAG
+          docker push $ECR_REGISTRY/homebase-frontend-$APP:latest
+
+      - name: Configure kubectl (EKS)
+        uses: aws-actions/amazon-eks-set-context@v1
+        with:
+          cluster-name: ${{ secrets.EKS_CLUSTER_NAME }}
+          region: ${{ env.AWS_REGION }}
+
+      - name: Deploy to EKS
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          IMAGE_TAG: ${{ github.sha }}
+          APP: ${{ matrix.app }}
+        run: |
+          kubectl set image deployment/$APP $APP=$ECR_REGISTRY/homebase-frontend-$APP:$IMAGE_TAG \
+            -n frontend
+          kubectl rollout status deployment/$APP -n frontend --timeout=180s

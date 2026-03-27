@@ -26,7 +26,6 @@ export function ReviewStep({ checkout, selectedAddress, paymentMethod, onSubmit,
         <CardTitle>Review Your Order</CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
-        {/* Items */}
         <div>
           <h4 className="mb-2 text-sm font-semibold text-gray-700">Items</h4>
           {checkout.items.map((item) => (
@@ -45,7 +44,6 @@ export function ReviewStep({ checkout, selectedAddress, paymentMethod, onSubmit,
 
         <Separator />
 
-        {/* Address */}
         {selectedAddress && (
           <div>
             <h4 className="mb-1 text-sm font-semibold text-gray-700">Shipping Address</h4>
@@ -56,7 +54,6 @@ export function ReviewStep({ checkout, selectedAddress, paymentMethod, onSubmit,
           </div>
         )}
 
-        {/* Payment */}
         {paymentMethod && (
           <div>
             <h4 className="mb-1 text-sm font-semibold text-gray-700">Payment</h4>
@@ -66,7 +63,6 @@ export function ReviewStep({ checkout, selectedAddress, paymentMethod, onSubmit,
 
         <Separator />
 
-        {/* Total */}
         <div className="space-y-1 text-sm">
           <div className="flex justify-between">
             <span className="text-gray-500">Subtotal</span>

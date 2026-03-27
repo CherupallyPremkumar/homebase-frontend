@@ -1,7 +1,7 @@
 'use client';
 
 import { SectionSkeleton, ErrorSection } from '@homebase/shared';
-import { Card, CardContent, CardHeader, CardTitle, Button, Separator, Badge } from '@homebase/ui';
+import { Card, CardContent, CardHeader, CardTitle, Button, Badge } from '@homebase/ui';
 import { Building2, Mail, Phone, MapPin, CreditCard, Edit } from 'lucide-react';
 import { useSellerProfile } from '../api/queries';
 
@@ -24,7 +24,6 @@ export function SellerProfile() {
         <Button variant="outline"><Edit className="mr-1 h-4 w-4" />Edit Profile</Button>
       </div>
 
-      {/* Business info */}
       <Card>
         <CardHeader><CardTitle className="flex items-center gap-2"><Building2 className="h-5 w-5" />Business Information</CardTitle></CardHeader>
         <CardContent className="grid gap-4 sm:grid-cols-2">

@@ -22,6 +22,44 @@ const DEFAULT_TIMEOUT = 5000;
 const MAX_RETRIES = 2;
 const RETRY_DELAYS = [200, 400];
 
+/**
+ * Transforms frontend SearchRequest fields to Chenile's expected format.
+ * Frontend uses: pageSize, sortCriteria[{ field, order }]
+ * Chenile expects: numRowsInPage, sortCriteria[{ name, ascendingOrder }]
+ */
+function transformSearchRequest(body: unknown): unknown {
+  if (!body || typeof body !== 'object') return body;
+  const obj = body as Record<string, unknown>;
+
+  // Only transform if this looks like a SearchRequest (has pageSize or queryName)
+  if (!('pageSize' in obj) && !('queryName' in obj)) return body;
+
+  const transformed: Record<string, unknown> = { ...obj };
+
+  // Map pageSize → numRowsInPage
+  if ('pageSize' in transformed) {
+    transformed.numRowsInPage = transformed.pageSize;
+    delete transformed.pageSize;
+  }
+
+  // Map sortCriteria[{ field, order }] → [{ name, ascendingOrder }]
+  if (Array.isArray(transformed.sortCriteria)) {
+    transformed.sortCriteria = transformed.sortCriteria.map(
+      (criterion: Record<string, unknown>) => {
+        if ('field' in criterion) {
+          return {
+            name: criterion.field,
+            ascendingOrder: criterion.order === 'ASC',
+          };
+        }
+        return criterion;
+      },
+    );
+  }
+
+  return transformed;
+}
+
 function sleep(ms: number): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
@@ -47,7 +85,7 @@ export class HttpClient {
   }
 
   async post<T>(path: string, body?: unknown, options?: RequestOptions): Promise<T> {
-    return this.request<T>('POST', path, body, options);
+    return this.request<T>('POST', path, transformSearchRequest(body), options);
   }
 
   async put<T>(path: string, body?: unknown, options?: RequestOptions): Promise<T> {
@@ -109,7 +147,7 @@ export class HttpClient {
 
       const headers: Record<string, string> = {
         'Content-Type': 'application/json',
-        'x-chenile-tenant-id': 'homebase',
+        'x-chenile-tenant-id': process.env.CHENILE_TENANT_ID || 'homebase',
         'X-Correlation-Id': correlationId,
         ...this.defaultHeaders,
         ...options?.headers,
@@ -166,9 +204,11 @@ function anySignal(...signals: AbortSignal[]): AbortSignal {
       controller.abort(signal.reason);
       return controller.signal;
     }
-    signal.addEventListener('abort', () => controller.abort(signal.reason), {
-      once: true,
-    });
+    signal.addEventListener(
+      'abort',
+      () => controller.abort(signal.reason),
+      { once: true, signal: controller.signal },
+    );
   }
   return controller.signal;
 }

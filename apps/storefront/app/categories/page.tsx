@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
+import Image from 'next/image';
 import { catalogApi } from '@homebase/api-client';
 import { buildMetadata } from '@homebase/shared';
 
@@ -31,9 +32,11 @@ export default async function CategoriesPage() {
               className="group flex flex-col items-center gap-3 rounded-lg border bg-white p-6 transition-shadow hover:shadow-md"
             >
               {category.imageUrl ? (
-                <img
+                <Image
                   src={category.imageUrl}
                   alt={category.name}
+                  width={80}
+                  height={80}
                   className="h-20 w-20 object-contain transition-transform group-hover:scale-105"
                 />
               ) : (
@@ -54,7 +57,6 @@ export default async function CategoriesPage() {
         </div>
       )}
 
-      {/* Subcategories grouped under parent */}
       {topCategories.some((c) => {
         const children = categories.filter((ch) => ch.parentId === c.id);
         return children.length > 0;
@@ -75,7 +77,7 @@ export default async function CategoriesPage() {
                       className="flex flex-col items-center gap-2 rounded-lg border p-4 transition-shadow hover:shadow-md"
                     >
                       {child.imageUrl ? (
-                        <img src={child.imageUrl} alt={child.name} className="h-12 w-12 object-contain" />
+                        <Image src={child.imageUrl} alt={child.name} width={48} height={48} className="h-12 w-12 object-contain" />
                       ) : (
                         <div className="flex h-12 w-12 items-center justify-center rounded-full bg-primary/10 text-lg font-bold text-primary">
                           {child.name.charAt(0)}

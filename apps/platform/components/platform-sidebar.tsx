@@ -16,6 +16,12 @@ import {
   ChevronDown,
   PanelLeftClose,
   PanelLeft,
+  FileText,
+  Image,
+  BarChart3,
+  ShieldCheck,
+  FileCheck,
+  Receipt,
 } from 'lucide-react';
 import { cn } from '@homebase/ui/src/lib/utils';
 import { useUIStore } from '@homebase/shared';
@@ -49,10 +55,31 @@ const NAV_GROUPS: NavGroup[] = [
     ],
   },
   {
+    label: 'Content',
+    items: [
+      { href: '/cms', label: 'Pages', icon: FileText },
+      { href: '/cms/banners', label: 'Banners', icon: Image },
+    ],
+  },
+  {
     label: 'Marketing',
     items: [
       { href: '/promotions', label: 'Promotions', icon: Tag },
       { href: '/reviews', label: 'Reviews', icon: Star },
+    ],
+  },
+  {
+    label: 'Reports',
+    items: [
+      { href: '/analytics', label: 'Analytics', icon: BarChart3 },
+    ],
+  },
+  {
+    label: 'Governance',
+    items: [
+      { href: '/compliance', label: 'Policies', icon: ShieldCheck },
+      { href: '/compliance/agreements', label: 'Agreements', icon: FileCheck },
+      { href: '/tax', label: 'Tax Rates', icon: Receipt },
     ],
   },
   {
@@ -87,7 +114,6 @@ export function PlatformSidebar() {
         sidebarOpen ? 'w-64' : 'w-16',
       )}
     >
-      {/* Header */}
       <div className="flex h-16 items-center justify-between border-b px-4">
         {sidebarOpen && (
           <Link href="/" className="text-lg font-bold text-primary">
@@ -99,7 +125,6 @@ export function PlatformSidebar() {
         </button>
       </div>
 
-      {/* Navigation */}
       <nav className="flex-1 overflow-y-auto py-4">
         {NAV_GROUPS.map((group) => (
           <div key={group.label} className="mb-1">
