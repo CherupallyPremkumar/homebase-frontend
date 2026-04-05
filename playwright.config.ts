@@ -56,5 +56,11 @@ export default defineConfig({
       testDir: './e2e/platform',
       use: { baseURL: BASE.platform },
     },
+    {
+      name: 'audit',
+      testDir: './e2e',
+      testMatch: 'ui-ux-audit.spec.ts',
+      use: { baseURL: BASE.storefront },
+    },
   ],
 });

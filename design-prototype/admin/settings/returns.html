@@ -1,0 +1,566 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HomeBase — Return & Refund Policy Engine</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brand: { 50:'#FFF7ED',100:'#FFEDD5',200:'#FED7AA',300:'#FDBA74',400:'#FB923C',500:'#F97316',600:'#EA580C',700:'#C2410C' },
+            navy: { 700:'#1E3A5F',800:'#0F1E30',900:'#0A1628' },
+            success: '#16A34A', warning: '#EAB308', danger: '#DC2626',
+          },
+          fontFamily: { sans: ['Inter','system-ui','sans-serif'] }
+        }
+      }
+    }
+  </script>
+  <style>
+    .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+    .scrollbar-hide::-webkit-scrollbar { display: none; }
+    .sidebar-link { transition: all 0.15s ease; }
+    .sidebar-link:hover { background: rgba(255,255,255,0.06); }
+    .sidebar-link.active { background: rgba(249,115,22,0.15); border-right: 3px solid #F97316; color: #F97316; }
+    .table-row { transition: background 0.15s ease; }
+    .table-row:hover { background: #FFF7ED; }
+    .toggle-track { transition: background 0.2s ease; }
+    .toggle-knob { transition: transform 0.2s ease; }
+    .dropdown-menu { display: none; }
+    .dropdown:hover .dropdown-menu { display: block; }
+  </style>
+</head>
+<body class="font-sans bg-gray-50 text-gray-900">
+
+  <!-- ===== TOP HEADER BAR ===== -->
+  <header id="admin-header" class="fixed top-0 left-0 right-0 z-50 bg-white border-b border-gray-200 h-16"></header>
+
+  <!-- ===== LAYOUT: SIDEBAR + MAIN ===== -->
+  <div class="flex pt-16 min-h-screen">
+    <aside id="admin-sidebar" class="fixed left-0 top-16 bottom-0 w-60 z-40 flex flex-col overflow-y-auto" style="background:#0A1628;"></aside>
+
+    <!-- ===== MAIN CONTENT ===== -->
+    <main class="flex-1 ml-60 p-6 lg:p-8 overflow-x-hidden">
+
+      <!-- Breadcrumb -->
+      <nav class="flex items-center gap-2 text-sm text-gray-500 mb-4">
+        <a href="../dashboard.html" class="hover:text-brand-500 transition">Dashboard</a>
+        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"/></svg>
+        <a href="index.html" class="hover:text-brand-500 transition">Settings</a>
+        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"/></svg>
+        <span class="text-gray-900 font-medium">Return & Refund Policy</span>
+      </nav>
+
+      <!-- Page Header -->
+      <div class="flex items-center justify-between mb-6">
+        <div class="min-w-0">
+          <h1 class="text-2xl font-bold text-gray-900">Return & Refund Policy Engine</h1>
+          <p class="text-sm text-gray-500 mt-1">Marketplace-wide return windows, auto-approval rules, refund timelines, and exchange policies</p>
+        </div>
+        <div class="flex items-center gap-3 shrink-0">
+          <button onclick="if(confirm('Discard all unsaved changes?'))location.reload()" class="px-4 py-2.5 text-sm font-medium text-gray-600 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 transition">Discard</button>
+          <button onclick="saveConfig()" class="px-5 py-2.5 bg-brand-500 text-white text-sm font-semibold rounded-lg hover:bg-brand-600 transition shadow-sm flex items-center gap-2">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4.5 12.75l6 6 9-13.5"/></svg>
+            Save Changes
+          </button>
+        </div>
+      </div>
+
+      <!-- ===== SECTION 1: DEFAULT RETURN WINDOW ===== -->
+      <div class="bg-white rounded-xl border border-gray-200 shadow-sm mb-6">
+        <div class="px-6 py-4 border-b border-gray-100">
+          <h2 class="text-lg font-bold text-gray-900">Default Return Window</h2>
+          <p class="text-sm text-gray-500 mt-0.5">The standard return period applied to all categories unless overridden</p>
+        </div>
+        <div class="p-6">
+          <div class="grid grid-cols-3 gap-4 items-start">
+            <label class="text-sm font-medium text-gray-700 pt-2">Return Window</label>
+            <div class="col-span-2">
+              <div class="flex items-center gap-2 max-w-md">
+                <input type="number" value="30" class="w-full border border-gray-200 rounded-lg px-4 py-2.5 text-sm outline-none focus:border-brand-400 focus:ring-2 focus:ring-brand-100 transition">
+                <span class="text-sm text-gray-500 whitespace-nowrap">days after delivery</span>
+              </div>
+              <p class="text-xs text-gray-400 mt-1">Customers can initiate a return within this many days of receiving the product</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== SECTION 2: CATEGORY OVERRIDES ===== -->
+      <div class="bg-white rounded-xl border border-gray-200 shadow-sm mb-6">
+        <div class="px-6 py-4 border-b border-gray-100 flex items-center justify-between">
+          <div>
+            <h2 class="text-lg font-bold text-gray-900">Category Return Window Overrides</h2>
+            <p class="text-sm text-gray-500 mt-0.5">Category-specific return periods that override the default</p>
+          </div>
+          <button onclick="alert('Add new category override')" class="px-4 py-2 text-sm font-medium text-brand-600 bg-brand-50 rounded-lg hover:bg-brand-100 transition">+ Add Override</button>
+        </div>
+        <div class="overflow-x-auto">
+          <table class="w-full text-sm">
+            <thead>
+              <tr class="bg-gray-50 text-left">
+                <th class="px-6 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Category</th>
+                <th class="px-6 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Return Window</th>
+                <th class="px-6 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Restocking Fee</th>
+                <th class="px-6 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Status</th>
+                <th class="px-6 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Actions</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-100">
+              <tr class="table-row">
+                <td class="px-6 py-4 font-medium text-gray-900">Electronics</td>
+                <td class="px-6 py-4">
+                  <div class="flex items-center gap-2">
+                    <input type="number" value="10" class="w-16 border border-gray-200 rounded px-2 py-1 text-sm text-center">
+                    <span class="text-xs text-gray-500">days</span>
+                  </div>
+                </td>
+                <td class="px-6 py-4">
+                  <div class="flex items-center gap-1">
+                    <input type="number" value="0" class="w-16 border border-gray-200 rounded px-2 py-1 text-sm text-center">
+                    <span class="text-xs text-gray-400">%</span>
+                  </div>
+                </td>
+                <td class="px-6 py-4"><span class="px-2 py-0.5 text-[10px] font-bold rounded-full bg-green-100 text-green-700">ACTIVE</span></td>
+                <td class="px-6 py-4"><button onclick="alert('Edit Electronics override')" class="text-brand-500 hover:text-brand-600 text-xs font-medium">Edit</button></td>
+              </tr>
+              <tr class="table-row">
+                <td class="px-6 py-4 font-medium text-gray-900">Clothing & Apparel</td>
+                <td class="px-6 py-4">
+                  <div class="flex items-center gap-2">
+                    <input type="number" value="30" class="w-16 border border-gray-200 rounded px-2 py-1 text-sm text-center">
+                    <span class="text-xs text-gray-500">days</span>
+                  </div>
+                </td>
+                <td class="px-6 py-4">
+                  <div class="flex items-center gap-1">
+                    <input type="number" value="0" class="w-16 border border-gray-200 rounded px-2 py-1 text-sm text-center">
+                    <span class="text-xs text-gray-400">%</span>
+                  </div>
+                </td>
+                <td class="px-6 py-4"><span class="px-2 py-0.5 text-[10px] font-bold rounded-full bg-green-100 text-green-700">ACTIVE</span></td>
+                <td class="px-6 py-4"><button onclick="alert('Edit Clothing override')" class="text-brand-500 hover:text-brand-600 text-xs font-medium">Edit</button></td>
+              </tr>
+              <tr class="table-row">
+                <td class="px-6 py-4 font-medium text-gray-900">Perishable / Food</td>
+                <td class="px-6 py-4">
+                  <div class="flex items-center gap-2">
+                    <input type="number" value="0" class="w-16 border border-gray-200 rounded px-2 py-1 text-sm text-center">
+                    <span class="text-xs text-gray-500">days</span>
+                  </div>
+                </td>
+                <td class="px-6 py-4">
+                  <span class="text-xs text-gray-400 italic">N/A</span>
+                </td>
+                <td class="px-6 py-4"><span class="px-2 py-0.5 text-[10px] font-bold rounded-full bg-red-100 text-red-700">NO RETURN</span></td>
+                <td class="px-6 py-4"><button onclick="alert('Edit Perishable override')" class="text-brand-500 hover:text-brand-600 text-xs font-medium">Edit</button></td>
+              </tr>
+              <tr class="table-row">
+                <td class="px-6 py-4 font-medium text-gray-900">Furniture</td>
+                <td class="px-6 py-4">
+                  <div class="flex items-center gap-2">
+                    <input type="number" value="7" class="w-16 border border-gray-200 rounded px-2 py-1 text-sm text-center">
+                    <span class="text-xs text-gray-500">days</span>
+                  </div>
+                </td>
+                <td class="px-6 py-4">
+                  <div class="flex items-center gap-1">
+                    <input type="number" value="10" class="w-16 border border-gray-200 rounded px-2 py-1 text-sm text-center">
+                    <span class="text-xs text-gray-400">%</span>
+                  </div>
+                </td>
+                <td class="px-6 py-4"><span class="px-2 py-0.5 text-[10px] font-bold rounded-full bg-green-100 text-green-700">ACTIVE</span></td>
+                <td class="px-6 py-4"><button onclick="alert('Edit Furniture override')" class="text-brand-500 hover:text-brand-600 text-xs font-medium">Edit</button></td>
+              </tr>
+              <tr class="table-row">
+                <td class="px-6 py-4 font-medium text-gray-900">Jewelry & Watches</td>
+                <td class="px-6 py-4">
+                  <div class="flex items-center gap-2">
+                    <input type="number" value="15" class="w-16 border border-gray-200 rounded px-2 py-1 text-sm text-center">
+                    <span class="text-xs text-gray-500">days</span>
+                  </div>
+                </td>
+                <td class="px-6 py-4">
+                  <div class="flex items-center gap-1">
+                    <input type="number" value="5" class="w-16 border border-gray-200 rounded px-2 py-1 text-sm text-center">
+                    <span class="text-xs text-gray-400">%</span>
+                  </div>
+                </td>
+                <td class="px-6 py-4"><span class="px-2 py-0.5 text-[10px] font-bold rounded-full bg-green-100 text-green-700">ACTIVE</span></td>
+                <td class="px-6 py-4"><button onclick="alert('Edit Jewelry override')" class="text-brand-500 hover:text-brand-600 text-xs font-medium">Edit</button></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="px-6 py-3 border-t border-gray-100 bg-gray-50 rounded-b-xl">
+          <p class="text-[11px] text-gray-500"><span class="font-semibold text-gray-600">Restocking fee:</span> Deducted from refund amount. Set to 0% for free returns. Applies to "Changed Mind" returns only -- quality/damage issues are always 0%.</p>
+        </div>
+      </div>
+
+      <!-- ===== SECTION 3: RETURN REASONS ===== -->
+      <div class="bg-white rounded-xl border border-gray-200 shadow-sm mb-6">
+        <div class="px-6 py-4 border-b border-gray-100 flex items-center justify-between">
+          <div>
+            <h2 class="text-lg font-bold text-gray-900">Return Reasons</h2>
+            <p class="text-sm text-gray-500 mt-0.5">Available return reasons shown to customers -- each can be toggled and configured</p>
+          </div>
+          <button onclick="alert('Add new return reason')" class="px-4 py-2 text-sm font-medium text-brand-600 bg-brand-50 rounded-lg hover:bg-brand-100 transition">+ Add Reason</button>
+        </div>
+        <div class="divide-y divide-gray-100">
+          <!-- Quality Issue -->
+          <div class="flex items-center justify-between px-6 py-4">
+            <div class="flex items-center gap-3">
+              <div class="w-9 h-9 rounded-lg bg-red-50 flex items-center justify-center">
+                <svg class="w-4 h-4 text-red-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126z"/></svg>
+              </div>
+              <div>
+                <p class="text-sm font-semibold text-gray-900">Quality Issue</p>
+                <p class="text-xs text-gray-500">Product defective or not functioning as expected</p>
+              </div>
+            </div>
+            <div class="flex items-center gap-4">
+              <div class="flex items-center gap-2">
+                <span class="px-2.5 py-1 text-[10px] font-bold rounded-full bg-green-100 text-green-700">FREE RETURN</span>
+              </div>
+              <button onclick="toggleSwitch(this)" class="relative inline-flex h-6 w-11 items-center rounded-full toggle-track bg-green-500" data-on="true">
+                <span class="toggle-knob inline-block h-4 w-4 rounded-full bg-white shadow translate-x-6"></span>
+              </button>
+            </div>
+          </div>
+          <!-- Wrong Product -->
+          <div class="flex items-center justify-between px-6 py-4">
+            <div class="flex items-center gap-3">
+              <div class="w-9 h-9 rounded-lg bg-yellow-50 flex items-center justify-center">
+                <svg class="w-4 h-4 text-yellow-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M7.5 21L3 16.5m0 0L7.5 12M3 16.5h13.5m0-13.5L21 7.5m0 0L16.5 12M21 7.5H7.5"/></svg>
+              </div>
+              <div>
+                <p class="text-sm font-semibold text-gray-900">Wrong Product</p>
+                <p class="text-xs text-gray-500">Received a different product than ordered</p>
+              </div>
+            </div>
+            <div class="flex items-center gap-4">
+              <div class="flex items-center gap-2">
+                <span class="px-2.5 py-1 text-[10px] font-bold rounded-full bg-green-100 text-green-700">FREE RETURN</span>
+              </div>
+              <button onclick="toggleSwitch(this)" class="relative inline-flex h-6 w-11 items-center rounded-full toggle-track bg-green-500" data-on="true">
+                <span class="toggle-knob inline-block h-4 w-4 rounded-full bg-white shadow translate-x-6"></span>
+              </button>
+            </div>
+          </div>
+          <!-- Not as Described -->
+          <div class="flex items-center justify-between px-6 py-4">
+            <div class="flex items-center gap-3">
+              <div class="w-9 h-9 rounded-lg bg-blue-50 flex items-center justify-center">
+                <svg class="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m6.75 12H9.75m3-3H9.75m6-3H9.75M5.625 21h12.75c.621 0 1.125-.504 1.125-1.125V8.743a3 3 0 00-.879-2.122l-4.742-4.742A3 3 0 0011.757 1.5H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125z"/></svg>
+              </div>
+              <div>
+                <p class="text-sm font-semibold text-gray-900">Not as Described</p>
+                <p class="text-xs text-gray-500">Product does not match listing description or images</p>
+              </div>
+            </div>
+            <div class="flex items-center gap-4">
+              <div class="flex items-center gap-2">
+                <span class="px-2.5 py-1 text-[10px] font-bold rounded-full bg-green-100 text-green-700">FREE RETURN</span>
+              </div>
+              <button onclick="toggleSwitch(this)" class="relative inline-flex h-6 w-11 items-center rounded-full toggle-track bg-green-500" data-on="true">
+                <span class="toggle-knob inline-block h-4 w-4 rounded-full bg-white shadow translate-x-6"></span>
+              </button>
+            </div>
+          </div>
+          <!-- Changed Mind -->
+          <div class="flex items-center justify-between px-6 py-4">
+            <div class="flex items-center gap-3">
+              <div class="w-9 h-9 rounded-lg bg-purple-50 flex items-center justify-center">
+                <svg class="w-4 h-4 text-purple-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 15L3 9m0 0l6-6M3 9h12a6 6 0 010 12h-3"/></svg>
+              </div>
+              <div>
+                <p class="text-sm font-semibold text-gray-900">Changed Mind</p>
+                <p class="text-xs text-gray-500">Customer no longer wants the product</p>
+              </div>
+            </div>
+            <div class="flex items-center gap-4">
+              <div class="flex items-center gap-2">
+                <span class="px-2.5 py-1 text-[10px] font-bold rounded-full bg-gray-100 text-gray-600">RESTOCKING FEE</span>
+              </div>
+              <button onclick="toggleSwitch(this)" class="relative inline-flex h-6 w-11 items-center rounded-full toggle-track bg-green-500" data-on="true">
+                <span class="toggle-knob inline-block h-4 w-4 rounded-full bg-white shadow translate-x-6"></span>
+              </button>
+            </div>
+          </div>
+          <!-- Damaged in Transit -->
+          <div class="flex items-center justify-between px-6 py-4">
+            <div class="flex items-center gap-3">
+              <div class="w-9 h-9 rounded-lg bg-orange-50 flex items-center justify-center">
+                <svg class="w-4 h-4 text-orange-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M20.25 7.5l-.625 10.632a2.25 2.25 0 01-2.247 2.118H6.622a2.25 2.25 0 01-2.247-2.118L3.75 7.5m8.25 3v6.75m0 0l-3-3m3 3l3-3M3.375 7.5h17.25c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125z"/></svg>
+              </div>
+              <div>
+                <p class="text-sm font-semibold text-gray-900">Damaged in Transit</p>
+                <p class="text-xs text-gray-500">Product arrived damaged due to shipping</p>
+              </div>
+            </div>
+            <div class="flex items-center gap-4">
+              <div class="flex items-center gap-2">
+                <span class="px-2.5 py-1 text-[10px] font-bold rounded-full bg-green-100 text-green-700">FREE RETURN</span>
+              </div>
+              <button onclick="toggleSwitch(this)" class="relative inline-flex h-6 w-11 items-center rounded-full toggle-track bg-green-500" data-on="true">
+                <span class="toggle-knob inline-block h-4 w-4 rounded-full bg-white shadow translate-x-6"></span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== SECTION 4: AUTO-APPROVE RULES ===== -->
+      <div class="bg-white rounded-xl border border-gray-200 shadow-sm mb-6">
+        <div class="px-6 py-4 border-b border-gray-100">
+          <h2 class="text-lg font-bold text-gray-900">Auto-Approval Rules</h2>
+          <p class="text-sm text-gray-500 mt-0.5">Conditions under which return requests are automatically approved without manual review</p>
+        </div>
+        <div class="p-6 space-y-6">
+          <div class="flex items-center justify-between">
+            <div>
+              <span class="text-sm font-medium text-gray-700">Enable Auto-Approval</span>
+              <p class="text-xs text-gray-400 mt-0.5">When enabled, returns matching ALL conditions below are approved instantly</p>
+            </div>
+            <button onclick="toggleSwitch(this)" class="relative inline-flex h-6 w-11 items-center rounded-full toggle-track bg-green-500" data-on="true">
+              <span class="toggle-knob inline-block h-4 w-4 rounded-full bg-white shadow translate-x-6"></span>
+            </button>
+          </div>
+          <div class="bg-gray-50 rounded-lg p-5 space-y-5 border border-gray-100">
+            <p class="text-xs font-semibold text-gray-500 uppercase tracking-wider">Auto-Approve Conditions (ALL must be met)</p>
+            <div class="grid grid-cols-2 gap-5">
+              <div>
+                <label class="text-sm font-medium text-gray-700 mb-1 block">Order Amount Below</label>
+                <div class="flex items-center">
+                  <span class="inline-flex items-center px-3 py-2.5 border border-r-0 border-gray-200 rounded-l-lg bg-white text-sm text-gray-500">&#8377;</span>
+                  <input type="number" value="1000" class="w-full border border-gray-200 rounded-r-lg px-4 py-2.5 text-sm outline-none focus:border-brand-400 focus:ring-2 focus:ring-brand-100 transition">
+                </div>
+                <p class="text-xs text-gray-400 mt-1">Returns for orders above this go to manual review</p>
+              </div>
+              <div>
+                <label class="text-sm font-medium text-gray-700 mb-1 block">Customer Tier</label>
+                <div class="flex flex-wrap gap-2 mt-1">
+                  <label class="flex items-center gap-2 text-sm text-gray-700">
+                    <input type="checkbox" checked class="w-4 h-4 rounded text-brand-500"> VIP
+                  </label>
+                  <label class="flex items-center gap-2 text-sm text-gray-700">
+                    <input type="checkbox" checked class="w-4 h-4 rounded text-brand-500"> Gold
+                  </label>
+                  <label class="flex items-center gap-2 text-sm text-gray-700">
+                    <input type="checkbox" class="w-4 h-4 rounded text-brand-500"> Silver
+                  </label>
+                  <label class="flex items-center gap-2 text-sm text-gray-700">
+                    <input type="checkbox" class="w-4 h-4 rounded text-brand-500"> Standard
+                  </label>
+                </div>
+                <p class="text-xs text-gray-400 mt-1">Only selected tiers eligible for auto-approval</p>
+              </div>
+            </div>
+            <div class="flex items-center justify-between">
+              <div>
+                <span class="text-sm text-gray-600">Return initiated within return window</span>
+                <p class="text-xs text-gray-400 mt-0.5">Must be within category-specific return period</p>
+              </div>
+              <button onclick="toggleSwitch(this)" class="relative inline-flex h-6 w-11 items-center rounded-full toggle-track bg-green-500" data-on="true">
+                <span class="toggle-knob inline-block h-4 w-4 rounded-full bg-white shadow translate-x-6"></span>
+              </button>
+            </div>
+            <div class="flex items-center justify-between">
+              <div>
+                <span class="text-sm text-gray-600">Customer has no prior abuse flags</span>
+                <p class="text-xs text-gray-400 mt-0.5">Flagged accounts always require manual review</p>
+              </div>
+              <button onclick="toggleSwitch(this)" class="relative inline-flex h-6 w-11 items-center rounded-full toggle-track bg-green-500" data-on="true">
+                <span class="toggle-knob inline-block h-4 w-4 rounded-full bg-white shadow translate-x-6"></span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== SECTION 5: RETURN SHIPPING ===== -->
+      <div class="bg-white rounded-xl border border-gray-200 shadow-sm mb-6">
+        <div class="px-6 py-4 border-b border-gray-100">
+          <h2 class="text-lg font-bold text-gray-900">Return Shipping</h2>
+          <p class="text-sm text-gray-500 mt-0.5">Who pays for return shipping and label generation settings</p>
+        </div>
+        <div class="p-6 space-y-5">
+          <div class="flex items-center justify-between">
+            <div>
+              <span class="text-sm font-medium text-gray-700">Platform Pays Return Shipping</span>
+              <p class="text-xs text-gray-400 mt-0.5">Platform absorbs return shipping cost (deducted from settlement)</p>
+            </div>
+            <button onclick="toggleSwitch(this)" class="relative inline-flex h-6 w-11 items-center rounded-full toggle-track bg-green-500" data-on="true">
+              <span class="toggle-knob inline-block h-4 w-4 rounded-full bg-white shadow translate-x-6"></span>
+            </button>
+          </div>
+          <div class="flex items-center justify-between">
+            <div>
+              <span class="text-sm font-medium text-gray-700">Auto-Generate Return Label</span>
+              <p class="text-xs text-gray-400 mt-0.5">Automatically create prepaid return shipping label for customer</p>
+            </div>
+            <button onclick="toggleSwitch(this)" class="relative inline-flex h-6 w-11 items-center rounded-full toggle-track bg-green-500" data-on="true">
+              <span class="toggle-knob inline-block h-4 w-4 rounded-full bg-white shadow translate-x-6"></span>
+            </button>
+          </div>
+          <div class="grid grid-cols-3 gap-4 items-start">
+            <label class="text-sm font-medium text-gray-700 pt-2">Preferred Return Carrier</label>
+            <div class="col-span-2">
+              <select class="w-full max-w-md border border-gray-200 rounded-lg px-4 py-2.5 text-sm outline-none focus:border-brand-400 focus:ring-2 focus:ring-brand-100 transition bg-white">
+                <option selected>Delhivery</option>
+                <option>BlueDart</option>
+                <option>DTDC</option>
+                <option>India Post</option>
+                <option>Ecom Express</option>
+              </select>
+              <p class="text-xs text-gray-400 mt-1">Default carrier for return pickup scheduling</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== SECTION 6: REFUND TIMELINE & METHOD ===== -->
+      <div class="bg-white rounded-xl border border-gray-200 shadow-sm mb-6">
+        <div class="px-6 py-4 border-b border-gray-100">
+          <h2 class="text-lg font-bold text-gray-900">Refund Timeline & Method</h2>
+          <p class="text-sm text-gray-500 mt-0.5">How and when refunds are processed after return approval</p>
+        </div>
+        <div class="p-6 space-y-6">
+          <div class="grid grid-cols-2 gap-6">
+            <div>
+              <label class="text-sm font-medium text-gray-700 mb-1 block">Refund Processing Time</label>
+              <div class="flex items-center gap-2">
+                <input type="number" value="5" class="w-full border border-gray-200 rounded-lg px-4 py-2.5 text-sm outline-none focus:border-brand-400 focus:ring-2 focus:ring-brand-100 transition">
+                <span class="text-sm text-gray-500 whitespace-nowrap">business days</span>
+              </div>
+              <p class="text-xs text-gray-400 mt-1">From return approval to refund initiation</p>
+            </div>
+            <div>
+              <label class="text-sm font-medium text-gray-700 mb-1 block">Default Restocking Fee</label>
+              <div class="flex items-center gap-2">
+                <input type="number" value="0" class="w-full border border-gray-200 rounded-lg px-4 py-2.5 text-sm outline-none focus:border-brand-400 focus:ring-2 focus:ring-brand-100 transition">
+                <span class="text-sm text-gray-500 whitespace-nowrap">%</span>
+              </div>
+              <p class="text-xs text-gray-400 mt-1">Applied unless category override sets a different rate</p>
+            </div>
+          </div>
+          <div class="space-y-4">
+            <div class="flex items-center justify-between">
+              <div>
+                <span class="text-sm font-medium text-gray-700">Refund to Original Payment Method</span>
+                <p class="text-xs text-gray-400 mt-0.5">Refund back to the card/UPI/bank used for purchase</p>
+              </div>
+              <button onclick="toggleSwitch(this)" class="relative inline-flex h-6 w-11 items-center rounded-full toggle-track bg-green-500" data-on="true">
+                <span class="toggle-knob inline-block h-4 w-4 rounded-full bg-white shadow translate-x-6"></span>
+              </button>
+            </div>
+            <div class="flex items-center justify-between">
+              <div>
+                <span class="text-sm font-medium text-gray-700">Offer Store Credit at 110%</span>
+                <p class="text-xs text-gray-400 mt-0.5">Give customers the option of 110% refund as platform store credit instead of cash refund</p>
+              </div>
+              <button onclick="toggleSwitch(this)" class="relative inline-flex h-6 w-11 items-center rounded-full toggle-track bg-green-500" data-on="true">
+                <span class="toggle-knob inline-block h-4 w-4 rounded-full bg-white shadow translate-x-6"></span>
+              </button>
+            </div>
+          </div>
+          <div class="grid grid-cols-3 gap-4 items-start">
+            <label class="text-sm font-medium text-gray-700 pt-2">Store Credit Bonus</label>
+            <div class="col-span-2">
+              <div class="flex items-center gap-2 max-w-md">
+                <input type="number" value="110" class="w-full border border-gray-200 rounded-lg px-4 py-2.5 text-sm outline-none focus:border-brand-400 focus:ring-2 focus:ring-brand-100 transition">
+                <span class="text-sm text-gray-500 whitespace-nowrap">% of order value</span>
+              </div>
+              <p class="text-xs text-gray-400 mt-1">Customer receives this % as store credit if they choose that option</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== SECTION 7: EXCHANGE POLICY ===== -->
+      <div class="bg-white rounded-xl border border-gray-200 shadow-sm mb-6">
+        <div class="px-6 py-4 border-b border-gray-100">
+          <h2 class="text-lg font-bold text-gray-900">Exchange Policy</h2>
+          <p class="text-sm text-gray-500 mt-0.5">Allow customers to exchange products instead of returning for refund</p>
+        </div>
+        <div class="p-6 space-y-5">
+          <div class="flex items-center justify-between">
+            <div>
+              <span class="text-sm font-medium text-gray-700">Allow Exchanges</span>
+              <p class="text-xs text-gray-400 mt-0.5">Customers can request same-product exchange (different size/color)</p>
+            </div>
+            <button onclick="toggleSwitch(this)" class="relative inline-flex h-6 w-11 items-center rounded-full toggle-track bg-green-500" data-on="true">
+              <span class="toggle-knob inline-block h-4 w-4 rounded-full bg-white shadow translate-x-6"></span>
+            </button>
+          </div>
+          <div class="flex items-center justify-between">
+            <div>
+              <span class="text-sm font-medium text-gray-700">Free Exchange Shipping</span>
+              <p class="text-xs text-gray-400 mt-0.5">Platform pays both return and forward shipping for exchanges</p>
+            </div>
+            <button onclick="toggleSwitch(this)" class="relative inline-flex h-6 w-11 items-center rounded-full toggle-track bg-green-500" data-on="true">
+              <span class="toggle-knob inline-block h-4 w-4 rounded-full bg-white shadow translate-x-6"></span>
+            </button>
+          </div>
+          <div class="flex items-center justify-between">
+            <div>
+              <span class="text-sm font-medium text-gray-700">Allow Different Product Exchange</span>
+              <p class="text-xs text-gray-400 mt-0.5">Allow exchanging for a completely different product (price-matched)</p>
+            </div>
+            <button onclick="toggleSwitch(this)" class="relative inline-flex h-6 w-11 items-center rounded-full toggle-track bg-gray-200" data-on="false">
+              <span class="toggle-knob inline-block h-4 w-4 rounded-full bg-white shadow translate-x-1"></span>
+            </button>
+          </div>
+          <div class="grid grid-cols-3 gap-4 items-start">
+            <label class="text-sm font-medium text-gray-700 pt-2">Max Exchange Attempts</label>
+            <div class="col-span-2">
+              <input type="number" value="2" class="w-full max-w-md border border-gray-200 rounded-lg px-4 py-2.5 text-sm outline-none focus:border-brand-400 focus:ring-2 focus:ring-brand-100 transition">
+              <p class="text-xs text-gray-400 mt-1">After this many exchanges, only refund is offered</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Bottom Save -->
+      <div class="flex justify-end gap-3 mt-2 mb-4">
+        <button onclick="if(confirm('Discard all unsaved changes?'))location.reload()" class="px-4 py-2.5 text-sm font-medium text-gray-600 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 transition">Discard</button>
+        <button onclick="saveConfig()" class="px-5 py-2.5 bg-brand-500 text-white text-sm font-semibold rounded-lg hover:bg-brand-600 transition shadow-sm flex items-center gap-2">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4.5 12.75l6 6 9-13.5"/></svg>
+          Save Changes
+        </button>
+      </div>
+
+    </main>
+  </div>
+
+<script>
+  function toggleSwitch(btn) {
+    var isOn = btn.dataset.on === 'true';
+    if (isOn) {
+      btn.dataset.on = 'false';
+      btn.classList.remove('bg-green-500');
+      btn.classList.add('bg-gray-200');
+      btn.querySelector('.toggle-knob').classList.remove('translate-x-6');
+      btn.querySelector('.toggle-knob').classList.add('translate-x-1');
+    } else {
+      btn.dataset.on = 'true';
+      btn.classList.remove('bg-gray-200');
+      btn.classList.add('bg-green-500');
+      btn.querySelector('.toggle-knob').classList.remove('translate-x-1');
+      btn.querySelector('.toggle-knob').classList.add('translate-x-6');
+    }
+  }
+
+  function saveConfig() {
+    alert('Return & refund policy saved successfully!');
+  }
+</script>
+
+<script src="../shared-layout.js"></script>
+<script>renderAdminLayout('settings', '../');</script>
+</body>
+</html>

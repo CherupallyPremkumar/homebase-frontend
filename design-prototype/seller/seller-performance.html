@@ -1,0 +1,766 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HomeBase — Seller Performance</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              50: '#FFF7ED',
+              100: '#FFEDD5',
+              200: '#FED7AA',
+              300: '#FDBA74',
+              400: '#FB923C',
+              500: '#F97316',
+              600: '#EA580C',
+              700: '#C2410C',
+            },
+            navy: {
+              700: '#1E3A5F',
+              800: '#1A2E4A',
+              900: '#0F1B2D',
+            },
+            success: '#16A34A',
+            warning: '#EAB308',
+            danger: '#DC2626',
+          },
+          fontFamily: {
+            sans: ['Inter', 'system-ui', 'sans-serif'],
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+    .scrollbar-hide::-webkit-scrollbar { display: none; }
+    .sidebar-link { transition: all 0.15s ease; }
+    .sidebar-link:hover { background: rgba(255,255,255,0.08); }
+    .sidebar-link.active { background: rgba(249,115,22,0.15); border-right: 3px solid #F97316; }
+    .stat-card { transition: all 0.2s ease; }
+    .stat-card:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,0.08); }
+    .chart-gradient { background: linear-gradient(180deg, rgba(249,115,22,0.12) 0%, rgba(249,115,22,0.02) 100%); }
+    .revenue-gradient { background: linear-gradient(135deg, #F97316 0%, #EA580C 100%); }
+    .table-row { transition: background 0.15s ease; }
+    .table-row:hover { background: #FFF7ED; }
+    .dropdown-menu { display: none; }
+    .dropdown:hover .dropdown-menu { display: block; }
+    .sidebar-scroll::-webkit-scrollbar { width: 4px; }
+    .sidebar-scroll::-webkit-scrollbar-track { background: transparent; }
+    .sidebar-scroll::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); border-radius: 2px; }
+    .review-card { transition: all 0.2s ease; }
+    .review-card:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(0,0,0,0.06); }
+    .tip-card { transition: all 0.2s ease; }
+    .tip-card:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(0,0,0,0.06); }
+    .line-chart-point { transition: all 0.2s ease; }
+    .line-chart-point:hover { transform: scale(1.5); }
+  </style>
+</head>
+<body class="font-sans bg-gray-50 text-gray-900">
+
+  <!-- ===== TOP HEADER BAR ===== -->
+  <header id="seller-header" class="fixed top-0 left-0 right-0 z-50 bg-white border-b border-gray-200 h-16"></header>
+
+  <!-- ===== LAYOUT: SIDEBAR + MAIN ===== -->
+  <div class="flex pt-16 min-h-screen">
+
+    <!-- ===== LEFT SIDEBAR ===== -->
+    <aside id="seller-sidebar" class="fixed left-0 top-16 bottom-0 w-60 z-40 flex flex-col overflow-y-auto" style="background:#0F1B2D;"></aside>
+
+    <!-- ===== MAIN CONTENT ===== -->
+    <main class="flex-1 ml-60 p-6">
+
+      <!-- Page Title + Date Range Picker -->
+      <div class="flex items-center justify-between mb-6">
+        <div>
+          <h1 class="text-2xl font-bold text-navy-900">Performance Analytics</h1>
+          <p class="text-sm text-gray-400 mt-1">Track your store's performance metrics and customer satisfaction</p>
+        </div>
+        <div class="flex items-center gap-3">
+          <div class="relative">
+            <select class="appearance-none bg-white border border-gray-200 rounded-lg py-2.5 pl-4 pr-10 text-sm font-medium text-gray-700 outline-none focus:border-brand-400 focus:ring-2 focus:ring-brand-100 transition cursor-pointer">
+              <option>Last 30 days</option>
+              <option>Last 7 days</option>
+              <option>Last 90 days</option>
+              <option>This Year</option>
+              <option>Custom Range</option>
+            </select>
+            <svg class="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M19.5 8.25l-7.5 7.5-7.5-7.5"/></svg>
+          </div>
+          <button class="flex items-center gap-1.5 bg-white border border-gray-200 text-gray-700 text-sm font-medium px-4 py-2.5 rounded-lg hover:bg-gray-50 transition">
+            <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3"/></svg>
+            Export
+          </button>
+        </div>
+      </div>
+
+      <!-- ===== KEY METRICS CARDS ===== -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 mb-6">
+        <!-- Order Fulfillment Rate -->
+        <div class="stat-card bg-white rounded-xl p-5 border border-gray-100 shadow-sm">
+          <div class="flex items-center justify-between mb-3">
+            <div class="w-10 h-10 rounded-lg bg-green-50 flex items-center justify-center">
+              <svg class="w-5 h-5 text-success" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+            </div>
+            <span class="flex items-center gap-1 text-xs font-semibold text-success bg-green-50 px-2 py-1 rounded-full">
+              <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M4.5 19.5l15-15m0 0H8.25m11.25 0v11.25"/></svg>
+              +2.1%
+            </span>
+          </div>
+          <p class="text-2xl font-bold text-navy-900">96.5%</p>
+          <p class="text-xs text-gray-400 mt-1">Order Fulfillment Rate</p>
+          <div class="mt-3 h-1 bg-gray-100 rounded-full overflow-hidden">
+            <div class="h-full bg-success rounded-full" style="width: 96.5%"></div>
+          </div>
+        </div>
+
+        <!-- Average Rating -->
+        <div class="stat-card bg-white rounded-xl p-5 border border-gray-100 shadow-sm">
+          <div class="flex items-center justify-between mb-3">
+            <div class="w-10 h-10 rounded-lg bg-yellow-50 flex items-center justify-center">
+              <svg class="w-5 h-5 text-yellow-500" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+            </div>
+            <div class="flex items-center gap-0.5 text-yellow-400 text-sm">
+              <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+              <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+              <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+              <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+              <svg class="w-3.5 h-3.5 text-gray-200" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+            </div>
+          </div>
+          <p class="text-2xl font-bold text-navy-900">4.6<span class="text-base font-normal text-gray-400">/5</span></p>
+          <p class="text-xs text-gray-400 mt-1">Average Rating</p>
+          <div class="mt-3 h-1 bg-gray-100 rounded-full overflow-hidden">
+            <div class="h-full bg-yellow-400 rounded-full" style="width: 92%"></div>
+          </div>
+        </div>
+
+        <!-- Response Time -->
+        <div class="stat-card bg-white rounded-xl p-5 border border-gray-100 shadow-sm">
+          <div class="flex items-center justify-between mb-3">
+            <div class="w-10 h-10 rounded-lg bg-blue-50 flex items-center justify-center">
+              <svg class="w-5 h-5 text-blue-500" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+            </div>
+            <span class="flex items-center gap-1 text-xs font-medium text-gray-400 bg-gray-50 px-2 py-1 rounded-full">
+              Avg
+            </span>
+          </div>
+          <p class="text-2xl font-bold text-navy-900">2.4<span class="text-base font-normal text-gray-400"> hrs</span></p>
+          <p class="text-xs text-gray-400 mt-1">Response Time</p>
+          <div class="mt-3 h-1 bg-gray-100 rounded-full overflow-hidden">
+            <div class="h-full bg-blue-500 rounded-full" style="width: 76%"></div>
+          </div>
+        </div>
+
+        <!-- Return Rate -->
+        <div class="stat-card bg-white rounded-xl p-5 border border-gray-100 shadow-sm">
+          <div class="flex items-center justify-between mb-3">
+            <div class="w-10 h-10 rounded-lg bg-green-50 flex items-center justify-center">
+              <svg class="w-5 h-5 text-success" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M9 15L3 9m0 0l6-6M3 9h12a6 6 0 010 12h-3"/></svg>
+            </div>
+            <span class="flex items-center gap-1 text-xs font-semibold text-success bg-green-50 px-2 py-1 rounded-full">
+              <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M19.5 4.5l-15 15m0 0h11.25m-11.25 0V8.25"/></svg>
+              -0.8%
+            </span>
+          </div>
+          <p class="text-2xl font-bold text-navy-900">3.2%</p>
+          <p class="text-xs text-gray-400 mt-1">Return Rate</p>
+          <div class="mt-3 h-1 bg-gray-100 rounded-full overflow-hidden">
+            <div class="h-full bg-success rounded-full" style="width: 97%"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== REVENUE CHART + ORDERS TREND ===== -->
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
+        <!-- Revenue Chart -->
+        <div class="lg:col-span-2 bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden">
+          <div class="flex items-center justify-between p-5 border-b border-gray-100">
+            <div>
+              <h3 class="text-base font-semibold text-navy-900">Revenue Overview</h3>
+              <p class="text-xs text-gray-400 mt-0.5">Monthly revenue for the current year</p>
+            </div>
+            <div class="flex items-center gap-2">
+              <button class="text-xs font-medium text-gray-500 bg-gray-50 px-3 py-1.5 rounded-lg hover:bg-gray-100 transition">Weekly</button>
+              <button class="text-xs font-medium text-white bg-brand-500 px-3 py-1.5 rounded-lg">Monthly</button>
+              <button class="text-xs font-medium text-gray-500 bg-gray-50 px-3 py-1.5 rounded-lg hover:bg-gray-100 transition">Yearly</button>
+            </div>
+          </div>
+          <div class="p-5">
+            <div class="chart-gradient rounded-xl h-64 relative flex items-end justify-between px-4 pb-4 pt-8">
+              <!-- Y-axis labels -->
+              <div class="absolute left-0 top-4 bottom-4 flex flex-col justify-between text-[10px] text-gray-400 pl-2">
+                <span>5L</span>
+                <span>4L</span>
+                <span>3L</span>
+                <span>2L</span>
+                <span>1L</span>
+                <span>0</span>
+              </div>
+              <!-- Bars -->
+              <div class="flex-1 flex items-end justify-between gap-2 ml-6">
+                <div class="flex flex-col items-center gap-1 flex-1">
+                  <div class="w-full bg-brand-200 rounded-t-md" style="height: 35%"></div>
+                  <span class="text-[10px] text-gray-400">Jan</span>
+                </div>
+                <div class="flex flex-col items-center gap-1 flex-1">
+                  <div class="w-full bg-brand-200 rounded-t-md" style="height: 48%"></div>
+                  <span class="text-[10px] text-gray-400">Feb</span>
+                </div>
+                <div class="flex flex-col items-center gap-1 flex-1">
+                  <div class="w-full bg-brand-300 rounded-t-md" style="height: 58%"></div>
+                  <span class="text-[10px] text-gray-400">Mar</span>
+                </div>
+                <div class="flex flex-col items-center gap-1 flex-1">
+                  <div class="w-full bg-brand-300 rounded-t-md" style="height: 45%"></div>
+                  <span class="text-[10px] text-gray-400">Apr</span>
+                </div>
+                <div class="flex flex-col items-center gap-1 flex-1">
+                  <div class="w-full bg-brand-300 rounded-t-md" style="height: 62%"></div>
+                  <span class="text-[10px] text-gray-400">May</span>
+                </div>
+                <div class="flex flex-col items-center gap-1 flex-1">
+                  <div class="w-full bg-brand-400 rounded-t-md" style="height: 55%"></div>
+                  <span class="text-[10px] text-gray-400">Jun</span>
+                </div>
+                <div class="flex flex-col items-center gap-1 flex-1">
+                  <div class="w-full bg-brand-400 rounded-t-md" style="height: 72%"></div>
+                  <span class="text-[10px] text-gray-400">Jul</span>
+                </div>
+                <div class="flex flex-col items-center gap-1 flex-1">
+                  <div class="w-full bg-brand-400 rounded-t-md" style="height: 65%"></div>
+                  <span class="text-[10px] text-gray-400">Aug</span>
+                </div>
+                <div class="flex flex-col items-center gap-1 flex-1">
+                  <div class="w-full bg-brand-500 rounded-t-md" style="height: 78%"></div>
+                  <span class="text-[10px] text-gray-400">Sep</span>
+                </div>
+                <div class="flex flex-col items-center gap-1 flex-1">
+                  <div class="w-full bg-brand-500 rounded-t-md" style="height: 88%"></div>
+                  <span class="text-[10px] text-gray-400">Oct</span>
+                </div>
+                <div class="flex flex-col items-center gap-1 flex-1">
+                  <div class="w-full bg-brand-500 rounded-t-md" style="height: 82%"></div>
+                  <span class="text-[10px] text-gray-400">Nov</span>
+                </div>
+                <div class="flex flex-col items-center gap-1 flex-1">
+                  <div class="w-full bg-brand-600 rounded-t-md" style="height: 95%"></div>
+                  <span class="text-[10px] text-gray-400">Dec</span>
+                </div>
+              </div>
+            </div>
+            <!-- Revenue Summary Row -->
+            <div class="flex items-center justify-between mt-4 pt-4 border-t border-gray-100">
+              <div class="flex items-center gap-6">
+                <div>
+                  <p class="text-xs text-gray-400">Total Revenue</p>
+                  <p class="text-lg font-bold text-navy-900 mt-0.5">&#8377;48,34,520</p>
+                </div>
+                <div class="w-px h-8 bg-gray-100"></div>
+                <div>
+                  <p class="text-xs text-gray-400">Avg. Monthly</p>
+                  <p class="text-lg font-bold text-navy-900 mt-0.5">&#8377;4,02,877</p>
+                </div>
+              </div>
+              <span class="flex items-center gap-1 text-xs font-semibold text-success">
+                <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M4.5 19.5l15-15m0 0H8.25m11.25 0v11.25"/></svg>
+                +18.3% vs last year
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Orders Trend -->
+        <div class="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden">
+          <div class="flex items-center justify-between p-5 border-b border-gray-100">
+            <div>
+              <h3 class="text-base font-semibold text-navy-900">Orders Trend</h3>
+              <p class="text-xs text-gray-400 mt-0.5">Daily orders over last 30 days</p>
+            </div>
+          </div>
+          <div class="p-5">
+            <!-- Line-like chart using CSS -->
+            <div class="relative h-48">
+              <!-- Grid lines -->
+              <div class="absolute inset-0 flex flex-col justify-between">
+                <div class="border-b border-dashed border-gray-100"></div>
+                <div class="border-b border-dashed border-gray-100"></div>
+                <div class="border-b border-dashed border-gray-100"></div>
+                <div class="border-b border-dashed border-gray-100"></div>
+                <div class="border-b border-gray-200"></div>
+              </div>
+              <!-- Y-axis labels -->
+              <div class="absolute left-0 top-0 bottom-0 flex flex-col justify-between text-[10px] text-gray-400 -ml-1">
+                <span>60</span>
+                <span>45</span>
+                <span>30</span>
+                <span>15</span>
+                <span>0</span>
+              </div>
+              <!-- Data points with connecting visual -->
+              <div class="absolute left-6 right-0 bottom-0 top-0 flex items-end">
+                <svg class="w-full h-full" viewBox="0 0 300 180" preserveAspectRatio="none">
+                  <!-- Area fill -->
+                  <path d="M0,140 L25,120 L50,100 L75,110 L100,80 L125,90 L150,60 L175,70 L200,45 L225,55 L250,35 L275,40 L300,25 L300,180 L0,180 Z" fill="url(#areaGradient)" opacity="0.3"/>
+                  <!-- Line -->
+                  <path d="M0,140 L25,120 L50,100 L75,110 L100,80 L125,90 L150,60 L175,70 L200,45 L225,55 L250,35 L275,40 L300,25" fill="none" stroke="#F97316" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+                  <!-- Data points -->
+                  <circle cx="0" cy="140" r="3" fill="#F97316"/>
+                  <circle cx="50" cy="100" r="3" fill="#F97316"/>
+                  <circle cx="100" cy="80" r="3" fill="#F97316"/>
+                  <circle cx="150" cy="60" r="3" fill="#F97316"/>
+                  <circle cx="200" cy="45" r="3" fill="#F97316"/>
+                  <circle cx="250" cy="35" r="3" fill="#F97316"/>
+                  <circle cx="300" cy="25" r="4" fill="#F97316" stroke="white" stroke-width="2"/>
+                  <defs>
+                    <linearGradient id="areaGradient" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="0%" stop-color="#F97316" stop-opacity="0.4"/>
+                      <stop offset="100%" stop-color="#F97316" stop-opacity="0.02"/>
+                    </linearGradient>
+                  </defs>
+                </svg>
+              </div>
+            </div>
+            <!-- X-axis labels -->
+            <div class="flex justify-between mt-2 ml-6 text-[10px] text-gray-400">
+              <span>Mar 1</span>
+              <span>Mar 7</span>
+              <span>Mar 14</span>
+              <span>Mar 21</span>
+              <span>Mar 28</span>
+            </div>
+            <!-- Summary -->
+            <div class="mt-4 pt-4 border-t border-gray-100 flex items-center justify-between">
+              <div>
+                <p class="text-xs text-gray-400">Total Orders</p>
+                <p class="text-lg font-bold text-navy-900 mt-0.5">1,247</p>
+              </div>
+              <span class="flex items-center gap-1 text-xs font-semibold text-success">
+                <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M4.5 19.5l15-15m0 0H8.25m11.25 0v11.25"/></svg>
+                +12.4%
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== TOP PERFORMING PRODUCTS TABLE ===== -->
+      <div class="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden mb-6">
+        <div class="flex items-center justify-between p-5 border-b border-gray-100">
+          <div>
+            <h3 class="text-base font-semibold text-navy-900">Top Performing Products</h3>
+            <p class="text-xs text-gray-400 mt-0.5">Best sellers by revenue in the selected period</p>
+          </div>
+          <a href="seller-products.html" class="text-xs font-medium text-brand-500 hover:text-brand-600 transition">View All Products</a>
+        </div>
+        <div class="overflow-x-auto">
+          <table class="w-full">
+            <thead>
+              <tr class="bg-gray-50 border-b border-gray-100">
+                <th class="text-left text-[11px] font-semibold text-gray-500 uppercase tracking-wider px-5 py-3">Product</th>
+                <th class="text-left text-[11px] font-semibold text-gray-500 uppercase tracking-wider px-5 py-3">Units Sold</th>
+                <th class="text-left text-[11px] font-semibold text-gray-500 uppercase tracking-wider px-5 py-3">Revenue</th>
+                <th class="text-left text-[11px] font-semibold text-gray-500 uppercase tracking-wider px-5 py-3">Rating</th>
+                <th class="text-left text-[11px] font-semibold text-gray-500 uppercase tracking-wider px-5 py-3">Trend</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-50">
+              <!-- Row 1 -->
+              <tr class="table-row">
+                <td class="px-5 py-4">
+                  <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-lg bg-brand-50 flex items-center justify-center shrink-0">
+                      <svg class="w-5 h-5 text-brand-500" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M20.25 7.5l-.625 10.632a2.25 2.25 0 01-2.247 2.118H6.622a2.25 2.25 0 01-2.247-2.118L3.75 7.5M10 11.25h4M3.375 7.5h17.25c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125z"/></svg>
+                    </div>
+                    <div>
+                      <p class="text-sm font-semibold text-navy-900">Organic Basmati Rice (5kg)</p>
+                      <p class="text-xs text-gray-400 mt-0.5">SKU: RIC-001</p>
+                    </div>
+                  </div>
+                </td>
+                <td class="px-5 py-4">
+                  <p class="text-sm font-semibold text-navy-900">342</p>
+                </td>
+                <td class="px-5 py-4">
+                  <p class="text-sm font-semibold text-navy-900">&#8377;2,73,600</p>
+                </td>
+                <td class="px-5 py-4">
+                  <div class="flex items-center gap-1">
+                    <svg class="w-3.5 h-3.5 text-yellow-400" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+                    <span class="text-sm font-medium text-gray-700">4.8</span>
+                  </div>
+                </td>
+                <td class="px-5 py-4">
+                  <span class="flex items-center gap-1 text-xs font-semibold text-success">
+                    <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M4.5 19.5l15-15m0 0H8.25m11.25 0v11.25"/></svg>
+                    +15%
+                  </span>
+                </td>
+              </tr>
+              <!-- Row 2 -->
+              <tr class="table-row">
+                <td class="px-5 py-4">
+                  <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-lg bg-purple-50 flex items-center justify-center shrink-0">
+                      <svg class="w-5 h-5 text-purple-500" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M20.25 7.5l-.625 10.632a2.25 2.25 0 01-2.247 2.118H6.622a2.25 2.25 0 01-2.247-2.118L3.75 7.5M10 11.25h4M3.375 7.5h17.25c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125z"/></svg>
+                    </div>
+                    <div>
+                      <p class="text-sm font-semibold text-navy-900">Cold Pressed Coconut Oil (1L)</p>
+                      <p class="text-xs text-gray-400 mt-0.5">SKU: OIL-023</p>
+                    </div>
+                  </div>
+                </td>
+                <td class="px-5 py-4">
+                  <p class="text-sm font-semibold text-navy-900">287</p>
+                </td>
+                <td class="px-5 py-4">
+                  <p class="text-sm font-semibold text-navy-900">&#8377;1,86,550</p>
+                </td>
+                <td class="px-5 py-4">
+                  <div class="flex items-center gap-1">
+                    <svg class="w-3.5 h-3.5 text-yellow-400" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+                    <span class="text-sm font-medium text-gray-700">4.7</span>
+                  </div>
+                </td>
+                <td class="px-5 py-4">
+                  <span class="flex items-center gap-1 text-xs font-semibold text-success">
+                    <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M4.5 19.5l15-15m0 0H8.25m11.25 0v11.25"/></svg>
+                    +22%
+                  </span>
+                </td>
+              </tr>
+              <!-- Row 3 -->
+              <tr class="table-row">
+                <td class="px-5 py-4">
+                  <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-lg bg-green-50 flex items-center justify-center shrink-0">
+                      <svg class="w-5 h-5 text-green-500" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M20.25 7.5l-.625 10.632a2.25 2.25 0 01-2.247 2.118H6.622a2.25 2.25 0 01-2.247-2.118L3.75 7.5M10 11.25h4M3.375 7.5h17.25c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125z"/></svg>
+                    </div>
+                    <div>
+                      <p class="text-sm font-semibold text-navy-900">Turmeric Powder (500g)</p>
+                      <p class="text-xs text-gray-400 mt-0.5">SKU: SPC-045</p>
+                    </div>
+                  </div>
+                </td>
+                <td class="px-5 py-4">
+                  <p class="text-sm font-semibold text-navy-900">256</p>
+                </td>
+                <td class="px-5 py-4">
+                  <p class="text-sm font-semibold text-navy-900">&#8377;1,02,400</p>
+                </td>
+                <td class="px-5 py-4">
+                  <div class="flex items-center gap-1">
+                    <svg class="w-3.5 h-3.5 text-yellow-400" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+                    <span class="text-sm font-medium text-gray-700">4.6</span>
+                  </div>
+                </td>
+                <td class="px-5 py-4">
+                  <span class="flex items-center gap-1 text-xs font-semibold text-success">
+                    <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M4.5 19.5l15-15m0 0H8.25m11.25 0v11.25"/></svg>
+                    +8%
+                  </span>
+                </td>
+              </tr>
+              <!-- Row 4 -->
+              <tr class="table-row">
+                <td class="px-5 py-4">
+                  <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-lg bg-blue-50 flex items-center justify-center shrink-0">
+                      <svg class="w-5 h-5 text-blue-500" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M20.25 7.5l-.625 10.632a2.25 2.25 0 01-2.247 2.118H6.622a2.25 2.25 0 01-2.247-2.118L3.75 7.5M10 11.25h4M3.375 7.5h17.25c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125z"/></svg>
+                    </div>
+                    <div>
+                      <p class="text-sm font-semibold text-navy-900">Darjeeling Green Tea (250g)</p>
+                      <p class="text-xs text-gray-400 mt-0.5">SKU: TEA-012</p>
+                    </div>
+                  </div>
+                </td>
+                <td class="px-5 py-4">
+                  <p class="text-sm font-semibold text-navy-900">198</p>
+                </td>
+                <td class="px-5 py-4">
+                  <p class="text-sm font-semibold text-navy-900">&#8377;89,100</p>
+                </td>
+                <td class="px-5 py-4">
+                  <div class="flex items-center gap-1">
+                    <svg class="w-3.5 h-3.5 text-yellow-400" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+                    <span class="text-sm font-medium text-gray-700">4.5</span>
+                  </div>
+                </td>
+                <td class="px-5 py-4">
+                  <span class="flex items-center gap-1 text-xs font-semibold text-success">
+                    <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M4.5 19.5l15-15m0 0H8.25m11.25 0v11.25"/></svg>
+                    +5%
+                  </span>
+                </td>
+              </tr>
+              <!-- Row 5 -->
+              <tr class="table-row">
+                <td class="px-5 py-4">
+                  <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-lg bg-yellow-50 flex items-center justify-center shrink-0">
+                      <svg class="w-5 h-5 text-yellow-500" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M20.25 7.5l-.625 10.632a2.25 2.25 0 01-2.247 2.118H6.622a2.25 2.25 0 01-2.247-2.118L3.75 7.5M10 11.25h4M3.375 7.5h17.25c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125z"/></svg>
+                    </div>
+                    <div>
+                      <p class="text-sm font-semibold text-navy-900">Organic Honey (500g)</p>
+                      <p class="text-xs text-gray-400 mt-0.5">SKU: HON-008</p>
+                    </div>
+                  </div>
+                </td>
+                <td class="px-5 py-4">
+                  <p class="text-sm font-semibold text-navy-900">175</p>
+                </td>
+                <td class="px-5 py-4">
+                  <p class="text-sm font-semibold text-navy-900">&#8377;78,750</p>
+                </td>
+                <td class="px-5 py-4">
+                  <div class="flex items-center gap-1">
+                    <svg class="w-3.5 h-3.5 text-yellow-400" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+                    <span class="text-sm font-medium text-gray-700">4.9</span>
+                  </div>
+                </td>
+                <td class="px-5 py-4">
+                  <span class="flex items-center gap-1 text-xs font-semibold text-success">
+                    <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M4.5 19.5l15-15m0 0H8.25m11.25 0v11.25"/></svg>
+                    +31%
+                  </span>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- ===== CUSTOMER SATISFACTION ===== -->
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+        <!-- Rating Breakdown -->
+        <div class="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden">
+          <div class="flex items-center justify-between p-5 border-b border-gray-100">
+            <div>
+              <h3 class="text-base font-semibold text-navy-900">Rating Breakdown</h3>
+              <p class="text-xs text-gray-400 mt-0.5">Distribution of customer ratings</p>
+            </div>
+            <div class="text-right">
+              <p class="text-2xl font-bold text-navy-900">4.6</p>
+              <p class="text-xs text-gray-400">out of 5</p>
+            </div>
+          </div>
+          <div class="p-5 space-y-3.5">
+            <!-- 5 Stars -->
+            <div class="flex items-center gap-3">
+              <div class="flex items-center gap-1 w-16 shrink-0">
+                <span class="text-sm font-medium text-gray-700">5</span>
+                <svg class="w-3.5 h-3.5 text-yellow-400" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+              </div>
+              <div class="flex-1 h-2.5 bg-gray-100 rounded-full overflow-hidden">
+                <div class="h-full bg-yellow-400 rounded-full" style="width: 68%"></div>
+              </div>
+              <span class="text-xs font-semibold text-gray-600 w-10 text-right">68%</span>
+              <span class="text-[10px] text-gray-400 w-12 text-right">842</span>
+            </div>
+            <!-- 4 Stars -->
+            <div class="flex items-center gap-3">
+              <div class="flex items-center gap-1 w-16 shrink-0">
+                <span class="text-sm font-medium text-gray-700">4</span>
+                <svg class="w-3.5 h-3.5 text-yellow-400" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+              </div>
+              <div class="flex-1 h-2.5 bg-gray-100 rounded-full overflow-hidden">
+                <div class="h-full bg-yellow-300 rounded-full" style="width: 20%"></div>
+              </div>
+              <span class="text-xs font-semibold text-gray-600 w-10 text-right">20%</span>
+              <span class="text-[10px] text-gray-400 w-12 text-right">248</span>
+            </div>
+            <!-- 3 Stars -->
+            <div class="flex items-center gap-3">
+              <div class="flex items-center gap-1 w-16 shrink-0">
+                <span class="text-sm font-medium text-gray-700">3</span>
+                <svg class="w-3.5 h-3.5 text-yellow-400" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+              </div>
+              <div class="flex-1 h-2.5 bg-gray-100 rounded-full overflow-hidden">
+                <div class="h-full bg-yellow-200 rounded-full" style="width: 7%"></div>
+              </div>
+              <span class="text-xs font-semibold text-gray-600 w-10 text-right">7%</span>
+              <span class="text-[10px] text-gray-400 w-12 text-right">87</span>
+            </div>
+            <!-- 2 Stars -->
+            <div class="flex items-center gap-3">
+              <div class="flex items-center gap-1 w-16 shrink-0">
+                <span class="text-sm font-medium text-gray-700">2</span>
+                <svg class="w-3.5 h-3.5 text-yellow-400" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+              </div>
+              <div class="flex-1 h-2.5 bg-gray-100 rounded-full overflow-hidden">
+                <div class="h-full bg-orange-300 rounded-full" style="width: 3%"></div>
+              </div>
+              <span class="text-xs font-semibold text-gray-600 w-10 text-right">3%</span>
+              <span class="text-[10px] text-gray-400 w-12 text-right">37</span>
+            </div>
+            <!-- 1 Star -->
+            <div class="flex items-center gap-3">
+              <div class="flex items-center gap-1 w-16 shrink-0">
+                <span class="text-sm font-medium text-gray-700">1</span>
+                <svg class="w-3.5 h-3.5 text-yellow-400" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+              </div>
+              <div class="flex-1 h-2.5 bg-gray-100 rounded-full overflow-hidden">
+                <div class="h-full bg-red-400 rounded-full" style="width: 2%"></div>
+              </div>
+              <span class="text-xs font-semibold text-gray-600 w-10 text-right">2%</span>
+              <span class="text-[10px] text-gray-400 w-12 text-right">24</span>
+            </div>
+            <!-- Total Reviews -->
+            <div class="mt-4 pt-4 border-t border-gray-100 flex items-center justify-between">
+              <span class="text-xs text-gray-400">Total Reviews</span>
+              <span class="text-sm font-bold text-navy-900">1,238</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Recent Reviews -->
+        <div class="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden">
+          <div class="flex items-center justify-between p-5 border-b border-gray-100">
+            <div>
+              <h3 class="text-base font-semibold text-navy-900">Recent Reviews</h3>
+              <p class="text-xs text-gray-400 mt-0.5">Latest customer feedback</p>
+            </div>
+            <a href="seller-reviews.html" class="text-xs font-medium text-brand-500 hover:text-brand-600 transition">View All</a>
+          </div>
+          <div class="p-4 space-y-3">
+            <!-- Review 1 -->
+            <div class="review-card p-4 bg-gray-50 rounded-xl border border-gray-100">
+              <div class="flex items-center justify-between mb-2">
+                <div class="flex items-center gap-2">
+                  <div class="w-8 h-8 rounded-full bg-gradient-to-br from-blue-400 to-blue-600 flex items-center justify-center text-white text-xs font-bold">AK</div>
+                  <div>
+                    <p class="text-sm font-semibold text-navy-900">Anita Kumar</p>
+                    <p class="text-[10px] text-gray-400">2 days ago</p>
+                  </div>
+                </div>
+                <div class="flex items-center gap-0.5">
+                  <svg class="w-3.5 h-3.5 text-yellow-400" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+                  <svg class="w-3.5 h-3.5 text-yellow-400" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+                  <svg class="w-3.5 h-3.5 text-yellow-400" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+                  <svg class="w-3.5 h-3.5 text-yellow-400" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+                  <svg class="w-3.5 h-3.5 text-yellow-400" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+                </div>
+              </div>
+              <p class="text-sm text-gray-600 leading-relaxed">Excellent quality basmati rice! The grains are long and aromatic. Packaging was also very good. Will definitely order again.</p>
+              <p class="text-[10px] text-gray-400 mt-2">Organic Basmati Rice (5kg)</p>
+            </div>
+
+            <!-- Review 2 -->
+            <div class="review-card p-4 bg-gray-50 rounded-xl border border-gray-100">
+              <div class="flex items-center justify-between mb-2">
+                <div class="flex items-center gap-2">
+                  <div class="w-8 h-8 rounded-full bg-gradient-to-br from-green-400 to-green-600 flex items-center justify-center text-white text-xs font-bold">PS</div>
+                  <div>
+                    <p class="text-sm font-semibold text-navy-900">Priya Sharma</p>
+                    <p class="text-[10px] text-gray-400">5 days ago</p>
+                  </div>
+                </div>
+                <div class="flex items-center gap-0.5">
+                  <svg class="w-3.5 h-3.5 text-yellow-400" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+                  <svg class="w-3.5 h-3.5 text-yellow-400" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+                  <svg class="w-3.5 h-3.5 text-yellow-400" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+                  <svg class="w-3.5 h-3.5 text-yellow-400" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+                  <svg class="w-3.5 h-3.5 text-gray-200" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+                </div>
+              </div>
+              <p class="text-sm text-gray-600 leading-relaxed">Good coconut oil, pure and natural. Delivery was on time. Would have loved a slightly better bottle cap design though.</p>
+              <p class="text-[10px] text-gray-400 mt-2">Cold Pressed Coconut Oil (1L)</p>
+            </div>
+
+            <!-- Review 3 -->
+            <div class="review-card p-4 bg-gray-50 rounded-xl border border-gray-100">
+              <div class="flex items-center justify-between mb-2">
+                <div class="flex items-center gap-2">
+                  <div class="w-8 h-8 rounded-full bg-gradient-to-br from-brand-400 to-brand-600 flex items-center justify-center text-white text-xs font-bold">VM</div>
+                  <div>
+                    <p class="text-sm font-semibold text-navy-900">Vikram Mehta</p>
+                    <p class="text-[10px] text-gray-400">1 week ago</p>
+                  </div>
+                </div>
+                <div class="flex items-center gap-0.5">
+                  <svg class="w-3.5 h-3.5 text-yellow-400" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+                  <svg class="w-3.5 h-3.5 text-yellow-400" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+                  <svg class="w-3.5 h-3.5 text-yellow-400" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+                  <svg class="w-3.5 h-3.5 text-yellow-400" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+                  <svg class="w-3.5 h-3.5 text-yellow-400" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+                </div>
+              </div>
+              <p class="text-sm text-gray-600 leading-relaxed">Best organic honey I've purchased online. Authentic taste and the seller shipped it very quickly. Highly recommended!</p>
+              <p class="text-[10px] text-gray-400 mt-2">Organic Honey (500g)</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== PERFORMANCE TIPS / RECOMMENDATIONS ===== -->
+      <div class="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden mb-6">
+        <div class="flex items-center justify-between p-5 border-b border-gray-100">
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-lg bg-brand-50 flex items-center justify-center">
+              <svg class="w-5 h-5 text-brand-500" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M12 18v-5.25m0 0a6.01 6.01 0 001.5-.189m-1.5.189a6.01 6.01 0 01-1.5-.189m3.75 7.478a12.06 12.06 0 01-4.5 0m3.75 2.383a14.406 14.406 0 01-3 0M14.25 18v-.192c0-.983.658-1.823 1.508-2.316a7.5 7.5 0 10-7.517 0c.85.493 1.509 1.333 1.509 2.316V18"/></svg>
+            </div>
+            <div>
+              <h3 class="text-base font-semibold text-navy-900">Performance Recommendations</h3>
+              <p class="text-xs text-gray-400 mt-0.5">Actionable tips to improve your store performance</p>
+            </div>
+          </div>
+        </div>
+        <div class="p-5 grid grid-cols-1 md:grid-cols-3 gap-4">
+          <!-- Tip 1 -->
+          <div class="tip-card p-5 bg-green-50 rounded-xl border border-green-100">
+            <div class="flex items-center gap-2 mb-3">
+              <div class="w-8 h-8 rounded-lg bg-success flex items-center justify-center">
+                <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M2.25 18L9 11.25l4.306 4.307a11.95 11.95 0 015.814-5.519l2.74-1.22m0 0l-5.94-2.28m5.94 2.28l-2.28 5.941"/></svg>
+              </div>
+              <h4 class="text-sm font-semibold text-navy-900">Boost Low-Stock Items</h4>
+            </div>
+            <p class="text-sm text-gray-600 leading-relaxed">5 products are running low on inventory. Restocking your top sellers before they go out of stock could increase monthly revenue by an estimated 12%.</p>
+            <button class="mt-4 flex items-center gap-1 text-xs font-semibold text-success hover:underline">
+              View Inventory
+              <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M8.25 4.5l7.5 7.5-7.5 7.5"/></svg>
+            </button>
+          </div>
+          <!-- Tip 2 -->
+          <div class="tip-card p-5 bg-blue-50 rounded-xl border border-blue-100">
+            <div class="flex items-center gap-2 mb-3">
+              <div class="w-8 h-8 rounded-lg bg-blue-500 flex items-center justify-center">
+                <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+              </div>
+              <h4 class="text-sm font-semibold text-navy-900">Improve Response Time</h4>
+            </div>
+            <p class="text-sm text-gray-600 leading-relaxed">Your average response time is 2.4 hours. Sellers who respond within 1 hour see a 25% increase in repeat purchases. Consider enabling auto-reply templates.</p>
+            <button class="mt-4 flex items-center gap-1 text-xs font-semibold text-blue-500 hover:underline">
+              Set Up Auto-Replies
+              <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M8.25 4.5l7.5 7.5-7.5 7.5"/></svg>
+            </button>
+          </div>
+          <!-- Tip 3 -->
+          <div class="tip-card p-5 bg-brand-50 rounded-xl border border-brand-100">
+            <div class="flex items-center gap-2 mb-3">
+              <div class="w-8 h-8 rounded-lg bg-brand-500 flex items-center justify-center">
+                <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M6.827 6.175A2.31 2.31 0 015.186 7.23c-.38.054-.757.112-1.134.175C2.999 7.58 2.25 8.507 2.25 9.574V18a2.25 2.25 0 002.25 2.25h15A2.25 2.25 0 0021.75 18V9.574c0-1.067-.75-1.994-1.802-2.169a47.865 47.865 0 00-1.134-.175 2.31 2.31 0 01-1.64-1.055l-.822-1.316a2.192 2.192 0 00-1.736-1.039 48.774 48.774 0 00-5.232 0 2.192 2.192 0 00-1.736 1.039l-.821 1.316z"/><path d="M16.5 12.75a4.5 4.5 0 11-9 0 4.5 4.5 0 019 0zM18.75 10.5h.008v.008h-.008V10.5z"/></svg>
+              </div>
+              <h4 class="text-sm font-semibold text-navy-900">Add Product Photos</h4>
+            </div>
+            <p class="text-sm text-gray-600 leading-relaxed">12 products have fewer than 3 images. Listings with 4+ high-quality photos see 40% higher conversion rates. Add lifestyle and detail shots to boost sales.</p>
+            <button class="mt-4 flex items-center gap-1 text-xs font-semibold text-brand-500 hover:underline">
+              Manage Photos
+              <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M8.25 4.5l7.5 7.5-7.5 7.5"/></svg>
+            </button>
+          </div>
+        </div>
+      </div>
+
+    </main>
+  </div>
+
+  <script src="shared-layout.js"></script>
+  <script>renderSellerLayout('performance');</script>
+</body>
+</html>

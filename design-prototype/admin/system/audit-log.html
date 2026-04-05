@@ -1,0 +1,524 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HomeBase — Audit Log</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              50: '#FFF7ED',
+              100: '#FFEDD5',
+              200: '#FED7AA',
+              300: '#FDBA74',
+              400: '#FB923C',
+              500: '#F97316',
+              600: '#EA580C',
+              700: '#C2410C',
+            },
+            navy: {
+              700: '#1E3A5F',
+              800: '#0F1E30',
+              900: '#0A1628',
+            },
+            success: '#16A34A',
+            warning: '#EAB308',
+            danger: '#DC2626',
+          },
+          fontFamily: {
+            sans: ['Inter', 'system-ui', 'sans-serif'],
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+    .scrollbar-hide::-webkit-scrollbar { display: none; }
+    .sidebar-link { transition: all 0.15s ease; }
+    .sidebar-link:hover { background: rgba(255,255,255,0.06); }
+    .sidebar-link.active { background: rgba(249,115,22,0.15); border-right: 3px solid #F97316; }
+    .stat-card { transition: all 0.2s ease; }
+    .stat-card:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,0.1); }
+    .table-row { transition: background 0.15s ease; }
+    .table-row:hover { background: #FFF7ED; }
+    .dropdown-menu { display: none; }
+    .dropdown:hover .dropdown-menu { display: block; }
+    .filter-tab { transition: all 0.15s ease; }
+    .filter-tab:hover { color: #F97316; }
+    .filter-tab.active { color: #F97316; border-bottom-color: #F97316; }
+    .critical-row { background: #FEF2F2; }
+    .critical-row:hover { background: #FEE2E2; }
+    .expandable-row { display: none; }
+    .expandable-row.open { display: table-row; }
+  </style>
+</head>
+<body class="font-sans bg-gray-50 text-gray-900">
+
+  <header id="admin-header" class="fixed top-0 left-0 right-0 z-50 bg-white border-b border-gray-200 h-16"></header>
+
+  <div class="flex pt-16 min-h-screen">
+    <aside id="admin-sidebar" class="fixed left-0 top-16 bottom-0 w-60 z-40 flex flex-col overflow-y-auto" style="background:#0A1628;"></aside>
+
+    <main class="flex-1 ml-60 p-6 lg:p-8">
+
+      <!-- Page Header -->
+      <div class="mb-8">
+        <div class="flex items-center justify-between">
+          <div>
+            <h1 class="text-2xl font-bold text-gray-900">Audit Log</h1>
+            <p class="text-sm text-gray-500 mt-1">Complete record of all administrative actions for compliance and accountability.</p>
+          </div>
+          <div class="flex items-center gap-3">
+            <button onclick="alert('Exporting audit log to CSV')" class="flex items-center gap-2 border border-gray-200 bg-white rounded-lg px-4 py-2.5 text-sm font-semibold text-gray-700 hover:bg-gray-50 transition">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3"/></svg>
+              Export Audit Log
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Stats Cards -->
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
+        <div class="stat-card bg-white rounded-xl border border-gray-200 p-5">
+          <div class="flex items-center justify-between mb-3">
+            <span class="text-xs font-semibold text-gray-500 uppercase tracking-wide">Total Actions Today</span>
+            <div class="w-8 h-8 rounded-lg bg-blue-50 flex items-center justify-center">
+              <svg class="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+            </div>
+          </div>
+          <p class="text-2xl font-bold text-gray-900">89</p>
+          <p class="text-xs text-gray-500 mt-1">Actions logged today</p>
+        </div>
+        <div class="stat-card bg-white rounded-xl border border-gray-200 p-5">
+          <div class="flex items-center justify-between mb-3">
+            <span class="text-xs font-semibold text-gray-500 uppercase tracking-wide">Admin Users Active</span>
+            <div class="w-8 h-8 rounded-lg bg-green-50 flex items-center justify-center">
+              <svg class="w-4 h-4 text-green-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M15 19.128a9.38 9.38 0 002.625.372 9.337 9.337 0 004.121-.952 4.125 4.125 0 00-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 018.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0111.964-3.07M12 6.375a3.375 3.375 0 11-6.75 0 3.375 3.375 0 016.75 0zm8.25 2.25a2.625 2.625 0 11-5.25 0 2.625 2.625 0 015.25 0z"/></svg>
+            </div>
+          </div>
+          <p class="text-2xl font-bold text-gray-900">3</p>
+          <p class="text-xs text-gray-500 mt-1">Currently logged in</p>
+        </div>
+        <div class="stat-card bg-white rounded-xl border border-red-200 p-5 ring-1 ring-red-100">
+          <div class="flex items-center justify-between mb-3">
+            <span class="text-xs font-semibold text-red-600 uppercase tracking-wide">Critical Actions</span>
+            <div class="w-8 h-8 rounded-lg bg-red-50 flex items-center justify-center">
+              <svg class="w-4 h-4 text-red-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126z"/></svg>
+            </div>
+          </div>
+          <p class="text-2xl font-bold text-red-600">5</p>
+          <p class="text-xs text-gray-500 mt-1">Require review</p>
+        </div>
+      </div>
+
+      <!-- Filter Bar -->
+      <div class="bg-white rounded-xl border border-gray-200 p-4 mb-6">
+        <div class="flex items-center gap-3 flex-wrap">
+          <div class="flex-1 min-w-[200px]">
+            <div class="relative">
+              <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+              <input type="text" placeholder="Search actions, users, entities..." class="w-full bg-gray-50 border border-gray-200 rounded-lg py-2 pl-10 pr-4 text-sm outline-none focus:border-brand-400 focus:ring-2 focus:ring-brand-100 transition">
+            </div>
+          </div>
+          <select class="border border-gray-200 rounded-lg py-2 px-3 text-sm bg-white outline-none focus:border-brand-400">
+            <option>All Admins</option>
+            <option>Super Admin</option>
+            <option>Ravi Krishnan</option>
+            <option>Deepa Menon</option>
+          </select>
+          <select class="border border-gray-200 rounded-lg py-2 px-3 text-sm bg-white outline-none focus:border-brand-400">
+            <option>All Actions</option>
+            <option>Create</option>
+            <option>Update</option>
+            <option>Delete</option>
+            <option>Approve</option>
+            <option>Suspend</option>
+            <option>Override</option>
+          </select>
+          <select class="border border-gray-200 rounded-lg py-2 px-3 text-sm bg-white outline-none focus:border-brand-400">
+            <option>All Entities</option>
+            <option>Order</option>
+            <option>Product</option>
+            <option>Seller</option>
+            <option>User</option>
+            <option>Settings</option>
+          </select>
+          <div class="flex items-center gap-2">
+            <input type="date" value="2026-03-28" class="text-sm border border-gray-200 rounded-lg px-3 py-2 outline-none focus:border-brand-400">
+            <span class="text-xs text-gray-400">to</span>
+            <input type="date" value="2026-03-28" class="text-sm border border-gray-200 rounded-lg px-3 py-2 outline-none focus:border-brand-400">
+          </div>
+          <button class="px-4 py-2 text-sm font-semibold bg-brand-500 text-white rounded-lg hover:bg-brand-600 transition">Filter</button>
+        </div>
+      </div>
+
+      <!-- Audit Log Table -->
+      <div class="bg-white rounded-xl border border-gray-200 overflow-hidden">
+        <div class="overflow-x-auto">
+          <table class="w-full text-sm text-left">
+            <thead>
+              <tr class="bg-gray-50 text-xs text-gray-500 uppercase tracking-wider">
+                <th class="px-4 py-3 font-semibold w-8"></th>
+                <th class="px-4 py-3 font-semibold">Timestamp</th>
+                <th class="px-4 py-3 font-semibold">Admin User</th>
+                <th class="px-4 py-3 font-semibold">Action</th>
+                <th class="px-4 py-3 font-semibold">Entity Type</th>
+                <th class="px-4 py-3 font-semibold">Entity ID</th>
+                <th class="px-4 py-3 font-semibold">Details</th>
+                <th class="px-4 py-3 font-semibold">IP Address</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-100">
+
+              <!-- Row 1: Critical - User suspension -->
+              <tr class="critical-row cursor-pointer" onclick="toggleExpand('row1')">
+                <td class="px-4 py-3.5 text-center"><svg id="arrow-row1" class="w-4 h-4 text-gray-400 transition-transform" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M8.25 4.5l7.5 7.5-7.5 7.5"/></svg></td>
+                <td class="px-4 py-3.5 text-xs text-gray-600 whitespace-nowrap">28 Mar 2026, 11:45 AM</td>
+                <td class="px-4 py-3.5">
+                  <div class="flex items-center gap-2">
+                    <div class="w-6 h-6 rounded-full bg-gradient-to-br from-green-500 to-green-700 flex items-center justify-center text-white text-[9px] font-bold">SA</div>
+                    <span class="font-medium text-gray-900">Super Admin</span>
+                  </div>
+                </td>
+                <td class="px-4 py-3.5"><span class="px-2 py-0.5 text-xs font-semibold rounded bg-red-100 text-red-700">Suspended</span></td>
+                <td class="px-4 py-3.5"><span class="text-xs text-gray-500">User</span></td>
+                <td class="px-4 py-3.5 font-mono text-xs text-brand-600">USR-4521</td>
+                <td class="px-4 py-3.5 text-xs text-gray-600">Suspended user account - Fraud detected</td>
+                <td class="px-4 py-3.5 font-mono text-xs text-gray-400">192.168.1.42</td>
+              </tr>
+              <tr id="expand-row1" class="expandable-row bg-red-50/50">
+                <td colspan="8" class="px-8 py-4">
+                  <div class="grid grid-cols-2 gap-4 text-xs">
+                    <div class="bg-white rounded-lg p-3 border border-red-100">
+                      <p class="font-semibold text-gray-500 mb-2">Before</p>
+                      <p class="text-gray-700">Status: <span class="font-medium">Active</span></p>
+                      <p class="text-gray-700">Account Type: <span class="font-medium">Customer</span></p>
+                    </div>
+                    <div class="bg-white rounded-lg p-3 border border-red-100">
+                      <p class="font-semibold text-gray-500 mb-2">After</p>
+                      <p class="text-gray-700">Status: <span class="font-medium text-red-600">Suspended</span></p>
+                      <p class="text-gray-700">Reason: <span class="font-medium">Multiple fraudulent payment attempts</span></p>
+                    </div>
+                  </div>
+                </td>
+              </tr>
+
+              <!-- Row 2: Approved seller onboarding -->
+              <tr class="table-row cursor-pointer" onclick="toggleExpand('row2')">
+                <td class="px-4 py-3.5 text-center"><svg id="arrow-row2" class="w-4 h-4 text-gray-400 transition-transform" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M8.25 4.5l7.5 7.5-7.5 7.5"/></svg></td>
+                <td class="px-4 py-3.5 text-xs text-gray-600 whitespace-nowrap">28 Mar 2026, 11:30 AM</td>
+                <td class="px-4 py-3.5">
+                  <div class="flex items-center gap-2">
+                    <div class="w-6 h-6 rounded-full bg-gradient-to-br from-blue-500 to-blue-700 flex items-center justify-center text-white text-[9px] font-bold">RK</div>
+                    <span class="font-medium text-gray-900">Ravi Krishnan</span>
+                  </div>
+                </td>
+                <td class="px-4 py-3.5"><span class="px-2 py-0.5 text-xs font-semibold rounded bg-green-100 text-green-700">Approved</span></td>
+                <td class="px-4 py-3.5"><span class="text-xs text-gray-500">Seller</span></td>
+                <td class="px-4 py-3.5 font-mono text-xs text-brand-600">SLR-0189</td>
+                <td class="px-4 py-3.5 text-xs text-gray-600">Approved seller onboarding - TechZone India</td>
+                <td class="px-4 py-3.5 font-mono text-xs text-gray-400">192.168.1.55</td>
+              </tr>
+              <tr id="expand-row2" class="expandable-row">
+                <td colspan="8" class="px-8 py-4">
+                  <div class="grid grid-cols-2 gap-4 text-xs">
+                    <div class="bg-gray-50 rounded-lg p-3 border"><p class="font-semibold text-gray-500 mb-2">Before</p><p class="text-gray-700">Status: <span class="font-medium">Pending Review</span></p></div>
+                    <div class="bg-gray-50 rounded-lg p-3 border"><p class="font-semibold text-gray-500 mb-2">After</p><p class="text-gray-700">Status: <span class="font-medium text-green-600">Active</span></p><p class="text-gray-700">Commission Rate: <span class="font-medium">5%</span></p></div>
+                  </div>
+                </td>
+              </tr>
+
+              <!-- Row 3: Flagged product -->
+              <tr class="table-row cursor-pointer" onclick="toggleExpand('row3')">
+                <td class="px-4 py-3.5 text-center"><svg id="arrow-row3" class="w-4 h-4 text-gray-400 transition-transform" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M8.25 4.5l7.5 7.5-7.5 7.5"/></svg></td>
+                <td class="px-4 py-3.5 text-xs text-gray-600 whitespace-nowrap">28 Mar 2026, 10:50 AM</td>
+                <td class="px-4 py-3.5">
+                  <div class="flex items-center gap-2">
+                    <div class="w-6 h-6 rounded-full bg-gradient-to-br from-purple-500 to-purple-700 flex items-center justify-center text-white text-[9px] font-bold">DM</div>
+                    <span class="font-medium text-gray-900">Deepa Menon</span>
+                  </div>
+                </td>
+                <td class="px-4 py-3.5"><span class="px-2 py-0.5 text-xs font-semibold rounded bg-yellow-100 text-yellow-700">Flagged</span></td>
+                <td class="px-4 py-3.5"><span class="text-xs text-gray-500">Product</span></td>
+                <td class="px-4 py-3.5 font-mono text-xs text-brand-600">PRD-8834</td>
+                <td class="px-4 py-3.5 text-xs text-gray-600">Flagged product - Premium LED Panel (misleading images)</td>
+                <td class="px-4 py-3.5 font-mono text-xs text-gray-400">192.168.1.87</td>
+              </tr>
+              <tr id="expand-row3" class="expandable-row">
+                <td colspan="8" class="px-8 py-4">
+                  <div class="grid grid-cols-2 gap-4 text-xs">
+                    <div class="bg-gray-50 rounded-lg p-3 border"><p class="font-semibold text-gray-500 mb-2">Before</p><p class="text-gray-700">Status: <span class="font-medium">Published</span></p></div>
+                    <div class="bg-gray-50 rounded-lg p-3 border"><p class="font-semibold text-gray-500 mb-2">After</p><p class="text-gray-700">Status: <span class="font-medium text-yellow-600">Flagged for Review</span></p><p class="text-gray-700">Reason: <span class="font-medium">Product images do not match description</span></p></div>
+                  </div>
+                </td>
+              </tr>
+
+              <!-- Row 4: Critical - Updated commission rate -->
+              <tr class="critical-row cursor-pointer" onclick="toggleExpand('row4')">
+                <td class="px-4 py-3.5 text-center"><svg id="arrow-row4" class="w-4 h-4 text-gray-400 transition-transform" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M8.25 4.5l7.5 7.5-7.5 7.5"/></svg></td>
+                <td class="px-4 py-3.5 text-xs text-gray-600 whitespace-nowrap">28 Mar 2026, 10:15 AM</td>
+                <td class="px-4 py-3.5">
+                  <div class="flex items-center gap-2">
+                    <div class="w-6 h-6 rounded-full bg-gradient-to-br from-green-500 to-green-700 flex items-center justify-center text-white text-[9px] font-bold">SA</div>
+                    <span class="font-medium text-gray-900">Super Admin</span>
+                  </div>
+                </td>
+                <td class="px-4 py-3.5"><span class="px-2 py-0.5 text-xs font-semibold rounded bg-red-100 text-red-700">Updated</span></td>
+                <td class="px-4 py-3.5"><span class="text-xs text-gray-500">Settings</span></td>
+                <td class="px-4 py-3.5 font-mono text-xs text-brand-600">CFG-COMM</td>
+                <td class="px-4 py-3.5 text-xs text-gray-600">Updated commission rate for Electronics category</td>
+                <td class="px-4 py-3.5 font-mono text-xs text-gray-400">192.168.1.42</td>
+              </tr>
+              <tr id="expand-row4" class="expandable-row bg-red-50/50">
+                <td colspan="8" class="px-8 py-4">
+                  <div class="grid grid-cols-2 gap-4 text-xs">
+                    <div class="bg-white rounded-lg p-3 border border-red-100"><p class="font-semibold text-gray-500 mb-2">Before</p><p class="text-gray-700">Commission Rate: <span class="font-medium">5.0%</span></p><p class="text-gray-700">Category: <span class="font-medium">Electronics</span></p></div>
+                    <div class="bg-white rounded-lg p-3 border border-red-100"><p class="font-semibold text-gray-500 mb-2">After</p><p class="text-gray-700">Commission Rate: <span class="font-medium text-red-600">6.5%</span></p><p class="text-gray-700">Effective From: <span class="font-medium">1 Apr 2026</span></p></div>
+                  </div>
+                </td>
+              </tr>
+
+              <!-- Row 5: Processed settlement batch -->
+              <tr class="table-row cursor-pointer" onclick="toggleExpand('row5')">
+                <td class="px-4 py-3.5 text-center"><svg id="arrow-row5" class="w-4 h-4 text-gray-400 transition-transform" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M8.25 4.5l7.5 7.5-7.5 7.5"/></svg></td>
+                <td class="px-4 py-3.5 text-xs text-gray-600 whitespace-nowrap">28 Mar 2026, 9:30 AM</td>
+                <td class="px-4 py-3.5">
+                  <div class="flex items-center gap-2">
+                    <div class="w-6 h-6 rounded-full bg-gradient-to-br from-blue-500 to-blue-700 flex items-center justify-center text-white text-[9px] font-bold">RK</div>
+                    <span class="font-medium text-gray-900">Ravi Krishnan</span>
+                  </div>
+                </td>
+                <td class="px-4 py-3.5"><span class="px-2 py-0.5 text-xs font-semibold rounded bg-blue-100 text-blue-700">Processed</span></td>
+                <td class="px-4 py-3.5"><span class="text-xs text-gray-500">Order</span></td>
+                <td class="px-4 py-3.5 font-mono text-xs text-brand-600">BTH-0045</td>
+                <td class="px-4 py-3.5 text-xs text-gray-600">Processed settlement batch - 18 sellers, &#8377;22.3L</td>
+                <td class="px-4 py-3.5 font-mono text-xs text-gray-400">192.168.1.55</td>
+              </tr>
+              <tr id="expand-row5" class="expandable-row">
+                <td colspan="8" class="px-8 py-4">
+                  <div class="grid grid-cols-2 gap-4 text-xs">
+                    <div class="bg-gray-50 rounded-lg p-3 border"><p class="font-semibold text-gray-500 mb-2">Before</p><p class="text-gray-700">Batch Status: <span class="font-medium">Pending</span></p><p class="text-gray-700">Sellers: <span class="font-medium">18</span></p></div>
+                    <div class="bg-gray-50 rounded-lg p-3 border"><p class="font-semibold text-gray-500 mb-2">After</p><p class="text-gray-700">Batch Status: <span class="font-medium text-green-600">Processing</span></p><p class="text-gray-700">Total: <span class="font-medium">&#8377;22,30,000</span></p></div>
+                  </div>
+                </td>
+              </tr>
+
+              <!-- Row 6: Overrode order status -->
+              <tr class="table-row cursor-pointer" onclick="toggleExpand('row6')">
+                <td class="px-4 py-3.5 text-center"><svg id="arrow-row6" class="w-4 h-4 text-gray-400 transition-transform" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M8.25 4.5l7.5 7.5-7.5 7.5"/></svg></td>
+                <td class="px-4 py-3.5 text-xs text-gray-600 whitespace-nowrap">28 Mar 2026, 9:10 AM</td>
+                <td class="px-4 py-3.5">
+                  <div class="flex items-center gap-2">
+                    <div class="w-6 h-6 rounded-full bg-gradient-to-br from-green-500 to-green-700 flex items-center justify-center text-white text-[9px] font-bold">SA</div>
+                    <span class="font-medium text-gray-900">Super Admin</span>
+                  </div>
+                </td>
+                <td class="px-4 py-3.5"><span class="px-2 py-0.5 text-xs font-semibold rounded bg-orange-100 text-orange-700">Override</span></td>
+                <td class="px-4 py-3.5"><span class="text-xs text-gray-500">Order</span></td>
+                <td class="px-4 py-3.5 font-mono text-xs text-brand-600">#HB-78102</td>
+                <td class="px-4 py-3.5 text-xs text-gray-600">Overrode order status - Customer escalation</td>
+                <td class="px-4 py-3.5 font-mono text-xs text-gray-400">192.168.1.42</td>
+              </tr>
+              <tr id="expand-row6" class="expandable-row">
+                <td colspan="8" class="px-8 py-4">
+                  <div class="grid grid-cols-2 gap-4 text-xs">
+                    <div class="bg-gray-50 rounded-lg p-3 border"><p class="font-semibold text-gray-500 mb-2">Before</p><p class="text-gray-700">Status: <span class="font-medium">Delivered</span></p></div>
+                    <div class="bg-gray-50 rounded-lg p-3 border"><p class="font-semibold text-gray-500 mb-2">After</p><p class="text-gray-700">Status: <span class="font-medium text-orange-600">Return Initiated</span></p><p class="text-gray-700">Override Reason: <span class="font-medium">Customer claims non-delivery despite tracking</span></p></div>
+                  </div>
+                </td>
+              </tr>
+
+              <!-- Row 7: Critical - Seller suspension -->
+              <tr class="critical-row cursor-pointer" onclick="toggleExpand('row7')">
+                <td class="px-4 py-3.5 text-center"><svg id="arrow-row7" class="w-4 h-4 text-gray-400 transition-transform" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M8.25 4.5l7.5 7.5-7.5 7.5"/></svg></td>
+                <td class="px-4 py-3.5 text-xs text-gray-600 whitespace-nowrap">28 Mar 2026, 8:45 AM</td>
+                <td class="px-4 py-3.5">
+                  <div class="flex items-center gap-2">
+                    <div class="w-6 h-6 rounded-full bg-gradient-to-br from-green-500 to-green-700 flex items-center justify-center text-white text-[9px] font-bold">SA</div>
+                    <span class="font-medium text-gray-900">Super Admin</span>
+                  </div>
+                </td>
+                <td class="px-4 py-3.5"><span class="px-2 py-0.5 text-xs font-semibold rounded bg-red-100 text-red-700">Suspended</span></td>
+                <td class="px-4 py-3.5"><span class="text-xs text-gray-500">Seller</span></td>
+                <td class="px-4 py-3.5 font-mono text-xs text-brand-600">SLR-0134</td>
+                <td class="px-4 py-3.5 text-xs text-gray-600">Suspended seller account - QuickMart (fake products)</td>
+                <td class="px-4 py-3.5 font-mono text-xs text-gray-400">192.168.1.42</td>
+              </tr>
+              <tr id="expand-row7" class="expandable-row bg-red-50/50">
+                <td colspan="8" class="px-8 py-4">
+                  <div class="grid grid-cols-2 gap-4 text-xs">
+                    <div class="bg-white rounded-lg p-3 border border-red-100"><p class="font-semibold text-gray-500 mb-2">Before</p><p class="text-gray-700">Status: <span class="font-medium">Active</span></p><p class="text-gray-700">Products: <span class="font-medium">47 listed</span></p></div>
+                    <div class="bg-white rounded-lg p-3 border border-red-100"><p class="font-semibold text-gray-500 mb-2">After</p><p class="text-gray-700">Status: <span class="font-medium text-red-600">Suspended</span></p><p class="text-gray-700">Products: <span class="font-medium text-red-600">All delisted</span></p><p class="text-gray-700">Reason: <span class="font-medium">Multiple counterfeit product complaints</span></p></div>
+                  </div>
+                </td>
+              </tr>
+
+              <!-- Row 8: Modified tax rule -->
+              <tr class="table-row cursor-pointer" onclick="toggleExpand('row8')">
+                <td class="px-4 py-3.5 text-center"><svg id="arrow-row8" class="w-4 h-4 text-gray-400 transition-transform" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M8.25 4.5l7.5 7.5-7.5 7.5"/></svg></td>
+                <td class="px-4 py-3.5 text-xs text-gray-600 whitespace-nowrap">28 Mar 2026, 8:20 AM</td>
+                <td class="px-4 py-3.5">
+                  <div class="flex items-center gap-2">
+                    <div class="w-6 h-6 rounded-full bg-gradient-to-br from-purple-500 to-purple-700 flex items-center justify-center text-white text-[9px] font-bold">DM</div>
+                    <span class="font-medium text-gray-900">Deepa Menon</span>
+                  </div>
+                </td>
+                <td class="px-4 py-3.5"><span class="px-2 py-0.5 text-xs font-semibold rounded bg-purple-100 text-purple-700">Modified</span></td>
+                <td class="px-4 py-3.5"><span class="text-xs text-gray-500">Settings</span></td>
+                <td class="px-4 py-3.5 font-mono text-xs text-brand-600">TAX-GST-05</td>
+                <td class="px-4 py-3.5 text-xs text-gray-600">Modified tax rule - Updated HSN code mapping</td>
+                <td class="px-4 py-3.5 font-mono text-xs text-gray-400">192.168.1.87</td>
+              </tr>
+              <tr id="expand-row8" class="expandable-row">
+                <td colspan="8" class="px-8 py-4">
+                  <div class="grid grid-cols-2 gap-4 text-xs">
+                    <div class="bg-gray-50 rounded-lg p-3 border"><p class="font-semibold text-gray-500 mb-2">Before</p><p class="text-gray-700">HSN: <span class="font-medium">8541</span> - Rate: <span class="font-medium">18%</span></p></div>
+                    <div class="bg-gray-50 rounded-lg p-3 border"><p class="font-semibold text-gray-500 mb-2">After</p><p class="text-gray-700">HSN: <span class="font-medium">8541</span> - Rate: <span class="font-medium text-purple-600">12%</span></p><p class="text-gray-700">Effective: <span class="font-medium">1 Apr 2026</span></p></div>
+                  </div>
+                </td>
+              </tr>
+
+              <!-- Row 9: Published CMS banner -->
+              <tr class="table-row cursor-pointer" onclick="toggleExpand('row9')">
+                <td class="px-4 py-3.5 text-center"><svg id="arrow-row9" class="w-4 h-4 text-gray-400 transition-transform" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M8.25 4.5l7.5 7.5-7.5 7.5"/></svg></td>
+                <td class="px-4 py-3.5 text-xs text-gray-600 whitespace-nowrap">27 Mar 2026, 5:30 PM</td>
+                <td class="px-4 py-3.5">
+                  <div class="flex items-center gap-2">
+                    <div class="w-6 h-6 rounded-full bg-gradient-to-br from-blue-500 to-blue-700 flex items-center justify-center text-white text-[9px] font-bold">RK</div>
+                    <span class="font-medium text-gray-900">Ravi Krishnan</span>
+                  </div>
+                </td>
+                <td class="px-4 py-3.5"><span class="px-2 py-0.5 text-xs font-semibold rounded bg-green-100 text-green-700">Published</span></td>
+                <td class="px-4 py-3.5"><span class="text-xs text-gray-500">Settings</span></td>
+                <td class="px-4 py-3.5 font-mono text-xs text-brand-600">CMS-BNR-12</td>
+                <td class="px-4 py-3.5 text-xs text-gray-600">Published CMS banner - Spring Sale 2026</td>
+                <td class="px-4 py-3.5 font-mono text-xs text-gray-400">192.168.1.55</td>
+              </tr>
+              <tr id="expand-row9" class="expandable-row">
+                <td colspan="8" class="px-8 py-4">
+                  <div class="grid grid-cols-2 gap-4 text-xs">
+                    <div class="bg-gray-50 rounded-lg p-3 border"><p class="font-semibold text-gray-500 mb-2">Before</p><p class="text-gray-700">Status: <span class="font-medium">Draft</span></p></div>
+                    <div class="bg-gray-50 rounded-lg p-3 border"><p class="font-semibold text-gray-500 mb-2">After</p><p class="text-gray-700">Status: <span class="font-medium text-green-600">Published</span></p><p class="text-gray-700">Target: <span class="font-medium">Homepage Hero Banner</span></p></div>
+                  </div>
+                </td>
+              </tr>
+
+              <!-- Row 10: Critical - Force refund -->
+              <tr class="critical-row cursor-pointer" onclick="toggleExpand('row10')">
+                <td class="px-4 py-3.5 text-center"><svg id="arrow-row10" class="w-4 h-4 text-gray-400 transition-transform" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M8.25 4.5l7.5 7.5-7.5 7.5"/></svg></td>
+                <td class="px-4 py-3.5 text-xs text-gray-600 whitespace-nowrap">27 Mar 2026, 4:15 PM</td>
+                <td class="px-4 py-3.5">
+                  <div class="flex items-center gap-2">
+                    <div class="w-6 h-6 rounded-full bg-gradient-to-br from-green-500 to-green-700 flex items-center justify-center text-white text-[9px] font-bold">SA</div>
+                    <span class="font-medium text-gray-900">Super Admin</span>
+                  </div>
+                </td>
+                <td class="px-4 py-3.5"><span class="px-2 py-0.5 text-xs font-semibold rounded bg-red-100 text-red-700">Force Refund</span></td>
+                <td class="px-4 py-3.5"><span class="text-xs text-gray-500">Order</span></td>
+                <td class="px-4 py-3.5 font-mono text-xs text-brand-600">#HB-78056</td>
+                <td class="px-4 py-3.5 text-xs text-gray-600">Forced refund of &#8377;78,500 - Escalated dispute</td>
+                <td class="px-4 py-3.5 font-mono text-xs text-gray-400">192.168.1.42</td>
+              </tr>
+              <tr id="expand-row10" class="expandable-row bg-red-50/50">
+                <td colspan="8" class="px-8 py-4">
+                  <div class="grid grid-cols-2 gap-4 text-xs">
+                    <div class="bg-white rounded-lg p-3 border border-red-100"><p class="font-semibold text-gray-500 mb-2">Before</p><p class="text-gray-700">Status: <span class="font-medium">Dispute - Escalated</span></p><p class="text-gray-700">Amount: <span class="font-medium">&#8377;78,500</span></p></div>
+                    <div class="bg-white rounded-lg p-3 border border-red-100"><p class="font-semibold text-gray-500 mb-2">After</p><p class="text-gray-700">Status: <span class="font-medium text-red-600">Refund Forced</span></p><p class="text-gray-700">Refunded to: <span class="font-medium">Customer (Anish Joshi)</span></p><p class="text-gray-700">Deducted from: <span class="font-medium">Seller balance (Patel Home Goods)</span></p></div>
+                  </div>
+                </td>
+              </tr>
+
+              <!-- Row 11 -->
+              <tr class="table-row cursor-pointer" onclick="toggleExpand('row11')">
+                <td class="px-4 py-3.5 text-center"><svg id="arrow-row11" class="w-4 h-4 text-gray-400 transition-transform" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M8.25 4.5l7.5 7.5-7.5 7.5"/></svg></td>
+                <td class="px-4 py-3.5 text-xs text-gray-600 whitespace-nowrap">27 Mar 2026, 3:00 PM</td>
+                <td class="px-4 py-3.5">
+                  <div class="flex items-center gap-2">
+                    <div class="w-6 h-6 rounded-full bg-gradient-to-br from-purple-500 to-purple-700 flex items-center justify-center text-white text-[9px] font-bold">DM</div>
+                    <span class="font-medium text-gray-900">Deepa Menon</span>
+                  </div>
+                </td>
+                <td class="px-4 py-3.5"><span class="px-2 py-0.5 text-xs font-semibold rounded bg-blue-100 text-blue-700">Approved</span></td>
+                <td class="px-4 py-3.5"><span class="text-xs text-gray-500">Product</span></td>
+                <td class="px-4 py-3.5 font-mono text-xs text-brand-600">PRD-9102</td>
+                <td class="px-4 py-3.5 text-xs text-gray-600">Approved product listing - Smart WiFi Router Pro</td>
+                <td class="px-4 py-3.5 font-mono text-xs text-gray-400">192.168.1.87</td>
+              </tr>
+              <tr id="expand-row11" class="expandable-row">
+                <td colspan="8" class="px-8 py-4">
+                  <div class="grid grid-cols-2 gap-4 text-xs">
+                    <div class="bg-gray-50 rounded-lg p-3 border"><p class="font-semibold text-gray-500 mb-2">Before</p><p class="text-gray-700">Status: <span class="font-medium">Pending Review</span></p></div>
+                    <div class="bg-gray-50 rounded-lg p-3 border"><p class="font-semibold text-gray-500 mb-2">After</p><p class="text-gray-700">Status: <span class="font-medium text-green-600">Published</span></p><p class="text-gray-700">Category: <span class="font-medium">Electronics > Networking</span></p></div>
+                  </div>
+                </td>
+              </tr>
+
+              <!-- Row 12: Critical - Config change -->
+              <tr class="critical-row cursor-pointer" onclick="toggleExpand('row12')">
+                <td class="px-4 py-3.5 text-center"><svg id="arrow-row12" class="w-4 h-4 text-gray-400 transition-transform" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M8.25 4.5l7.5 7.5-7.5 7.5"/></svg></td>
+                <td class="px-4 py-3.5 text-xs text-gray-600 whitespace-nowrap">27 Mar 2026, 2:00 PM</td>
+                <td class="px-4 py-3.5">
+                  <div class="flex items-center gap-2">
+                    <div class="w-6 h-6 rounded-full bg-gradient-to-br from-green-500 to-green-700 flex items-center justify-center text-white text-[9px] font-bold">SA</div>
+                    <span class="font-medium text-gray-900">Super Admin</span>
+                  </div>
+                </td>
+                <td class="px-4 py-3.5"><span class="px-2 py-0.5 text-xs font-semibold rounded bg-red-100 text-red-700">Modified</span></td>
+                <td class="px-4 py-3.5"><span class="text-xs text-gray-500">Settings</span></td>
+                <td class="px-4 py-3.5 font-mono text-xs text-brand-600">CFG-PAY</td>
+                <td class="px-4 py-3.5 text-xs text-gray-600">Modified payment gateway config - Switched backup gateway</td>
+                <td class="px-4 py-3.5 font-mono text-xs text-gray-400">192.168.1.42</td>
+              </tr>
+              <tr id="expand-row12" class="expandable-row bg-red-50/50">
+                <td colspan="8" class="px-8 py-4">
+                  <div class="grid grid-cols-2 gap-4 text-xs">
+                    <div class="bg-white rounded-lg p-3 border border-red-100"><p class="font-semibold text-gray-500 mb-2">Before</p><p class="text-gray-700">Backup Gateway: <span class="font-medium">PayU</span></p><p class="text-gray-700">Failover: <span class="font-medium">Enabled</span></p></div>
+                    <div class="bg-white rounded-lg p-3 border border-red-100"><p class="font-semibold text-gray-500 mb-2">After</p><p class="text-gray-700">Backup Gateway: <span class="font-medium text-red-600">Cashfree</span></p><p class="text-gray-700">Failover: <span class="font-medium">Enabled</span></p><p class="text-gray-700">Reason: <span class="font-medium">Lower fees + faster settlements</span></p></div>
+                  </div>
+                </td>
+              </tr>
+
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Pagination -->
+        <div class="px-6 py-4 border-t border-gray-100 flex items-center justify-between">
+          <p class="text-xs text-gray-500">Showing 1-12 of 89 entries</p>
+          <div class="flex items-center gap-1">
+            <button class="px-3 py-1.5 text-xs font-medium rounded bg-brand-500 text-white">1</button>
+            <button class="px-3 py-1.5 text-xs font-medium rounded bg-gray-100 text-gray-600 hover:bg-gray-200">2</button>
+            <button class="px-3 py-1.5 text-xs font-medium rounded bg-gray-100 text-gray-600 hover:bg-gray-200">3</button>
+            <span class="px-2 text-xs text-gray-400">...</span>
+            <button class="px-3 py-1.5 text-xs font-medium rounded bg-gray-100 text-gray-600 hover:bg-gray-200">8</button>
+          </div>
+        </div>
+      </div>
+
+    </main>
+  </div>
+
+  <script src="../shared-layout.js"></script>
+  <script>
+    renderAdminLayout('audit-log', '../');
+
+    function toggleExpand(rowId) {
+      var expandRow = document.getElementById('expand-' + rowId);
+      var arrow = document.getElementById('arrow-' + rowId);
+      if (expandRow.classList.contains('open')) {
+        expandRow.classList.remove('open');
+        arrow.style.transform = '';
+      } else {
+        expandRow.classList.add('open');
+        arrow.style.transform = 'rotate(90deg)';
+      }
+    }
+  </script>
+</body>
+</html>

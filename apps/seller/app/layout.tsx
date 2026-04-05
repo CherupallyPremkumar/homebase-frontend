@@ -27,14 +27,12 @@ export default async function RootLayout({ children }: { children: React.ReactNo
 
   return (
     <html lang="en" className={inter.variable}>
-      <body>
+      <body className="font-sans bg-gray-50 text-gray-900">
         <Providers>
-          <div className="flex h-screen overflow-hidden">
+          <SellerHeader user={user} />
+          <div className="flex pt-16 min-h-screen">
             <SellerSidebar />
-            <div className="flex flex-1 flex-col overflow-hidden">
-              <SellerHeader user={user} />
-              <main className="flex-1 overflow-y-auto p-6">{children}</main>
-            </div>
+            <main className="flex-1 ml-60 overflow-y-auto p-6">{children}</main>
           </div>
           <Toaster position="top-right" />
         </Providers>

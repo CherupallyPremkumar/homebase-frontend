@@ -1,0 +1,966 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HomeBase — Become a Seller</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              50: '#FFF7ED',
+              100: '#FFEDD5',
+              200: '#FED7AA',
+              300: '#FDBA74',
+              400: '#FB923C',
+              500: '#F97316',
+              600: '#EA580C',
+              700: '#C2410C',
+            },
+            navy: {
+              700: '#1E3A5F',
+              800: '#1A2E4A',
+              900: '#0F1B2D',
+            },
+            success: '#16A34A',
+            warning: '#EAB308',
+            danger: '#DC2626',
+          },
+          fontFamily: {
+            sans: ['Inter', 'system-ui', 'sans-serif'],
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    .hero-gradient { background: linear-gradient(135deg, #0F1B2D 0%, #1E3A5F 100%); }
+    .btn-brand { background: #F97316; transition: all 0.2s; }
+    .btn-brand:hover { background: #EA580C; transform: translateY(-1px); box-shadow: 0 4px 12px rgba(249,115,22,0.3); }
+    .btn-brand:active { transform: translateY(0); }
+    .btn-outline { border: 1.5px solid #D1D5DB; transition: all 0.2s; }
+    .btn-outline:hover { border-color: #F97316; color: #F97316; }
+    .input-field { transition: border-color 0.2s, box-shadow 0.2s; }
+    .input-field:focus-within { border-color: #F97316; box-shadow: 0 0 0 3px rgba(249,115,22,0.1); }
+    .strength-bar { transition: width 0.3s ease, background-color 0.3s ease; }
+    .fade-in { animation: fadeIn 0.25s ease-out; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+    .step-dot { transition: all 0.3s ease; }
+    .error-msg { color: #DC2626; font-size: 0.75rem; margin-top: 0.25rem; display: none; }
+    .error-msg.visible { display: block; }
+    .input-error { border-color: #DC2626 !important; }
+    .category-chip { transition: all 0.15s ease; }
+    .category-chip:hover { border-color: #FB923C; }
+    .category-chip.selected { background: #FFF7ED; border-color: #F97316; color: #C2410C; }
+    .success-bounce { animation: successBounce 0.5s ease-out; }
+    @keyframes successBounce {
+      0% { transform: scale(0.5); opacity: 0; }
+      60% { transform: scale(1.1); }
+      100% { transform: scale(1); opacity: 1; }
+    }
+  </style>
+</head>
+<body class="font-sans bg-gray-50 text-gray-900 min-h-screen flex flex-col">
+
+  <!-- ===== HEADER (Simplified - Public Page) ===== -->
+  <header class="bg-white border-b border-gray-100 shadow-sm">
+    <div class="max-w-7xl mx-auto px-4 flex items-center justify-center h-16">
+      <a href="../customer/storefront.html" class="flex items-center gap-2">
+        <div class="w-9 h-9 rounded-lg bg-brand-500 flex items-center justify-center">
+          <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-4 0a1 1 0 01-1-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 01-1 1"/></svg>
+        </div>
+        <span class="text-xl font-extrabold tracking-tight text-navy-900">Home<span class="text-brand-500">Base</span></span>
+      </a>
+    </div>
+  </header>
+
+  <!-- ===== MAIN CONTENT ===== -->
+  <main class="flex-1 flex items-center justify-center py-10 px-4">
+    <div class="w-full max-w-6xl bg-white rounded-2xl shadow-lg overflow-hidden flex min-h-[640px]">
+
+      <!-- ===== Left Side: Brand Panel ===== -->
+      <div class="hidden lg:flex lg:w-5/12 hero-gradient relative flex-col items-center justify-center p-10 text-white">
+        <!-- Decorative circles -->
+        <div class="absolute right-0 top-0 w-64 h-64 bg-brand-500/10 rounded-full -translate-y-1/3 translate-x-1/3"></div>
+        <div class="absolute left-0 bottom-0 w-48 h-48 bg-brand-400/10 rounded-full translate-y-1/4 -translate-x-1/4"></div>
+        <div class="absolute right-10 bottom-20 w-32 h-32 bg-white/5 rounded-full"></div>
+
+        <div class="relative z-10 text-center">
+          <!-- Logo Mark -->
+          <div class="w-16 h-16 rounded-2xl bg-brand-500 flex items-center justify-center mx-auto mb-6 shadow-lg">
+            <svg class="w-9 h-9 text-white" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-4 0a1 1 0 01-1-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 01-1 1"/></svg>
+          </div>
+          <h2 class="text-2xl font-extrabold mb-2">Home<span class="text-brand-400">Base</span></h2>
+          <p class="text-base text-gray-200 mb-10 font-semibold">Become a Seller on HomeBase</p>
+
+          <!-- Benefits list -->
+          <div class="space-y-5 text-left max-w-xs mx-auto">
+            <div class="flex items-center gap-4">
+              <div class="w-10 h-10 rounded-xl bg-white/10 backdrop-blur-sm flex items-center justify-center shrink-0">
+                <svg class="w-5 h-5 text-brand-400" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M18 18.72a9.094 9.094 0 003.741-.479 3 3 0 00-4.682-2.72m.94 3.198l.001.031c0 .225-.012.447-.037.666A11.944 11.944 0 0112 21c-2.17 0-4.207-.576-5.963-1.584A6.062 6.062 0 016 18.719m12 0a5.971 5.971 0 00-.941-3.197m0 0A5.995 5.995 0 0012 12.75a5.995 5.995 0 00-5.058 2.772m0 0a3 3 0 00-4.681 2.72 8.986 8.986 0 003.74.477m.94-3.197a5.971 5.971 0 00-.94 3.197M15 6.75a3 3 0 11-6 0 3 3 0 016 0zm6 3a2.25 2.25 0 11-4.5 0 2.25 2.25 0 014.5 0zm-13.5 0a2.25 2.25 0 11-4.5 0 2.25 2.25 0 014.5 0z"/></svg>
+              </div>
+              <div>
+                <p class="text-sm font-semibold">Reach millions of customers</p>
+                <p class="text-xs text-gray-400">Access India's largest marketplace</p>
+              </div>
+            </div>
+            <div class="flex items-center gap-4">
+              <div class="w-10 h-10 rounded-xl bg-white/10 backdrop-blur-sm flex items-center justify-center shrink-0">
+                <svg class="w-5 h-5 text-brand-400" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M20.25 7.5l-.625 10.632a2.25 2.25 0 01-2.247 2.118H6.622a2.25 2.25 0 01-2.247-2.118L3.75 7.5M10 11.25h4M3.375 7.5h17.25c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125z"/></svg>
+              </div>
+              <div>
+                <p class="text-sm font-semibold">Easy product listing tools</p>
+                <p class="text-xs text-gray-400">List products in minutes</p>
+              </div>
+            </div>
+            <div class="flex items-center gap-4">
+              <div class="w-10 h-10 rounded-xl bg-white/10 backdrop-blur-sm flex items-center justify-center shrink-0">
+                <svg class="w-5 h-5 text-brand-400" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z"/></svg>
+              </div>
+              <div>
+                <p class="text-sm font-semibold">Secure & fast payments</p>
+                <p class="text-xs text-gray-400">Get paid within 7 days</p>
+              </div>
+            </div>
+            <div class="flex items-center gap-4">
+              <div class="w-10 h-10 rounded-xl bg-white/10 backdrop-blur-sm flex items-center justify-center shrink-0">
+                <svg class="w-5 h-5 text-brand-400" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M20.25 8.511c.884.284 1.5 1.128 1.5 2.097v4.286c0 1.136-.847 2.1-1.98 2.193-.34.027-.68.052-1.02.072v3.091l-3-3c-1.354 0-2.694-.055-4.02-.163a2.115 2.115 0 01-.825-.242m9.345-8.334a2.126 2.126 0 00-.476-.095 48.64 48.64 0 00-8.048 0c-1.131.094-1.976 1.057-1.976 2.192v4.286c0 .837.46 1.58 1.155 1.951m9.345-8.334V6.637c0-1.621-1.152-3.026-2.76-3.235A48.455 48.455 0 0011.25 3c-2.115 0-4.198.137-6.24.402-1.608.209-2.76 1.614-2.76 3.235v6.226c0 1.621 1.152 3.026 2.76 3.235.577.075 1.157.14 1.74.194V21l4.155-4.155"/></svg>
+              </div>
+              <div>
+                <p class="text-sm font-semibold">Dedicated seller support</p>
+                <p class="text-xs text-gray-400">24/7 help when you need it</p>
+              </div>
+            </div>
+            <div class="flex items-center gap-4">
+              <div class="w-10 h-10 rounded-xl bg-white/10 backdrop-blur-sm flex items-center justify-center shrink-0">
+                <svg class="w-5 h-5 text-brand-400" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M2.25 18.75a60.07 60.07 0 0115.797 2.101c.727.198 1.453-.342 1.453-1.096V18.75M3.75 4.5v.75A.75.75 0 013 6h-.75m0 0v-.375c0-.621.504-1.125 1.125-1.125H20.25M2.25 6v9m18-10.5v.75c0 .414.336.75.75.75h.75m-1.5-1.5h.375c.621 0 1.125.504 1.125 1.125v9.75c0 .621-.504 1.125-1.125 1.125h-.375m1.5-1.5H21a.75.75 0 00-.75.75v.75m0 0H3.75m0 0h-.375a1.125 1.125 0 01-1.125-1.125V15m1.5 1.5v-.75A.75.75 0 003 15h-.75M15 10.5a3 3 0 11-6 0 3 3 0 016 0zm3 0h.008v.008H18V10.5zm-12 0h.008v.008H6V10.5z"/></svg>
+              </div>
+              <div>
+                <p class="text-sm font-semibold">&#8377;0 listing fee to start</p>
+                <p class="text-xs text-gray-400">Zero upfront cost to begin selling</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Already a seller? -->
+          <p class="mt-10 text-sm text-gray-300">
+            Already a seller?
+            <a href="seller-dashboard.html" class="text-brand-400 font-semibold hover:text-brand-300 hover:underline">Sign In</a>
+          </p>
+        </div>
+      </div>
+
+      <!-- ===== Right Side: Multi-Step Form ===== -->
+      <div class="w-full lg:w-7/12 p-8 sm:p-10 flex flex-col">
+
+        <!-- Mobile-only brand heading -->
+        <div class="lg:hidden text-center mb-6">
+          <h2 class="text-lg font-bold text-navy-900">Become a Seller on Home<span class="text-brand-500">Base</span></h2>
+          <p class="text-sm text-gray-500">Start selling to millions of customers</p>
+        </div>
+
+        <!-- ===== Step Indicator ===== -->
+        <div id="step-indicator" class="flex items-center justify-between mb-8 px-2">
+          <!-- Step 1 -->
+          <div class="flex items-center gap-2">
+            <div id="dot-1" class="step-dot w-8 h-8 rounded-full bg-brand-500 text-white flex items-center justify-center text-xs font-bold">1</div>
+            <span id="label-1" class="text-xs font-semibold text-brand-600 hidden sm:inline">Basic Info</span>
+          </div>
+          <div id="line-1" class="flex-1 h-0.5 bg-gray-200 mx-2"></div>
+          <!-- Step 2 -->
+          <div class="flex items-center gap-2">
+            <div id="dot-2" class="step-dot w-8 h-8 rounded-full bg-gray-200 text-gray-500 flex items-center justify-center text-xs font-bold">2</div>
+            <span id="label-2" class="text-xs font-medium text-gray-400 hidden sm:inline">Business</span>
+          </div>
+          <div id="line-2" class="flex-1 h-0.5 bg-gray-200 mx-2"></div>
+          <!-- Step 3 -->
+          <div class="flex items-center gap-2">
+            <div id="dot-3" class="step-dot w-8 h-8 rounded-full bg-gray-200 text-gray-500 flex items-center justify-center text-xs font-bold">3</div>
+            <span id="label-3" class="text-xs font-medium text-gray-400 hidden sm:inline">Categories</span>
+          </div>
+          <div id="line-3" class="flex-1 h-0.5 bg-gray-200 mx-2"></div>
+          <!-- Step 4 -->
+          <div class="flex items-center gap-2">
+            <div id="dot-4" class="step-dot w-8 h-8 rounded-full bg-gray-200 text-gray-500 flex items-center justify-center text-xs font-bold">4</div>
+            <span id="label-4" class="text-xs font-medium text-gray-400 hidden sm:inline">Submit</span>
+          </div>
+        </div>
+
+        <!-- ===== STEP 1: Basic Info ===== -->
+        <div id="step-1" class="flex-1 fade-in overflow-y-auto">
+          <h3 class="text-xl font-bold text-navy-900 mb-1">Basic Information</h3>
+          <p class="text-sm text-gray-500 mb-6">Tell us about yourself to get started</p>
+
+          <div class="space-y-4">
+            <!-- Full Name -->
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1.5">Full Name <span class="text-danger">*</span></label>
+              <div class="input-field flex items-center border border-gray-200 rounded-lg overflow-hidden bg-white">
+                <span class="pl-3.5 text-gray-400">
+                  <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z"/></svg>
+                </span>
+                <input id="s1-name" type="text" placeholder="Enter your full name" class="flex-1 py-2.5 px-3 text-sm outline-none bg-transparent">
+              </div>
+              <p id="err-s1-name" class="error-msg">Full name is required</p>
+            </div>
+
+            <!-- Email -->
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1.5">Email Address <span class="text-danger">*</span></label>
+              <div class="input-field flex items-center border border-gray-200 rounded-lg overflow-hidden bg-white">
+                <span class="pl-3.5 text-gray-400">
+                  <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0L3.32 8.91a2.25 2.25 0 01-1.07-1.916V6.75"/></svg>
+                </span>
+                <input id="s1-email" type="email" placeholder="you@example.com" class="flex-1 py-2.5 px-3 text-sm outline-none bg-transparent">
+              </div>
+              <p id="err-s1-email" class="error-msg">Please enter a valid email address</p>
+            </div>
+
+            <!-- Phone -->
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1.5">Phone Number <span class="text-danger">*</span></label>
+              <div class="input-field flex items-center border border-gray-200 rounded-lg overflow-hidden bg-white">
+                <span class="pl-3.5 pr-2 text-sm font-medium text-gray-500 border-r border-gray-200 flex items-center gap-1.5 shrink-0">
+                  <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M2 3a1 1 0 011-1h2.153a1 1 0 01.986.836l.74 4.435a1 1 0 01-.54 1.06l-1.548.773a11.037 11.037 0 006.105 6.105l.774-1.548a1 1 0 011.059-.54l4.435.74a1 1 0 01.836.986V17a1 1 0 01-1 1h-2C7.82 18 2 12.18 2 5V3z"/></svg>
+                  +91
+                </span>
+                <input id="s1-phone" type="tel" placeholder="Enter your phone number" maxlength="10" class="flex-1 py-2.5 px-3 text-sm outline-none bg-transparent">
+              </div>
+              <p id="err-s1-phone" class="error-msg">Please enter a valid 10-digit phone number</p>
+            </div>
+
+            <!-- Password -->
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1.5">Password <span class="text-danger">*</span></label>
+              <div class="input-field flex items-center border border-gray-200 rounded-lg overflow-hidden bg-white">
+                <span class="pl-3.5 text-gray-400">
+                  <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z"/></svg>
+                </span>
+                <input id="s1-password" type="password" placeholder="Create a strong password" oninput="checkPasswordStrength(this.value)" class="flex-1 py-2.5 px-3 text-sm outline-none bg-transparent">
+                <button type="button" onclick="togglePassword('s1-password', 's1-eye')" class="pr-3.5 text-gray-400 hover:text-gray-600 transition">
+                  <svg id="s1-eye" class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z"/><path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                </button>
+              </div>
+              <!-- Strength Indicator -->
+              <div id="strength-container" class="mt-2 hidden">
+                <div class="flex gap-1.5 mb-1">
+                  <div class="h-1 flex-1 rounded-full bg-gray-200 overflow-hidden"><div id="strength-bar-1" class="h-full strength-bar rounded-full" style="width:0"></div></div>
+                  <div class="h-1 flex-1 rounded-full bg-gray-200 overflow-hidden"><div id="strength-bar-2" class="h-full strength-bar rounded-full" style="width:0"></div></div>
+                  <div class="h-1 flex-1 rounded-full bg-gray-200 overflow-hidden"><div id="strength-bar-3" class="h-full strength-bar rounded-full" style="width:0"></div></div>
+                </div>
+                <p id="strength-label" class="text-xs font-medium"></p>
+              </div>
+              <p id="err-s1-password" class="error-msg">Password must be at least 8 characters</p>
+            </div>
+
+            <!-- Confirm Password -->
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1.5">Confirm Password <span class="text-danger">*</span></label>
+              <div class="input-field flex items-center border border-gray-200 rounded-lg overflow-hidden bg-white">
+                <span class="pl-3.5 text-gray-400">
+                  <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z"/></svg>
+                </span>
+                <input id="s1-confirm" type="password" placeholder="Confirm your password" oninput="checkPasswordMatch()" class="flex-1 py-2.5 px-3 text-sm outline-none bg-transparent">
+                <button type="button" onclick="togglePassword('s1-confirm', 's1-confirm-eye')" class="pr-3.5 text-gray-400 hover:text-gray-600 transition">
+                  <svg id="s1-confirm-eye" class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z"/><path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                </button>
+              </div>
+              <p id="password-match-msg" class="text-xs mt-1 hidden"></p>
+              <p id="err-s1-confirm" class="error-msg">Passwords do not match</p>
+            </div>
+          </div>
+
+          <!-- Step 1 Actions -->
+          <div class="flex justify-end mt-8">
+            <button onclick="goToStep(2)" class="btn-brand text-white font-semibold py-2.5 px-8 rounded-lg text-sm">
+              Next
+              <svg class="w-4 h-4 inline ml-1 -mt-0.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3"/></svg>
+            </button>
+          </div>
+        </div>
+
+        <!-- ===== STEP 2: Business Details ===== -->
+        <div id="step-2" class="flex-1 hidden fade-in overflow-y-auto">
+          <h3 class="text-xl font-bold text-navy-900 mb-1">Business Details</h3>
+          <p class="text-sm text-gray-500 mb-6">Help us understand your business</p>
+
+          <div class="space-y-4">
+            <!-- Business/Store Name -->
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1.5">Business / Store Name <span class="text-danger">*</span></label>
+              <div class="input-field flex items-center border border-gray-200 rounded-lg overflow-hidden bg-white">
+                <span class="pl-3.5 text-gray-400">
+                  <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M13.5 21v-7.5a.75.75 0 01.75-.75h3a.75.75 0 01.75.75V21m-4.5 0H2.36m11.14 0H18m0 0h3.64m-1.39 0V9.349m-16.5 11.65V9.35m0 0a3.001 3.001 0 003.75-.615A2.993 2.993 0 009.75 9.75c.896 0 1.7-.393 2.25-1.016a2.993 2.993 0 002.25 1.016c.896 0 1.7-.393 2.25-1.016a3.001 3.001 0 003.75.614m-16.5 0a3.004 3.004 0 01-.621-4.72L4.318 3.44A1.5 1.5 0 015.378 3h13.243a1.5 1.5 0 011.06.44l1.19 1.189a3 3 0 01-.621 4.72m-13.5 8.65h3.75a.75.75 0 00.75-.75V13.5a.75.75 0 00-.75-.75H6.75a.75.75 0 00-.75.75v3.15c0 .415.336.75.75.75z"/></svg>
+                </span>
+                <input id="s2-business" type="text" placeholder="e.g., TechMart Electronics" class="flex-1 py-2.5 px-3 text-sm outline-none bg-transparent">
+              </div>
+              <p id="err-s2-business" class="error-msg">Business name is required</p>
+            </div>
+
+            <!-- Business Type -->
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1.5">Business Type <span class="text-danger">*</span></label>
+              <div class="input-field border border-gray-200 rounded-lg overflow-hidden bg-white">
+                <select id="s2-type" class="w-full py-2.5 px-3.5 text-sm outline-none bg-transparent text-gray-700 appearance-none cursor-pointer" style="background-image: url('data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%2220%22 height=%2220%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22%239CA3AF%22 stroke-width=%221.5%22><path d=%22M19.5 8.25l-7.5 7.5-7.5-7.5%22/></svg>'); background-repeat: no-repeat; background-position: right 0.75rem center; background-size: 1.25rem;">
+                  <option value="">Select business type</option>
+                  <option value="sole">Sole Proprietorship</option>
+                  <option value="partnership">Partnership</option>
+                  <option value="pvt">Private Limited (Pvt Ltd)</option>
+                  <option value="llp">Limited Liability Partnership (LLP)</option>
+                </select>
+              </div>
+              <p id="err-s2-type" class="error-msg">Please select a business type</p>
+            </div>
+
+            <!-- GSTIN -->
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1.5">GSTIN</label>
+              <div id="gstin-field" class="input-field flex items-center border border-gray-200 rounded-lg overflow-hidden bg-white">
+                <span class="pl-3.5 text-gray-400">
+                  <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z"/></svg>
+                </span>
+                <input id="s2-gstin" type="text" placeholder="e.g., 22AAAAA0000A1Z5" maxlength="15" class="flex-1 py-2.5 px-3 text-sm outline-none bg-transparent uppercase">
+              </div>
+              <div class="flex items-center gap-2 mt-2">
+                <input type="checkbox" id="no-gstin" onchange="toggleGstin()" class="w-4 h-4 rounded border-gray-300 text-brand-500 focus:ring-brand-400 accent-brand-500 cursor-pointer">
+                <label for="no-gstin" class="text-sm text-gray-600 cursor-pointer">I don't have a GSTIN yet</label>
+              </div>
+              <p id="err-s2-gstin" class="error-msg">Please enter a valid GSTIN (15 characters)</p>
+            </div>
+
+            <!-- PAN Number -->
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1.5">PAN Number <span class="text-danger">*</span></label>
+              <div class="input-field flex items-center border border-gray-200 rounded-lg overflow-hidden bg-white">
+                <span class="pl-3.5 text-gray-400">
+                  <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M15 9h3.75M15 12h3.75M15 15h3.75M4.5 19.5h15a2.25 2.25 0 002.25-2.25V6.75A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25v10.5A2.25 2.25 0 004.5 19.5zm6-10.125a1.875 1.875 0 11-3.75 0 1.875 1.875 0 013.75 0zm1.294 6.336a6.721 6.721 0 01-3.17.789 6.721 6.721 0 01-3.168-.789 3.376 3.376 0 016.338 0z"/></svg>
+                </span>
+                <input id="s2-pan" type="text" placeholder="e.g., ABCDE1234F" maxlength="10" class="flex-1 py-2.5 px-3 text-sm outline-none bg-transparent uppercase">
+              </div>
+              <p id="err-s2-pan" class="error-msg">Please enter a valid PAN (e.g., ABCDE1234F)</p>
+            </div>
+
+            <!-- Business Address -->
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1.5">Business Address <span class="text-danger">*</span></label>
+              <div class="space-y-3">
+                <div class="input-field border border-gray-200 rounded-lg overflow-hidden bg-white">
+                  <input id="s2-addr1" type="text" placeholder="Address Line 1" class="w-full py-2.5 px-3.5 text-sm outline-none bg-transparent">
+                </div>
+                <div class="input-field border border-gray-200 rounded-lg overflow-hidden bg-white">
+                  <input id="s2-addr2" type="text" placeholder="Address Line 2 (optional)" class="w-full py-2.5 px-3.5 text-sm outline-none bg-transparent">
+                </div>
+                <div class="grid grid-cols-2 gap-3">
+                  <div class="input-field border border-gray-200 rounded-lg overflow-hidden bg-white">
+                    <input id="s2-city" type="text" placeholder="City" class="w-full py-2.5 px-3.5 text-sm outline-none bg-transparent">
+                  </div>
+                  <div class="input-field border border-gray-200 rounded-lg overflow-hidden bg-white">
+                    <select id="s2-state" class="w-full py-2.5 px-3.5 text-sm outline-none bg-transparent text-gray-700 appearance-none cursor-pointer" style="background-image: url('data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%2220%22 height=%2220%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22%239CA3AF%22 stroke-width=%221.5%22><path d=%22M19.5 8.25l-7.5 7.5-7.5-7.5%22/></svg>'); background-repeat: no-repeat; background-position: right 0.75rem center; background-size: 1.25rem;">
+                      <option value="">State</option>
+                      <option>Andhra Pradesh</option><option>Arunachal Pradesh</option><option>Assam</option><option>Bihar</option>
+                      <option>Chhattisgarh</option><option>Delhi</option><option>Goa</option><option>Gujarat</option>
+                      <option>Haryana</option><option>Himachal Pradesh</option><option>Jharkhand</option><option>Karnataka</option>
+                      <option>Kerala</option><option>Madhya Pradesh</option><option>Maharashtra</option><option>Manipur</option>
+                      <option>Meghalaya</option><option>Mizoram</option><option>Nagaland</option><option>Odisha</option>
+                      <option>Punjab</option><option>Rajasthan</option><option>Sikkim</option><option>Tamil Nadu</option>
+                      <option>Telangana</option><option>Tripura</option><option>Uttar Pradesh</option><option>Uttarakhand</option>
+                      <option>West Bengal</option>
+                    </select>
+                  </div>
+                </div>
+                <div class="w-1/2">
+                  <div class="input-field border border-gray-200 rounded-lg overflow-hidden bg-white">
+                    <input id="s2-pin" type="text" placeholder="PIN Code" maxlength="6" class="w-full py-2.5 px-3.5 text-sm outline-none bg-transparent">
+                  </div>
+                </div>
+              </div>
+              <p id="err-s2-addr" class="error-msg">Please fill in all required address fields</p>
+            </div>
+          </div>
+
+          <!-- Step 2 Actions -->
+          <div class="flex justify-between mt-8">
+            <button onclick="goToStep(1)" class="btn-outline text-gray-700 font-semibold py-2.5 px-6 rounded-lg text-sm bg-white">
+              <svg class="w-4 h-4 inline mr-1 -mt-0.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18"/></svg>
+              Back
+            </button>
+            <button onclick="goToStep(3)" class="btn-brand text-white font-semibold py-2.5 px-8 rounded-lg text-sm">
+              Next
+              <svg class="w-4 h-4 inline ml-1 -mt-0.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3"/></svg>
+            </button>
+          </div>
+        </div>
+
+        <!-- ===== STEP 3: Categories ===== -->
+        <div id="step-3" class="flex-1 hidden fade-in overflow-y-auto">
+          <h3 class="text-xl font-bold text-navy-900 mb-1">What do you sell?</h3>
+          <p class="text-sm text-gray-500 mb-6">Select up to 3 categories that best describe your products</p>
+
+          <div class="space-y-5">
+            <!-- Category Checkboxes -->
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-3">Product Categories <span class="text-danger">*</span> <span id="cat-count" class="text-xs text-gray-400 font-normal">(0/3 selected)</span></label>
+              <div class="grid grid-cols-2 gap-2.5" id="category-grid">
+                <label class="category-chip flex items-center gap-2.5 border border-gray-200 rounded-lg px-3.5 py-2.5 cursor-pointer">
+                  <input type="checkbox" value="Electronics" onchange="handleCategory()" class="cat-check w-4 h-4 rounded border-gray-300 text-brand-500 focus:ring-brand-400 accent-brand-500">
+                  <span class="text-sm text-gray-700">Electronics</span>
+                </label>
+                <label class="category-chip flex items-center gap-2.5 border border-gray-200 rounded-lg px-3.5 py-2.5 cursor-pointer">
+                  <input type="checkbox" value="Fashion" onchange="handleCategory()" class="cat-check w-4 h-4 rounded border-gray-300 text-brand-500 focus:ring-brand-400 accent-brand-500">
+                  <span class="text-sm text-gray-700">Fashion</span>
+                </label>
+                <label class="category-chip flex items-center gap-2.5 border border-gray-200 rounded-lg px-3.5 py-2.5 cursor-pointer">
+                  <input type="checkbox" value="Home & Living" onchange="handleCategory()" class="cat-check w-4 h-4 rounded border-gray-300 text-brand-500 focus:ring-brand-400 accent-brand-500">
+                  <span class="text-sm text-gray-700">Home & Living</span>
+                </label>
+                <label class="category-chip flex items-center gap-2.5 border border-gray-200 rounded-lg px-3.5 py-2.5 cursor-pointer">
+                  <input type="checkbox" value="Sports" onchange="handleCategory()" class="cat-check w-4 h-4 rounded border-gray-300 text-brand-500 focus:ring-brand-400 accent-brand-500">
+                  <span class="text-sm text-gray-700">Sports</span>
+                </label>
+                <label class="category-chip flex items-center gap-2.5 border border-gray-200 rounded-lg px-3.5 py-2.5 cursor-pointer">
+                  <input type="checkbox" value="Beauty" onchange="handleCategory()" class="cat-check w-4 h-4 rounded border-gray-300 text-brand-500 focus:ring-brand-400 accent-brand-500">
+                  <span class="text-sm text-gray-700">Beauty</span>
+                </label>
+                <label class="category-chip flex items-center gap-2.5 border border-gray-200 rounded-lg px-3.5 py-2.5 cursor-pointer">
+                  <input type="checkbox" value="Groceries" onchange="handleCategory()" class="cat-check w-4 h-4 rounded border-gray-300 text-brand-500 focus:ring-brand-400 accent-brand-500">
+                  <span class="text-sm text-gray-700">Groceries</span>
+                </label>
+                <label class="category-chip flex items-center gap-2.5 border border-gray-200 rounded-lg px-3.5 py-2.5 cursor-pointer">
+                  <input type="checkbox" value="Books" onchange="handleCategory()" class="cat-check w-4 h-4 rounded border-gray-300 text-brand-500 focus:ring-brand-400 accent-brand-500">
+                  <span class="text-sm text-gray-700">Books</span>
+                </label>
+                <label class="category-chip flex items-center gap-2.5 border border-gray-200 rounded-lg px-3.5 py-2.5 cursor-pointer">
+                  <input type="checkbox" value="Toys" onchange="handleCategory()" class="cat-check w-4 h-4 rounded border-gray-300 text-brand-500 focus:ring-brand-400 accent-brand-500">
+                  <span class="text-sm text-gray-700">Toys</span>
+                </label>
+                <label class="category-chip flex items-center gap-2.5 border border-gray-200 rounded-lg px-3.5 py-2.5 cursor-pointer">
+                  <input type="checkbox" value="Health" onchange="handleCategory()" class="cat-check w-4 h-4 rounded border-gray-300 text-brand-500 focus:ring-brand-400 accent-brand-500">
+                  <span class="text-sm text-gray-700">Health</span>
+                </label>
+                <label class="category-chip flex items-center gap-2.5 border border-gray-200 rounded-lg px-3.5 py-2.5 cursor-pointer">
+                  <input type="checkbox" value="Automotive" onchange="handleCategory()" class="cat-check w-4 h-4 rounded border-gray-300 text-brand-500 focus:ring-brand-400 accent-brand-500">
+                  <span class="text-sm text-gray-700">Automotive</span>
+                </label>
+              </div>
+              <p id="err-s3-cats" class="error-msg">Please select at least one category</p>
+            </div>
+
+            <!-- Product Description -->
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1.5">Tell us about your products</label>
+              <div class="input-field border border-gray-200 rounded-lg overflow-hidden bg-white">
+                <textarea id="s3-desc" rows="3" placeholder="Briefly describe the products you plan to sell on HomeBase..." class="w-full py-2.5 px-3.5 text-sm outline-none bg-transparent resize-none"></textarea>
+              </div>
+            </div>
+
+            <!-- Expected Monthly Orders -->
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1.5">Expected Monthly Orders</label>
+              <div class="input-field border border-gray-200 rounded-lg overflow-hidden bg-white">
+                <select id="s3-orders" class="w-full py-2.5 px-3.5 text-sm outline-none bg-transparent text-gray-700 appearance-none cursor-pointer" style="background-image: url('data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%2220%22 height=%2220%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22%239CA3AF%22 stroke-width=%221.5%22><path d=%22M19.5 8.25l-7.5 7.5-7.5-7.5%22/></svg>'); background-repeat: no-repeat; background-position: right 0.75rem center; background-size: 1.25rem;">
+                  <option value="">Select expected volume</option>
+                  <option value="1-50">1 - 50 orders</option>
+                  <option value="50-200">50 - 200 orders</option>
+                  <option value="200-500">200 - 500 orders</option>
+                  <option value="500+">500+ orders</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <!-- Step 3 Actions -->
+          <div class="flex justify-between mt-8">
+            <button onclick="goToStep(2)" class="btn-outline text-gray-700 font-semibold py-2.5 px-6 rounded-lg text-sm bg-white">
+              <svg class="w-4 h-4 inline mr-1 -mt-0.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18"/></svg>
+              Back
+            </button>
+            <button onclick="goToStep(4)" class="btn-brand text-white font-semibold py-2.5 px-8 rounded-lg text-sm">
+              Next
+              <svg class="w-4 h-4 inline ml-1 -mt-0.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3"/></svg>
+            </button>
+          </div>
+        </div>
+
+        <!-- ===== STEP 4: Review & Submit ===== -->
+        <div id="step-4" class="flex-1 hidden fade-in overflow-y-auto">
+          <h3 class="text-xl font-bold text-navy-900 mb-1">Review & Submit</h3>
+          <p class="text-sm text-gray-500 mb-6">Please review your details before submitting</p>
+
+          <!-- Review Summary -->
+          <div class="space-y-5">
+            <!-- Basic Info Summary -->
+            <div class="border border-gray-100 rounded-xl p-4 bg-gray-50/50">
+              <div class="flex items-center justify-between mb-3">
+                <h4 class="text-sm font-semibold text-navy-900 flex items-center gap-2">
+                  <svg class="w-4 h-4 text-brand-500" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z"/></svg>
+                  Basic Information
+                </h4>
+                <button onclick="goToStep(1)" class="text-xs text-brand-500 font-medium hover:text-brand-600 hover:underline">Edit</button>
+              </div>
+              <div class="grid grid-cols-2 gap-x-6 gap-y-2 text-sm">
+                <div><span class="text-gray-500">Name:</span> <span id="rev-name" class="font-medium text-gray-800"></span></div>
+                <div><span class="text-gray-500">Email:</span> <span id="rev-email" class="font-medium text-gray-800"></span></div>
+                <div><span class="text-gray-500">Phone:</span> <span id="rev-phone" class="font-medium text-gray-800"></span></div>
+              </div>
+            </div>
+
+            <!-- Business Details Summary -->
+            <div class="border border-gray-100 rounded-xl p-4 bg-gray-50/50">
+              <div class="flex items-center justify-between mb-3">
+                <h4 class="text-sm font-semibold text-navy-900 flex items-center gap-2">
+                  <svg class="w-4 h-4 text-brand-500" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M13.5 21v-7.5a.75.75 0 01.75-.75h3a.75.75 0 01.75.75V21m-4.5 0H2.36m11.14 0H18m0 0h3.64m-1.39 0V9.349m-16.5 11.65V9.35m0 0a3.001 3.001 0 003.75-.615A2.993 2.993 0 009.75 9.75c.896 0 1.7-.393 2.25-1.016a2.993 2.993 0 002.25 1.016c.896 0 1.7-.393 2.25-1.016a3.001 3.001 0 003.75.614m-16.5 0a3.004 3.004 0 01-.621-4.72L4.318 3.44A1.5 1.5 0 015.378 3h13.243a1.5 1.5 0 011.06.44l1.19 1.189a3 3 0 01-.621 4.72m-13.5 8.65h3.75a.75.75 0 00.75-.75V13.5a.75.75 0 00-.75-.75H6.75a.75.75 0 00-.75.75v3.15c0 .415.336.75.75.75z"/></svg>
+                  Business Details
+                </h4>
+                <button onclick="goToStep(2)" class="text-xs text-brand-500 font-medium hover:text-brand-600 hover:underline">Edit</button>
+              </div>
+              <div class="grid grid-cols-2 gap-x-6 gap-y-2 text-sm">
+                <div><span class="text-gray-500">Store:</span> <span id="rev-business" class="font-medium text-gray-800"></span></div>
+                <div><span class="text-gray-500">Type:</span> <span id="rev-type" class="font-medium text-gray-800"></span></div>
+                <div><span class="text-gray-500">GSTIN:</span> <span id="rev-gstin" class="font-medium text-gray-800"></span></div>
+                <div><span class="text-gray-500">PAN:</span> <span id="rev-pan" class="font-medium text-gray-800"></span></div>
+                <div class="col-span-2"><span class="text-gray-500">Address:</span> <span id="rev-address" class="font-medium text-gray-800"></span></div>
+              </div>
+            </div>
+
+            <!-- Categories Summary -->
+            <div class="border border-gray-100 rounded-xl p-4 bg-gray-50/50">
+              <div class="flex items-center justify-between mb-3">
+                <h4 class="text-sm font-semibold text-navy-900 flex items-center gap-2">
+                  <svg class="w-4 h-4 text-brand-500" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M9.568 3H5.25A2.25 2.25 0 003 5.25v4.318c0 .597.237 1.17.659 1.591l9.581 9.581c.699.699 1.78.872 2.607.33a18.095 18.095 0 005.223-5.223c.542-.827.369-1.908-.33-2.607L11.16 3.66A2.25 2.25 0 009.568 3z"/><path d="M6 6h.008v.008H6V6z"/></svg>
+                  Product Categories
+                </h4>
+                <button onclick="goToStep(3)" class="text-xs text-brand-500 font-medium hover:text-brand-600 hover:underline">Edit</button>
+              </div>
+              <div class="flex flex-wrap gap-2 mb-2" id="rev-cats"></div>
+              <div class="text-sm" id="rev-desc-row" style="display:none;"><span class="text-gray-500">Description:</span> <span id="rev-desc" class="font-medium text-gray-800"></span></div>
+              <div class="text-sm mt-1" id="rev-orders-row" style="display:none;"><span class="text-gray-500">Expected Orders:</span> <span id="rev-orders" class="font-medium text-gray-800"></span></div>
+            </div>
+          </div>
+
+          <!-- Terms & Conditions -->
+          <div class="flex items-start gap-2.5 mt-6 p-4 bg-brand-50 rounded-xl border border-brand-100">
+            <input type="checkbox" id="terms-checkbox" class="w-4 h-4 mt-0.5 rounded border-gray-300 text-brand-500 focus:ring-brand-400 accent-brand-500 cursor-pointer">
+            <label for="terms-checkbox" class="text-sm text-gray-700 leading-relaxed cursor-pointer">
+              I agree to the <a href="#" class="text-brand-500 font-medium hover:underline">HomeBase Seller Agreement</a>,
+              <a href="#" class="text-brand-500 font-medium hover:underline">Terms of Service</a>, and
+              <a href="#" class="text-brand-500 font-medium hover:underline">Privacy Policy</a>
+            </label>
+          </div>
+          <p id="err-s4-terms" class="error-msg">You must agree to the terms to proceed</p>
+
+          <!-- Step 4 Actions -->
+          <div class="flex justify-between mt-6">
+            <button onclick="goToStep(3)" class="btn-outline text-gray-700 font-semibold py-2.5 px-6 rounded-lg text-sm bg-white">
+              <svg class="w-4 h-4 inline mr-1 -mt-0.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18"/></svg>
+              Back
+            </button>
+            <button onclick="submitApplication()" class="btn-brand text-white font-semibold py-3 px-10 rounded-lg text-sm">
+              Submit Application
+              <svg class="w-4 h-4 inline ml-1 -mt-0.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M6 12L3.269 3.126A59.768 59.768 0 0121.485 12 59.77 59.77 0 013.27 20.876L5.999 12zm0 0h7.5"/></svg>
+            </button>
+          </div>
+        </div>
+
+        <!-- ===== SUCCESS STATE ===== -->
+        <div id="success-state" class="flex-1 hidden fade-in flex flex-col items-center justify-center text-center py-8">
+          <!-- Green Checkmark -->
+          <div class="success-bounce w-20 h-20 rounded-full bg-green-50 flex items-center justify-center mb-6">
+            <svg class="w-10 h-10 text-success" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+          </div>
+
+          <h3 class="text-2xl font-bold text-navy-900 mb-2">Application Submitted Successfully!</h3>
+          <p class="text-gray-500 mb-1">We'll review your application within <strong class="text-gray-700">48 hours</strong>.</p>
+          <p class="text-gray-500 mb-8">You'll receive an email at <strong id="success-email" class="text-brand-600"></strong> once approved.</p>
+
+          <!-- What happens next? -->
+          <div class="w-full max-w-md mx-auto mb-8">
+            <h4 class="text-sm font-semibold text-navy-900 mb-5">What happens next?</h4>
+            <div class="flex items-start gap-0">
+              <!-- Step 1: Review -->
+              <div class="flex flex-col items-center text-center flex-1">
+                <div class="w-10 h-10 rounded-full bg-brand-100 flex items-center justify-center mb-2">
+                  <svg class="w-5 h-5 text-brand-600" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m5.231 13.481L15 17.25m-4.5-15H5.625c-.621 0-1.125.504-1.125 1.125v16.5c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9zm3.75 11.625a2.625 2.625 0 11-5.25 0 2.625 2.625 0 015.25 0z"/></svg>
+                </div>
+                <p class="text-xs font-semibold text-gray-800">Review</p>
+                <p class="text-xs text-gray-400 mt-0.5">We verify details</p>
+              </div>
+              <div class="flex-shrink-0 w-8 h-0.5 bg-gray-200 mt-5"></div>
+              <!-- Step 2: Approval -->
+              <div class="flex flex-col items-center text-center flex-1">
+                <div class="w-10 h-10 rounded-full bg-brand-100 flex items-center justify-center mb-2">
+                  <svg class="w-5 h-5 text-brand-600" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                </div>
+                <p class="text-xs font-semibold text-gray-800">Approval</p>
+                <p class="text-xs text-gray-400 mt-0.5">Within 48 hours</p>
+              </div>
+              <div class="flex-shrink-0 w-8 h-0.5 bg-gray-200 mt-5"></div>
+              <!-- Step 3: Setup Store -->
+              <div class="flex flex-col items-center text-center flex-1">
+                <div class="w-10 h-10 rounded-full bg-brand-100 flex items-center justify-center mb-2">
+                  <svg class="w-5 h-5 text-brand-600" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M13.5 21v-7.5a.75.75 0 01.75-.75h3a.75.75 0 01.75.75V21m-4.5 0H2.36m11.14 0H18m0 0h3.64m-1.39 0V9.349m-16.5 11.65V9.35m0 0a3.001 3.001 0 003.75-.615A2.993 2.993 0 009.75 9.75c.896 0 1.7-.393 2.25-1.016a2.993 2.993 0 002.25 1.016c.896 0 1.7-.393 2.25-1.016a3.001 3.001 0 003.75.614m-16.5 0a3.004 3.004 0 01-.621-4.72L4.318 3.44A1.5 1.5 0 015.378 3h13.243a1.5 1.5 0 011.06.44l1.19 1.189a3 3 0 01-.621 4.72m-13.5 8.65h3.75a.75.75 0 00.75-.75V13.5a.75.75 0 00-.75-.75H6.75a.75.75 0 00-.75.75v3.15c0 .415.336.75.75.75z"/></svg>
+                </div>
+                <p class="text-xs font-semibold text-gray-800">Setup Store</p>
+                <p class="text-xs text-gray-400 mt-0.5">Add products</p>
+              </div>
+              <div class="flex-shrink-0 w-8 h-0.5 bg-gray-200 mt-5"></div>
+              <!-- Step 4: Go Live -->
+              <div class="flex flex-col items-center text-center flex-1">
+                <div class="w-10 h-10 rounded-full bg-brand-100 flex items-center justify-center mb-2">
+                  <svg class="w-5 h-5 text-brand-600" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M15.59 14.37a6 6 0 01-5.84 7.38v-4.8m5.84-2.58a14.98 14.98 0 006.16-12.12A14.98 14.98 0 009.631 8.41m5.96 5.96a14.926 14.926 0 01-5.841 2.58m-.119-8.54a6 6 0 00-7.381 5.84h4.8m2.581-5.84a14.927 14.927 0 00-2.58 5.84m2.699 2.7c-.103.021-.207.041-.311.06a15.09 15.09 0 01-2.448-2.448 14.9 14.9 0 01.06-.312m-2.24 2.39a4.493 4.493 0 00-1.757 4.306 4.493 4.493 0 004.306-1.758M16.5 9a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0z"/></svg>
+                </div>
+                <p class="text-xs font-semibold text-gray-800">Go Live</p>
+                <p class="text-xs text-gray-400 mt-0.5">Start selling!</p>
+              </div>
+            </div>
+          </div>
+
+          <a href="../customer/storefront.html" class="btn-brand inline-flex items-center gap-2 text-white font-semibold py-2.5 px-8 rounded-lg text-sm">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-4 0a1 1 0 01-1-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 01-1 1"/></svg>
+            Back to HomeBase
+          </a>
+        </div>
+
+      </div><!-- /right panel -->
+    </div><!-- /card -->
+  </main>
+
+  <!-- ===== JAVASCRIPT ===== -->
+  <script>
+    // ── State ──
+    let currentStep = 1;
+
+    // ── Step Navigation ──
+    function goToStep(target) {
+      // Validate current step before moving forward
+      if (target > currentStep && !validateStep(currentStep)) return;
+
+      // If going to step 4, populate review
+      if (target === 4) populateReview();
+
+      // Hide current step
+      document.getElementById('step-' + currentStep).classList.add('hidden');
+      // Show target step
+      const targetEl = document.getElementById('step-' + target);
+      targetEl.classList.remove('hidden');
+      // Re-trigger animation
+      targetEl.classList.remove('fade-in');
+      void targetEl.offsetWidth;
+      targetEl.classList.add('fade-in');
+
+      // Update step indicator
+      updateStepIndicator(target);
+      currentStep = target;
+
+      // Scroll to top of form
+      targetEl.scrollTop = 0;
+    }
+
+    function updateStepIndicator(active) {
+      for (let i = 1; i <= 4; i++) {
+        const dot = document.getElementById('dot-' + i);
+        const label = document.getElementById('label-' + i);
+        const line = document.getElementById('line-' + i);
+
+        if (i < active) {
+          // Completed
+          dot.className = 'step-dot w-8 h-8 rounded-full bg-success text-white flex items-center justify-center text-xs font-bold';
+          dot.innerHTML = '<svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5"/></svg>';
+          if (label) { label.className = 'text-xs font-semibold text-success hidden sm:inline'; }
+          if (line) { line.className = 'flex-1 h-0.5 bg-success mx-2'; }
+        } else if (i === active) {
+          // Active
+          dot.className = 'step-dot w-8 h-8 rounded-full bg-brand-500 text-white flex items-center justify-center text-xs font-bold';
+          dot.textContent = i;
+          if (label) { label.className = 'text-xs font-semibold text-brand-600 hidden sm:inline'; }
+          if (line) { line.className = 'flex-1 h-0.5 bg-gray-200 mx-2'; }
+        } else {
+          // Upcoming
+          dot.className = 'step-dot w-8 h-8 rounded-full bg-gray-200 text-gray-500 flex items-center justify-center text-xs font-bold';
+          dot.textContent = i;
+          if (label) { label.className = 'text-xs font-medium text-gray-400 hidden sm:inline'; }
+          if (line) { line.className = 'flex-1 h-0.5 bg-gray-200 mx-2'; }
+        }
+      }
+    }
+
+    // ── Validation ──
+    function validateStep(step) {
+      clearErrors();
+      let valid = true;
+
+      if (step === 1) {
+        const name = document.getElementById('s1-name').value.trim();
+        const email = document.getElementById('s1-email').value.trim();
+        const phone = document.getElementById('s1-phone').value.trim();
+        const password = document.getElementById('s1-password').value;
+        const confirm = document.getElementById('s1-confirm').value;
+
+        if (!name) { showError('err-s1-name', 's1-name'); valid = false; }
+        if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { showError('err-s1-email', 's1-email'); valid = false; }
+        if (!phone || !/^\d{10}$/.test(phone)) { showError('err-s1-phone', 's1-phone'); valid = false; }
+        if (!password || password.length < 8) { showError('err-s1-password', 's1-password'); valid = false; }
+        if (password !== confirm) { showError('err-s1-confirm', 's1-confirm'); valid = false; }
+      }
+
+      if (step === 2) {
+        const business = document.getElementById('s2-business').value.trim();
+        const type = document.getElementById('s2-type').value;
+        const noGstin = document.getElementById('no-gstin').checked;
+        const gstin = document.getElementById('s2-gstin').value.trim();
+        const pan = document.getElementById('s2-pan').value.trim();
+        const addr1 = document.getElementById('s2-addr1').value.trim();
+        const city = document.getElementById('s2-city').value.trim();
+        const state = document.getElementById('s2-state').value;
+        const pin = document.getElementById('s2-pin').value.trim();
+
+        if (!business) { showError('err-s2-business', 's2-business'); valid = false; }
+        if (!type) { showError('err-s2-type', 's2-type'); valid = false; }
+        if (!noGstin && gstin && !/^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}$/.test(gstin.toUpperCase())) {
+          showError('err-s2-gstin', 's2-gstin'); valid = false;
+        }
+        if (!pan || !/^[A-Z]{5}[0-9]{4}[A-Z]{1}$/.test(pan.toUpperCase())) { showError('err-s2-pan', 's2-pan'); valid = false; }
+        if (!addr1 || !city || !state || !pin || !/^\d{6}$/.test(pin)) { showError('err-s2-addr'); valid = false; }
+      }
+
+      if (step === 3) {
+        const checked = document.querySelectorAll('.cat-check:checked');
+        if (checked.length === 0) { showError('err-s3-cats'); valid = false; }
+      }
+
+      return valid;
+    }
+
+    function showError(errId, inputId) {
+      const err = document.getElementById(errId);
+      if (err) err.classList.add('visible');
+      if (inputId) {
+        const input = document.getElementById(inputId);
+        if (input) input.closest('.input-field, .border')?.classList.add('input-error');
+      }
+    }
+
+    function clearErrors() {
+      document.querySelectorAll('.error-msg').forEach(el => el.classList.remove('visible'));
+      document.querySelectorAll('.input-error').forEach(el => el.classList.remove('input-error'));
+    }
+
+    // ── Password Strength ──
+    function checkPasswordStrength(value) {
+      const container = document.getElementById('strength-container');
+      const bar1 = document.getElementById('strength-bar-1');
+      const bar2 = document.getElementById('strength-bar-2');
+      const bar3 = document.getElementById('strength-bar-3');
+      const label = document.getElementById('strength-label');
+
+      if (!value) { container.classList.add('hidden'); return; }
+      container.classList.remove('hidden');
+
+      let score = 0;
+      if (value.length >= 8) score++;
+      if (/[A-Z]/.test(value) && /[a-z]/.test(value)) score++;
+      if (/[0-9]/.test(value) && /[^A-Za-z0-9]/.test(value)) score++;
+
+      const colors = ['#DC2626', '#EAB308', '#16A34A'];
+      const labels = ['Weak', 'Medium', 'Strong'];
+
+      bar1.style.width = score >= 1 ? '100%' : '0';
+      bar1.style.backgroundColor = colors[score - 1] || '#DC2626';
+      bar2.style.width = score >= 2 ? '100%' : '0';
+      bar2.style.backgroundColor = colors[score - 1] || '#DC2626';
+      bar3.style.width = score >= 3 ? '100%' : '0';
+      bar3.style.backgroundColor = colors[score - 1] || '#DC2626';
+
+      label.textContent = labels[score - 1] || 'Too short';
+      label.style.color = colors[score - 1] || '#DC2626';
+    }
+
+    function checkPasswordMatch() {
+      const pw = document.getElementById('s1-password').value;
+      const confirm = document.getElementById('s1-confirm').value;
+      const msg = document.getElementById('password-match-msg');
+
+      if (!confirm) { msg.classList.add('hidden'); return; }
+
+      msg.classList.remove('hidden');
+      if (pw === confirm) {
+        msg.textContent = 'Passwords match';
+        msg.className = 'text-xs mt-1 text-success font-medium';
+      } else {
+        msg.textContent = 'Passwords do not match';
+        msg.className = 'text-xs mt-1 text-danger font-medium';
+      }
+    }
+
+    // ── Toggle Password Visibility ──
+    function togglePassword(inputId, eyeId) {
+      const input = document.getElementById(inputId);
+      const eye = document.getElementById(eyeId);
+      if (input.type === 'password') {
+        input.type = 'text';
+        eye.innerHTML = '<path d="M3.98 8.223A10.477 10.477 0 001.934 12C3.226 16.338 7.244 19.5 12 19.5c.993 0 1.953-.138 2.863-.395M6.228 6.228A10.45 10.45 0 0112 4.5c4.756 0 8.773 3.162 10.065 7.498a10.523 10.523 0 01-4.293 5.774M6.228 6.228L3 3m3.228 3.228l3.65 3.65m7.894 7.894L21 21m-3.228-3.228l-3.65-3.65m0 0a3 3 0 10-4.243-4.243m4.242 4.242L9.88 9.88"/>';
+      } else {
+        input.type = 'password';
+        eye.innerHTML = '<path d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z"/><path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>';
+      }
+    }
+
+    // ── GSTIN Toggle ──
+    function toggleGstin() {
+      const field = document.getElementById('gstin-field');
+      const input = document.getElementById('s2-gstin');
+      const checked = document.getElementById('no-gstin').checked;
+      if (checked) {
+        field.classList.add('opacity-50', 'pointer-events-none');
+        input.value = '';
+      } else {
+        field.classList.remove('opacity-50', 'pointer-events-none');
+      }
+    }
+
+    // ── Category Handling ──
+    function handleCategory() {
+      const checks = document.querySelectorAll('.cat-check');
+      const checked = document.querySelectorAll('.cat-check:checked');
+      const countEl = document.getElementById('cat-count');
+
+      countEl.textContent = '(' + checked.length + '/3 selected)';
+
+      // Enforce max 3
+      checks.forEach(cb => {
+        const chip = cb.closest('.category-chip');
+        if (checked.length >= 3 && !cb.checked) {
+          cb.disabled = true;
+          chip.classList.add('opacity-50', 'cursor-not-allowed');
+        } else {
+          cb.disabled = false;
+          chip.classList.remove('opacity-50', 'cursor-not-allowed');
+        }
+        // Toggle selected style
+        if (cb.checked) {
+          chip.classList.add('selected');
+        } else {
+          chip.classList.remove('selected');
+        }
+      });
+    }
+
+    // ── Populate Review ──
+    function populateReview() {
+      // Basic info
+      document.getElementById('rev-name').textContent = document.getElementById('s1-name').value.trim();
+      document.getElementById('rev-email').textContent = document.getElementById('s1-email').value.trim();
+      document.getElementById('rev-phone').textContent = '+91 ' + document.getElementById('s1-phone').value.trim();
+
+      // Business details
+      document.getElementById('rev-business').textContent = document.getElementById('s2-business').value.trim();
+      const typeSelect = document.getElementById('s2-type');
+      document.getElementById('rev-type').textContent = typeSelect.options[typeSelect.selectedIndex]?.text || '-';
+      const noGstin = document.getElementById('no-gstin').checked;
+      document.getElementById('rev-gstin').textContent = noGstin ? 'Not available' : (document.getElementById('s2-gstin').value.trim().toUpperCase() || '-');
+      document.getElementById('rev-pan').textContent = document.getElementById('s2-pan').value.trim().toUpperCase();
+
+      // Address
+      const parts = [
+        document.getElementById('s2-addr1').value.trim(),
+        document.getElementById('s2-addr2').value.trim(),
+        document.getElementById('s2-city').value.trim(),
+        document.getElementById('s2-state').value,
+        document.getElementById('s2-pin').value.trim()
+      ].filter(Boolean);
+      document.getElementById('rev-address').textContent = parts.join(', ');
+
+      // Categories
+      const catsEl = document.getElementById('rev-cats');
+      catsEl.innerHTML = '';
+      document.querySelectorAll('.cat-check:checked').forEach(cb => {
+        const tag = document.createElement('span');
+        tag.className = 'inline-block px-3 py-1 bg-brand-50 text-brand-700 text-xs font-medium rounded-full border border-brand-200';
+        tag.textContent = cb.value;
+        catsEl.appendChild(tag);
+      });
+
+      // Description
+      const desc = document.getElementById('s3-desc').value.trim();
+      const descRow = document.getElementById('rev-desc-row');
+      if (desc) { descRow.style.display = 'block'; document.getElementById('rev-desc').textContent = desc; }
+      else { descRow.style.display = 'none'; }
+
+      // Orders
+      const ordersSelect = document.getElementById('s3-orders');
+      const ordersRow = document.getElementById('rev-orders-row');
+      if (ordersSelect.value) {
+        ordersRow.style.display = 'block';
+        document.getElementById('rev-orders').textContent = ordersSelect.options[ordersSelect.selectedIndex].text;
+      } else { ordersRow.style.display = 'none'; }
+    }
+
+    // ── Submit Application ──
+    function submitApplication() {
+      clearErrors();
+      const terms = document.getElementById('terms-checkbox');
+      if (!terms.checked) {
+        showError('err-s4-terms');
+        return;
+      }
+
+      // Hide step indicator and step 4, show success
+      document.getElementById('step-indicator').classList.add('hidden');
+      document.getElementById('step-4').classList.add('hidden');
+      const success = document.getElementById('success-state');
+      success.classList.remove('hidden');
+      success.classList.remove('fade-in');
+      void success.offsetWidth;
+      success.classList.add('fade-in');
+
+      // Set email in success
+      document.getElementById('success-email').textContent = document.getElementById('s1-email').value.trim();
+    }
+
+    // ===== PRE-FILL FROM INVITE LINK =====
+    // URL: seller-register.html?invite=true&email=rajesh@store.com&business=Rajesh+Electronics&category=Electronics
+    (function() {
+      var params = new URLSearchParams(window.location.search);
+      if (params.get('invite')) {
+        // Show invite banner
+        var banner = document.createElement('div');
+        banner.className = 'bg-green-50 border border-green-200 rounded-xl p-4 mb-6 flex items-center gap-3';
+        banner.innerHTML = '<div class="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center shrink-0"><svg class="w-4 h-4 text-green-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4.5 12.75l6 6 9-13.5"/></svg></div>' +
+          '<div><p class="text-sm font-semibold text-green-800">You\'ve been invited to sell on HomeBase!</p>' +
+          '<p class="text-xs text-green-600">Complete the form below to set up your seller account. Your application will be fast-tracked.</p></div>';
+        var formArea = document.querySelector('.space-y-6') || document.querySelector('form') || document.getElementById('step-1');
+        if (formArea) formArea.parentNode.insertBefore(banner, formArea);
+
+        // Pre-fill email
+        if (params.get('email')) {
+          var emailField = document.getElementById('s1-email');
+          if (emailField) {
+            emailField.value = params.get('email');
+            emailField.readOnly = true;
+            emailField.classList.add('bg-gray-100');
+          }
+        }
+        // Pre-fill business name in step 2
+        if (params.get('business')) {
+          var bizField = document.getElementById('s2-business') || document.querySelector('input[placeholder*="store"]') || document.querySelector('input[placeholder*="Store"]') || document.querySelector('input[placeholder*="business"]');
+          if (bizField) bizField.value = decodeURIComponent(params.get('business'));
+        }
+        // Pre-select category in step 3
+        if (params.get('category')) {
+          setTimeout(function() {
+            var cats = document.querySelectorAll('.category-option, [data-category]');
+            cats.forEach(function(c) {
+              if (c.textContent.trim().includes(params.get('category'))) {
+                c.click();
+              }
+            });
+          }, 500);
+        }
+      }
+    })();
+  </script>
+</body>
+</html>

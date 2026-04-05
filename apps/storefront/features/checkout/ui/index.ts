@@ -1,5 +1,10 @@
 export { CheckoutPage } from './checkout-page';
 export { CheckoutProgress } from './checkout-progress';
+export { CheckoutStepIndicator } from './checkout-step-indicator';
+export { CheckoutAddressSection } from './checkout-address-section';
+export { CheckoutShippingSection } from './checkout-shipping-section';
+export { CheckoutPaymentSection } from './checkout-payment-section';
+export { CheckoutOrderSummary } from './checkout-order-summary';
 export { AddressStep } from './address-step';
 export { PaymentStep } from './payment-step';
 export { ReviewStep } from './review-step';

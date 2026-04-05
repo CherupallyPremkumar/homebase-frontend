@@ -1,0 +1,657 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HomeBase — Seller Returns</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              50: '#FFF7ED',
+              100: '#FFEDD5',
+              200: '#FED7AA',
+              300: '#FDBA74',
+              400: '#FB923C',
+              500: '#F97316',
+              600: '#EA580C',
+              700: '#C2410C',
+            },
+            navy: {
+              700: '#1E3A5F',
+              800: '#1A2E4A',
+              900: '#0F1B2D',
+            },
+            success: '#16A34A',
+            warning: '#EAB308',
+            danger: '#DC2626',
+          },
+          fontFamily: {
+            sans: ['Inter', 'system-ui', 'sans-serif'],
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+    .scrollbar-hide::-webkit-scrollbar { display: none; }
+    .sidebar-link { transition: all 0.15s ease; }
+    .sidebar-link:hover { background: rgba(255,255,255,0.08); }
+    .sidebar-link.active { background: rgba(249,115,22,0.15); border-right: 3px solid #F97316; }
+    .stat-card { transition: all 0.2s ease; }
+    .stat-card:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,0.08); }
+    .table-row { transition: background 0.15s ease; }
+    .table-row:hover { background: #FFF7ED; }
+    .filter-tab { transition: all 0.15s ease; }
+    .filter-tab.active { background: #F97316; color: white; }
+    .filter-tab:not(.active):hover { background: #F3F4F6; }
+    .dropdown-menu { display: none; }
+    .dropdown:hover .dropdown-menu { display: block; }
+
+    /* Custom scrollbar for sidebar */
+    .sidebar-scroll::-webkit-scrollbar { width: 4px; }
+    .sidebar-scroll::-webkit-scrollbar-track { background: transparent; }
+    .sidebar-scroll::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); border-radius: 2px; }
+  </style>
+</head>
+<body class="font-sans bg-gray-50 text-gray-900">
+
+  <!-- ===== TOP HEADER BAR ===== -->
+  <header id="seller-header" class="fixed top-0 left-0 right-0 z-50 bg-white border-b border-gray-200 h-16"></header>
+
+  <!-- ===== LAYOUT: SIDEBAR + MAIN ===== -->
+  <div class="flex pt-16 min-h-screen">
+
+    <!-- ===== LEFT SIDEBAR ===== -->
+    <aside id="seller-sidebar" class="fixed left-0 top-16 bottom-0 w-60 z-40 flex flex-col overflow-y-auto" style="background:#0F1B2D;"></aside>
+
+    <!-- ===== MAIN CONTENT ===== -->
+    <main class="flex-1 ml-60 p-6">
+
+      <!-- Page Header -->
+      <div class="flex items-center justify-between mb-6">
+        <div>
+          <h1 class="text-2xl font-bold text-navy-900">Returns Management</h1>
+          <p class="text-sm text-gray-400 mt-1">Track and manage customer return requests</p>
+        </div>
+        <button class="flex items-center gap-2 bg-white border border-gray-200 text-gray-700 text-sm font-medium px-4 py-2.5 rounded-lg hover:bg-gray-50 transition shadow-sm">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3"/></svg>
+          Export
+        </button>
+      </div>
+
+      <!-- Stats Cards -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 mb-6">
+        <!-- Total Returns -->
+        <div class="stat-card bg-white rounded-xl p-4 border border-gray-100 shadow-sm">
+          <div class="flex items-center justify-between mb-2">
+            <div class="w-9 h-9 rounded-lg bg-blue-50 flex items-center justify-center">
+              <svg class="w-4.5 h-4.5 text-blue-500" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M9 15L3 9m0 0l6-6M3 9h12a6 6 0 010 12h-3"/></svg>
+            </div>
+          </div>
+          <p class="text-2xl font-bold text-navy-900">8</p>
+          <p class="text-xs text-gray-400 mt-0.5">Total Returns</p>
+        </div>
+
+        <!-- Pending Approval -->
+        <div class="stat-card bg-white rounded-xl p-4 border border-gray-100 shadow-sm">
+          <div class="flex items-center justify-between mb-2">
+            <div class="w-9 h-9 rounded-lg bg-yellow-50 flex items-center justify-center">
+              <svg class="w-4.5 h-4.5 text-yellow-500" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+            </div>
+          </div>
+          <p class="text-2xl font-bold text-navy-900">3</p>
+          <p class="text-xs text-gray-400 mt-0.5">Pending Approval</p>
+        </div>
+
+        <!-- Pickup Scheduled -->
+        <div class="stat-card bg-white rounded-xl p-4 border border-gray-100 shadow-sm">
+          <div class="flex items-center justify-between mb-2">
+            <div class="w-9 h-9 rounded-lg bg-purple-50 flex items-center justify-center">
+              <svg class="w-4.5 h-4.5 text-purple-500" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M8.25 18.75a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m3 0h6m-9 0H3.375a1.125 1.125 0 01-1.125-1.125V14.25m17.25 4.5a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m3 0h1.125c.621 0 1.129-.504 1.09-1.124a17.902 17.902 0 00-3.213-9.193 2.056 2.056 0 00-1.58-.86H14.25M16.5 18.75h-2.25m0-11.177v-.958c0-.568-.422-1.048-.987-1.106a48.554 48.554 0 00-10.026 0 1.106 1.106 0 00-.987 1.106v7.635m12-6.677v6.677m0 4.5v-4.5m0 0h-12"/></svg>
+            </div>
+          </div>
+          <p class="text-2xl font-bold text-navy-900">2</p>
+          <p class="text-xs text-gray-400 mt-0.5">Pickup Scheduled</p>
+        </div>
+
+        <!-- Refund Processing -->
+        <div class="stat-card bg-white rounded-xl p-4 border border-gray-100 shadow-sm">
+          <div class="flex items-center justify-between mb-2">
+            <div class="w-9 h-9 rounded-lg bg-brand-50 flex items-center justify-center">
+              <svg class="w-4.5 h-4.5 text-brand-500" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M2.25 18.75a60.07 60.07 0 0115.797 2.101c.727.198 1.453-.342 1.453-1.096V18.75M3.75 4.5v.75A.75.75 0 013 6h-.75m0 0v-.375c0-.621.504-1.125 1.125-1.125H20.25M2.25 6v9m18-10.5v.75c0 .414.336.75.75.75h.75m-1.5-1.5h.375c.621 0 1.125.504 1.125 1.125v9.75c0 .621-.504 1.125-1.125 1.125h-.375m1.5-1.5H21a.75.75 0 00-.75.75v.75m0 0H3.75m0 0h-.375a1.125 1.125 0 01-1.125-1.125V15m1.5 1.5v-.75A.75.75 0 003 15h-.75M15 10.5a3 3 0 11-6 0 3 3 0 016 0zm3 0h.008v.008H18V10.5zm-12 0h.008v.008H6V10.5z"/></svg>
+            </div>
+          </div>
+          <p class="text-2xl font-bold text-navy-900">2</p>
+          <p class="text-xs text-gray-400 mt-0.5">Refund Processing</p>
+        </div>
+
+        <!-- Completed -->
+        <div class="stat-card bg-white rounded-xl p-4 border border-gray-100 shadow-sm">
+          <div class="flex items-center justify-between mb-2">
+            <div class="w-9 h-9 rounded-lg bg-green-50 flex items-center justify-center">
+              <svg class="w-4.5 h-4.5 text-green-500" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+            </div>
+          </div>
+          <p class="text-2xl font-bold text-navy-900">1</p>
+          <p class="text-xs text-gray-400 mt-0.5">Completed</p>
+        </div>
+      </div>
+
+      <!-- Filter Tabs + Returns Table -->
+      <div class="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden mb-6">
+        <!-- Filter Tabs -->
+        <div class="flex items-center gap-2 p-4 border-b border-gray-100 overflow-x-auto scrollbar-hide">
+          <button class="filter-tab active text-xs font-medium px-4 py-2 rounded-lg whitespace-nowrap">All (8)</button>
+          <button class="filter-tab text-xs font-medium px-4 py-2 rounded-lg text-gray-500 whitespace-nowrap">Pending (3)</button>
+          <button class="filter-tab text-xs font-medium px-4 py-2 rounded-lg text-gray-500 whitespace-nowrap">Approved (2)</button>
+          <button class="filter-tab text-xs font-medium px-4 py-2 rounded-lg text-gray-500 whitespace-nowrap">In Transit (1)</button>
+          <button class="filter-tab text-xs font-medium px-4 py-2 rounded-lg text-gray-500 whitespace-nowrap">Received (1)</button>
+          <button class="filter-tab text-xs font-medium px-4 py-2 rounded-lg text-gray-500 whitespace-nowrap">Refunded (1)</button>
+          <button class="filter-tab text-xs font-medium px-4 py-2 rounded-lg text-gray-500 whitespace-nowrap">Rejected (0)</button>
+          <div class="ml-auto relative shrink-0">
+            <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+            <input type="text" placeholder="Search returns..." class="bg-gray-50 border border-gray-200 rounded-lg py-2 pl-9 pr-3 text-sm outline-none focus:border-brand-400 focus:ring-2 focus:ring-brand-100 transition w-48">
+          </div>
+        </div>
+
+        <!-- Table -->
+        <div class="overflow-x-auto">
+          <table class="w-full text-sm">
+            <thead>
+              <tr class="bg-gray-50 text-left">
+                <th class="px-4 py-3 text-[11px] font-semibold text-gray-500 uppercase tracking-wider">Return ID</th>
+                <th class="px-4 py-3 text-[11px] font-semibold text-gray-500 uppercase tracking-wider">Order ID</th>
+                <th class="px-4 py-3 text-[11px] font-semibold text-gray-500 uppercase tracking-wider">Customer</th>
+                <th class="px-4 py-3 text-[11px] font-semibold text-gray-500 uppercase tracking-wider">Product</th>
+                <th class="px-4 py-3 text-[11px] font-semibold text-gray-500 uppercase tracking-wider">Reason</th>
+                <th class="px-4 py-3 text-[11px] font-semibold text-gray-500 uppercase tracking-wider">Refund (&#8377;)</th>
+                <th class="px-4 py-3 text-[11px] font-semibold text-gray-500 uppercase tracking-wider">Status</th>
+                <th class="px-4 py-3 text-[11px] font-semibold text-gray-500 uppercase tracking-wider">Date</th>
+                <th class="px-4 py-3 text-[11px] font-semibold text-gray-500 uppercase tracking-wider">Actions</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-100">
+              <!-- Row 1 -->
+              <tr class="table-row" data-returnid="#RTN-4501" data-orderid="#ORD-8821" data-customer="Ananya Sharma" data-email="ananya@email.com" data-product="Cotton Kurta Set" data-reason="Size mismatch" data-refund="1,299" data-status="Pending" data-date="27 Mar 2026">
+                <td class="px-4 py-3.5 font-mono text-xs font-semibold text-brand-600">#RTN-4501</td>
+                <td class="px-4 py-3.5 font-mono text-xs text-gray-600">#ORD-8821</td>
+                <td class="px-4 py-3.5">
+                  <p class="font-medium text-gray-800">Ananya Sharma</p>
+                  <p class="text-[11px] text-gray-400">ananya@email.com</p>
+                </td>
+                <td class="px-4 py-3.5">
+                  <div class="flex items-center gap-2">
+                    <span class="text-lg">&#128090;</span>
+                    <span class="text-gray-700">Cotton Kurta Set</span>
+                  </div>
+                </td>
+                <td class="px-4 py-3.5 text-gray-600">Size mismatch</td>
+                <td class="px-4 py-3.5 font-semibold text-gray-800">&#8377;1,299</td>
+                <td class="px-4 py-3.5">
+                  <span class="inline-flex items-center gap-1 text-[11px] font-semibold bg-yellow-50 text-yellow-700 px-2.5 py-1 rounded-full">
+                    <span class="w-1.5 h-1.5 rounded-full bg-yellow-500"></span>
+                    Pending
+                  </span>
+                </td>
+                <td class="px-4 py-3.5 text-gray-500 text-xs">27 Mar 2026</td>
+                <td class="px-4 py-3.5">
+                  <div class="flex items-center gap-1">
+                    <button onclick="viewReturn(this)" class="p-1.5 text-gray-400 hover:text-brand-500 hover:bg-brand-50 rounded-lg transition" title="View Details">
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z"/><path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                    </button>
+                    <button onclick="showMoreMenu(event, this)" class="p-1.5 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition" title="More">
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M12 6.75a.75.75 0 110-1.5.75.75 0 010 1.5zM12 12.75a.75.75 0 110-1.5.75.75 0 010 1.5zM12 18.75a.75.75 0 110-1.5.75.75 0 010 1.5z"/></svg>
+                    </button>
+                  </div>
+                </td>
+              </tr>
+
+              <!-- Row 2 -->
+              <tr class="table-row" data-returnid="#RTN-4502" data-orderid="#ORD-8793" data-customer="Vikram Patel" data-email="vikram.p@email.com" data-product="Wireless Keyboard" data-reason="Defective keys" data-refund="2,499" data-status="Approved" data-date="26 Mar 2026">
+                <td class="px-4 py-3.5 font-mono text-xs font-semibold text-brand-600">#RTN-4502</td>
+                <td class="px-4 py-3.5 font-mono text-xs text-gray-600">#ORD-8793</td>
+                <td class="px-4 py-3.5">
+                  <p class="font-medium text-gray-800">Vikram Patel</p>
+                  <p class="text-[11px] text-gray-400">vikram.p@email.com</p>
+                </td>
+                <td class="px-4 py-3.5">
+                  <div class="flex items-center gap-2">
+                    <span class="text-lg">&#128187;</span>
+                    <span class="text-gray-700">Wireless Keyboard</span>
+                  </div>
+                </td>
+                <td class="px-4 py-3.5 text-gray-600">Defective keys</td>
+                <td class="px-4 py-3.5 font-semibold text-gray-800">&#8377;2,499</td>
+                <td class="px-4 py-3.5">
+                  <span class="inline-flex items-center gap-1 text-[11px] font-semibold bg-blue-50 text-blue-700 px-2.5 py-1 rounded-full">
+                    <span class="w-1.5 h-1.5 rounded-full bg-blue-500"></span>
+                    Approved
+                  </span>
+                </td>
+                <td class="px-4 py-3.5 text-gray-500 text-xs">26 Mar 2026</td>
+                <td class="px-4 py-3.5">
+                  <div class="flex items-center gap-1">
+                    <button onclick="viewReturn(this)" class="p-1.5 text-gray-400 hover:text-brand-500 hover:bg-brand-50 rounded-lg transition" title="View Details">
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z"/><path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                    </button>
+                    <button onclick="showMoreMenu(event, this)" class="p-1.5 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition" title="More">
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M12 6.75a.75.75 0 110-1.5.75.75 0 010 1.5zM12 12.75a.75.75 0 110-1.5.75.75 0 010 1.5zM12 18.75a.75.75 0 110-1.5.75.75 0 010 1.5z"/></svg>
+                    </button>
+                  </div>
+                </td>
+              </tr>
+
+              <!-- Row 3 -->
+              <tr class="table-row" data-returnid="#RTN-4503" data-orderid="#ORD-8756" data-customer="Priya Menon" data-email="priya.m@email.com" data-product="Silk Saree (Blue)" data-reason="Color different from image" data-refund="4,599" data-status="Pending" data-date="25 Mar 2026">
+                <td class="px-4 py-3.5 font-mono text-xs font-semibold text-brand-600">#RTN-4503</td>
+                <td class="px-4 py-3.5 font-mono text-xs text-gray-600">#ORD-8756</td>
+                <td class="px-4 py-3.5">
+                  <p class="font-medium text-gray-800">Priya Menon</p>
+                  <p class="text-[11px] text-gray-400">priya.m@email.com</p>
+                </td>
+                <td class="px-4 py-3.5">
+                  <div class="flex items-center gap-2">
+                    <span class="text-lg">&#127891;</span>
+                    <span class="text-gray-700">Silk Saree (Blue)</span>
+                  </div>
+                </td>
+                <td class="px-4 py-3.5 text-gray-600">Color different from image</td>
+                <td class="px-4 py-3.5 font-semibold text-gray-800">&#8377;4,599</td>
+                <td class="px-4 py-3.5">
+                  <span class="inline-flex items-center gap-1 text-[11px] font-semibold bg-yellow-50 text-yellow-700 px-2.5 py-1 rounded-full">
+                    <span class="w-1.5 h-1.5 rounded-full bg-yellow-500"></span>
+                    Pending
+                  </span>
+                </td>
+                <td class="px-4 py-3.5 text-gray-500 text-xs">25 Mar 2026</td>
+                <td class="px-4 py-3.5">
+                  <div class="flex items-center gap-1">
+                    <button onclick="viewReturn(this)" class="p-1.5 text-gray-400 hover:text-brand-500 hover:bg-brand-50 rounded-lg transition" title="View Details">
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z"/><path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                    </button>
+                    <button onclick="showMoreMenu(event, this)" class="p-1.5 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition" title="More">
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M12 6.75a.75.75 0 110-1.5.75.75 0 010 1.5zM12 12.75a.75.75 0 110-1.5.75.75 0 010 1.5zM12 18.75a.75.75 0 110-1.5.75.75 0 010 1.5z"/></svg>
+                    </button>
+                  </div>
+                </td>
+              </tr>
+
+              <!-- Row 4 -->
+              <tr class="table-row" data-returnid="#RTN-4504" data-orderid="#ORD-8701" data-customer="Rahul Gupta" data-email="rahul.g@email.com" data-product="Running Shoes (42)" data-reason="Wrong item delivered" data-refund="3,899" data-status="In Transit" data-date="24 Mar 2026">
+                <td class="px-4 py-3.5 font-mono text-xs font-semibold text-brand-600">#RTN-4504</td>
+                <td class="px-4 py-3.5 font-mono text-xs text-gray-600">#ORD-8701</td>
+                <td class="px-4 py-3.5">
+                  <p class="font-medium text-gray-800">Rahul Gupta</p>
+                  <p class="text-[11px] text-gray-400">rahul.g@email.com</p>
+                </td>
+                <td class="px-4 py-3.5">
+                  <div class="flex items-center gap-2">
+                    <span class="text-lg">&#128095;</span>
+                    <span class="text-gray-700">Running Shoes (42)</span>
+                  </div>
+                </td>
+                <td class="px-4 py-3.5 text-gray-600">Wrong item delivered</td>
+                <td class="px-4 py-3.5 font-semibold text-gray-800">&#8377;3,899</td>
+                <td class="px-4 py-3.5">
+                  <span class="inline-flex items-center gap-1 text-[11px] font-semibold bg-purple-50 text-purple-700 px-2.5 py-1 rounded-full">
+                    <span class="w-1.5 h-1.5 rounded-full bg-purple-500"></span>
+                    In Transit
+                  </span>
+                </td>
+                <td class="px-4 py-3.5 text-gray-500 text-xs">24 Mar 2026</td>
+                <td class="px-4 py-3.5">
+                  <div class="flex items-center gap-1">
+                    <button onclick="viewReturn(this)" class="p-1.5 text-gray-400 hover:text-brand-500 hover:bg-brand-50 rounded-lg transition" title="View Details">
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z"/><path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                    </button>
+                    <button onclick="showMoreMenu(event, this)" class="p-1.5 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition" title="More">
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M12 6.75a.75.75 0 110-1.5.75.75 0 010 1.5zM12 12.75a.75.75 0 110-1.5.75.75 0 010 1.5zM12 18.75a.75.75 0 110-1.5.75.75 0 010 1.5z"/></svg>
+                    </button>
+                  </div>
+                </td>
+              </tr>
+
+              <!-- Row 5 -->
+              <tr class="table-row" data-returnid="#RTN-4505" data-orderid="#ORD-8688" data-customer="Deepika Nair" data-email="deepika.n@email.com" data-product="Smart Watch Pro" data-reason="Not working after 2 days" data-refund="6,999" data-status="Refund Processing" data-date="22 Mar 2026">
+                <td class="px-4 py-3.5 font-mono text-xs font-semibold text-brand-600">#RTN-4505</td>
+                <td class="px-4 py-3.5 font-mono text-xs text-gray-600">#ORD-8688</td>
+                <td class="px-4 py-3.5">
+                  <p class="font-medium text-gray-800">Deepika Nair</p>
+                  <p class="text-[11px] text-gray-400">deepika.n@email.com</p>
+                </td>
+                <td class="px-4 py-3.5">
+                  <div class="flex items-center gap-2">
+                    <span class="text-lg">&#9201;</span>
+                    <span class="text-gray-700">Smart Watch Pro</span>
+                  </div>
+                </td>
+                <td class="px-4 py-3.5 text-gray-600">Not working after 2 days</td>
+                <td class="px-4 py-3.5 font-semibold text-gray-800">&#8377;6,999</td>
+                <td class="px-4 py-3.5">
+                  <span class="inline-flex items-center gap-1 text-[11px] font-semibold bg-brand-50 text-brand-700 px-2.5 py-1 rounded-full">
+                    <span class="w-1.5 h-1.5 rounded-full bg-brand-500"></span>
+                    Refund Processing
+                  </span>
+                </td>
+                <td class="px-4 py-3.5 text-gray-500 text-xs">22 Mar 2026</td>
+                <td class="px-4 py-3.5">
+                  <div class="flex items-center gap-1">
+                    <button onclick="viewReturn(this)" class="p-1.5 text-gray-400 hover:text-brand-500 hover:bg-brand-50 rounded-lg transition" title="View Details">
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z"/><path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                    </button>
+                    <button onclick="showMoreMenu(event, this)" class="p-1.5 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition" title="More">
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M12 6.75a.75.75 0 110-1.5.75.75 0 010 1.5zM12 12.75a.75.75 0 110-1.5.75.75 0 010 1.5zM12 18.75a.75.75 0 110-1.5.75.75 0 010 1.5z"/></svg>
+                    </button>
+                  </div>
+                </td>
+              </tr>
+
+              <!-- Row 6 -->
+              <tr class="table-row" data-returnid="#RTN-4506" data-orderid="#ORD-8645" data-customer="Suresh Kumar" data-email="suresh.k@email.com" data-product="Ceramic Dinner Set" data-reason="Arrived broken/damaged" data-refund="2,199" data-status="Refunded" data-date="20 Mar 2026">
+                <td class="px-4 py-3.5 font-mono text-xs font-semibold text-brand-600">#RTN-4506</td>
+                <td class="px-4 py-3.5 font-mono text-xs text-gray-600">#ORD-8645</td>
+                <td class="px-4 py-3.5">
+                  <p class="font-medium text-gray-800">Suresh Kumar</p>
+                  <p class="text-[11px] text-gray-400">suresh.k@email.com</p>
+                </td>
+                <td class="px-4 py-3.5">
+                  <div class="flex items-center gap-2">
+                    <span class="text-lg">&#127874;</span>
+                    <span class="text-gray-700">Ceramic Dinner Set</span>
+                  </div>
+                </td>
+                <td class="px-4 py-3.5 text-gray-600">Arrived broken/damaged</td>
+                <td class="px-4 py-3.5 font-semibold text-gray-800">&#8377;2,199</td>
+                <td class="px-4 py-3.5">
+                  <span class="inline-flex items-center gap-1 text-[11px] font-semibold bg-green-50 text-green-700 px-2.5 py-1 rounded-full">
+                    <span class="w-1.5 h-1.5 rounded-full bg-green-500"></span>
+                    Refunded
+                  </span>
+                </td>
+                <td class="px-4 py-3.5 text-gray-500 text-xs">20 Mar 2026</td>
+                <td class="px-4 py-3.5">
+                  <div class="flex items-center gap-1">
+                    <button onclick="viewReturn(this)" class="p-1.5 text-gray-400 hover:text-brand-500 hover:bg-brand-50 rounded-lg transition" title="View Details">
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z"/><path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                    </button>
+                    <button onclick="showMoreMenu(event, this)" class="p-1.5 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition" title="More">
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M12 6.75a.75.75 0 110-1.5.75.75 0 010 1.5zM12 12.75a.75.75 0 110-1.5.75.75 0 010 1.5zM12 18.75a.75.75 0 110-1.5.75.75 0 010 1.5z"/></svg>
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Return Policy Reminder Card -->
+      <div class="bg-gradient-to-r from-brand-50 to-orange-50 rounded-xl border border-brand-100 p-5 mb-6">
+        <div class="flex items-start gap-4">
+          <div class="w-10 h-10 rounded-lg bg-brand-100 flex items-center justify-center shrink-0">
+            <svg class="w-5 h-5 text-brand-600" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M11.25 11.25l.041-.02a.75.75 0 011.063.852l-.708 2.836a.75.75 0 001.063.853l.041-.021M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9-3.75h.008v.008H12V8.25z"/></svg>
+          </div>
+          <div class="flex-1">
+            <h3 class="text-sm font-semibold text-navy-900 mb-1">Return Policy Reminder</h3>
+            <p class="text-xs text-gray-600 leading-relaxed mb-3">
+              All return requests must be processed within <strong>48 hours</strong> of receipt. Items must be inspected within <strong>24 hours</strong> of pickup.
+              Refunds are automatically initiated once the returned item passes quality check. Late processing may affect your seller rating.
+            </p>
+            <div class="flex items-center gap-4">
+              <div class="flex items-center gap-1.5 text-xs text-gray-500">
+                <svg class="w-3.5 h-3.5 text-green-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4.5 12.75l6 6 9-13.5"/></svg>
+                7-day return window
+              </div>
+              <div class="flex items-center gap-1.5 text-xs text-gray-500">
+                <svg class="w-3.5 h-3.5 text-green-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4.5 12.75l6 6 9-13.5"/></svg>
+                Free return shipping
+              </div>
+              <div class="flex items-center gap-1.5 text-xs text-gray-500">
+                <svg class="w-3.5 h-3.5 text-green-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4.5 12.75l6 6 9-13.5"/></svg>
+                Refund within 5-7 days
+              </div>
+            </div>
+          </div>
+          <a href="#" onclick="event.preventDefault();alert('Return Policy - Coming Soon')" class="text-xs font-medium text-brand-600 hover:text-brand-700 whitespace-nowrap shrink-0">View Full Policy &rarr;</a>
+        </div>
+      </div>
+
+      <!-- Pagination -->
+      <div class="flex items-center justify-between">
+        <p id="showingCount" class="text-xs text-gray-400">Showing 1-6 of 6</p>
+        <div id="paginationBtns" class="flex items-center gap-1"></div>
+      </div>
+
+    </main>
+  </div>
+
+
+  <!-- ===== VIEW RETURN MODAL ===== -->
+  <div id="viewModal" class="fixed inset-0 z-[100] hidden items-center justify-center bg-black/40 backdrop-blur-sm">
+    <div class="relative w-full max-w-lg mx-4 bg-white rounded-2xl shadow-2xl overflow-hidden">
+      <div class="flex items-center justify-between px-6 py-4 border-b border-gray-100 bg-gray-50">
+        <h3 class="text-lg font-bold text-gray-900">Return Details</h3>
+        <button onclick="closeViewModal()" class="p-1.5 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M6 18L18 6M6 6l12 12"/></svg>
+        </button>
+      </div>
+      <div class="px-6 py-5 space-y-4" id="viewModalBody"></div>
+      <div class="flex justify-end gap-3 px-6 py-4 border-t border-gray-100 bg-gray-50" id="viewModalFooter"></div>
+    </div>
+  </div>
+
+  <!-- ===== MORE ACTIONS DROPDOWN ===== -->
+  <div id="moreMenu" class="fixed z-[110] hidden bg-white rounded-xl shadow-xl border border-gray-100 py-1.5 w-48" id="moreMenuItems"></div>
+
+  <!-- ===== JavaScript ===== -->
+  <script>
+    function getRowData(btn) {
+      var tr = btn.closest('tr');
+      return { returnid: tr.dataset.returnid, orderid: tr.dataset.orderid, customer: tr.dataset.customer, email: tr.dataset.email, product: tr.dataset.product, reason: tr.dataset.reason, refund: tr.dataset.refund, status: tr.dataset.status, date: tr.dataset.date, tr: tr };
+    }
+
+    function viewReturn(btn) {
+      var d = getRowData(btn);
+      var statusColor = d.status === 'Pending' ? 'bg-yellow-50 text-yellow-700' :
+                        d.status === 'Approved' ? 'bg-blue-50 text-blue-700' :
+                        d.status === 'In Transit' ? 'bg-purple-50 text-purple-700' :
+                        d.status === 'Refund Processing' ? 'bg-orange-50 text-orange-700' :
+                        d.status === 'Refunded' ? 'bg-green-50 text-green-700' :
+                        'bg-red-50 text-red-700';
+      document.getElementById('viewModalBody').innerHTML =
+        '<div class="grid grid-cols-2 gap-4">' +
+          '<div class="space-y-1"><p class="text-xs font-semibold text-gray-400 uppercase tracking-wider">Return ID</p><p class="font-mono text-sm font-semibold text-gray-800 bg-gray-100 inline-block px-2 py-0.5 rounded">' + d.returnid + '</p></div>' +
+          '<div class="space-y-1"><p class="text-xs font-semibold text-gray-400 uppercase tracking-wider">Status</p><span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold ' + statusColor + '">' + d.status + '</span></div>' +
+          '<div class="space-y-1"><p class="text-xs font-semibold text-gray-400 uppercase tracking-wider">Order ID</p><p class="font-mono text-sm text-gray-700">' + d.orderid + '</p></div>' +
+          '<div class="space-y-1"><p class="text-xs font-semibold text-gray-400 uppercase tracking-wider">Date</p><p class="text-sm text-gray-700">' + d.date + '</p></div>' +
+          '<div class="space-y-1"><p class="text-xs font-semibold text-gray-400 uppercase tracking-wider">Customer</p><p class="text-sm font-medium text-gray-900">' + d.customer + '</p><p class="text-xs text-gray-400">' + d.email + '</p></div>' +
+          '<div class="space-y-1"><p class="text-xs font-semibold text-gray-400 uppercase tracking-wider">Refund Amount</p><p class="text-sm font-bold text-gray-900">&#8377;' + d.refund + '</p></div>' +
+          '<div class="space-y-1 col-span-2"><p class="text-xs font-semibold text-gray-400 uppercase tracking-wider">Product</p><p class="text-sm text-gray-700">' + d.product + '</p></div>' +
+          '<div class="space-y-1 col-span-2"><p class="text-xs font-semibold text-gray-400 uppercase tracking-wider">Reason</p><p class="text-sm text-gray-700">' + d.reason + '</p></div>' +
+        '</div>';
+      var footer = '<button onclick="closeViewModal()" class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 transition">Close</button>';
+      if (d.status === 'Pending') {
+        footer += '<button onclick="alert('Approve Return ' + d.returnid + '')" class="px-4 py-2 text-sm font-medium text-white bg-green-600 rounded-lg hover:bg-green-700 transition">Approve Return</button>';
+      }
+      document.getElementById('viewModalFooter').innerHTML = footer;
+      var modal = document.getElementById('viewModal');
+      modal.classList.remove('hidden');
+      modal.classList.add('flex');
+    }
+
+    function closeViewModal() { var m = document.getElementById('viewModal'); m.classList.add('hidden'); m.classList.remove('flex'); }
+    document.getElementById('viewModal').addEventListener('click', function(e) { if (e.target === this) closeViewModal(); });
+    document.addEventListener('keydown', function(e) { if (e.key === 'Escape') { closeViewModal(); hideMoreMenu(); } });
+
+    var moreMenuReturnId = null;
+    var moreMenuStatus = null;
+    function showMoreMenu(e, btn) {
+      e.stopPropagation();
+      var d = getRowData(btn);
+      moreMenuReturnId = d.returnid;
+      moreMenuStatus = d.status;
+      var menu = document.getElementById('moreMenu');
+      // Build context-aware menu items
+      var items = '';
+      if (d.status === 'Pending') {
+        items = '<button onclick="moreAction('Approve')" class="flex items-center gap-2.5 w-full px-4 py-2.5 text-sm text-green-700 hover:bg-green-50 transition text-left"><svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M4.5 12.75l6 6 9-13.5"/></svg>Approve</button>' +
+                '<button onclick="moreAction('Reject')" class="flex items-center gap-2.5 w-full px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 transition text-left"><svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M6 18L18 6M6 6l12 12"/></svg>Reject</button>' +
+                '<div class="border-t border-gray-100 my-1"></div>';
+      }
+      items += '<button onclick="moreAction('Contact Customer')" class="flex items-center gap-2.5 w-full px-4 py-2.5 text-sm text-gray-700 hover:bg-brand-50 hover:text-brand-600 transition text-left"><svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0L3.32 8.91a2.25 2.25 0 01-1.07-1.916V6.75"/></svg>Contact Customer</button>';
+      menu.innerHTML = items;
+      var rect = btn.getBoundingClientRect();
+      menu.style.top = (rect.bottom + 4) + 'px';
+      menu.style.left = Math.max(8, rect.right - 192) + 'px';
+      menu.classList.remove('hidden');
+    }
+
+    function hideMoreMenu() { document.getElementById('moreMenu').classList.add('hidden'); moreMenuReturnId = null; }
+
+    function moreAction(action) {
+      alert(action + ' for ' + moreMenuReturnId);
+      hideMoreMenu();
+    }
+
+    document.addEventListener('click', function(e) {
+      var menu = document.getElementById('moreMenu');
+      if (!menu.classList.contains('hidden') && !menu.contains(e.target)) hideMoreMenu();
+    });
+  </script>
+
+  <script>
+  /* ===== Filter Tabs + Search + Pagination ===== */
+  (function() {
+    var tabs = document.querySelectorAll('.filter-tab');
+    var tbody = document.querySelector('table tbody');
+    if (!tabs.length || !tbody) return;
+    var allRows = Array.from(tbody.querySelectorAll('tr.table-row'));
+    var countEl = document.getElementById('showingCount');
+    var paginationContainer = document.getElementById('paginationBtns');
+
+    /* ===== Filter Tabs ===== */
+    tabs.forEach(function(tab) {
+      tab.addEventListener('click', function() {
+        tabs.forEach(function(t) {
+          t.classList.remove('active');
+          t.classList.add('text-gray-500');
+        });
+        this.classList.add('active');
+        this.classList.remove('text-gray-500');
+
+        var raw = this.textContent.trim().replace(/\s*\(.*\)/, '').toLowerCase();
+        allRows.forEach(function(row) {
+          var status = (row.getAttribute('data-status') || '').toLowerCase();
+          if (raw === 'all') {
+            row.classList.remove('filter-hidden');
+            row.style.display = '';
+          } else if (raw === 'in transit' && status === 'in transit') {
+            row.classList.remove('filter-hidden');
+            row.style.display = '';
+          } else if (raw === 'refund' && status.indexOf('refund') !== -1) {
+            row.classList.remove('filter-hidden');
+            row.style.display = '';
+          } else if (status === raw) {
+            row.classList.remove('filter-hidden');
+            row.style.display = '';
+          } else {
+            row.classList.add('filter-hidden');
+            row.style.display = 'none';
+          }
+        });
+        currentPage = 1;
+        paginate();
+      });
+    });
+
+    /* ===== Search (debounced) ===== */
+    var searchInput = null;
+    var inputs = document.querySelectorAll('input[type="text"][placeholder*="Search"], input[type="text"][placeholder*="search"]');
+    inputs.forEach(function(inp) { if (inp.closest('main')) searchInput = inp; });
+    var debounceTimer;
+    if (searchInput) {
+      searchInput.addEventListener('keyup', function() {
+        clearTimeout(debounceTimer);
+        var q = this.value.toLowerCase();
+        debounceTimer = setTimeout(function() {
+          allRows.forEach(function(row) {
+            if (row.classList.contains('filter-hidden')) return;
+            var text = row.textContent.toLowerCase();
+            if (!q || text.indexOf(q) !== -1) {
+              row.classList.remove('search-hidden');
+              row.style.display = '';
+            } else {
+              row.classList.add('search-hidden');
+              row.style.display = 'none';
+            }
+          });
+          currentPage = 1;
+          paginate();
+        }, 250);
+      });
+    }
+
+    /* ===== Pagination ===== */
+    var ROWS_PER_PAGE = 8;
+    var currentPage = 1;
+
+    function paginate() {
+      var visible = allRows.filter(function(r) {
+        return !r.classList.contains('filter-hidden') && !r.classList.contains('search-hidden');
+      });
+      var totalPages = Math.max(1, Math.ceil(visible.length / ROWS_PER_PAGE));
+      if (currentPage > totalPages) currentPage = totalPages;
+      var start = (currentPage - 1) * ROWS_PER_PAGE;
+      var end = start + ROWS_PER_PAGE;
+
+      visible.forEach(function(row, i) {
+        row.style.display = (i >= start && i < end) ? '' : 'none';
+      });
+
+      if (countEl) {
+        var showStart = visible.length > 0 ? start + 1 : 0;
+        var showEnd = Math.min(end, visible.length);
+        countEl.textContent = 'Showing ' + showStart + '-' + showEnd + ' of ' + visible.length;
+      }
+
+      if (paginationContainer) {
+        paginationContainer.innerHTML = '';
+        var prevBtn = document.createElement('button');
+        prevBtn.className = 'w-8 h-8 rounded-lg border border-gray-200 text-gray-400 flex items-center justify-center hover:bg-gray-50 transition text-xs';
+        prevBtn.innerHTML = '<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M15.75 19.5L8.25 12l7.5-7.5"/></svg>';
+        prevBtn.onclick = function(e) { e.preventDefault(); if (currentPage > 1) { currentPage--; paginate(); } };
+        prevBtn.style.opacity = currentPage <= 1 ? '0.5' : '1';
+        prevBtn.style.pointerEvents = currentPage <= 1 ? 'none' : 'auto';
+        paginationContainer.appendChild(prevBtn);
+        for (var p = 1; p <= totalPages; p++) {
+          var pgBtn = document.createElement('button');
+          pgBtn.className = p === currentPage
+            ? 'w-8 h-8 rounded-lg bg-brand-500 text-white flex items-center justify-center text-xs font-semibold'
+            : 'w-8 h-8 rounded-lg border border-gray-200 text-gray-600 flex items-center justify-center hover:bg-gray-50 transition text-xs font-medium';
+          pgBtn.textContent = p;
+          pgBtn.onclick = (function(pg) { return function(e) { e.preventDefault(); currentPage = pg; paginate(); }; })(p);
+          paginationContainer.appendChild(pgBtn);
+        }
+        var nextBtn = document.createElement('button');
+        nextBtn.className = 'w-8 h-8 rounded-lg border border-gray-200 text-gray-400 flex items-center justify-center hover:bg-gray-50 transition text-xs';
+        nextBtn.innerHTML = '<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M8.25 4.5l7.5 7.5-7.5 7.5"/></svg>';
+        nextBtn.onclick = function(e) { e.preventDefault(); if (currentPage < totalPages) { currentPage++; paginate(); } };
+        nextBtn.style.opacity = currentPage >= totalPages ? '0.5' : '1';
+        nextBtn.style.pointerEvents = currentPage >= totalPages ? 'none' : 'auto';
+        paginationContainer.appendChild(nextBtn);
+      }
+    }
+    paginate();
+  })();
+  </script>
+
+  <script src="shared-layout.js"></script>
+  <script>renderSellerLayout('returns');</script>
+</body>
+</html>

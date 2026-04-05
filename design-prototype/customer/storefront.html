@@ -1,0 +1,790 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HomeBase — Storefront Design</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              50: '#FFF7ED',
+              100: '#FFEDD5',
+              200: '#FED7AA',
+              300: '#FDBA74',
+              400: '#FB923C',
+              500: '#F97316',
+              600: '#EA580C',
+              700: '#C2410C',
+            },
+            navy: {
+              700: '#1E3A5F',
+              800: '#1A2E4A',
+              900: '#0F1B2D',
+            },
+            success: '#16A34A',
+            warning: '#EAB308',
+            danger: '#DC2626',
+          },
+          fontFamily: {
+            sans: ['Inter', 'system-ui', 'sans-serif'],
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+    .scrollbar-hide::-webkit-scrollbar { display: none; }
+    .product-card:hover { transform: translateY(-4px); box-shadow: 0 12px 24px rgba(0,0,0,0.1); }
+    .product-card { transition: all 0.2s ease; }
+    .hero-gradient { background: linear-gradient(135deg, #0F1B2D 0%, #1E3A5F 100%); }
+    .deal-gradient { background: linear-gradient(135deg, #F97316 0%, #EA580C 100%); }
+    .category-card:hover { border-color: #F97316; }
+    .category-card { transition: all 0.2s ease; }
+    .nav-link:hover { color: #F97316; }
+    .btn-brand { background: #F97316; transition: all 0.2s; }
+    .btn-brand:hover { background: #EA580C; }
+    .countdown-box { background: rgba(255,255,255,0.15); backdrop-filter: blur(4px); }
+  </style>
+</head>
+<body class="font-sans bg-white text-gray-900">
+
+  <!-- ===== TOP BAR ===== -->
+  <div class="bg-navy-900 text-gray-300 text-xs">
+    <div class="max-w-7xl mx-auto px-4 flex items-center justify-between h-9">
+      <div class="flex items-center gap-5">
+        <span class="flex items-center gap-1.5">
+          <svg class="w-3.5 h-3.5 text-brand-400" fill="currentColor" viewBox="0 0 20 20"><path d="M2 3a1 1 0 011-1h2.153a1 1 0 01.986.836l.74 4.435a1 1 0 01-.54 1.06l-1.548.773a11.037 11.037 0 006.105 6.105l.774-1.548a1 1 0 011.059-.54l4.435.74a1 1 0 01.836.986V17a1 1 0 01-1 1h-2C7.82 18 2 12.18 2 5V3z"/></svg>
+          Hotline 24/7: <strong class="text-white ml-1">(025) 3886 2516</strong>
+        </span>
+        <a href="../seller/seller-register.html" class="hover:text-brand-400">Sell on HomeBase</a>
+        <a href="order-tracking.html" class="hover:text-brand-400">Order Tracking</a>
+      </div>
+      <div class="flex items-center gap-4">
+        <select class="bg-transparent text-gray-300 text-xs border-none outline-none cursor-pointer">
+          <option>INR &#8377;</option>
+          <option>USD $</option>
+        </select>
+        <select class="bg-transparent text-gray-300 text-xs border-none outline-none cursor-pointer">
+          <option>English</option>
+          <option>Hindi</option>
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== HEADER ===== -->
+  <header class="bg-white border-b border-gray-100 sticky top-0 z-50 shadow-sm">
+    <div class="max-w-7xl mx-auto px-4 flex items-center justify-between h-16">
+      <!-- Logo -->
+      <a href="storefront.html" class="flex items-center gap-2">
+        <div class="w-9 h-9 rounded-lg bg-brand-500 flex items-center justify-center">
+          <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-4 0a1 1 0 01-1-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 01-1 1"/></svg>
+        </div>
+        <span class="text-xl font-extrabold tracking-tight text-navy-900">Home<span class="text-brand-500">Base</span></span>
+      </a>
+
+      <!-- Search -->
+      <div class="hidden md:flex flex-1 max-w-xl mx-8">
+        <div class="flex w-full">
+          <select id="sellerFilter" onchange="filterBySeller(this.value)" class="bg-gray-50 border border-r-0 border-gray-200 rounded-l-lg px-3 text-sm text-gray-600 outline-none">
+            <option value="all">All Sellers</option>
+            <option value="rajesh">Rajesh Store</option>
+            <option value="priya">Priya Electronics</option>
+            <option value="kumar">Kumar Fashions</option>
+            <option value="anita">Anita Home Decor</option>
+            <option value="vikram">Vikram Sports</option>
+          </select>
+          <div class="relative flex-1">
+            <input type="text" placeholder="Search for products, brands and more..." class="w-full border border-gray-200 py-2.5 px-4 text-sm outline-none focus:border-brand-400 focus:ring-1 focus:ring-brand-200">
+            <button class="absolute right-0 top-0 h-full px-4 btn-brand text-white rounded-r-lg">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Actions -->
+      <div class="flex items-center gap-5">
+        <!-- Wishlist -->
+        <a href="wishlist.html" class="hidden md:flex flex-col items-center text-gray-500 hover:text-brand-500 transition">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12z"/></svg>
+          <span class="text-[10px] mt-0.5">Wishlist</span>
+        </a>
+        <!-- Cart -->
+        <a href="cart.html" class="flex flex-col items-center text-gray-500 hover:text-brand-500 transition relative">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25a3 3 0 00-3 3h15.75m-12.75-3h11.218c1.121-2.3 2.1-4.684 2.924-7.138a60.114 60.114 0 00-16.536-1.84M7.5 14.25L5.106 5.272M6 20.25a.75.75 0 11-1.5 0 .75.75 0 011.5 0zm12.75 0a.75.75 0 11-1.5 0 .75.75 0 011.5 0z"/></svg>
+          <span class="text-[10px] mt-0.5">Cart</span>
+          <span class="absolute -top-1.5 -right-2 bg-brand-500 text-white text-[9px] font-bold rounded-full w-4 h-4 flex items-center justify-center">3</span>
+        </a>
+        <!-- User -->
+        <a href="my-account.html" class="hidden md:flex flex-col items-center text-gray-500 hover:text-brand-500 transition">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z"/></svg>
+          <span class="text-[10px] mt-0.5">Account</span>
+        </a>
+      </div>
+    </div>
+
+    <!-- Navigation -->
+    <nav class="bg-white border-t border-gray-50">
+      <div class="max-w-7xl mx-auto px-4 flex items-center gap-1 h-11 text-sm">
+        <!-- All Sellers Dropdown -->
+        <div class="relative mr-4">
+          <select id="sellerFilterNav" onchange="filterBySeller(this.value)" class="appearance-none bg-navy-900 text-white px-4 py-1.5 rounded-md text-sm font-medium pr-8 cursor-pointer outline-none">
+            <option value="all">All Sellers</option>
+            <option value="rajesh">Rajesh Store</option>
+            <option value="priya">Priya Electronics</option>
+            <option value="kumar">Kumar Fashions</option>
+            <option value="anita">Anita Home Decor</option>
+            <option value="vikram">Vikram Sports</option>
+          </select>
+          <svg class="w-3 h-3 absolute right-2 top-1/2 -translate-y-1/2 text-white pointer-events-none" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M19.5 8.25l-7.5 7.5-7.5-7.5"/></svg>
+        </div>
+        <a href="storefront.html" class="nav-link px-3 py-1.5 font-medium text-brand-600">Home</a>
+        <a href="product-listing.html" class="nav-link px-3 py-1.5 text-gray-600">Electronics</a>
+        <a href="product-listing.html" class="nav-link px-3 py-1.5 text-gray-600">Fashion</a>
+        <a href="product-listing.html" class="nav-link px-3 py-1.5 text-gray-600">Home & Living</a>
+        <a href="product-listing.html" class="nav-link px-3 py-1.5 text-gray-600">Sports</a>
+        <a href="product-listing.html" class="nav-link px-3 py-1.5 text-gray-600">Groceries</a>
+        <a href="product-listing.html" class="nav-link px-3 py-1.5 text-gray-600">Beauty</a>
+        <div class="ml-auto">
+          <a href="order-tracking.html" class="nav-link px-3 py-1.5 text-gray-600 flex items-center gap-1">
+            <svg class="w-4 h-4 text-brand-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z"/><path d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z"/></svg>
+            Track Order
+          </a>
+        </div>
+      </div>
+    </nav>
+  </header>
+
+  <!-- ===== SELLER BANNER (hidden by default) ===== -->
+  <div id="sellerBanner" class="hidden bg-gradient-to-r from-brand-50 to-orange-50 border-b border-brand-100">
+    <div class="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <div id="sellerAvatar" class="w-10 h-10 rounded-full bg-brand-500 flex items-center justify-center text-white font-bold text-sm">RS</div>
+        <div>
+          <p id="sellerName" class="font-semibold text-navy-900 text-sm">Rajesh Store</p>
+          <div class="flex items-center gap-2 text-xs text-gray-500">
+            <span>&#11088; 4.6</span> · <span>1,234 products</span> · <span>Member since 2024</span>
+          </div>
+        </div>
+      </div>
+      <button onclick="filterBySeller('all')" class="text-xs text-brand-500 font-medium hover:underline">&#10005; Clear Filter</button>
+    </div>
+  </div>
+
+  <!-- ===== HERO SECTION ===== -->
+  <section class="hero-gradient">
+    <div class="max-w-7xl mx-auto px-4 py-10 flex items-center gap-8">
+      <!-- Left: Category Sidebar -->
+      <div class="hidden lg:block w-56 shrink-0 bg-white/5 backdrop-blur-sm rounded-xl p-4 border border-white/10">
+        <ul class="space-y-1 text-sm">
+          <li><a href="product-listing.html" class="flex items-center gap-2 text-white/80 hover:text-brand-400 py-1.5 px-2 rounded hover:bg-white/5">
+            <span>&#128187;</span> Laptops</a></li>
+          <li><a href="product-listing.html" class="flex items-center gap-2 text-white/80 hover:text-brand-400 py-1.5 px-2 rounded hover:bg-white/5">
+            <span>&#128241;</span> Smartphones</a></li>
+          <li><a href="product-listing.html" class="flex items-center gap-2 text-white/80 hover:text-brand-400 py-1.5 px-2 rounded hover:bg-white/5">
+            <span>&#127911;</span> Headphones</a></li>
+          <li><a href="product-listing.html" class="flex items-center gap-2 text-white/80 hover:text-brand-400 py-1.5 px-2 rounded hover:bg-white/5">
+            <span>&#128249;</span> Cameras</a></li>
+          <li><a href="product-listing.html" class="flex items-center gap-2 text-white/80 hover:text-brand-400 py-1.5 px-2 rounded hover:bg-white/5">
+            <span>&#127918;</span> Gaming</a></li>
+          <li><a href="product-listing.html" class="flex items-center gap-2 text-white/80 hover:text-brand-400 py-1.5 px-2 rounded hover:bg-white/5">
+            <span>&#128084;</span> Fashion</a></li>
+          <li><a href="product-listing.html" class="flex items-center gap-2 text-white/80 hover:text-brand-400 py-1.5 px-2 rounded hover:bg-white/5">
+            <span>&#127968;</span> Home & Living</a></li>
+          <li><a href="product-listing.html" class="flex items-center gap-2 text-white/80 hover:text-brand-400 py-1.5 px-2 rounded hover:bg-white/5">
+            <span>&#9917;</span> Sports</a></li>
+        </ul>
+      </div>
+
+      <!-- Center: Main Banner -->
+      <div class="flex-1 relative rounded-2xl overflow-hidden bg-gradient-to-r from-navy-800 to-navy-700 p-10 min-h-[360px] flex items-center">
+        <div class="relative z-10 max-w-md">
+          <span class="inline-block bg-brand-500 text-white text-xs font-bold px-3 py-1 rounded-full mb-4">SALE 40% OFF</span>
+          <h1 class="hero-title text-4xl font-extrabold text-white leading-tight mb-3">Discover the<br>Best Deals on<br><span class="text-brand-400">Top Products</span></h1>
+          <p class="hero-subtitle text-gray-300 mb-6 text-sm leading-relaxed">Shop from thousands of sellers. Free shipping on orders over &#8377;999. 30-day easy returns.</p>
+          <a href="product-listing.html" class="inline-flex items-center gap-2 btn-brand text-white font-semibold px-6 py-3 rounded-lg">
+            Shop Now
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3"/></svg>
+          </a>
+        </div>
+        <!-- Decorative circles -->
+        <div class="absolute right-0 top-0 w-80 h-80 bg-brand-500/10 rounded-full -translate-y-1/4 translate-x-1/4"></div>
+        <div class="absolute right-20 bottom-0 w-60 h-60 bg-brand-400/10 rounded-full translate-y-1/4"></div>
+      </div>
+
+      <!-- Right: Side Banners -->
+      <div class="hidden xl:flex flex-col gap-4 w-64 shrink-0">
+        <div class="bg-gradient-to-br from-orange-50 to-orange-100 rounded-xl p-5 border border-orange-200">
+          <span class="text-[10px] font-bold text-brand-600 uppercase tracking-wider">New Arrival</span>
+          <h3 class="font-bold text-navy-900 mt-1 text-sm">Smart Watch Series 8</h3>
+          <p class="text-xs text-gray-500 mt-1">Water Resistant, GPS</p>
+          <p class="text-brand-600 font-bold mt-2">&#8377;24,999</p>
+          <a href="product-detail.html" class="text-xs text-brand-600 font-semibold mt-2 inline-flex items-center gap-1 hover:underline">Shop Now &rarr;</a>
+        </div>
+        <div class="bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl p-5 border border-blue-200">
+          <span class="text-[10px] font-bold text-blue-600 uppercase tracking-wider">Best Seller</span>
+          <h3 class="font-bold text-navy-900 mt-1 text-sm">Wireless Noise Cancelling</h3>
+          <p class="text-xs text-gray-500 mt-1">Headphones Pro Max</p>
+          <p class="text-blue-600 font-bold mt-2">&#8377;12,499</p>
+          <a href="product-detail.html" class="text-xs text-blue-600 font-semibold mt-2 inline-flex items-center gap-1 hover:underline">Shop Now &rarr;</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== TRUST BAR ===== -->
+  <section class="border-b border-gray-100">
+    <div class="max-w-7xl mx-auto px-4 py-5 grid grid-cols-2 md:grid-cols-4 gap-4">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-full bg-brand-50 flex items-center justify-center">
+          <svg class="w-5 h-5 text-brand-500" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M8.25 18.75a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m3 0h6m-9 0H3.375a1.125 1.125 0 01-1.125-1.125V14.25m17.25 4.5a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m3 0H6.375m11.25 3V7.5a.375.375 0 00-.375-.375H14.25m0 0V3h4.5a.375.375 0 01.375.375v3.75m-4.875 0h4.875"/></svg>
+        </div>
+        <div>
+          <p class="text-sm font-semibold text-navy-900">Free Shipping</p>
+          <p class="text-xs text-gray-400">On orders over &#8377;999</p>
+        </div>
+      </div>
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-full bg-green-50 flex items-center justify-center">
+          <svg class="w-5 h-5 text-success" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z"/></svg>
+        </div>
+        <div>
+          <p class="text-sm font-semibold text-navy-900">Secure Payment</p>
+          <p class="text-xs text-gray-400">100% protected</p>
+        </div>
+      </div>
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-full bg-blue-50 flex items-center justify-center">
+          <svg class="w-5 h-5 text-blue-500" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182"/></svg>
+        </div>
+        <div>
+          <p class="text-sm font-semibold text-navy-900">30-Day Returns</p>
+          <p class="text-xs text-gray-400">Money back guarantee</p>
+        </div>
+      </div>
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-full bg-purple-50 flex items-center justify-center">
+          <svg class="w-5 h-5 text-purple-500" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M20.25 8.511c.884.284 1.5 1.128 1.5 2.097v4.286c0 1.136-.847 2.1-1.98 2.193-.34.027-.68.052-1.02.072v3.091l-3-3c-1.354 0-2.694-.055-4.02-.163a2.115 2.115 0 01-.825-.242m9.345-8.334a2.126 2.126 0 00-.476-.095 48.64 48.64 0 00-8.048 0c-1.131.094-1.976 1.057-1.976 2.192v4.286c0 .837.46 1.58 1.155 1.951m9.345-8.334V6.637c0-1.621-1.152-3.026-2.76-3.235A48.455 48.455 0 0011.25 3c-2.115 0-4.198.137-6.24.402-1.608.209-2.76 1.614-2.76 3.235v6.226c0 1.621 1.152 3.026 2.76 3.235.577.075 1.157.14 1.74.194V21l4.155-4.155"/></svg>
+        </div>
+        <div>
+          <p class="text-sm font-semibold text-navy-900">24/7 Support</p>
+          <p class="text-xs text-gray-400">Live chat & phone</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== TOP CATEGORIES ===== -->
+  <section class="py-10">
+    <div class="max-w-7xl mx-auto px-4">
+      <div class="flex items-center justify-between mb-6">
+        <h2 class="text-xl font-bold text-navy-900">Shop by Category</h2>
+        <a href="product-listing.html" class="text-sm text-brand-500 font-medium hover:underline">View All &rarr;</a>
+      </div>
+      <div class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-4">
+        <a href="product-listing.html" class="category-card flex flex-col items-center p-4 bg-gray-50 rounded-xl border border-gray-100 hover:bg-brand-50">
+          <span class="text-3xl mb-2">&#128187;</span>
+          <span class="text-xs font-medium text-gray-700">Laptops</span>
+          <span class="text-[10px] text-gray-400 mt-0.5">74 items</span>
+        </a>
+        <a href="product-listing.html" class="category-card flex flex-col items-center p-4 bg-gray-50 rounded-xl border border-gray-100 hover:bg-brand-50">
+          <span class="text-3xl mb-2">&#128241;</span>
+          <span class="text-xs font-medium text-gray-700">Smartphones</span>
+          <span class="text-[10px] text-gray-400 mt-0.5">156 items</span>
+        </a>
+        <a href="product-listing.html" class="category-card flex flex-col items-center p-4 bg-gray-50 rounded-xl border border-gray-100 hover:bg-brand-50">
+          <span class="text-3xl mb-2">&#127911;</span>
+          <span class="text-xs font-medium text-gray-700">Headphones</span>
+          <span class="text-[10px] text-gray-400 mt-0.5">42 items</span>
+        </a>
+        <a href="product-listing.html" class="category-card flex flex-col items-center p-4 bg-gray-50 rounded-xl border border-gray-100 hover:bg-brand-50">
+          <span class="text-3xl mb-2">&#128084;</span>
+          <span class="text-xs font-medium text-gray-700">Fashion</span>
+          <span class="text-[10px] text-gray-400 mt-0.5">320 items</span>
+        </a>
+        <a href="product-listing.html" class="category-card flex flex-col items-center p-4 bg-gray-50 rounded-xl border border-gray-100 hover:bg-brand-50">
+          <span class="text-3xl mb-2">&#127968;</span>
+          <span class="text-xs font-medium text-gray-700">Home</span>
+          <span class="text-[10px] text-gray-400 mt-0.5">89 items</span>
+        </a>
+        <a href="product-listing.html" class="category-card flex flex-col items-center p-4 bg-gray-50 rounded-xl border border-gray-100 hover:bg-brand-50">
+          <span class="text-3xl mb-2">&#9917;</span>
+          <span class="text-xs font-medium text-gray-700">Sports</span>
+          <span class="text-[10px] text-gray-400 mt-0.5">65 items</span>
+        </a>
+        <a href="product-listing.html" class="category-card flex flex-col items-center p-4 bg-gray-50 rounded-xl border border-gray-100 hover:bg-brand-50">
+          <span class="text-3xl mb-2">&#128249;</span>
+          <span class="text-xs font-medium text-gray-700">Cameras</span>
+          <span class="text-[10px] text-gray-400 mt-0.5">28 items</span>
+        </a>
+        <a href="product-listing.html" class="category-card flex flex-col items-center p-4 bg-gray-50 rounded-xl border border-gray-100 hover:bg-brand-50">
+          <span class="text-3xl mb-2">&#127918;</span>
+          <span class="text-xs font-medium text-gray-700">Gaming</span>
+          <span class="text-[10px] text-gray-400 mt-0.5">52 items</span>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== DEAL OF THE DAY ===== -->
+  <section class="py-8">
+    <div class="max-w-7xl mx-auto px-4">
+      <div class="deal-gradient rounded-2xl p-8 flex flex-col md:flex-row items-center gap-8">
+        <!-- Left: Timer & Info -->
+        <div class="text-white max-w-md">
+          <span class="text-xs font-bold uppercase tracking-widest text-orange-200">Deal of the Day</span>
+          <h2 class="deal-title text-3xl font-extrabold mt-2 mb-1">Flash Sale!</h2>
+          <p class="text-orange-100 text-sm mb-5">Grab the best deals before they're gone. Limited stock available.</p>
+          <!-- Countdown -->
+          <div class="flex gap-3 mb-6">
+            <div class="countdown-box rounded-lg px-4 py-2 text-center">
+              <p class="text-2xl font-bold">06</p>
+              <p class="text-[10px] text-orange-200 uppercase">Days</p>
+            </div>
+            <div class="countdown-box rounded-lg px-4 py-2 text-center">
+              <p class="text-2xl font-bold">18</p>
+              <p class="text-[10px] text-orange-200 uppercase">Hours</p>
+            </div>
+            <div class="countdown-box rounded-lg px-4 py-2 text-center">
+              <p class="text-2xl font-bold">45</p>
+              <p class="text-[10px] text-orange-200 uppercase">Mins</p>
+            </div>
+            <div class="countdown-box rounded-lg px-4 py-2 text-center">
+              <p class="text-2xl font-bold">32</p>
+              <p class="text-[10px] text-orange-200 uppercase">Secs</p>
+            </div>
+          </div>
+          <a href="product-listing.html" class="inline-flex items-center gap-2 bg-white text-brand-600 font-semibold px-5 py-2.5 rounded-lg hover:bg-orange-50 transition text-sm">
+            View All Deals
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3"/></svg>
+          </a>
+        </div>
+        <!-- Right: Deal Products -->
+        <div class="flex-1 grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <div data-seller="rajesh" class="bg-white rounded-xl p-4 product-card cursor-pointer" onclick="window.location='product-detail.html'">
+            <div class="relative">
+              <span class="absolute top-0 left-0 bg-red-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-br-lg rounded-tl-lg">-40%</span>
+              <div class="bg-gray-100 rounded-lg h-32 flex items-center justify-center text-4xl">&#127911;</div>
+            </div>
+            <div class="mt-3">
+              <div class="flex items-center gap-1 text-yellow-400 text-xs">&#9733;&#9733;&#9733;&#9733;&#9733; <span class="text-gray-400">(152)</span></div>
+              <p class="text-sm font-medium text-gray-800 mt-1 line-clamp-2">Pro Max Wireless Headphone</p>
+              <div class="flex items-center gap-2 mt-2">
+                <span class="text-brand-600 font-bold">&#8377;4,999</span>
+                <span class="text-gray-400 text-xs line-through">&#8377;8,999</span>
+              </div>
+            </div>
+          </div>
+          <div data-seller="priya" class="bg-white rounded-xl p-4 product-card cursor-pointer" onclick="window.location='product-detail.html'">
+            <div class="relative">
+              <span class="absolute top-0 left-0 bg-red-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-br-lg rounded-tl-lg">-35%</span>
+              <div class="bg-gray-100 rounded-lg h-32 flex items-center justify-center text-4xl">&#128241;</div>
+            </div>
+            <div class="mt-3">
+              <div class="flex items-center gap-1 text-yellow-400 text-xs">&#9733;&#9733;&#9733;&#9733;&#9734; <span class="text-gray-400">(89)</span></div>
+              <p class="text-sm font-medium text-gray-800 mt-1 line-clamp-2">Smart Phone 128GB OLED</p>
+              <div class="flex items-center gap-2 mt-2">
+                <span class="text-brand-600 font-bold">&#8377;18,999</span>
+                <span class="text-gray-400 text-xs line-through">&#8377;28,999</span>
+              </div>
+            </div>
+          </div>
+          <div data-seller="vikram" class="bg-white rounded-xl p-4 product-card cursor-pointer" onclick="window.location='product-detail.html'">
+            <div class="relative">
+              <span class="absolute top-0 left-0 bg-red-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-br-lg rounded-tl-lg">-50%</span>
+              <div class="bg-gray-100 rounded-lg h-32 flex items-center justify-center text-4xl">&#8986;</div>
+            </div>
+            <div class="mt-3">
+              <div class="flex items-center gap-1 text-yellow-400 text-xs">&#9733;&#9733;&#9733;&#9733;&#9733; <span class="text-gray-400">(203)</span></div>
+              <p class="text-sm font-medium text-gray-800 mt-1 line-clamp-2">Sport Water Resistance Watch</p>
+              <div class="flex items-center gap-2 mt-2">
+                <span class="text-brand-600 font-bold">&#8377;6,499</span>
+                <span class="text-gray-400 text-xs line-through">&#8377;12,999</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== FEATURED PRODUCTS ===== -->
+  <section class="py-8">
+    <div class="max-w-7xl mx-auto px-4">
+      <div class="flex items-center justify-between mb-6">
+        <h2 class="text-xl font-bold text-navy-900">Best Sellers</h2>
+        <div class="flex items-center gap-2">
+          <button class="px-4 py-1.5 text-sm font-medium text-brand-600 bg-brand-50 rounded-full">All</button>
+          <button class="px-4 py-1.5 text-sm font-medium text-gray-500 hover:text-brand-600 hover:bg-brand-50 rounded-full transition">Electronics</button>
+          <button class="px-4 py-1.5 text-sm font-medium text-gray-500 hover:text-brand-600 hover:bg-brand-50 rounded-full transition">Fashion</button>
+          <button class="px-4 py-1.5 text-sm font-medium text-gray-500 hover:text-brand-600 hover:bg-brand-50 rounded-full transition">Home</button>
+          <a href="product-listing.html" class="text-sm text-brand-500 font-medium hover:underline ml-4">View All &rarr;</a>
+        </div>
+      </div>
+      <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
+        <!-- Product 1 -->
+        <div data-seller="rajesh" class="product-card bg-white rounded-xl border border-gray-100 p-4 cursor-pointer" onclick="window.location='product-detail.html'">
+          <div class="relative">
+            <button class="absolute top-0 right-0 w-7 h-7 bg-white rounded-full shadow flex items-center justify-center text-gray-400 hover:text-red-500 transition">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12z"/></svg>
+            </button>
+            <div class="bg-gray-50 rounded-lg h-40 flex items-center justify-center text-5xl">&#128187;</div>
+          </div>
+          <div class="mt-3">
+            <div class="flex items-center gap-1 text-yellow-400 text-xs">&#9733;&#9733;&#9733;&#9733;&#9733; <span class="text-gray-400">(312)</span></div>
+            <p class="text-sm font-medium text-gray-800 mt-1 line-clamp-2">MacBook Pro M3 14" 512GB Space Gray</p>
+            <div class="flex items-center gap-2 mt-2">
+              <span class="text-brand-600 font-bold">&#8377;1,49,990</span>
+            </div>
+            <div class="flex items-center gap-1 mt-2">
+              <span class="text-[10px] text-green-600 bg-green-50 px-1.5 py-0.5 rounded font-medium">Free Shipping</span>
+            </div>
+          </div>
+        </div>
+        <!-- Product 2 -->
+        <div data-seller="priya" class="product-card bg-white rounded-xl border border-gray-100 p-4 cursor-pointer" onclick="window.location='product-detail.html'">
+          <div class="relative">
+            <span class="absolute top-0 left-0 bg-green-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-br-lg rounded-tl-lg">NEW</span>
+            <button class="absolute top-0 right-0 w-7 h-7 bg-white rounded-full shadow flex items-center justify-center text-gray-400 hover:text-red-500 transition">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12z"/></svg>
+            </button>
+            <div class="bg-gray-50 rounded-lg h-40 flex items-center justify-center text-5xl">&#128241;</div>
+          </div>
+          <div class="mt-3">
+            <div class="flex items-center gap-1 text-yellow-400 text-xs">&#9733;&#9733;&#9733;&#9733;&#9734; <span class="text-gray-400">(89)</span></div>
+            <p class="text-sm font-medium text-gray-800 mt-1 line-clamp-2">iPhone 16 Pro Max 256GB Natural Titanium</p>
+            <div class="flex items-center gap-2 mt-2">
+              <span class="text-brand-600 font-bold">&#8377;1,44,900</span>
+            </div>
+            <div class="flex items-center gap-1 mt-2">
+              <span class="text-[10px] text-green-600 bg-green-50 px-1.5 py-0.5 rounded font-medium">Free Shipping</span>
+              <span class="text-[10px] text-purple-600 bg-purple-50 px-1.5 py-0.5 rounded font-medium">Free Gift</span>
+            </div>
+          </div>
+        </div>
+        <!-- Product 3 -->
+        <div data-seller="kumar" class="product-card bg-white rounded-xl border border-gray-100 p-4 cursor-pointer" onclick="window.location='product-detail.html'">
+          <div class="relative">
+            <span class="absolute top-0 left-0 bg-red-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-br-lg rounded-tl-lg">-25%</span>
+            <button class="absolute top-0 right-0 w-7 h-7 bg-white rounded-full shadow flex items-center justify-center text-red-500 transition">
+              <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M11.645 20.91l-.007-.003-.022-.012a15.247 15.247 0 01-.383-.218 25.18 25.18 0 01-4.244-3.17C4.688 15.36 2.25 12.174 2.25 8.25 2.25 5.322 4.714 3 7.688 3A5.5 5.5 0 0112 5.052 5.5 5.5 0 0116.313 3c2.973 0 5.437 2.322 5.437 5.25 0 3.925-2.438 7.111-4.739 9.256a25.175 25.175 0 01-4.244 3.17 15.247 15.247 0 01-.383.219l-.022.012-.007.004-.003.001a.752.752 0 01-.704 0l-.003-.001z"/></svg>
+            </button>
+            <div class="bg-gray-50 rounded-lg h-40 flex items-center justify-center text-5xl">&#127911;</div>
+          </div>
+          <div class="mt-3">
+            <div class="flex items-center gap-1 text-yellow-400 text-xs">&#9733;&#9733;&#9733;&#9733;&#9733; <span class="text-gray-400">(456)</span></div>
+            <p class="text-sm font-medium text-gray-800 mt-1 line-clamp-2">Sony WH-1000XM5 Wireless Noise Cancelling</p>
+            <div class="flex items-center gap-2 mt-2">
+              <span class="text-brand-600 font-bold">&#8377;22,490</span>
+              <span class="text-gray-400 text-xs line-through">&#8377;29,990</span>
+            </div>
+            <div class="flex items-center gap-1 mt-2">
+              <span class="text-[10px] text-green-600 bg-green-50 px-1.5 py-0.5 rounded font-medium">In Stock</span>
+            </div>
+          </div>
+        </div>
+        <!-- Product 4 -->
+        <div data-seller="anita" class="product-card bg-white rounded-xl border border-gray-100 p-4 cursor-pointer" onclick="window.location='product-detail.html'">
+          <div class="relative">
+            <button class="absolute top-0 right-0 w-7 h-7 bg-white rounded-full shadow flex items-center justify-center text-gray-400 hover:text-red-500 transition">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12z"/></svg>
+            </button>
+            <div class="bg-gray-50 rounded-lg h-40 flex items-center justify-center text-5xl">&#8986;</div>
+          </div>
+          <div class="mt-3">
+            <div class="flex items-center gap-1 text-yellow-400 text-xs">&#9733;&#9733;&#9733;&#9733;&#9734; <span class="text-gray-400">(178)</span></div>
+            <p class="text-sm font-medium text-gray-800 mt-1 line-clamp-2">Apple Watch Ultra 2 GPS + Cellular 49mm</p>
+            <div class="flex items-center gap-2 mt-2">
+              <span class="text-brand-600 font-bold">&#8377;89,900</span>
+            </div>
+            <div class="flex items-center gap-1 mt-2">
+              <span class="text-[10px] text-green-600 bg-green-50 px-1.5 py-0.5 rounded font-medium">Free Shipping</span>
+            </div>
+          </div>
+        </div>
+        <!-- Product 5 -->
+        <div data-seller="vikram" class="product-card bg-white rounded-xl border border-gray-100 p-4 cursor-pointer" onclick="window.location='product-detail.html'">
+          <div class="relative">
+            <span class="absolute top-0 left-0 bg-red-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-br-lg rounded-tl-lg">-30%</span>
+            <button class="absolute top-0 right-0 w-7 h-7 bg-white rounded-full shadow flex items-center justify-center text-gray-400 hover:text-red-500 transition">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12z"/></svg>
+            </button>
+            <div class="bg-gray-50 rounded-lg h-40 flex items-center justify-center text-5xl">&#128084;</div>
+          </div>
+          <div class="mt-3">
+            <div class="flex items-center gap-1 text-yellow-400 text-xs">&#9733;&#9733;&#9733;&#9733;&#9733; <span class="text-gray-400">(67)</span></div>
+            <p class="text-sm font-medium text-gray-800 mt-1 line-clamp-2">Nike Air Max 270 React Running Shoes</p>
+            <div class="flex items-center gap-2 mt-2">
+              <span class="text-brand-600 font-bold">&#8377;8,995</span>
+              <span class="text-gray-400 text-xs line-through">&#8377;12,995</span>
+            </div>
+            <div class="flex items-center gap-1 mt-2">
+              <span class="text-[10px] text-blue-600 bg-blue-50 px-1.5 py-0.5 rounded font-medium">&#8377;49 Shipping</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== BANNER SECTION ===== -->
+  <section class="py-6">
+    <div class="max-w-7xl mx-auto px-4 grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div class="bg-gradient-to-r from-navy-900 to-navy-700 rounded-2xl p-8 flex items-center justify-between">
+        <div>
+          <span class="text-xs text-brand-400 font-bold uppercase tracking-wider">Summer Sale</span>
+          <h3 class="text-2xl font-extrabold text-white mt-2">Up to 50% OFF</h3>
+          <p class="text-gray-400 text-sm mt-1">On gaming accessories & chairs</p>
+          <a href="product-listing.html" class="inline-block mt-4 btn-brand text-white text-sm font-semibold px-5 py-2 rounded-lg">Shop Now</a>
+        </div>
+        <span class="text-7xl">&#127918;</span>
+      </div>
+      <div class="bg-gradient-to-r from-orange-500 to-orange-600 rounded-2xl p-8 flex items-center justify-between">
+        <div>
+          <span class="text-xs text-orange-200 font-bold uppercase tracking-wider">New Collection</span>
+          <h3 class="text-2xl font-extrabold text-white mt-2">Smart Home</h3>
+          <p class="text-orange-100 text-sm mt-1">IoT devices starting &#8377;1,999</p>
+          <a href="product-listing.html" class="inline-block mt-4 bg-white text-brand-600 text-sm font-semibold px-5 py-2 rounded-lg hover:bg-orange-50 transition">Discover</a>
+        </div>
+        <span class="text-7xl">&#127968;</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== NEWSLETTER ===== -->
+  <section class="py-10 bg-gray-50">
+    <div class="max-w-7xl mx-auto px-4">
+      <div class="bg-navy-900 rounded-2xl p-10 flex flex-col md:flex-row items-center justify-between gap-6">
+        <div>
+          <h3 class="text-2xl font-bold text-white">Subscribe to our Newsletter</h3>
+          <p class="text-gray-400 text-sm mt-1">Get the latest deals, offers & updates directly in your inbox</p>
+        </div>
+        <div class="flex w-full md:w-auto">
+          <input type="email" placeholder="Enter your email address" class="px-5 py-3 rounded-l-lg text-sm w-full md:w-80 outline-none focus:ring-2 focus:ring-brand-400">
+          <button class="btn-brand text-white font-semibold px-6 py-3 rounded-r-lg whitespace-nowrap text-sm">Subscribe</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== BRANDS ===== -->
+  <section class="py-10">
+    <div class="max-w-7xl mx-auto px-4">
+      <h2 class="text-xl font-bold text-navy-900 mb-6 text-center">Featured Brands</h2>
+      <div class="flex items-center justify-center gap-12 flex-wrap opacity-50 grayscale hover:grayscale-0 hover:opacity-100 transition-all duration-300">
+        <span class="text-2xl font-bold text-gray-400">Samsung</span>
+        <span class="text-2xl font-bold text-gray-400">Apple</span>
+        <span class="text-2xl font-bold text-gray-400">Sony</span>
+        <span class="text-2xl font-bold text-gray-400">Nike</span>
+        <span class="text-2xl font-bold text-gray-400">boAt</span>
+        <span class="text-2xl font-bold text-gray-400">OnePlus</span>
+        <span class="text-2xl font-bold text-gray-400">Dell</span>
+        <span class="text-2xl font-bold text-gray-400">Puma</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== FOOTER ===== -->
+  <footer class="bg-navy-900 text-gray-400 pt-12 pb-6">
+    <div class="max-w-7xl mx-auto px-4">
+      <div class="grid grid-cols-2 md:grid-cols-5 gap-8 pb-10 border-b border-white/10">
+        <!-- Brand -->
+        <div class="col-span-2 md:col-span-1">
+          <a href="storefront.html" class="flex items-center gap-2 mb-4">
+            <div class="w-8 h-8 rounded-lg bg-brand-500 flex items-center justify-center">
+              <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-4 0a1 1 0 01-1-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 01-1 1"/></svg>
+            </div>
+            <span class="text-lg font-extrabold text-white">Home<span class="text-brand-500">Base</span></span>
+          </a>
+          <p class="text-sm text-gray-500 leading-relaxed">India's #1 Online Marketplace. Shop from thousands of sellers with secure payments and easy returns.</p>
+          <div class="flex items-center gap-3 mt-4">
+            <a href="#" class="w-8 h-8 bg-white/10 rounded-full flex items-center justify-center hover:bg-brand-500 transition text-xs text-white">f</a>
+            <a href="#" class="w-8 h-8 bg-white/10 rounded-full flex items-center justify-center hover:bg-brand-500 transition text-xs text-white">t</a>
+            <a href="#" class="w-8 h-8 bg-white/10 rounded-full flex items-center justify-center hover:bg-brand-500 transition text-xs text-white">in</a>
+            <a href="#" class="w-8 h-8 bg-white/10 rounded-full flex items-center justify-center hover:bg-brand-500 transition text-xs text-white">yt</a>
+          </div>
+        </div>
+        <!-- Quick Links -->
+        <div>
+          <h4 class="text-white font-semibold text-sm mb-4">Quick Links</h4>
+          <ul class="space-y-2 text-sm">
+            <li><a href="#" class="hover:text-brand-400 transition">About Us</a></li>
+            <li><a href="#" class="hover:text-brand-400 transition">Contact</a></li>
+            <li><a href="#" class="hover:text-brand-400 transition">Careers</a></li>
+            <li><a href="#" class="hover:text-brand-400 transition">Blog</a></li>
+          </ul>
+        </div>
+        <!-- Customer -->
+        <div>
+          <h4 class="text-white font-semibold text-sm mb-4">Customer Service</h4>
+          <ul class="space-y-2 text-sm">
+            <li><a href="#" class="hover:text-brand-400 transition">Help Center</a></li>
+            <li><a href="order-tracking.html" class="hover:text-brand-400 transition">Track Order</a></li>
+            <li><a href="returns.html" class="hover:text-brand-400 transition">Returns & Refunds</a></li>
+            <li><a href="#" class="hover:text-brand-400 transition">Shipping Info</a></li>
+          </ul>
+        </div>
+        <!-- Seller -->
+        <div>
+          <h4 class="text-white font-semibold text-sm mb-4">Sell on HomeBase</h4>
+          <ul class="space-y-2 text-sm">
+            <li><a href="../seller/seller-register.html" class="hover:text-brand-400 transition">Become a Seller</a></li>
+            <li><a href="../seller/seller-dashboard.html" class="hover:text-brand-400 transition">Seller Dashboard</a></li>
+            <li><a href="#" class="hover:text-brand-400 transition">Seller Policies</a></li>
+            <li><a href="#" class="hover:text-brand-400 transition">Seller Support</a></li>
+          </ul>
+        </div>
+        <!-- Payment -->
+        <div>
+          <h4 class="text-white font-semibold text-sm mb-4">Payment Methods</h4>
+          <div class="flex flex-wrap gap-2">
+            <span class="bg-white/10 text-xs text-white px-3 py-1.5 rounded">VISA</span>
+            <span class="bg-white/10 text-xs text-white px-3 py-1.5 rounded">MasterCard</span>
+            <span class="bg-white/10 text-xs text-white px-3 py-1.5 rounded">UPI</span>
+            <span class="bg-white/10 text-xs text-white px-3 py-1.5 rounded">PayTM</span>
+            <span class="bg-white/10 text-xs text-white px-3 py-1.5 rounded">COD</span>
+            <span class="bg-white/10 text-xs text-white px-3 py-1.5 rounded">Net Banking</span>
+          </div>
+          <h4 class="text-white font-semibold text-sm mb-3 mt-5">Download App</h4>
+          <div class="flex flex-col gap-2">
+            <a href="#" class="bg-white/10 text-xs text-white px-3 py-2 rounded hover:bg-white/20 transition">App Store</a>
+            <a href="#" class="bg-white/10 text-xs text-white px-3 py-2 rounded hover:bg-white/20 transition">Google Play</a>
+          </div>
+        </div>
+      </div>
+      <!-- Bottom -->
+      <div class="pt-6 flex flex-col md:flex-row items-center justify-between text-xs text-gray-500">
+        <p>&copy; 2026 HomeBase. All rights reserved.</p>
+        <div class="flex items-center gap-4 mt-2 md:mt-0">
+          <a href="#" class="hover:text-brand-400">Privacy Policy</a>
+          <a href="#" class="hover:text-brand-400">Terms of Service</a>
+          <a href="#" class="hover:text-brand-400">Cookie Policy</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- ===== SELLER FILTER JAVASCRIPT ===== -->
+  <script>
+    const sellerData = {
+      rajesh: {
+        name: 'Rajesh Store',
+        initials: 'RS',
+        rating: '4.6',
+        products: '234',
+        since: '2024',
+        color: '#F97316',
+        heroTitle: 'Rajesh Store\nBest Electronics Deals',
+        heroSubtitle: 'Top-rated seller for electronics & gadgets. Free shipping on all orders.',
+        dealTitle: 'Rajesh Store Flash Sale!'
+      },
+      priya: {
+        name: 'Priya Electronics',
+        initials: 'PE',
+        rating: '4.8',
+        products: '189',
+        since: '2023',
+        color: '#8B5CF6',
+        heroTitle: 'Priya Electronics\nPremium Tech Store',
+        heroSubtitle: 'Authorized dealer for Apple, Samsung, Sony. Genuine products guaranteed.',
+        dealTitle: 'Priya Electronics Exclusive!'
+      },
+      kumar: {
+        name: 'Kumar Fashions',
+        initials: 'KF',
+        rating: '4.5',
+        products: '567',
+        since: '2023',
+        color: '#EC4899',
+        heroTitle: 'Kumar Fashions\nTrending Styles',
+        heroSubtitle: 'Latest fashion trends. Nike, Adidas, Levi\'s and more at best prices.',
+        dealTitle: 'Kumar Fashions Sale!'
+      },
+      anita: {
+        name: 'Anita Home Decor',
+        initials: 'AH',
+        rating: '4.7',
+        products: '312',
+        since: '2024',
+        color: '#10B981',
+        heroTitle: 'Anita Home Decor\nTransform Your Space',
+        heroSubtitle: 'Beautiful furniture, lighting, and home accessories. Interior design experts.',
+        dealTitle: 'Anita Home Decor Offers!'
+      },
+      vikram: {
+        name: 'Vikram Sports',
+        initials: 'VS',
+        rating: '4.4',
+        products: '156',
+        since: '2025',
+        color: '#3B82F6',
+        heroTitle: 'Vikram Sports\nGear Up for Victory',
+        heroSubtitle: 'Sports equipment, activewear, and fitness gear. Train like a pro.',
+        dealTitle: 'Vikram Sports Deals!'
+      }
+    };
+
+    function filterBySeller(sellerId) {
+      // Save selection to localStorage for cross-page persistence
+      localStorage.setItem('selectedSeller', sellerId);
+
+      const banner = document.getElementById('sellerBanner');
+      const dropdown = document.getElementById('sellerFilter');
+      const dropdownNav = document.getElementById('sellerFilterNav');
+      const heroTitle = document.querySelector('.hero-title');
+      const heroSubtitle = document.querySelector('.hero-subtitle');
+      const dealTitle = document.querySelector('.deal-title');
+      const allProducts = document.querySelectorAll('[data-seller]');
+
+      // Sync both dropdowns
+      if (dropdown) dropdown.value = sellerId;
+      if (dropdownNav) dropdownNav.value = sellerId;
+
+      if (sellerId === 'all') {
+        // Show all
+        banner.classList.add('hidden');
+        allProducts.forEach(p => p.style.display = '');
+        if (heroTitle) heroTitle.innerHTML = 'Discover the<br>Best Deals on<br><span class="text-brand-400">Top Products</span>';
+        if (heroSubtitle) heroSubtitle.textContent = 'Shop from thousands of sellers. Free shipping on orders over \u20B9999. 30-day easy returns.';
+        if (dealTitle) dealTitle.textContent = 'Flash Sale!';
+      } else {
+        const seller = sellerData[sellerId];
+        // Show banner
+        banner.classList.remove('hidden');
+        document.getElementById('sellerAvatar').textContent = seller.initials;
+        document.getElementById('sellerAvatar').style.background = seller.color;
+        document.getElementById('sellerName').textContent = seller.name;
+        banner.querySelector('.text-xs.text-gray-500').innerHTML =
+          '<span>\u2B50 ' + seller.rating + '</span> \u00B7 <span>' + seller.products + ' products</span> \u00B7 <span>Member since ' + seller.since + '</span>';
+
+        // Update hero
+        if (heroTitle) {
+          const parts = seller.heroTitle.split('\n');
+          heroTitle.innerHTML = parts[0] + '<br><span class="text-brand-400">' + parts[1] + '</span>';
+        }
+        if (heroSubtitle) heroSubtitle.textContent = seller.heroSubtitle;
+        if (dealTitle) dealTitle.textContent = seller.dealTitle;
+
+        // Filter products
+        allProducts.forEach(p => {
+          p.style.display = (p.dataset.seller === sellerId || p.dataset.seller === 'all') ? '' : 'none';
+        });
+      }
+    }
+
+    // On page load, restore saved seller selection
+    document.addEventListener('DOMContentLoaded', function() {
+      const saved = localStorage.getItem('selectedSeller');
+      if (saved && saved !== 'all') filterBySeller(saved);
+    });
+  </script>
+
+</body>
+</html>

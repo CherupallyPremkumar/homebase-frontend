@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HomeBase — Pricing Rules</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brand: { 50:'#FFF7ED',100:'#FFEDD5',200:'#FED7AA',300:'#FDBA74',400:'#FB923C',500:'#F97316',600:'#EA580C',700:'#C2410C' },
+            navy: { 700:'#1E3A5F',800:'#1A2E4A',900:'#0A1628' },
+            success:'#16A34A', warning:'#EAB308', danger:'#DC2626',
+          },
+          fontFamily: { sans:['Inter','system-ui','sans-serif'] }
+        }
+      }
+    }
+  </script>
+  <style>
+    .sidebar-link{transition:all .15s ease}.sidebar-link:hover{background:rgba(255,255,255,.08)}.sidebar-link.active{background:rgba(249,115,22,.15);border-right:3px solid #F97316}
+    .stat-card{transition:all .2s ease}.stat-card:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(0,0,0,.08)}
+    .table-row{transition:background .15s ease}.table-row:hover{background:#FFF7ED}
+    .dropdown-menu{display:none}.dropdown:hover .dropdown-menu{display:block}
+    .toggle-switch { position: relative; display: inline-block; width: 36px; height: 20px; }
+    .toggle-switch input { opacity: 0; width: 0; height: 0; }
+    .toggle-slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background: #D1D5DB; border-radius: 20px; transition: 0.2s; }
+    .toggle-slider:before { position: absolute; content: ""; height: 16px; width: 16px; left: 2px; bottom: 2px; background: white; border-radius: 50%; transition: 0.2s; }
+    .toggle-switch input:checked + .toggle-slider { background: #16A34A; }
+    .toggle-switch input:checked + .toggle-slider:before { transform: translateX(16px); }
+  </style>
+</head>
+<body class="font-sans bg-gray-50 text-gray-900">
+
+  <header id="admin-header" class="fixed top-0 left-0 right-0 z-50 bg-white border-b border-gray-200 h-16"></header>
+
+  <div class="flex pt-16 min-h-screen">
+    <aside id="admin-sidebar" class="fixed left-0 top-16 bottom-0 w-60 z-40 flex flex-col overflow-y-auto" style="background:#0A1628;"></aside>
+
+    <main class="flex-1 ml-60 p-6 lg:p-8">
+
+      <!-- Page Header -->
+      <div class="flex items-center justify-between mb-8">
+        <div>
+          <h1 class="text-2xl font-bold text-gray-900">Pricing Rules</h1>
+          <p class="text-sm text-gray-500 mt-1">Configure markup, discount, floor, and ceiling pricing rules for products</p>
+        </div>
+        <div class="flex items-center gap-3">
+          <button onclick="alert('Running price impact simulation...')" class="flex items-center gap-2 border border-gray-200 bg-white rounded-lg px-4 py-2.5 text-sm font-semibold hover:bg-gray-50 transition">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 013 19.875v-6.75zM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v11.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V8.625zM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v15.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V4.125z"/></svg>
+            Simulate Price Impact
+          </button>
+          <button onclick="document.getElementById('createRuleModal').classList.remove('hidden')" class="flex items-center gap-2 bg-brand-500 text-white rounded-lg px-4 py-2.5 text-sm font-semibold hover:bg-brand-600 transition shadow-sm">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 4.5v15m7.5-7.5h-15"/></svg>
+            Create Rule
+          </button>
+        </div>
+      </div>
+
+      <!-- Stats -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        <div class="stat-card bg-white rounded-xl border border-gray-100 p-5">
+          <div class="flex items-center justify-between mb-3">
+            <span class="text-xs font-semibold text-gray-400 uppercase tracking-wide">Active Rules</span>
+            <div class="w-9 h-9 rounded-lg bg-blue-50 flex items-center justify-center"><svg class="w-5 h-5 text-blue-500" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M9.594 3.94c.09-.542.56-.94 1.11-.94h2.593c.55 0 1.02.398 1.11.94l.213 1.281c.063.374.313.686.645.87.074.04.147.083.22.127.324.196.72.257 1.075.124l1.217-.456a1.125 1.125 0 011.37.49l1.296 2.247a1.125 1.125 0 01-.26 1.431l-1.003.827c-.293.24-.438.613-.431.992a6.759 6.759 0 010 .255c-.007.378.138.75.43.99l1.005.828c.424.35.534.954.26 1.43l-1.298 2.247a1.125 1.125 0 01-1.369.491l-1.217-.456c-.355-.133-.75-.072-1.076.124a6.57 6.57 0 01-.22.128c-.331.183-.581.495-.644.869l-.213 1.28c-.09.543-.56.941-1.11.941h-2.594c-.55 0-1.02-.398-1.11-.94l-.213-1.281c-.062-.374-.312-.686-.644-.87a6.52 6.52 0 01-.22-.127c-.325-.196-.72-.257-1.076-.124l-1.217.456a1.125 1.125 0 01-1.369-.49l-1.297-2.247a1.125 1.125 0 01.26-1.431l1.004-.827c.292-.24.437-.613.43-.992a6.932 6.932 0 010-.255c.007-.378-.138-.75-.43-.99l-1.004-.828a1.125 1.125 0 01-.26-1.43l1.297-2.247a1.125 1.125 0 011.37-.491l1.216.456c.356.133.751.072 1.076-.124.072-.044.146-.087.22-.128.332-.183.582-.495.644-.869l.214-1.281z"/><path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg></div>
+          </div>
+          <p class="text-2xl font-bold text-gray-900">12</p>
+          <p class="text-xs text-gray-400 font-medium mt-1">3 added this month</p>
+        </div>
+        <div class="stat-card bg-white rounded-xl border border-gray-100 p-5">
+          <div class="flex items-center justify-between mb-3">
+            <span class="text-xs font-semibold text-gray-400 uppercase tracking-wide">Products Affected</span>
+            <div class="w-9 h-9 rounded-lg bg-orange-50 flex items-center justify-center"><svg class="w-5 h-5 text-orange-500" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M20.25 7.5l-.625 10.632a2.25 2.25 0 01-2.247 2.118H6.622a2.25 2.25 0 01-2.247-2.118L3.75 7.5M10 11.25h4M3.375 7.5h17.25c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125z"/></svg></div>
+          </div>
+          <p class="text-2xl font-bold text-gray-900">2,340</p>
+          <p class="text-xs text-gray-400 font-medium mt-1">Across 8 categories</p>
+        </div>
+        <div class="stat-card bg-white rounded-xl border border-gray-100 p-5">
+          <div class="flex items-center justify-between mb-3">
+            <span class="text-xs font-semibold text-gray-400 uppercase tracking-wide">Avg Discount</span>
+            <div class="w-9 h-9 rounded-lg bg-green-50 flex items-center justify-center"><svg class="w-5 h-5 text-green-500" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M9.568 3H5.25A2.25 2.25 0 003 5.25v4.318c0 .597.237 1.17.659 1.591l9.581 9.581c.699.699 1.78.872 2.607.33a18.095 18.095 0 005.223-5.223c.542-.827.369-1.908-.33-2.607L11.16 3.66A2.25 2.25 0 009.568 3z"/><path d="M6 6h.008v.008H6V6z"/></svg></div>
+          </div>
+          <p class="text-2xl font-bold text-gray-900">8.5%</p>
+          <p class="text-xs text-gray-400 font-medium mt-1">Weighted average</p>
+        </div>
+        <div class="stat-card bg-white rounded-xl border border-gray-100 p-5">
+          <div class="flex items-center justify-between mb-3">
+            <span class="text-xs font-semibold text-gray-400 uppercase tracking-wide">Revenue Impact</span>
+            <div class="w-9 h-9 rounded-lg bg-emerald-50 flex items-center justify-center"><svg class="w-5 h-5 text-emerald-500" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M2.25 18L9 11.25l4.306 4.307a11.95 11.95 0 015.814-5.519l2.74-1.22m0 0l-5.94-2.28m5.94 2.28l-2.28 5.941"/></svg></div>
+          </div>
+          <p class="text-2xl font-bold text-emerald-600">+&#8377;4.2L</p>
+          <p class="text-xs text-green-600 font-medium mt-1">This month vs baseline</p>
+        </div>
+      </div>
+
+      <!-- Rule Conflict Detection -->
+      <div class="bg-red-50 border border-red-200 rounded-xl p-5 mb-8">
+        <div class="flex items-start justify-between">
+          <div class="flex items-start gap-3">
+            <div class="w-10 h-10 rounded-lg bg-red-100 flex items-center justify-center shrink-0 mt-0.5">
+              <svg class="w-5 h-5 text-red-600" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z"/></svg>
+            </div>
+            <div>
+              <div class="flex items-center gap-2 mb-1">
+                <h3 class="text-sm font-bold text-red-800">Rule Conflict Detected</h3>
+                <span class="px-2 py-0.5 text-[10px] font-bold rounded-full bg-red-100 text-red-700 uppercase">Action Required</span>
+              </div>
+              <p class="text-sm text-red-700"><strong>"Min Price - Fashion"</strong> (Floor &#8377;500) conflicts with <strong>"Clearance Sale"</strong> (Discount 60%).</p>
+              <p class="text-sm text-red-700 mt-1">Result: &#8377;500 base price - 60% = <strong class="text-red-800">&#8377;200 (below floor!)</strong></p>
+              <p class="text-xs text-red-500 mt-2">Affects <strong>3 products</strong> in Fashion category: SKU-2241, SKU-2245, SKU-2250</p>
+            </div>
+          </div>
+          <button onclick="alert('Opening conflict resolution...')" class="shrink-0 ml-4 px-4 py-2 text-xs font-semibold text-white bg-red-600 hover:bg-red-700 rounded-lg transition shadow-sm">
+            Resolve Conflict
+          </button>
+        </div>
+      </div>
+
+      <!-- Rule Performance Table -->
+      <div class="bg-white rounded-xl border border-gray-100 mb-8">
+        <div class="px-6 py-4 border-b border-gray-100 flex items-center justify-between">
+          <h2 class="text-base font-semibold text-gray-900">Rule Performance</h2>
+          <div class="flex items-center gap-2">
+            <button class="text-xs font-medium px-3 py-1.5 rounded-lg bg-brand-50 text-brand-600">All</button>
+            <button class="text-xs font-medium px-3 py-1.5 rounded-lg text-gray-500 hover:bg-gray-50">Markup</button>
+            <button class="text-xs font-medium px-3 py-1.5 rounded-lg text-gray-500 hover:bg-gray-50">Discount</button>
+            <button class="text-xs font-medium px-3 py-1.5 rounded-lg text-gray-500 hover:bg-gray-50">Floor</button>
+            <button class="text-xs font-medium px-3 py-1.5 rounded-lg text-gray-500 hover:bg-gray-50">Ceiling</button>
+          </div>
+        </div>
+        <div class="overflow-x-auto">
+          <table class="w-full text-sm">
+            <thead><tr class="text-left text-xs font-semibold text-gray-400 uppercase tracking-wide border-b border-gray-50">
+              <th class="px-6 py-3">Rule Name</th><th class="px-4 py-3">Type</th><th class="px-4 py-3">Products</th><th class="px-4 py-3">Conversions</th><th class="px-4 py-3">Revenue Impact</th><th class="px-4 py-3">Status</th><th class="px-4 py-3">Actions</th>
+            </tr></thead>
+            <tbody>
+              <tr class="table-row border-b border-gray-50">
+                <td class="px-6 py-3.5 font-medium">Electronics Markup</td>
+                <td class="px-4 py-3.5"><span class="px-2 py-1 rounded text-xs font-semibold bg-blue-50 text-blue-600">Markup +15%</span></td>
+                <td class="px-4 py-3.5">580</td>
+                <td class="px-4 py-3.5"><span class="text-green-600 font-semibold">12.4%</span></td>
+                <td class="px-4 py-3.5"><span class="text-emerald-600 font-semibold">+&#8377;1.8L</span></td>
+                <td class="px-4 py-3.5">
+                  <label class="toggle-switch"><input type="checkbox" checked onchange="alert('Toggling Electronics Markup')"><span class="toggle-slider"></span></label>
+                </td>
+                <td class="px-4 py-3.5"><button onclick="alert('Edit: Electronics Markup')" class="text-xs font-medium text-brand-500 hover:text-brand-600">Edit</button></td>
+              </tr>
+              <tr class="table-row border-b border-gray-50">
+                <td class="px-6 py-3.5 font-medium">Festival Discount</td>
+                <td class="px-4 py-3.5"><span class="px-2 py-1 rounded text-xs font-semibold bg-green-50 text-green-600">Discount -10%</span></td>
+                <td class="px-4 py-3.5">2,340</td>
+                <td class="px-4 py-3.5"><span class="text-green-600 font-semibold">18.2%</span></td>
+                <td class="px-4 py-3.5"><span class="text-emerald-600 font-semibold">+&#8377;3.1L</span></td>
+                <td class="px-4 py-3.5">
+                  <label class="toggle-switch"><input type="checkbox" checked onchange="alert('Toggling Festival Discount')"><span class="toggle-slider"></span></label>
+                </td>
+                <td class="px-4 py-3.5"><button onclick="alert('Edit: Festival Discount')" class="text-xs font-medium text-brand-500 hover:text-brand-600">Edit</button></td>
+              </tr>
+              <tr class="table-row border-b border-gray-50">
+                <td class="px-6 py-3.5 font-medium">Min Price - Fashion</td>
+                <td class="px-4 py-3.5"><span class="px-2 py-1 rounded text-xs font-semibold bg-orange-50 text-orange-600">Floor &#8377;199</span></td>
+                <td class="px-4 py-3.5">420</td>
+                <td class="px-4 py-3.5"><span class="text-gray-600 font-semibold">9.8%</span></td>
+                <td class="px-4 py-3.5"><span class="text-emerald-600 font-semibold">+&#8377;0.6L</span></td>
+                <td class="px-4 py-3.5">
+                  <label class="toggle-switch"><input type="checkbox" checked onchange="alert('Toggling Min Price - Fashion')"><span class="toggle-slider"></span></label>
+                </td>
+                <td class="px-4 py-3.5"><button onclick="alert('Edit: Min Price - Fashion')" class="text-xs font-medium text-brand-500 hover:text-brand-600">Edit</button></td>
+              </tr>
+              <tr class="table-row border-b border-gray-50">
+                <td class="px-6 py-3.5 font-medium">Max Price - Samsung</td>
+                <td class="px-4 py-3.5"><span class="px-2 py-1 rounded text-xs font-semibold bg-red-50 text-red-600">Ceiling &#8377;99,999</span></td>
+                <td class="px-4 py-3.5">145</td>
+                <td class="px-4 py-3.5"><span class="text-green-600 font-semibold">14.5%</span></td>
+                <td class="px-4 py-3.5"><span class="text-gray-500 font-semibold">--</span></td>
+                <td class="px-4 py-3.5">
+                  <label class="toggle-switch"><input type="checkbox" checked onchange="alert('Toggling Max Price - Samsung')"><span class="toggle-slider"></span></label>
+                </td>
+                <td class="px-4 py-3.5"><button onclick="alert('Edit: Max Price - Samsung')" class="text-xs font-medium text-brand-500 hover:text-brand-600">Edit</button></td>
+              </tr>
+              <tr class="table-row border-b border-gray-50">
+                <td class="px-6 py-3.5 font-medium">Home & Kitchen Markup</td>
+                <td class="px-4 py-3.5"><span class="px-2 py-1 rounded text-xs font-semibold bg-blue-50 text-blue-600">Markup +12%</span></td>
+                <td class="px-4 py-3.5">310</td>
+                <td class="px-4 py-3.5"><span class="text-green-600 font-semibold">11.1%</span></td>
+                <td class="px-4 py-3.5"><span class="text-emerald-600 font-semibold">+&#8377;0.9L</span></td>
+                <td class="px-4 py-3.5">
+                  <label class="toggle-switch"><input type="checkbox" checked onchange="alert('Toggling Home & Kitchen Markup')"><span class="toggle-slider"></span></label>
+                </td>
+                <td class="px-4 py-3.5"><button onclick="alert('Edit: Home & Kitchen Markup')" class="text-xs font-medium text-brand-500 hover:text-brand-600">Edit</button></td>
+              </tr>
+              <tr class="table-row border-b border-gray-50">
+                <td class="px-6 py-3.5 font-medium">Clearance Sale</td>
+                <td class="px-4 py-3.5"><span class="px-2 py-1 rounded text-xs font-semibold bg-green-50 text-green-600">Discount -25%</span></td>
+                <td class="px-4 py-3.5">890</td>
+                <td class="px-4 py-3.5"><span class="text-gray-400 font-semibold">--</span></td>
+                <td class="px-4 py-3.5"><span class="text-gray-400 font-semibold">--</span></td>
+                <td class="px-4 py-3.5">
+                  <label class="toggle-switch"><input type="checkbox" onchange="alert('Toggling Clearance Sale')"><span class="toggle-slider"></span></label>
+                </td>
+                <td class="px-4 py-3.5"><button onclick="alert('Edit: Clearance Sale')" class="text-xs font-medium text-brand-500 hover:text-brand-600">Edit</button></td>
+              </tr>
+              <tr class="table-row border-b border-gray-50">
+                <td class="px-6 py-3.5 font-medium">Min Price - Electronics</td>
+                <td class="px-4 py-3.5"><span class="px-2 py-1 rounded text-xs font-semibold bg-orange-50 text-orange-600">Floor &#8377;499</span></td>
+                <td class="px-4 py-3.5">580</td>
+                <td class="px-4 py-3.5"><span class="text-gray-600 font-semibold">10.2%</span></td>
+                <td class="px-4 py-3.5"><span class="text-emerald-600 font-semibold">+&#8377;0.4L</span></td>
+                <td class="px-4 py-3.5">
+                  <label class="toggle-switch"><input type="checkbox" checked onchange="alert('Toggling Min Price - Electronics')"><span class="toggle-slider"></span></label>
+                </td>
+                <td class="px-4 py-3.5"><button onclick="alert('Edit: Min Price - Electronics')" class="text-xs font-medium text-brand-500 hover:text-brand-600">Edit</button></td>
+              </tr>
+              <tr class="table-row">
+                <td class="px-6 py-3.5 font-medium">New Seller Discount</td>
+                <td class="px-4 py-3.5"><span class="px-2 py-1 rounded text-xs font-semibold bg-green-50 text-green-600">Discount -5%</span></td>
+                <td class="px-4 py-3.5">2,340</td>
+                <td class="px-4 py-3.5"><span class="text-green-600 font-semibold">15.8%</span></td>
+                <td class="px-4 py-3.5"><span class="text-red-500 font-semibold">-&#8377;2.6L</span></td>
+                <td class="px-4 py-3.5">
+                  <label class="toggle-switch"><input type="checkbox" checked onchange="alert('Toggling New Seller Discount')"><span class="toggle-slider"></span></label>
+                </td>
+                <td class="px-4 py-3.5"><button onclick="alert('Edit: New Seller Discount')" class="text-xs font-medium text-brand-500 hover:text-brand-600">Edit</button></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Recent Bulk Price Changes -->
+      <div class="bg-white rounded-xl border border-gray-100">
+        <div class="px-6 py-4 border-b border-gray-100">
+          <h2 class="text-base font-semibold text-gray-900">Recent Bulk Price Changes</h2>
+        </div>
+        <div class="divide-y divide-gray-50">
+          <div class="px-6 py-4 flex items-center justify-between"><div><p class="text-sm font-medium text-gray-900">Festival Discount applied to All Products</p><p class="text-xs text-gray-500">-10% across 2,340 products</p></div><span class="text-xs text-gray-400">2 days ago</span></div>
+          <div class="px-6 py-4 flex items-center justify-between"><div><p class="text-sm font-medium text-gray-900">Electronics Markup updated from 12% to 15%</p><p class="text-xs text-gray-500">Affected 580 products</p></div><span class="text-xs text-gray-400">5 days ago</span></div>
+          <div class="px-6 py-4 flex items-center justify-between"><div><p class="text-sm font-medium text-gray-900">Clearance Sale paused</p><p class="text-xs text-gray-500">890 products reverted to original price</p></div><span class="text-xs text-gray-400">1 week ago</span></div>
+          <div class="px-6 py-4 flex items-center justify-between"><div><p class="text-sm font-medium text-gray-900">Floor price set for Fashion category</p><p class="text-xs text-gray-500">Minimum price &#8377;199 for 420 products</p></div><span class="text-xs text-gray-400">2 weeks ago</span></div>
+          <div class="px-6 py-4 flex items-center justify-between"><div><p class="text-sm font-medium text-gray-900">Samsung ceiling price added</p><p class="text-xs text-gray-500">Max &#8377;99,999 for 145 Samsung products</p></div><span class="text-xs text-gray-400">3 weeks ago</span></div>
+        </div>
+      </div>
+
+    </main>
+  </div>
+
+<!-- Create Rule Modal -->
+<div id="createRuleModal" class="hidden fixed inset-0 bg-black/40 z-50 flex items-center justify-center">
+  <div class="bg-white rounded-2xl shadow-xl w-full max-w-lg mx-4 p-6">
+    <div class="flex items-center justify-between mb-6">
+      <h3 class="text-lg font-bold text-gray-900">Create Pricing Rule</h3>
+      <button onclick="document.getElementById('createRuleModal').classList.add('hidden')" class="text-gray-400 hover:text-gray-600"><svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M6 18L18 6M6 6l12 12"/></svg></button>
+    </div>
+    <div class="space-y-4">
+      <div><label class="block text-sm font-medium text-gray-700 mb-1">Rule Name</label><input type="text" class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm" placeholder="e.g., Summer Sale Discount"></div>
+      <div><label class="block text-sm font-medium text-gray-700 mb-1">Type</label><select class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm"><option>Markup</option><option>Discount</option><option>Floor Price</option><option>Ceiling</option></select></div>
+      <div><label class="block text-sm font-medium text-gray-700 mb-1">Scope</label><select class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm"><option>All Products</option><option>Category</option><option>Brand</option></select></div>
+      <div><label class="block text-sm font-medium text-gray-700 mb-1">Value</label><input type="text" class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm" placeholder="e.g., 15% or 499"></div>
+    </div>
+    <div class="flex justify-end gap-3 mt-6">
+      <button onclick="document.getElementById('createRuleModal').classList.add('hidden')" class="px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 rounded-lg">Cancel</button>
+      <button onclick="alert('Rule created!');document.getElementById('createRuleModal').classList.add('hidden')" class="px-4 py-2 text-sm font-semibold text-white bg-brand-500 hover:bg-brand-600 rounded-lg">Create Rule</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  document.getElementById('createRuleModal').addEventListener('click', function(e) { if(e.target===this) this.classList.add('hidden'); });
+</script>
+
+<script src="../shared-layout.js"></script>
+<script>renderAdminLayout('pricing', '../');</script>
+</body>
+</html>

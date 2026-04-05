@@ -1,0 +1,1150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HomeBase — Shipping Management</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              50: '#FFF7ED',
+              100: '#FFEDD5',
+              200: '#FED7AA',
+              300: '#FDBA74',
+              400: '#FB923C',
+              500: '#F97316',
+              600: '#EA580C',
+              700: '#C2410C',
+            },
+            navy: {
+              700: '#1E3A5F',
+              800: '#152238',
+              900: '#0A1628',
+            },
+            success: '#16A34A',
+            warning: '#EAB308',
+            danger: '#DC2626',
+          },
+          fontFamily: {
+            sans: ['Inter', 'system-ui', 'sans-serif'],
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+    .scrollbar-hide::-webkit-scrollbar { display: none; }
+    .sidebar-link { transition: all 0.15s ease; }
+    .sidebar-link:hover { background: rgba(255,255,255,0.08); }
+    .sidebar-link.active { background: rgba(249,115,22,0.15); border-right: 3px solid #F97316; }
+    .stat-card { transition: all 0.2s ease; }
+    .stat-card:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,0.08); }
+    .table-row { transition: background 0.15s ease; }
+    .table-row:hover { background: #FFF7ED; }
+    .filter-tab { transition: all 0.15s ease; }
+    .filter-tab.active { color: #F97316; border-color: #F97316; }
+    .filter-tab:hover:not(.active) { color: #374151; border-color: #D1D5DB; }
+    .dropdown-menu { display: none; }
+    .dropdown:hover .dropdown-menu { display: block; }
+    .sidebar-scroll::-webkit-scrollbar { width: 4px; }
+    .sidebar-scroll::-webkit-scrollbar-track { background: transparent; }
+    .sidebar-scroll::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); border-radius: 2px; }
+    .perf-bar { transition: width 0.6s ease; }
+    .pulse-dot { animation: pulse-ring 2s ease infinite; }
+    @keyframes pulse-ring {
+      0% { box-shadow: 0 0 0 0 rgba(22, 163, 74, 0.4); }
+      70% { box-shadow: 0 0 0 6px rgba(22, 163, 74, 0); }
+      100% { box-shadow: 0 0 0 0 rgba(22, 163, 74, 0); }
+    }
+    .calc-result { animation: slideUp 0.3s ease; }
+    @keyframes slideUp {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+  </style>
+</head>
+<body class="font-sans bg-gray-50 text-gray-900">
+
+  <!-- ===== TOP HEADER BAR ===== -->
+  <header id="admin-header" class="fixed top-0 left-0 right-0 z-50 bg-white border-b border-gray-200 h-16"></header>
+
+  <!-- ===== LAYOUT: SIDEBAR + MAIN ===== -->
+  <div class="flex pt-16 min-h-screen">
+
+    <!-- ===== LEFT SIDEBAR ===== -->
+    <aside id="admin-sidebar" class="fixed left-0 top-16 bottom-0 w-60 z-40 flex flex-col overflow-y-auto" style="background:#0A1628;"></aside>
+
+    <!-- ===== MAIN CONTENT ===== -->
+    <main class="flex-1 ml-60 p-6 lg:p-8">
+
+      <!-- Page Header -->
+      <div class="flex items-center justify-between mb-8">
+        <div>
+          <h1 class="text-2xl font-bold text-gray-900">Shipping Management</h1>
+          <p class="text-sm text-gray-500 mt-1">Configure carriers, zones, rates and delivery SLAs</p>
+        </div>
+        <div class="flex items-center gap-3">
+          <button class="flex items-center gap-2 bg-white border border-gray-200 text-gray-700 text-sm font-medium px-4 py-2.5 rounded-lg hover:bg-gray-50 transition shadow-sm">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3"/></svg>
+            Export
+          </button>
+          <button onclick="alert('Add new shipping carrier configuration')" class="flex items-center gap-2 bg-brand-500 text-white rounded-lg px-4 py-2.5 text-sm font-semibold hover:bg-brand-600 transition shadow-sm">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 4.5v15m7.5-7.5h-15"/></svg>
+            Add Carrier
+          </button>
+        </div>
+      </div>
+
+      <!-- Stats Cards -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 mb-8">
+        <!-- Active Carriers -->
+        <div class="stat-card bg-white rounded-xl border border-gray-100 p-5 shadow-sm">
+          <div class="flex items-center justify-between mb-3">
+            <span class="text-sm font-medium text-gray-500">Active Carriers</span>
+            <div class="w-9 h-9 rounded-lg bg-blue-50 flex items-center justify-center">
+              <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M8.25 18.75a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m3 0h6m-9 0H3.375a1.125 1.125 0 01-1.125-1.125V14.25m17.25 4.5a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m3 0H6.375m11.25 3V7.5a.375.375 0 00-.375-.375H14.25m0 0V3h4.5a.375.375 0 01.375.375v3.75m-4.875 0h4.875"/></svg>
+            </div>
+          </div>
+          <p class="text-2xl font-bold text-gray-900">5</p>
+          <div class="flex items-center gap-1 mt-1">
+            <svg class="w-3.5 h-3.5 text-green-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4.5 12.75l6 6 9-13.5"/></svg>
+            <span class="text-xs font-semibold text-green-600">All carriers operational</span>
+          </div>
+        </div>
+
+        <!-- Avg Delivery -->
+        <div class="stat-card bg-white rounded-xl border border-gray-100 p-5 shadow-sm">
+          <div class="flex items-center justify-between mb-3">
+            <span class="text-sm font-medium text-gray-500">Avg Delivery Time</span>
+            <div class="w-9 h-9 rounded-lg bg-purple-50 flex items-center justify-center">
+              <svg class="w-5 h-5 text-purple-600" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+            </div>
+          </div>
+          <p class="text-2xl font-bold text-gray-900">4.2 <span class="text-base font-medium text-gray-400">days</span></p>
+          <div class="flex items-center gap-1 mt-1">
+            <svg class="w-3.5 h-3.5 text-green-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M2.25 6L9 12.75l4.286-4.286a11.948 11.948 0 014.306 6.43l.776 2.898m0 0l3.182-5.511m-3.182 5.51l-5.511-3.181"/></svg>
+            <span class="text-xs font-semibold text-green-600">-0.3 days vs last month</span>
+          </div>
+        </div>
+
+        <!-- On-time -->
+        <div class="stat-card bg-white rounded-xl border border-gray-100 p-5 shadow-sm">
+          <div class="flex items-center justify-between mb-3">
+            <span class="text-sm font-medium text-gray-500">On-time Delivery</span>
+            <div class="w-9 h-9 rounded-lg bg-green-50 flex items-center justify-center">
+              <svg class="w-5 h-5 text-green-600" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+            </div>
+          </div>
+          <p class="text-2xl font-bold text-gray-900">94.5%</p>
+          <div class="flex items-center gap-1 mt-1">
+            <svg class="w-3.5 h-3.5 text-green-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M2.25 18L9 11.25l4.306 4.307a11.95 11.95 0 015.814-5.519l2.74-1.22m0 0l-5.94-2.281m5.94 2.28l-2.28 5.941"/></svg>
+            <span class="text-xs font-semibold text-green-600">+1.2% this month</span>
+          </div>
+        </div>
+
+        <!-- Coverage -->
+        <div class="stat-card bg-white rounded-xl border border-gray-100 p-5 shadow-sm">
+          <div class="flex items-center justify-between mb-3">
+            <span class="text-sm font-medium text-gray-500">PIN Code Coverage</span>
+            <div class="w-9 h-9 rounded-lg bg-amber-50 flex items-center justify-center">
+              <svg class="w-5 h-5 text-amber-600" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z"/><path d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z"/></svg>
+            </div>
+          </div>
+          <p class="text-2xl font-bold text-gray-900">98%</p>
+          <div class="flex items-center gap-1 mt-1">
+            <span class="text-xs font-semibold text-gray-500">19,200 / 19,600 PIN codes</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== REAL-TIME CARRIER STATUS ===== -->
+      <div class="bg-white rounded-xl border border-gray-100 shadow-sm mb-8">
+        <div class="flex items-center justify-between px-6 py-5 border-b border-gray-100">
+          <div>
+            <h2 class="text-lg font-bold text-gray-900">Real-time Carrier Status</h2>
+            <p class="text-sm text-gray-500 mt-0.5">Live operational status of all integrated carriers</p>
+          </div>
+          <div class="flex items-center gap-2">
+            <span class="w-2 h-2 rounded-full bg-green-500 pulse-dot"></span>
+            <span class="text-xs font-medium text-gray-500">Live</span>
+            <span class="text-xs text-gray-400 ml-2">Updated 30s ago</span>
+          </div>
+        </div>
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-0 divide-y sm:divide-y-0 sm:divide-x divide-gray-100">
+          <!-- Delhivery -->
+          <div class="px-6 py-5">
+            <div class="flex items-center gap-3 mb-3">
+              <div class="w-10 h-10 rounded-lg bg-red-50 flex items-center justify-center text-xs font-bold text-red-600">DL</div>
+              <div>
+                <p class="text-sm font-semibold text-gray-900">Delhivery</p>
+                <p class="text-xs text-gray-400">All services</p>
+              </div>
+            </div>
+            <div class="flex items-center gap-2 mb-2">
+              <span class="w-2.5 h-2.5 rounded-full bg-green-500 pulse-dot"></span>
+              <span class="text-sm font-semibold text-green-700">Operational</span>
+            </div>
+            <div class="flex items-center gap-3 text-xs text-gray-500">
+              <span>Uptime: 99.8%</span>
+              <span>Latency: 120ms</span>
+            </div>
+          </div>
+          <!-- BlueDart -->
+          <div class="px-6 py-5">
+            <div class="flex items-center gap-3 mb-3">
+              <div class="w-10 h-10 rounded-lg bg-blue-50 flex items-center justify-center text-xs font-bold text-blue-600">BD</div>
+              <div>
+                <p class="text-sm font-semibold text-gray-900">BlueDart</p>
+                <p class="text-xs text-gray-400">All services</p>
+              </div>
+            </div>
+            <div class="flex items-center gap-2 mb-2">
+              <span class="w-2.5 h-2.5 rounded-full bg-green-500 pulse-dot"></span>
+              <span class="text-sm font-semibold text-green-700">Operational</span>
+            </div>
+            <div class="flex items-center gap-3 text-xs text-gray-500">
+              <span>Uptime: 99.9%</span>
+              <span>Latency: 95ms</span>
+            </div>
+          </div>
+          <!-- DTDC -->
+          <div class="px-6 py-5">
+            <div class="flex items-center gap-3 mb-3">
+              <div class="w-10 h-10 rounded-lg bg-orange-50 flex items-center justify-center text-xs font-bold text-orange-600">DT</div>
+              <div>
+                <p class="text-sm font-semibold text-gray-900">DTDC</p>
+                <p class="text-xs text-gray-400">Partial disruption</p>
+              </div>
+            </div>
+            <div class="flex items-center gap-2 mb-2">
+              <span class="w-2.5 h-2.5 rounded-full bg-amber-500"></span>
+              <span class="text-sm font-semibold text-amber-700">Degraded</span>
+            </div>
+            <div class="text-xs text-amber-600 bg-amber-50 rounded-md px-2.5 py-1.5 mt-1">
+              Delays in NE region. ETA: 2-3 extra days for Assam, Meghalaya, Nagaland.
+            </div>
+          </div>
+          <!-- India Post -->
+          <div class="px-6 py-5">
+            <div class="flex items-center gap-3 mb-3">
+              <div class="w-10 h-10 rounded-lg bg-amber-50 flex items-center justify-center text-xs font-bold text-amber-600">IP</div>
+              <div>
+                <p class="text-sm font-semibold text-gray-900">India Post</p>
+                <p class="text-xs text-gray-400">All services</p>
+              </div>
+            </div>
+            <div class="flex items-center gap-2 mb-2">
+              <span class="w-2.5 h-2.5 rounded-full bg-green-500 pulse-dot"></span>
+              <span class="text-sm font-semibold text-green-700">Operational</span>
+            </div>
+            <div class="flex items-center gap-3 text-xs text-gray-500">
+              <span>Uptime: 98.5%</span>
+              <span>Latency: 340ms</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== SHIPPING RATE CALCULATOR + SERVICEABILITY CHECK ===== -->
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+
+        <!-- Shipping Rate Calculator -->
+        <div class="bg-white rounded-xl border border-gray-100 shadow-sm p-6">
+          <div class="mb-5">
+            <h2 class="text-lg font-bold text-gray-900">Shipping Rate Calculator</h2>
+            <p class="text-sm text-gray-500 mt-0.5">Compare rates across carriers for a given shipment</p>
+          </div>
+          <div class="grid grid-cols-3 gap-4 mb-5">
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1.5">Weight (kg)</label>
+              <input id="calcWeight" type="number" value="2.5" step="0.1" min="0.1" class="w-full border border-gray-200 rounded-lg py-2.5 px-4 text-sm outline-none focus:border-brand-400 focus:ring-2 focus:ring-brand-100 transition font-semibold">
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1.5">From PIN</label>
+              <input id="calcFrom" type="text" value="400001" maxlength="6" class="w-full border border-gray-200 rounded-lg py-2.5 px-4 text-sm outline-none focus:border-brand-400 focus:ring-2 focus:ring-brand-100 transition font-mono">
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1.5">To PIN</label>
+              <input id="calcTo" type="text" value="560001" maxlength="6" class="w-full border border-gray-200 rounded-lg py-2.5 px-4 text-sm outline-none focus:border-brand-400 focus:ring-2 focus:ring-brand-100 transition font-mono">
+            </div>
+          </div>
+          <button onclick="calculateRates()" class="w-full flex items-center justify-center gap-2 bg-brand-500 text-white rounded-lg px-4 py-2.5 text-sm font-semibold hover:bg-brand-600 transition mb-5">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M15.75 15.75V18m-7.5-6.75h.008v.008H8.25v-.008zm0 2.25h.008v.008H8.25V13.5zm0 2.25h.008v.008H8.25v-.008zm0 2.25h.008v.008H8.25V18zm2.498-6.75h.007v.008h-.007v-.008zm0 2.25h.007v.008h-.007V13.5zm0 2.25h.007v.008h-.007v-.008zm0 2.25h.007v.008h-.007V18zm2.504-6.75h.008v.008h-.008v-.008zm0 2.25h.008v.008h-.008V13.5zm0 2.25h.008v.008h-.008v-.008zm0 2.25h.008v.008h-.008V18zm2.498-6.75h.008v.008h-.008v-.008zm0 2.25h.008v.008h-.008V13.5zM8.25 6h7.5v2.25h-7.5V6zM12 2.25c-1.892 0-3.758.11-5.593.322C5.307 2.7 4.5 3.65 4.5 4.757V19.5a2.25 2.25 0 002.25 2.25h10.5a2.25 2.25 0 002.25-2.25V4.757c0-1.108-.806-2.057-1.907-2.185A48.507 48.507 0 0012 2.25z"/></svg>
+            Calculate Rates
+          </button>
+          <!-- Results -->
+          <div id="rateResults" class="space-y-3">
+            <div class="calc-result flex items-center justify-between p-3 bg-green-50 border border-green-100 rounded-lg">
+              <div class="flex items-center gap-3">
+                <div class="w-8 h-8 rounded-lg bg-blue-100 flex items-center justify-center text-[10px] font-bold text-blue-700">BD</div>
+                <div>
+                  <p class="text-sm font-semibold text-gray-900">BlueDart Express</p>
+                  <p class="text-xs text-gray-500">2-3 days delivery</p>
+                </div>
+              </div>
+              <div class="text-right">
+                <p class="text-sm font-bold text-gray-900">Rs.137</p>
+                <span class="text-[10px] font-semibold text-green-700 bg-green-100 px-1.5 py-0.5 rounded">FASTEST</span>
+              </div>
+            </div>
+            <div class="calc-result flex items-center justify-between p-3 bg-gray-50 border border-gray-100 rounded-lg">
+              <div class="flex items-center gap-3">
+                <div class="w-8 h-8 rounded-lg bg-red-100 flex items-center justify-center text-[10px] font-bold text-red-700">DL</div>
+                <div>
+                  <p class="text-sm font-semibold text-gray-900">Delhivery Standard</p>
+                  <p class="text-xs text-gray-500">3-4 days delivery</p>
+                </div>
+              </div>
+              <div class="text-right">
+                <p class="text-sm font-bold text-gray-900">Rs.105</p>
+                <span class="text-[10px] font-semibold text-blue-700 bg-blue-100 px-1.5 py-0.5 rounded">BEST VALUE</span>
+              </div>
+            </div>
+            <div class="calc-result flex items-center justify-between p-3 bg-gray-50 border border-gray-100 rounded-lg">
+              <div class="flex items-center gap-3">
+                <div class="w-8 h-8 rounded-lg bg-green-100 flex items-center justify-center text-[10px] font-bold text-green-700">EE</div>
+                <div>
+                  <p class="text-sm font-semibold text-gray-900">Ecom Express</p>
+                  <p class="text-xs text-gray-500">3-5 days delivery</p>
+                </div>
+              </div>
+              <div class="text-right">
+                <p class="text-sm font-bold text-gray-900">Rs.95</p>
+                <span class="text-[10px] font-semibold text-gray-600 bg-gray-200 px-1.5 py-0.5 rounded">CHEAPEST</span>
+              </div>
+            </div>
+            <div class="calc-result flex items-center justify-between p-3 bg-gray-50 border border-gray-100 rounded-lg">
+              <div class="flex items-center gap-3">
+                <div class="w-8 h-8 rounded-lg bg-orange-100 flex items-center justify-center text-[10px] font-bold text-orange-700">DT</div>
+                <div>
+                  <p class="text-sm font-semibold text-gray-900">DTDC Standard</p>
+                  <p class="text-xs text-gray-500">4-5 days delivery</p>
+                </div>
+              </div>
+              <div class="text-right">
+                <p class="text-sm font-bold text-gray-900">Rs.88</p>
+              </div>
+            </div>
+            <div class="calc-result flex items-center justify-between p-3 bg-gray-50 border border-gray-100 rounded-lg">
+              <div class="flex items-center gap-3">
+                <div class="w-8 h-8 rounded-lg bg-amber-100 flex items-center justify-center text-[10px] font-bold text-amber-700">IP</div>
+                <div>
+                  <p class="text-sm font-semibold text-gray-900">India Post Speed Post</p>
+                  <p class="text-xs text-gray-500">5-7 days delivery</p>
+                </div>
+              </div>
+              <div class="text-right">
+                <p class="text-sm font-bold text-gray-900">Rs.55</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Serviceability Check -->
+        <div class="bg-white rounded-xl border border-gray-100 shadow-sm p-6">
+          <div class="mb-5">
+            <h2 class="text-lg font-bold text-gray-900">Serviceability Check</h2>
+            <p class="text-sm text-gray-500 mt-0.5">Check which carriers deliver to a specific PIN code</p>
+          </div>
+          <div class="flex gap-3 mb-5">
+            <div class="flex-1">
+              <label class="block text-sm font-medium text-gray-700 mb-1.5">PIN Code</label>
+              <input id="servicePin" type="text" value="560001" maxlength="6" placeholder="Enter 6-digit PIN code" class="w-full border border-gray-200 rounded-lg py-2.5 px-4 text-sm outline-none focus:border-brand-400 focus:ring-2 focus:ring-brand-100 transition font-mono text-lg tracking-widest">
+            </div>
+            <div class="flex items-end">
+              <button onclick="checkServiceability()" class="flex items-center gap-2 bg-brand-500 text-white rounded-lg px-5 py-2.5 text-sm font-semibold hover:bg-brand-600 transition whitespace-nowrap">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z"/></svg>
+                Check
+              </button>
+            </div>
+          </div>
+
+          <!-- Serviceability Result -->
+          <div id="serviceResult" class="space-y-3">
+            <div class="flex items-center gap-3 p-3 bg-blue-50 border border-blue-100 rounded-lg mb-4">
+              <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z"/><path d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z"/></svg>
+              <div>
+                <p class="text-sm font-semibold text-gray-900">560001 - Bangalore, Karnataka</p>
+                <p class="text-xs text-gray-500">Zone: Metro | All 5 carriers available</p>
+              </div>
+              <span class="ml-auto inline-flex items-center gap-1 px-2.5 py-1 bg-green-100 text-green-700 text-xs font-semibold rounded-full">
+                <span class="w-1.5 h-1.5 bg-green-500 rounded-full"></span> Serviceable
+              </span>
+            </div>
+
+            <div class="overflow-hidden rounded-lg border border-gray-100">
+              <table class="w-full">
+                <thead>
+                  <tr class="bg-gray-50 border-b border-gray-100">
+                    <th class="text-left text-[11px] font-semibold text-gray-400 uppercase tracking-wider px-4 py-2.5">Carrier</th>
+                    <th class="text-left text-[11px] font-semibold text-gray-400 uppercase tracking-wider px-4 py-2.5">Service</th>
+                    <th class="text-left text-[11px] font-semibold text-gray-400 uppercase tracking-wider px-4 py-2.5">Est. Delivery</th>
+                    <th class="text-left text-[11px] font-semibold text-gray-400 uppercase tracking-wider px-4 py-2.5">COD</th>
+                    <th class="text-left text-[11px] font-semibold text-gray-400 uppercase tracking-wider px-4 py-2.5">Status</th>
+                  </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-50">
+                  <tr class="table-row">
+                    <td class="px-4 py-3"><span class="text-sm font-semibold text-gray-900">Delhivery</span></td>
+                    <td class="px-4 py-3"><span class="text-sm text-gray-600">Express + Standard</span></td>
+                    <td class="px-4 py-3"><span class="text-sm font-medium text-gray-900">1-2 days</span></td>
+                    <td class="px-4 py-3"><span class="inline-flex items-center gap-1 px-2 py-0.5 bg-green-50 text-green-700 text-xs font-semibold rounded-full">Yes</span></td>
+                    <td class="px-4 py-3"><span class="inline-flex items-center gap-1 text-xs font-semibold text-green-700"><span class="w-1.5 h-1.5 bg-green-500 rounded-full"></span> Active</span></td>
+                  </tr>
+                  <tr class="table-row">
+                    <td class="px-4 py-3"><span class="text-sm font-semibold text-gray-900">BlueDart</span></td>
+                    <td class="px-4 py-3"><span class="text-sm text-gray-600">Express + Priority</span></td>
+                    <td class="px-4 py-3"><span class="text-sm font-medium text-gray-900">1-2 days</span></td>
+                    <td class="px-4 py-3"><span class="inline-flex items-center gap-1 px-2 py-0.5 bg-green-50 text-green-700 text-xs font-semibold rounded-full">Yes</span></td>
+                    <td class="px-4 py-3"><span class="inline-flex items-center gap-1 text-xs font-semibold text-green-700"><span class="w-1.5 h-1.5 bg-green-500 rounded-full"></span> Active</span></td>
+                  </tr>
+                  <tr class="table-row">
+                    <td class="px-4 py-3"><span class="text-sm font-semibold text-gray-900">DTDC</span></td>
+                    <td class="px-4 py-3"><span class="text-sm text-gray-600">Standard + Economy</span></td>
+                    <td class="px-4 py-3"><span class="text-sm font-medium text-gray-900">2-3 days</span></td>
+                    <td class="px-4 py-3"><span class="inline-flex items-center gap-1 px-2 py-0.5 bg-green-50 text-green-700 text-xs font-semibold rounded-full">Yes</span></td>
+                    <td class="px-4 py-3"><span class="inline-flex items-center gap-1 text-xs font-semibold text-green-700"><span class="w-1.5 h-1.5 bg-green-500 rounded-full"></span> Active</span></td>
+                  </tr>
+                  <tr class="table-row">
+                    <td class="px-4 py-3"><span class="text-sm font-semibold text-gray-900">Ecom Express</span></td>
+                    <td class="px-4 py-3"><span class="text-sm text-gray-600">Standard + COD</span></td>
+                    <td class="px-4 py-3"><span class="text-sm font-medium text-gray-900">2-3 days</span></td>
+                    <td class="px-4 py-3"><span class="inline-flex items-center gap-1 px-2 py-0.5 bg-green-50 text-green-700 text-xs font-semibold rounded-full">Yes</span></td>
+                    <td class="px-4 py-3"><span class="inline-flex items-center gap-1 text-xs font-semibold text-green-700"><span class="w-1.5 h-1.5 bg-green-500 rounded-full"></span> Active</span></td>
+                  </tr>
+                  <tr class="table-row">
+                    <td class="px-4 py-3"><span class="text-sm font-semibold text-gray-900">India Post</span></td>
+                    <td class="px-4 py-3"><span class="text-sm text-gray-600">Speed Post</span></td>
+                    <td class="px-4 py-3"><span class="text-sm font-medium text-gray-900">3-5 days</span></td>
+                    <td class="px-4 py-3"><span class="inline-flex items-center gap-1 px-2 py-0.5 bg-gray-100 text-gray-600 text-xs font-semibold rounded-full">No</span></td>
+                    <td class="px-4 py-3"><span class="inline-flex items-center gap-1 text-xs font-semibold text-amber-700"><span class="w-1.5 h-1.5 bg-amber-500 rounded-full"></span> Limited</span></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Carrier Table -->
+      <div class="bg-white rounded-xl border border-gray-100 shadow-sm mb-8">
+        <div class="flex items-center justify-between px-6 pt-5 pb-0">
+          <div class="flex items-center gap-0 border-b border-gray-200 -mb-px">
+            <button class="filter-tab active text-sm font-semibold px-4 pb-3 border-b-2 border-brand-500 text-brand-500" onclick="filterCarriers('all', this)">All Carriers <span class="ml-1 bg-gray-100 text-gray-600 text-[11px] font-bold px-1.5 py-0.5 rounded-full">5</span></button>
+            <button class="filter-tab text-sm font-medium px-4 pb-3 border-b-2 border-transparent text-gray-500" onclick="filterCarriers('active', this)">Active <span class="ml-1 bg-green-100 text-green-700 text-[11px] font-bold px-1.5 py-0.5 rounded-full">4</span></button>
+            <button class="filter-tab text-sm font-medium px-4 pb-3 border-b-2 border-transparent text-gray-500" onclick="filterCarriers('limited', this)">Limited <span class="ml-1 bg-amber-100 text-amber-700 text-[11px] font-bold px-1.5 py-0.5 rounded-full">1</span></button>
+          </div>
+          <div class="relative mb-3">
+            <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+            <input type="text" placeholder="Search carriers..." class="bg-gray-50 border border-gray-200 rounded-lg py-2 pl-9 pr-4 text-sm outline-none focus:border-brand-400 focus:ring-2 focus:ring-brand-100 transition w-64">
+          </div>
+        </div>
+
+        <div class="overflow-x-auto">
+          <table class="w-full">
+            <thead>
+              <tr class="border-b border-gray-100">
+                <th class="text-left text-[11px] font-semibold text-gray-400 uppercase tracking-wider px-6 py-3">Carrier</th>
+                <th class="text-left text-[11px] font-semibold text-gray-400 uppercase tracking-wider px-4 py-3">Status</th>
+                <th class="text-left text-[11px] font-semibold text-gray-400 uppercase tracking-wider px-4 py-3">Zones</th>
+                <th class="text-left text-[11px] font-semibold text-gray-400 uppercase tracking-wider px-4 py-3">Avg Delivery</th>
+                <th class="text-left text-[11px] font-semibold text-gray-400 uppercase tracking-wider px-4 py-3">Cost/kg</th>
+                <th class="text-left text-[11px] font-semibold text-gray-400 uppercase tracking-wider px-4 py-3">SLA</th>
+                <th class="text-left text-[11px] font-semibold text-gray-400 uppercase tracking-wider px-4 py-3">Rating</th>
+                <th class="text-right text-[11px] font-semibold text-gray-400 uppercase tracking-wider px-6 py-3">Actions</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-50">
+              <!-- Delhivery -->
+              <tr class="table-row">
+                <td class="px-6 py-4">
+                  <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-lg bg-red-50 flex items-center justify-center text-xs font-bold text-red-600">DL</div>
+                    <div>
+                      <p class="text-sm font-semibold text-gray-900">Delhivery</p>
+                      <p class="text-xs text-gray-400">Express & Standard</p>
+                    </div>
+                  </div>
+                </td>
+                <td class="px-4 py-4">
+                  <span class="inline-flex items-center gap-1 px-2.5 py-1 bg-green-50 text-green-700 text-xs font-semibold rounded-full">
+                    <span class="w-1.5 h-1.5 bg-green-500 rounded-full"></span> Active
+                  </span>
+                </td>
+                <td class="px-4 py-4"><span class="text-sm text-gray-700">All 6 zones</span></td>
+                <td class="px-4 py-4"><span class="text-sm font-semibold text-gray-900">3.5 days</span></td>
+                <td class="px-4 py-4"><span class="text-sm font-semibold text-gray-900">Rs.42</span></td>
+                <td class="px-4 py-4"><span class="text-sm text-gray-700">48h dispatch</span></td>
+                <td class="px-4 py-4">
+                  <div class="flex items-center gap-1">
+                    <svg class="w-4 h-4 text-amber-400" fill="currentColor" viewBox="0 0 24 24"><path d="M11.48 3.499a.562.562 0 011.04 0l2.125 5.111a.563.563 0 00.475.345l5.518.442c.499.04.701.663.321.988l-4.204 3.602a.563.563 0 00-.182.557l1.285 5.385a.562.562 0 01-.84.61l-4.725-2.885a.563.563 0 00-.586 0L6.982 20.54a.562.562 0 01-.84-.61l1.285-5.386a.562.562 0 00-.182-.557l-4.204-3.602a.563.563 0 01.321-.988l5.518-.442a.563.563 0 00.475-.345L11.48 3.5z"/></svg>
+                    <span class="text-sm font-semibold text-gray-900">4.6</span>
+                  </div>
+                </td>
+                <td class="px-6 py-4">
+                  <div class="flex items-center justify-end gap-1.5">
+                    <button onclick="editCarrier('Delhivery')" class="p-1.5 text-gray-400 hover:text-brand-500 hover:bg-brand-50 rounded-md transition" title="Edit"><svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10"/></svg></button>
+                    <button onclick="toggleCarrier('Delhivery')" class="p-1.5 text-gray-400 hover:text-amber-500 hover:bg-amber-50 rounded-md transition" title="Disable"><svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M5.636 5.636a9 9 0 1012.728 0M12 3v9"/></svg></button>
+                  </div>
+                </td>
+              </tr>
+              <!-- BlueDart -->
+              <tr class="table-row">
+                <td class="px-6 py-4">
+                  <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-lg bg-blue-50 flex items-center justify-center text-xs font-bold text-blue-600">BD</div>
+                    <div>
+                      <p class="text-sm font-semibold text-gray-900">BlueDart</p>
+                      <p class="text-xs text-gray-400">Express & Priority</p>
+                    </div>
+                  </div>
+                </td>
+                <td class="px-4 py-4">
+                  <span class="inline-flex items-center gap-1 px-2.5 py-1 bg-green-50 text-green-700 text-xs font-semibold rounded-full">
+                    <span class="w-1.5 h-1.5 bg-green-500 rounded-full"></span> Active
+                  </span>
+                </td>
+                <td class="px-4 py-4"><span class="text-sm text-gray-700">4 zones</span></td>
+                <td class="px-4 py-4"><span class="text-sm font-semibold text-gray-900">3.2 days</span></td>
+                <td class="px-4 py-4"><span class="text-sm font-semibold text-gray-900">Rs.55</span></td>
+                <td class="px-4 py-4"><span class="text-sm text-gray-700">24h dispatch</span></td>
+                <td class="px-4 py-4">
+                  <div class="flex items-center gap-1">
+                    <svg class="w-4 h-4 text-amber-400" fill="currentColor" viewBox="0 0 24 24"><path d="M11.48 3.499a.562.562 0 011.04 0l2.125 5.111a.563.563 0 00.475.345l5.518.442c.499.04.701.663.321.988l-4.204 3.602a.563.563 0 00-.182.557l1.285 5.385a.562.562 0 01-.84.61l-4.725-2.885a.563.563 0 00-.586 0L6.982 20.54a.562.562 0 01-.84-.61l1.285-5.386a.562.562 0 00-.182-.557l-4.204-3.602a.563.563 0 01.321-.988l5.518-.442a.563.563 0 00.475-.345L11.48 3.5z"/></svg>
+                    <span class="text-sm font-semibold text-gray-900">4.8</span>
+                  </div>
+                </td>
+                <td class="px-6 py-4">
+                  <div class="flex items-center justify-end gap-1.5">
+                    <button onclick="editCarrier('BlueDart')" class="p-1.5 text-gray-400 hover:text-brand-500 hover:bg-brand-50 rounded-md transition" title="Edit"><svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10"/></svg></button>
+                    <button onclick="toggleCarrier('BlueDart')" class="p-1.5 text-gray-400 hover:text-amber-500 hover:bg-amber-50 rounded-md transition" title="Disable"><svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M5.636 5.636a9 9 0 1012.728 0M12 3v9"/></svg></button>
+                  </div>
+                </td>
+              </tr>
+              <!-- DTDC -->
+              <tr class="table-row">
+                <td class="px-6 py-4">
+                  <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-lg bg-orange-50 flex items-center justify-center text-xs font-bold text-orange-600">DT</div>
+                    <div>
+                      <p class="text-sm font-semibold text-gray-900">DTDC</p>
+                      <p class="text-xs text-gray-400">Standard & Economy</p>
+                    </div>
+                  </div>
+                </td>
+                <td class="px-4 py-4">
+                  <span class="inline-flex items-center gap-1 px-2.5 py-1 bg-green-50 text-green-700 text-xs font-semibold rounded-full">
+                    <span class="w-1.5 h-1.5 bg-green-500 rounded-full"></span> Active
+                  </span>
+                </td>
+                <td class="px-4 py-4"><span class="text-sm text-gray-700">All 6 zones</span></td>
+                <td class="px-4 py-4"><span class="text-sm font-semibold text-gray-900">4.8 days</span></td>
+                <td class="px-4 py-4"><span class="text-sm font-semibold text-gray-900">Rs.35</span></td>
+                <td class="px-4 py-4"><span class="text-sm text-gray-700">48h dispatch</span></td>
+                <td class="px-4 py-4">
+                  <div class="flex items-center gap-1">
+                    <svg class="w-4 h-4 text-amber-400" fill="currentColor" viewBox="0 0 24 24"><path d="M11.48 3.499a.562.562 0 011.04 0l2.125 5.111a.563.563 0 00.475.345l5.518.442c.499.04.701.663.321.988l-4.204 3.602a.563.563 0 00-.182.557l1.285 5.385a.562.562 0 01-.84.61l-4.725-2.885a.563.563 0 00-.586 0L6.982 20.54a.562.562 0 01-.84-.61l1.285-5.386a.562.562 0 00-.182-.557l-4.204-3.602a.563.563 0 01.321-.988l5.518-.442a.563.563 0 00.475-.345L11.48 3.5z"/></svg>
+                    <span class="text-sm font-semibold text-gray-900">4.1</span>
+                  </div>
+                </td>
+                <td class="px-6 py-4">
+                  <div class="flex items-center justify-end gap-1.5">
+                    <button onclick="editCarrier('DTDC')" class="p-1.5 text-gray-400 hover:text-brand-500 hover:bg-brand-50 rounded-md transition" title="Edit"><svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10"/></svg></button>
+                    <button onclick="toggleCarrier('DTDC')" class="p-1.5 text-gray-400 hover:text-amber-500 hover:bg-amber-50 rounded-md transition" title="Disable"><svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M5.636 5.636a9 9 0 1012.728 0M12 3v9"/></svg></button>
+                  </div>
+                </td>
+              </tr>
+              <!-- India Post -->
+              <tr class="table-row">
+                <td class="px-6 py-4">
+                  <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-lg bg-amber-50 flex items-center justify-center text-xs font-bold text-amber-600">IP</div>
+                    <div>
+                      <p class="text-sm font-semibold text-gray-900">India Post</p>
+                      <p class="text-xs text-gray-400">Economy & Speed Post</p>
+                    </div>
+                  </div>
+                </td>
+                <td class="px-4 py-4">
+                  <span class="inline-flex items-center gap-1 px-2.5 py-1 bg-amber-50 text-amber-700 text-xs font-semibold rounded-full">
+                    <span class="w-1.5 h-1.5 bg-amber-500 rounded-full"></span> Limited
+                  </span>
+                </td>
+                <td class="px-4 py-4"><span class="text-sm text-gray-700">All 6 zones</span></td>
+                <td class="px-4 py-4"><span class="text-sm font-semibold text-gray-900">6.5 days</span></td>
+                <td class="px-4 py-4"><span class="text-sm font-semibold text-gray-900">Rs.22</span></td>
+                <td class="px-4 py-4"><span class="text-sm text-gray-700">72h dispatch</span></td>
+                <td class="px-4 py-4">
+                  <div class="flex items-center gap-1">
+                    <svg class="w-4 h-4 text-amber-400" fill="currentColor" viewBox="0 0 24 24"><path d="M11.48 3.499a.562.562 0 011.04 0l2.125 5.111a.563.563 0 00.475.345l5.518.442c.499.04.701.663.321.988l-4.204 3.602a.563.563 0 00-.182.557l1.285 5.385a.562.562 0 01-.84.61l-4.725-2.885a.563.563 0 00-.586 0L6.982 20.54a.562.562 0 01-.84-.61l1.285-5.386a.562.562 0 00-.182-.557l-4.204-3.602a.563.563 0 01.321-.988l5.518-.442a.563.563 0 00.475-.345L11.48 3.5z"/></svg>
+                    <span class="text-sm font-semibold text-gray-900">3.8</span>
+                  </div>
+                </td>
+                <td class="px-6 py-4">
+                  <div class="flex items-center justify-end gap-1.5">
+                    <button onclick="editCarrier('India Post')" class="p-1.5 text-gray-400 hover:text-brand-500 hover:bg-brand-50 rounded-md transition" title="Edit"><svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10"/></svg></button>
+                    <button onclick="toggleCarrier('India Post')" class="p-1.5 text-gray-400 hover:text-green-500 hover:bg-green-50 rounded-md transition" title="Enable Full"><svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M5.636 5.636a9 9 0 1012.728 0M12 3v9"/></svg></button>
+                  </div>
+                </td>
+              </tr>
+              <!-- Ecom Express -->
+              <tr class="table-row">
+                <td class="px-6 py-4">
+                  <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-lg bg-green-50 flex items-center justify-center text-xs font-bold text-green-600">EE</div>
+                    <div>
+                      <p class="text-sm font-semibold text-gray-900">Ecom Express</p>
+                      <p class="text-xs text-gray-400">Standard & COD</p>
+                    </div>
+                  </div>
+                </td>
+                <td class="px-4 py-4">
+                  <span class="inline-flex items-center gap-1 px-2.5 py-1 bg-green-50 text-green-700 text-xs font-semibold rounded-full">
+                    <span class="w-1.5 h-1.5 bg-green-500 rounded-full"></span> Active
+                  </span>
+                </td>
+                <td class="px-4 py-4"><span class="text-sm text-gray-700">4 zones</span></td>
+                <td class="px-4 py-4"><span class="text-sm font-semibold text-gray-900">4.0 days</span></td>
+                <td class="px-4 py-4"><span class="text-sm font-semibold text-gray-900">Rs.38</span></td>
+                <td class="px-4 py-4"><span class="text-sm text-gray-700">48h dispatch</span></td>
+                <td class="px-4 py-4">
+                  <div class="flex items-center gap-1">
+                    <svg class="w-4 h-4 text-amber-400" fill="currentColor" viewBox="0 0 24 24"><path d="M11.48 3.499a.562.562 0 011.04 0l2.125 5.111a.563.563 0 00.475.345l5.518.442c.499.04.701.663.321.988l-4.204 3.602a.563.563 0 00-.182.557l1.285 5.385a.562.562 0 01-.84.61l-4.725-2.885a.563.563 0 00-.586 0L6.982 20.54a.562.562 0 01-.84-.61l1.285-5.386a.562.562 0 00-.182-.557l-4.204-3.602a.563.563 0 01.321-.988l5.518-.442a.563.563 0 00.475-.345L11.48 3.5z"/></svg>
+                    <span class="text-sm font-semibold text-gray-900">4.3</span>
+                  </div>
+                </td>
+                <td class="px-6 py-4">
+                  <div class="flex items-center justify-end gap-1.5">
+                    <button onclick="editCarrier('Ecom Express')" class="p-1.5 text-gray-400 hover:text-brand-500 hover:bg-brand-50 rounded-md transition" title="Edit"><svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10"/></svg></button>
+                    <button onclick="toggleCarrier('Ecom Express')" class="p-1.5 text-gray-400 hover:text-amber-500 hover:bg-amber-50 rounded-md transition" title="Disable"><svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M5.636 5.636a9 9 0 1012.728 0M12 3v9"/></svg></button>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- ===== ZONE MAPPING ===== -->
+      <div class="bg-white rounded-xl border border-gray-100 shadow-sm mb-8">
+        <div class="flex items-center justify-between px-6 py-5 border-b border-gray-100">
+          <div>
+            <h2 class="text-lg font-bold text-gray-900">Zone Mapping & Rates</h2>
+            <p class="text-sm text-gray-500 mt-0.5">6-zone configuration with base rates, per-kg pricing, and free shipping thresholds</p>
+          </div>
+          <button onclick="alert('Add new shipping zone')" class="flex items-center gap-2 bg-white border border-gray-200 text-gray-700 text-sm font-medium px-3 py-2 rounded-lg hover:bg-gray-50 transition">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 4.5v15m7.5-7.5h-15"/></svg>
+            Add Zone
+          </button>
+        </div>
+        <div class="overflow-x-auto">
+          <table class="w-full">
+            <thead>
+              <tr class="border-b border-gray-100">
+                <th class="text-left text-[11px] font-semibold text-gray-400 uppercase tracking-wider px-6 py-3">Zone</th>
+                <th class="text-left text-[11px] font-semibold text-gray-400 uppercase tracking-wider px-4 py-3">Regions / States</th>
+                <th class="text-left text-[11px] font-semibold text-gray-400 uppercase tracking-wider px-4 py-3">Delivery Time</th>
+                <th class="text-right text-[11px] font-semibold text-gray-400 uppercase tracking-wider px-4 py-3">Base Rate</th>
+                <th class="text-right text-[11px] font-semibold text-gray-400 uppercase tracking-wider px-4 py-3">Per Kg</th>
+                <th class="text-right text-[11px] font-semibold text-gray-400 uppercase tracking-wider px-4 py-3">Free Above</th>
+                <th class="text-right text-[11px] font-semibold text-gray-400 uppercase tracking-wider px-6 py-3">Actions</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-50">
+              <tr class="table-row">
+                <td class="px-6 py-4">
+                  <div class="flex items-center gap-2">
+                    <span class="w-2.5 h-2.5 rounded-full bg-green-500"></span>
+                    <span class="text-sm font-semibold text-gray-900">Metro</span>
+                  </div>
+                </td>
+                <td class="px-4 py-4"><span class="text-sm text-gray-600">Delhi, Mumbai, Bangalore, Chennai, Hyderabad, Kolkata</span></td>
+                <td class="px-4 py-4"><span class="text-sm font-medium text-gray-900">1-2 days</span></td>
+                <td class="px-4 py-4 text-right"><span class="text-sm font-semibold text-gray-900">Rs.40</span></td>
+                <td class="px-4 py-4 text-right"><span class="text-sm font-semibold text-gray-900">Rs.15</span></td>
+                <td class="px-4 py-4 text-right"><span class="text-sm font-semibold text-green-600">Rs.499</span></td>
+                <td class="px-6 py-4 text-right">
+                  <button onclick="editZone('Metro')" class="p-1.5 text-gray-400 hover:text-brand-500 hover:bg-brand-50 rounded-md transition" title="Edit"><svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10"/></svg></button>
+                </td>
+              </tr>
+              <tr class="table-row">
+                <td class="px-6 py-4">
+                  <div class="flex items-center gap-2">
+                    <span class="w-2.5 h-2.5 rounded-full bg-blue-500"></span>
+                    <span class="text-sm font-semibold text-gray-900">Tier-1</span>
+                  </div>
+                </td>
+                <td class="px-4 py-4"><span class="text-sm text-gray-600">Pune, Ahmedabad, Jaipur, Lucknow, Chandigarh + 15 more</span></td>
+                <td class="px-4 py-4"><span class="text-sm font-medium text-gray-900">2-4 days</span></td>
+                <td class="px-4 py-4 text-right"><span class="text-sm font-semibold text-gray-900">Rs.50</span></td>
+                <td class="px-4 py-4 text-right"><span class="text-sm font-semibold text-gray-900">Rs.20</span></td>
+                <td class="px-4 py-4 text-right"><span class="text-sm font-semibold text-green-600">Rs.699</span></td>
+                <td class="px-6 py-4 text-right">
+                  <button onclick="editZone('Tier-1')" class="p-1.5 text-gray-400 hover:text-brand-500 hover:bg-brand-50 rounded-md transition" title="Edit"><svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10"/></svg></button>
+                </td>
+              </tr>
+              <tr class="table-row">
+                <td class="px-6 py-4">
+                  <div class="flex items-center gap-2">
+                    <span class="w-2.5 h-2.5 rounded-full bg-purple-500"></span>
+                    <span class="text-sm font-semibold text-gray-900">Tier-2</span>
+                  </div>
+                </td>
+                <td class="px-4 py-4"><span class="text-sm text-gray-600">Smaller cities, district HQs across India</span></td>
+                <td class="px-4 py-4"><span class="text-sm font-medium text-gray-900">4-6 days</span></td>
+                <td class="px-4 py-4 text-right"><span class="text-sm font-semibold text-gray-900">Rs.60</span></td>
+                <td class="px-4 py-4 text-right"><span class="text-sm font-semibold text-gray-900">Rs.25</span></td>
+                <td class="px-4 py-4 text-right"><span class="text-sm font-semibold text-green-600">Rs.999</span></td>
+                <td class="px-6 py-4 text-right">
+                  <button onclick="editZone('Tier-2')" class="p-1.5 text-gray-400 hover:text-brand-500 hover:bg-brand-50 rounded-md transition" title="Edit"><svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10"/></svg></button>
+                </td>
+              </tr>
+              <tr class="table-row">
+                <td class="px-6 py-4">
+                  <div class="flex items-center gap-2">
+                    <span class="w-2.5 h-2.5 rounded-full bg-amber-500"></span>
+                    <span class="text-sm font-semibold text-gray-900">Remote</span>
+                  </div>
+                </td>
+                <td class="px-4 py-4"><span class="text-sm text-gray-600">Rural areas, hill stations, border regions</span></td>
+                <td class="px-4 py-4"><span class="text-sm font-medium text-gray-900">7-10 days</span></td>
+                <td class="px-4 py-4 text-right"><span class="text-sm font-semibold text-gray-900">Rs.80</span></td>
+                <td class="px-4 py-4 text-right"><span class="text-sm font-semibold text-gray-900">Rs.35</span></td>
+                <td class="px-4 py-4 text-right"><span class="text-sm font-semibold text-green-600">Rs.1,499</span></td>
+                <td class="px-6 py-4 text-right">
+                  <button onclick="editZone('Remote')" class="p-1.5 text-gray-400 hover:text-brand-500 hover:bg-brand-50 rounded-md transition" title="Edit"><svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10"/></svg></button>
+                </td>
+              </tr>
+              <tr class="table-row">
+                <td class="px-6 py-4">
+                  <div class="flex items-center gap-2">
+                    <span class="w-2.5 h-2.5 rounded-full bg-teal-500"></span>
+                    <span class="text-sm font-semibold text-gray-900">NE India</span>
+                  </div>
+                </td>
+                <td class="px-4 py-4"><span class="text-sm text-gray-600">Assam, Meghalaya, Manipur, Mizoram, Nagaland, Tripura, Arunachal Pradesh, Sikkim</span></td>
+                <td class="px-4 py-4"><span class="text-sm font-medium text-gray-900">8-12 days</span></td>
+                <td class="px-4 py-4 text-right"><span class="text-sm font-semibold text-gray-900">Rs.100</span></td>
+                <td class="px-4 py-4 text-right"><span class="text-sm font-semibold text-gray-900">Rs.45</span></td>
+                <td class="px-4 py-4 text-right"><span class="text-sm font-semibold text-green-600">Rs.1,999</span></td>
+                <td class="px-6 py-4 text-right">
+                  <button onclick="editZone('NE India')" class="p-1.5 text-gray-400 hover:text-brand-500 hover:bg-brand-50 rounded-md transition" title="Edit"><svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10"/></svg></button>
+                </td>
+              </tr>
+              <tr class="table-row">
+                <td class="px-6 py-4">
+                  <div class="flex items-center gap-2">
+                    <span class="w-2.5 h-2.5 rounded-full bg-red-500"></span>
+                    <span class="text-sm font-semibold text-gray-900">J&K / Islands</span>
+                  </div>
+                </td>
+                <td class="px-4 py-4"><span class="text-sm text-gray-600">Jammu & Kashmir, Ladakh, A&N Islands, Lakshadweep</span></td>
+                <td class="px-4 py-4"><span class="text-sm font-medium text-gray-900">10-14 days</span></td>
+                <td class="px-4 py-4 text-right"><span class="text-sm font-semibold text-gray-900">Rs.120</span></td>
+                <td class="px-4 py-4 text-right"><span class="text-sm font-semibold text-gray-900">Rs.50</span></td>
+                <td class="px-4 py-4 text-right"><span class="text-sm font-semibold text-green-600">Rs.2,499</span></td>
+                <td class="px-6 py-4 text-right">
+                  <button onclick="editZone('J&K / Islands')" class="p-1.5 text-gray-400 hover:text-brand-500 hover:bg-brand-50 rounded-md transition" title="Edit"><svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10"/></svg></button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- ===== CARRIER SLA RULES ===== -->
+      <div class="bg-white rounded-xl border border-gray-100 shadow-sm mb-8">
+        <div class="flex items-center justify-between px-6 py-5 border-b border-gray-100">
+          <div>
+            <h2 class="text-lg font-bold text-gray-900">Carrier SLA Rules</h2>
+            <p class="text-sm text-gray-500 mt-0.5">SLA commitments, penalty rates, and auto-switch thresholds per carrier per zone</p>
+          </div>
+          <button onclick="alert('Add new SLA rule')" class="flex items-center gap-2 bg-white border border-gray-200 text-gray-700 text-sm font-medium px-3 py-2 rounded-lg hover:bg-gray-50 transition">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 4.5v15m7.5-7.5h-15"/></svg>
+            Add SLA Rule
+          </button>
+        </div>
+        <div class="overflow-x-auto">
+          <table class="w-full">
+            <thead>
+              <tr class="border-b border-gray-100">
+                <th class="text-left text-[11px] font-semibold text-gray-400 uppercase tracking-wider px-6 py-3">Carrier</th>
+                <th class="text-left text-[11px] font-semibold text-gray-400 uppercase tracking-wider px-4 py-3">Zone</th>
+                <th class="text-center text-[11px] font-semibold text-gray-400 uppercase tracking-wider px-4 py-3">SLA (days)</th>
+                <th class="text-right text-[11px] font-semibold text-gray-400 uppercase tracking-wider px-4 py-3">Penalty / Day Late</th>
+                <th class="text-center text-[11px] font-semibold text-gray-400 uppercase tracking-wider px-4 py-3">Auto-switch Threshold</th>
+                <th class="text-left text-[11px] font-semibold text-gray-400 uppercase tracking-wider px-4 py-3">Current Performance</th>
+                <th class="text-right text-[11px] font-semibold text-gray-400 uppercase tracking-wider px-6 py-3">Actions</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-50">
+              <!-- Delhivery -->
+              <tr class="table-row">
+                <td class="px-6 py-4">
+                  <div class="flex items-center gap-2">
+                    <div class="w-8 h-8 rounded-lg bg-red-50 flex items-center justify-center text-[10px] font-bold text-red-600">DL</div>
+                    <span class="text-sm font-semibold text-gray-900">Delhivery</span>
+                  </div>
+                </td>
+                <td class="px-4 py-4"><span class="text-sm text-gray-700">Metro</span></td>
+                <td class="px-4 py-4 text-center"><span class="text-sm font-bold text-gray-900">3</span></td>
+                <td class="px-4 py-4 text-right"><span class="text-sm font-semibold text-red-600">Rs.25</span></td>
+                <td class="px-4 py-4 text-center"><span class="text-sm font-medium text-gray-700">3 consecutive SLA breaches</span></td>
+                <td class="px-4 py-4">
+                  <div class="flex items-center gap-2">
+                    <div class="w-16 bg-gray-100 rounded-full h-2"><div class="bg-green-500 h-2 rounded-full" style="width:96%"></div></div>
+                    <span class="text-xs font-semibold text-green-600">96%</span>
+                  </div>
+                </td>
+                <td class="px-6 py-4 text-right">
+                  <button class="p-1.5 text-gray-400 hover:text-brand-500 hover:bg-brand-50 rounded-md transition" title="Edit"><svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10"/></svg></button>
+                </td>
+              </tr>
+              <tr class="table-row">
+                <td class="px-6 py-4">
+                  <div class="flex items-center gap-2">
+                    <div class="w-8 h-8 rounded-lg bg-red-50 flex items-center justify-center text-[10px] font-bold text-red-600">DL</div>
+                    <span class="text-sm font-semibold text-gray-900">Delhivery</span>
+                  </div>
+                </td>
+                <td class="px-4 py-4"><span class="text-sm text-gray-700">NE India</span></td>
+                <td class="px-4 py-4 text-center"><span class="text-sm font-bold text-gray-900">10</span></td>
+                <td class="px-4 py-4 text-right"><span class="text-sm font-semibold text-red-600">Rs.15</span></td>
+                <td class="px-4 py-4 text-center"><span class="text-sm font-medium text-gray-700">5 consecutive SLA breaches</span></td>
+                <td class="px-4 py-4">
+                  <div class="flex items-center gap-2">
+                    <div class="w-16 bg-gray-100 rounded-full h-2"><div class="bg-amber-500 h-2 rounded-full" style="width:88%"></div></div>
+                    <span class="text-xs font-semibold text-amber-600">88%</span>
+                  </div>
+                </td>
+                <td class="px-6 py-4 text-right">
+                  <button class="p-1.5 text-gray-400 hover:text-brand-500 hover:bg-brand-50 rounded-md transition" title="Edit"><svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10"/></svg></button>
+                </td>
+              </tr>
+              <!-- BlueDart -->
+              <tr class="table-row">
+                <td class="px-6 py-4">
+                  <div class="flex items-center gap-2">
+                    <div class="w-8 h-8 rounded-lg bg-blue-50 flex items-center justify-center text-[10px] font-bold text-blue-600">BD</div>
+                    <span class="text-sm font-semibold text-gray-900">BlueDart</span>
+                  </div>
+                </td>
+                <td class="px-4 py-4"><span class="text-sm text-gray-700">Metro</span></td>
+                <td class="px-4 py-4 text-center"><span class="text-sm font-bold text-gray-900">2</span></td>
+                <td class="px-4 py-4 text-right"><span class="text-sm font-semibold text-red-600">Rs.50</span></td>
+                <td class="px-4 py-4 text-center"><span class="text-sm font-medium text-gray-700">2 consecutive SLA breaches</span></td>
+                <td class="px-4 py-4">
+                  <div class="flex items-center gap-2">
+                    <div class="w-16 bg-gray-100 rounded-full h-2"><div class="bg-green-500 h-2 rounded-full" style="width:97%"></div></div>
+                    <span class="text-xs font-semibold text-green-600">97%</span>
+                  </div>
+                </td>
+                <td class="px-6 py-4 text-right">
+                  <button class="p-1.5 text-gray-400 hover:text-brand-500 hover:bg-brand-50 rounded-md transition" title="Edit"><svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10"/></svg></button>
+                </td>
+              </tr>
+              <tr class="table-row">
+                <td class="px-6 py-4">
+                  <div class="flex items-center gap-2">
+                    <div class="w-8 h-8 rounded-lg bg-blue-50 flex items-center justify-center text-[10px] font-bold text-blue-600">BD</div>
+                    <span class="text-sm font-semibold text-gray-900">BlueDart</span>
+                  </div>
+                </td>
+                <td class="px-4 py-4"><span class="text-sm text-gray-700">Tier-1</span></td>
+                <td class="px-4 py-4 text-center"><span class="text-sm font-bold text-gray-900">4</span></td>
+                <td class="px-4 py-4 text-right"><span class="text-sm font-semibold text-red-600">Rs.35</span></td>
+                <td class="px-4 py-4 text-center"><span class="text-sm font-medium text-gray-700">3 consecutive SLA breaches</span></td>
+                <td class="px-4 py-4">
+                  <div class="flex items-center gap-2">
+                    <div class="w-16 bg-gray-100 rounded-full h-2"><div class="bg-green-500 h-2 rounded-full" style="width:95%"></div></div>
+                    <span class="text-xs font-semibold text-green-600">95%</span>
+                  </div>
+                </td>
+                <td class="px-6 py-4 text-right">
+                  <button class="p-1.5 text-gray-400 hover:text-brand-500 hover:bg-brand-50 rounded-md transition" title="Edit"><svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10"/></svg></button>
+                </td>
+              </tr>
+              <!-- DTDC -->
+              <tr class="table-row">
+                <td class="px-6 py-4">
+                  <div class="flex items-center gap-2">
+                    <div class="w-8 h-8 rounded-lg bg-orange-50 flex items-center justify-center text-[10px] font-bold text-orange-600">DT</div>
+                    <span class="text-sm font-semibold text-gray-900">DTDC</span>
+                  </div>
+                </td>
+                <td class="px-4 py-4"><span class="text-sm text-gray-700">J&K / Islands</span></td>
+                <td class="px-4 py-4 text-center"><span class="text-sm font-bold text-gray-900">12</span></td>
+                <td class="px-4 py-4 text-right"><span class="text-sm font-semibold text-red-600">Rs.10</span></td>
+                <td class="px-4 py-4 text-center"><span class="text-sm font-medium text-gray-700">5 consecutive SLA breaches</span></td>
+                <td class="px-4 py-4">
+                  <div class="flex items-center gap-2">
+                    <div class="w-16 bg-gray-100 rounded-full h-2"><div class="bg-red-500 h-2 rounded-full" style="width:82%"></div></div>
+                    <span class="text-xs font-semibold text-red-600">82%</span>
+                  </div>
+                </td>
+                <td class="px-6 py-4 text-right">
+                  <button class="p-1.5 text-gray-400 hover:text-brand-500 hover:bg-brand-50 rounded-md transition" title="Edit"><svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10"/></svg></button>
+                </td>
+              </tr>
+              <!-- India Post -->
+              <tr class="table-row">
+                <td class="px-6 py-4">
+                  <div class="flex items-center gap-2">
+                    <div class="w-8 h-8 rounded-lg bg-amber-50 flex items-center justify-center text-[10px] font-bold text-amber-600">IP</div>
+                    <span class="text-sm font-semibold text-gray-900">India Post</span>
+                  </div>
+                </td>
+                <td class="px-4 py-4"><span class="text-sm text-gray-700">Remote</span></td>
+                <td class="px-4 py-4 text-center"><span class="text-sm font-bold text-gray-900">10</span></td>
+                <td class="px-4 py-4 text-right"><span class="text-sm font-semibold text-red-600">Rs.8</span></td>
+                <td class="px-4 py-4 text-center"><span class="text-sm font-medium text-gray-700">7 consecutive SLA breaches</span></td>
+                <td class="px-4 py-4">
+                  <div class="flex items-center gap-2">
+                    <div class="w-16 bg-gray-100 rounded-full h-2"><div class="bg-amber-500 h-2 rounded-full" style="width:85%"></div></div>
+                    <span class="text-xs font-semibold text-amber-600">85%</span>
+                  </div>
+                </td>
+                <td class="px-6 py-4 text-right">
+                  <button class="p-1.5 text-gray-400 hover:text-brand-500 hover:bg-brand-50 rounded-md transition" title="Edit"><svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10"/></svg></button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Bottom Row: SLA Config + Carrier Performance -->
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+
+        <!-- SLA Configuration -->
+        <div class="bg-white rounded-xl border border-gray-100 shadow-sm p-6">
+          <div class="mb-5">
+            <h2 class="text-lg font-bold text-gray-900">SLA Configuration</h2>
+            <p class="text-sm text-gray-500 mt-0.5">Maximum allowed times for dispatch and delivery</p>
+          </div>
+          <div class="space-y-4">
+            <div class="flex items-center justify-between py-3 border-b border-gray-100">
+              <div>
+                <p class="text-sm font-medium text-gray-800">Max Dispatch Time</p>
+                <p class="text-xs text-gray-400">After order confirmation</p>
+              </div>
+              <div class="flex items-center gap-2">
+                <input type="number" value="48" class="w-20 border border-gray-200 rounded-lg py-2 px-3 text-sm text-center font-semibold outline-none focus:border-brand-400 focus:ring-2 focus:ring-brand-100 transition">
+                <span class="text-sm text-gray-500">hours</span>
+              </div>
+            </div>
+            <div class="flex items-center justify-between py-3 border-b border-gray-100">
+              <div>
+                <p class="text-sm font-medium text-gray-800">Max Delivery - Metro</p>
+                <p class="text-xs text-gray-400">Tier 0 cities</p>
+              </div>
+              <div class="flex items-center gap-2">
+                <input type="number" value="3" class="w-20 border border-gray-200 rounded-lg py-2 px-3 text-sm text-center font-semibold outline-none focus:border-brand-400 focus:ring-2 focus:ring-brand-100 transition">
+                <span class="text-sm text-gray-500">days</span>
+              </div>
+            </div>
+            <div class="flex items-center justify-between py-3 border-b border-gray-100">
+              <div>
+                <p class="text-sm font-medium text-gray-800">Max Delivery - Tier 1</p>
+                <p class="text-xs text-gray-400">Major cities</p>
+              </div>
+              <div class="flex items-center gap-2">
+                <input type="number" value="5" class="w-20 border border-gray-200 rounded-lg py-2 px-3 text-sm text-center font-semibold outline-none focus:border-brand-400 focus:ring-2 focus:ring-brand-100 transition">
+                <span class="text-sm text-gray-500">days</span>
+              </div>
+            </div>
+            <div class="flex items-center justify-between py-3 border-b border-gray-100">
+              <div>
+                <p class="text-sm font-medium text-gray-800">Max Delivery - Tier 2</p>
+                <p class="text-xs text-gray-400">Smaller cities</p>
+              </div>
+              <div class="flex items-center gap-2">
+                <input type="number" value="7" class="w-20 border border-gray-200 rounded-lg py-2 px-3 text-sm text-center font-semibold outline-none focus:border-brand-400 focus:ring-2 focus:ring-brand-100 transition">
+                <span class="text-sm text-gray-500">days</span>
+              </div>
+            </div>
+            <div class="flex items-center justify-between py-3">
+              <div>
+                <p class="text-sm font-medium text-gray-800">Max Delivery - Remote/Special</p>
+                <p class="text-xs text-gray-400">Hard-to-reach areas</p>
+              </div>
+              <div class="flex items-center gap-2">
+                <input type="number" value="14" class="w-20 border border-gray-200 rounded-lg py-2 px-3 text-sm text-center font-semibold outline-none focus:border-brand-400 focus:ring-2 focus:ring-brand-100 transition">
+                <span class="text-sm text-gray-500">days</span>
+              </div>
+            </div>
+          </div>
+          <div class="mt-5 pt-4 border-t border-gray-100">
+            <button onclick="alert('SLA configuration saved successfully!')" class="w-full bg-brand-500 text-white rounded-lg px-4 py-2.5 text-sm font-semibold hover:bg-brand-600 transition">Save SLA Settings</button>
+          </div>
+        </div>
+
+        <!-- Carrier Performance Comparison -->
+        <div class="bg-white rounded-xl border border-gray-100 shadow-sm p-6">
+          <div class="mb-5">
+            <h2 class="text-lg font-bold text-gray-900">Carrier Performance</h2>
+            <p class="text-sm text-gray-500 mt-0.5">On-time delivery rate comparison (last 30 days)</p>
+          </div>
+          <div class="space-y-5">
+            <!-- BlueDart -->
+            <div>
+              <div class="flex items-center justify-between mb-1.5">
+                <span class="text-sm font-medium text-gray-800">BlueDart</span>
+                <span class="text-sm font-bold text-gray-900">97.2%</span>
+              </div>
+              <div class="w-full bg-gray-100 rounded-full h-3">
+                <div class="perf-bar bg-blue-500 h-3 rounded-full" style="width:97.2%"></div>
+              </div>
+            </div>
+            <!-- Delhivery -->
+            <div>
+              <div class="flex items-center justify-between mb-1.5">
+                <span class="text-sm font-medium text-gray-800">Delhivery</span>
+                <span class="text-sm font-bold text-gray-900">95.8%</span>
+              </div>
+              <div class="w-full bg-gray-100 rounded-full h-3">
+                <div class="perf-bar bg-red-500 h-3 rounded-full" style="width:95.8%"></div>
+              </div>
+            </div>
+            <!-- Ecom Express -->
+            <div>
+              <div class="flex items-center justify-between mb-1.5">
+                <span class="text-sm font-medium text-gray-800">Ecom Express</span>
+                <span class="text-sm font-bold text-gray-900">93.5%</span>
+              </div>
+              <div class="w-full bg-gray-100 rounded-full h-3">
+                <div class="perf-bar bg-green-500 h-3 rounded-full" style="width:93.5%"></div>
+              </div>
+            </div>
+            <!-- DTDC -->
+            <div>
+              <div class="flex items-center justify-between mb-1.5">
+                <span class="text-sm font-medium text-gray-800">DTDC</span>
+                <span class="text-sm font-bold text-gray-900">91.0%</span>
+              </div>
+              <div class="w-full bg-gray-100 rounded-full h-3">
+                <div class="perf-bar bg-orange-500 h-3 rounded-full" style="width:91%"></div>
+              </div>
+            </div>
+            <!-- India Post -->
+            <div>
+              <div class="flex items-center justify-between mb-1.5">
+                <span class="text-sm font-medium text-gray-800">India Post</span>
+                <span class="text-sm font-bold text-gray-900">85.3%</span>
+              </div>
+              <div class="w-full bg-gray-100 rounded-full h-3">
+                <div class="perf-bar bg-amber-500 h-3 rounded-full" style="width:85.3%"></div>
+              </div>
+            </div>
+          </div>
+          <div class="mt-5 pt-4 border-t border-gray-100 flex items-center justify-between">
+            <span class="text-xs text-gray-400">Target SLA: 90% on-time</span>
+            <div class="flex items-center gap-1">
+              <span class="w-2 h-2 rounded-full bg-red-400"></span>
+              <span class="text-xs text-gray-500">Below target flagged for review</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+    </main>
+  </div>
+
+  <!-- ===== JAVASCRIPT ===== -->
+  <script>
+    function editCarrier(name) {
+      alert('Edit carrier configuration: ' + name + '\n\nOpening carrier settings panel...');
+    }
+
+    function toggleCarrier(name) {
+      if (confirm('Toggle carrier "' + name + '" status?\n\nThis will affect all pending shipments.')) {
+        alert('Carrier "' + name + '" status updated.');
+      }
+    }
+
+    function editZone(name) {
+      alert('Edit shipping zone: ' + name + '\n\nOpening zone configuration...');
+    }
+
+    function filterCarriers(filter, btn) {
+      document.querySelectorAll('.filter-tab').forEach(function(t) {
+        t.classList.remove('active', 'text-brand-500', 'border-brand-500');
+        t.classList.add('text-gray-500', 'border-transparent');
+      });
+      btn.classList.add('active', 'text-brand-500', 'border-brand-500');
+      btn.classList.remove('text-gray-500', 'border-transparent');
+    }
+
+    function calculateRates() {
+      var weight = document.getElementById('calcWeight').value;
+      var from = document.getElementById('calcFrom').value;
+      var to = document.getElementById('calcTo').value;
+
+      if (!weight || !from || !to || from.length !== 6 || to.length !== 6) {
+        alert('Please enter valid weight and 6-digit PIN codes.');
+        return;
+      }
+
+      // Simulate rate calculation based on weight
+      var w = parseFloat(weight);
+      var rates = [
+        { carrier: 'BlueDart Express', code: 'BD', color: 'blue', days: '2-3', base: 55, perKg: 33, tag: 'FASTEST', tagColor: 'green' },
+        { carrier: 'Delhivery Standard', code: 'DL', color: 'red', days: '3-4', base: 42, perKg: 25, tag: 'BEST VALUE', tagColor: 'blue' },
+        { carrier: 'Ecom Express', code: 'EE', color: 'green', days: '3-5', base: 38, perKg: 23, tag: 'CHEAPEST', tagColor: 'gray' },
+        { carrier: 'DTDC Standard', code: 'DT', color: 'orange', days: '4-5', base: 35, perKg: 21, tag: '', tagColor: '' },
+        { carrier: 'India Post Speed Post', code: 'IP', color: 'amber', days: '5-7', base: 22, perKg: 13, tag: '', tagColor: '' }
+      ];
+
+      var html = '';
+      rates.forEach(function(r, i) {
+        var total = Math.round(r.base + (w * r.perKg));
+        var bgClass = i === 0 ? 'bg-green-50 border-green-100' : 'bg-gray-50 border-gray-100';
+        var tagHtml = r.tag ? '<span class="text-[10px] font-semibold text-' + r.tagColor + '-700 bg-' + r.tagColor + '-100 px-1.5 py-0.5 rounded">' + r.tag + '</span>' : '';
+        html += '<div class="calc-result flex items-center justify-between p-3 ' + bgClass + ' border rounded-lg">' +
+          '<div class="flex items-center gap-3">' +
+          '<div class="w-8 h-8 rounded-lg bg-' + r.color + '-100 flex items-center justify-center text-[10px] font-bold text-' + r.color + '-700">' + r.code + '</div>' +
+          '<div><p class="text-sm font-semibold text-gray-900">' + r.carrier + '</p>' +
+          '<p class="text-xs text-gray-500">' + r.days + ' days delivery</p></div></div>' +
+          '<div class="text-right"><p class="text-sm font-bold text-gray-900">Rs.' + total + '</p>' + tagHtml + '</div></div>';
+      });
+
+      document.getElementById('rateResults').innerHTML = html;
+    }
+
+    function checkServiceability() {
+      var pin = document.getElementById('servicePin').value;
+      if (!pin || pin.length !== 6) {
+        alert('Please enter a valid 6-digit PIN code.');
+        return;
+      }
+
+      // Simulate a non-serviceable check for remote pins
+      var nonServiceable = ['793001', '796001', '799001'];
+      if (nonServiceable.indexOf(pin) !== -1) {
+        document.getElementById('serviceResult').innerHTML =
+          '<div class="flex items-center gap-3 p-4 bg-red-50 border border-red-100 rounded-lg">' +
+          '<svg class="w-5 h-5 text-red-600" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z"/></svg>' +
+          '<div><p class="text-sm font-semibold text-gray-900">PIN ' + pin + ' - Limited Serviceability</p>' +
+          '<p class="text-xs text-gray-500">Only India Post Speed Post available. Est. 10-14 days.</p></div>' +
+          '<span class="ml-auto inline-flex items-center gap-1 px-2.5 py-1 bg-amber-100 text-amber-700 text-xs font-semibold rounded-full">' +
+          '<span class="w-1.5 h-1.5 bg-amber-500 rounded-full"></span> Limited</span></div>';
+        return;
+      }
+
+      alert('Serviceability check complete for PIN ' + pin + '. Results shown below.');
+    }
+  </script>
+
+  <script src="../shared-layout.js"></script>
+  <script>renderAdminLayout('shipments', '../');</script>
+
+</body>
+</html>

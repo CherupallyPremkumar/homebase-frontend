@@ -1,0 +1,871 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HomeBase — Settlements & Payments</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              50: '#FFF7ED',
+              100: '#FFEDD5',
+              200: '#FED7AA',
+              300: '#FDBA74',
+              400: '#FB923C',
+              500: '#F97316',
+              600: '#EA580C',
+              700: '#C2410C',
+            },
+            navy: {
+              700: '#1E3A5F',
+              800: '#1A2E4A',
+              900: '#0F1B2D',
+            },
+            success: '#16A34A',
+            warning: '#EAB308',
+            danger: '#DC2626',
+          },
+          fontFamily: {
+            sans: ['Inter', 'system-ui', 'sans-serif'],
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+    .scrollbar-hide::-webkit-scrollbar { display: none; }
+    .sidebar-link { transition: all 0.15s ease; }
+    .sidebar-link:hover { background: rgba(255,255,255,0.08); }
+    .sidebar-link.active { background: rgba(249,115,22,0.15); border-right: 3px solid #F97316; }
+    .stat-card { transition: all 0.2s ease; }
+    .stat-card:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,0.08); }
+    .table-row { transition: background 0.15s ease; }
+    .table-row:hover { background: #FFF7ED; }
+    .dropdown-menu { display: none; }
+    .dropdown:hover .dropdown-menu { display: block; }
+    .sidebar-scroll::-webkit-scrollbar { width: 4px; }
+    .sidebar-scroll::-webkit-scrollbar-track { background: transparent; }
+    .sidebar-scroll::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); border-radius: 2px; }
+    .breakdown-row { transition: background 0.1s ease; }
+    .breakdown-row:hover { background: #F9FAFB; }
+  </style>
+</head>
+<body class="font-sans bg-gray-50 text-gray-900">
+
+  <!-- ===== TOP HEADER BAR ===== -->
+  <header id="seller-header" class="fixed top-0 left-0 right-0 z-50 bg-white border-b border-gray-200 h-16"></header>
+
+  <!-- ===== LAYOUT: SIDEBAR + MAIN ===== -->
+  <div class="flex pt-16 min-h-screen">
+
+    <!-- ===== LEFT SIDEBAR ===== -->
+    <aside id="seller-sidebar" class="fixed left-0 top-16 bottom-0 w-60 z-40 flex flex-col overflow-y-auto" style="background:#0F1B2D;"></aside>
+
+    <!-- ===== MAIN CONTENT ===== -->
+    <main class="flex-1 ml-60 p-6">
+
+      <!-- Page Title Row -->
+      <div class="flex items-center justify-between mb-6">
+        <div>
+          <h1 class="text-2xl font-bold text-navy-900">Settlements & Payments</h1>
+          <p class="text-sm text-gray-400 mt-1">Manage your payouts, view settlement history, and track earnings</p>
+        </div>
+        <div class="flex items-center gap-3">
+          <button class="flex items-center gap-1.5 bg-white border border-gray-200 text-gray-700 text-sm font-medium px-4 py-2.5 rounded-lg hover:bg-gray-50 transition shadow-sm">
+            <svg class="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3"/></svg>
+            Download Statement
+          </button>
+        </div>
+      </div>
+
+      <!-- Balance Overview Cards -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 mb-6">
+        <!-- Available Balance -->
+        <div class="stat-card bg-white rounded-xl p-5 border border-gray-100 shadow-sm">
+          <div class="flex items-center justify-between mb-3">
+            <div class="w-10 h-10 rounded-lg bg-green-50 flex items-center justify-center">
+              <svg class="w-5 h-5 text-success" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M21 12a2.25 2.25 0 00-2.25-2.25H15a3 3 0 11-6 0H5.25A2.25 2.25 0 003 12m18 0v6a2.25 2.25 0 01-2.25 2.25H5.25A2.25 2.25 0 013 18v-6m18 0V9M3 12V9m18 0a2.25 2.25 0 00-2.25-2.25H5.25A2.25 2.25 0 003 9m18 0V6a2.25 2.25 0 00-2.25-2.25H5.25A2.25 2.25 0 003 6v3"/></svg>
+            </div>
+            <span class="flex items-center gap-1 text-xs font-semibold text-success bg-green-50 px-2 py-1 rounded-full">
+              Available
+            </span>
+          </div>
+          <p class="text-2xl font-bold text-navy-900">&#8377;1,52,340</p>
+          <p class="text-xs text-gray-400 mt-1">Available Balance</p>
+          <button class="mt-4 w-full bg-brand-500 hover:bg-brand-600 text-white text-sm font-semibold py-2.5 rounded-lg transition">
+            Request Payout
+          </button>
+        </div>
+
+        <!-- Pending Settlement -->
+        <div class="stat-card bg-white rounded-xl p-5 border border-gray-100 shadow-sm">
+          <div class="flex items-center justify-between mb-3">
+            <div class="w-10 h-10 rounded-lg bg-orange-50 flex items-center justify-center">
+              <svg class="w-5 h-5 text-brand-500" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+            </div>
+            <span class="flex items-center gap-1 text-xs font-semibold text-brand-600 bg-orange-50 px-2 py-1 rounded-full">
+              <span class="w-1.5 h-1.5 rounded-full bg-brand-500 animate-pulse"></span>
+              Processing
+            </span>
+          </div>
+          <p class="text-2xl font-bold text-navy-900">&#8377;45,680</p>
+          <p class="text-xs text-gray-400 mt-1">Pending Settlement</p>
+          <div class="mt-4 h-1.5 bg-gray-100 rounded-full overflow-hidden">
+            <div class="h-full bg-brand-400 rounded-full animate-pulse" style="width: 65%"></div>
+          </div>
+          <p class="text-[10px] text-gray-400 mt-1.5">Settlement cycle: 7 days</p>
+        </div>
+
+        <!-- Total Earned This Month -->
+        <div class="stat-card bg-white rounded-xl p-5 border border-gray-100 shadow-sm">
+          <div class="flex items-center justify-between mb-3">
+            <div class="w-10 h-10 rounded-lg bg-blue-50 flex items-center justify-center">
+              <svg class="w-5 h-5 text-blue-500" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M2.25 18L9 11.25l4.306 4.307a11.95 11.95 0 015.814-5.519l2.74-1.22m0 0l-5.94-2.28m5.94 2.28l-2.28 5.941"/></svg>
+            </div>
+            <span class="flex items-center gap-1 text-xs font-semibold text-success bg-green-50 px-2 py-1 rounded-full">
+              <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M4.5 19.5l15-15m0 0H8.25m11.25 0v11.25"/></svg>
+              +18.3%
+            </span>
+          </div>
+          <p class="text-2xl font-bold text-navy-900">&#8377;4,52,890</p>
+          <p class="text-xs text-gray-400 mt-1">Total Earned (This Month)</p>
+          <div class="mt-4 h-1.5 bg-gray-100 rounded-full overflow-hidden">
+            <div class="h-full bg-blue-500 rounded-full" style="width: 78%"></div>
+          </div>
+          <p class="text-[10px] text-gray-400 mt-1.5">vs &#8377;3,82,500 last month</p>
+        </div>
+      </div>
+
+      <!-- Next Settlement Info Banner -->
+      <div class="bg-gradient-to-r from-brand-50 to-orange-50 border border-brand-100 rounded-xl p-4 mb-6 flex items-center gap-3">
+        <div class="w-10 h-10 rounded-full bg-brand-500 flex items-center justify-center shrink-0">
+          <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5"/></svg>
+        </div>
+        <div class="flex-1">
+          <p class="text-sm font-semibold text-navy-900">Next payout of &#8377;45,680 scheduled for April 2, 2026</p>
+          <p class="text-xs text-gray-500 mt-0.5">Amount will be credited to your registered bank account via NEFT/IMPS</p>
+        </div>
+        <button class="hidden sm:flex items-center gap-1.5 text-xs font-medium text-brand-600 bg-white border border-brand-200 px-3 py-1.5 rounded-lg hover:bg-brand-50 transition">
+          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M11.25 11.25l.041-.02a.75.75 0 011.063.852l-.708 2.836a.75.75 0 001.063.853l.041-.021M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9-3.75h.008v.008H12V8.25z"/></svg>
+          View Details
+        </button>
+      </div>
+
+      <!-- Settlement History Table -->
+      <div class="bg-white rounded-xl border border-gray-100 shadow-sm mb-6">
+        <div class="flex items-center justify-between p-5 border-b border-gray-100">
+          <div>
+            <h3 class="text-base font-semibold text-navy-900">Settlement History</h3>
+            <p class="text-xs text-gray-400 mt-0.5">All past and upcoming settlement transactions</p>
+          </div>
+          <div class="flex items-center gap-3">
+            <div class="relative">
+              <svg class="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+              <input type="text" placeholder="Search settlements..." class="bg-gray-50 border border-gray-200 rounded-lg py-1.5 pl-8 pr-3 text-xs outline-none focus:border-brand-400 focus:ring-1 focus:ring-brand-100 w-44">
+            </div>
+            <select class="bg-gray-50 border border-gray-200 rounded-lg py-1.5 px-3 text-xs outline-none focus:border-brand-400 focus:ring-1 focus:ring-brand-100 text-gray-600">
+              <option>All Status</option>
+              <option>Paid</option>
+              <option>Processing</option>
+              <option>Pending</option>
+            </select>
+            <select class="bg-gray-50 border border-gray-200 rounded-lg py-1.5 px-3 text-xs outline-none focus:border-brand-400 focus:ring-1 focus:ring-brand-100 text-gray-600">
+              <option>March 2026</option>
+              <option>February 2026</option>
+              <option>January 2026</option>
+              <option>December 2025</option>
+            </select>
+          </div>
+        </div>
+        <div class="overflow-x-auto">
+          <table class="w-full">
+            <thead>
+              <tr class="bg-gray-50/80">
+                <th class="text-left text-[11px] font-semibold text-gray-500 uppercase tracking-wider px-5 py-3">Settlement ID</th>
+                <th class="text-left text-[11px] font-semibold text-gray-500 uppercase tracking-wider px-5 py-3">Period</th>
+                <th class="text-center text-[11px] font-semibold text-gray-500 uppercase tracking-wider px-5 py-3">Orders</th>
+                <th class="text-right text-[11px] font-semibold text-gray-500 uppercase tracking-wider px-5 py-3">Gross Amount</th>
+                <th class="text-right text-[11px] font-semibold text-gray-500 uppercase tracking-wider px-5 py-3">Platform Fee</th>
+                <th class="text-right text-[11px] font-semibold text-gray-500 uppercase tracking-wider px-5 py-3">GST</th>
+                <th class="text-right text-[11px] font-semibold text-gray-500 uppercase tracking-wider px-5 py-3">Net Amount</th>
+                <th class="text-center text-[11px] font-semibold text-gray-500 uppercase tracking-wider px-5 py-3">Status</th>
+                <th class="text-right text-[11px] font-semibold text-gray-500 uppercase tracking-wider px-5 py-3">Payout Date</th>
+                <th class="text-center text-[11px] font-semibold text-gray-500 uppercase tracking-wider px-5 py-3">Actions</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-50">
+              <!-- Row 1 -->
+              <tr class="table-row" data-id="#STL-20260328" data-period="22 Mar - 28 Mar" data-orders="48" data-gross="1,24,500" data-fee="6,225" data-gst="3,735" data-net="1,14,540" data-status="Pending" data-payout="02 Apr 2026">
+                <td class="px-5 py-3.5">
+                  <span class="text-sm font-mono font-medium text-brand-600 cursor-pointer hover:underline" onclick="viewSettlement(this)">#STL-20260328</span>
+                </td>
+                <td class="px-5 py-3.5">
+                  <span class="text-sm text-gray-600">22 Mar - 28 Mar</span>
+                </td>
+                <td class="px-5 py-3.5 text-center">
+                  <span class="text-sm font-medium text-gray-800">48</span>
+                </td>
+                <td class="px-5 py-3.5 text-right">
+                  <span class="text-sm font-semibold text-navy-900">&#8377;1,24,500</span>
+                </td>
+                <td class="px-5 py-3.5 text-right">
+                  <span class="text-sm text-danger">-&#8377;6,225</span>
+                </td>
+                <td class="px-5 py-3.5 text-right">
+                  <span class="text-sm text-danger">-&#8377;3,735</span>
+                </td>
+                <td class="px-5 py-3.5 text-right">
+                  <span class="text-sm font-bold text-navy-900">&#8377;1,14,540</span>
+                </td>
+                <td class="px-5 py-3.5 text-center">
+                  <span class="inline-flex items-center gap-1 text-[11px] font-semibold text-yellow-700 bg-yellow-50 px-2.5 py-1 rounded-full border border-yellow-100">
+                    <span class="w-1.5 h-1.5 rounded-full bg-yellow-500"></span>
+                    Pending
+                  </span>
+                </td>
+                <td class="px-5 py-3.5 text-right">
+                  <span class="text-sm text-gray-500">02 Apr 2026</span>
+                </td>
+                <td class="px-5 py-3.5 text-center">
+                  <div class="flex items-center justify-center gap-1">
+                    <button onclick="viewSettlement(this)" class="p-1.5 text-gray-400 hover:text-brand-500 hover:bg-brand-50 rounded-lg transition" title="View Details">
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z"/><path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                    </button>
+                  </div>
+                </td>
+              </tr>
+              <!-- Row 2 -->
+              <tr class="table-row" data-id="#STL-20260321" data-period="15 Mar - 21 Mar" data-orders="62" data-gross="1,58,200" data-fee="7,910" data-gst="4,746" data-net="1,45,544" data-status="Processing" data-payout="28 Mar 2026">
+                <td class="px-5 py-3.5">
+                  <span class="text-sm font-mono font-medium text-brand-600 cursor-pointer hover:underline" onclick="viewSettlement(this)">#STL-20260321</span>
+                </td>
+                <td class="px-5 py-3.5">
+                  <span class="text-sm text-gray-600">15 Mar - 21 Mar</span>
+                </td>
+                <td class="px-5 py-3.5 text-center">
+                  <span class="text-sm font-medium text-gray-800">62</span>
+                </td>
+                <td class="px-5 py-3.5 text-right">
+                  <span class="text-sm font-semibold text-navy-900">&#8377;1,58,200</span>
+                </td>
+                <td class="px-5 py-3.5 text-right">
+                  <span class="text-sm text-danger">-&#8377;7,910</span>
+                </td>
+                <td class="px-5 py-3.5 text-right">
+                  <span class="text-sm text-danger">-&#8377;4,746</span>
+                </td>
+                <td class="px-5 py-3.5 text-right">
+                  <span class="text-sm font-bold text-navy-900">&#8377;1,45,544</span>
+                </td>
+                <td class="px-5 py-3.5 text-center">
+                  <span class="inline-flex items-center gap-1 text-[11px] font-semibold text-orange-700 bg-orange-50 px-2.5 py-1 rounded-full border border-orange-100">
+                    <span class="w-1.5 h-1.5 rounded-full bg-orange-500"></span>
+                    Processing
+                  </span>
+                </td>
+                <td class="px-5 py-3.5 text-right">
+                  <span class="text-sm text-gray-500">28 Mar 2026</span>
+                </td>
+                <td class="px-5 py-3.5 text-center">
+                  <div class="flex items-center justify-center gap-1">
+                    <button onclick="viewSettlement(this)" class="p-1.5 text-gray-400 hover:text-brand-500 hover:bg-brand-50 rounded-lg transition" title="View Details">
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z"/><path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                    </button>
+                  </div>
+                </td>
+              </tr>
+              <!-- Row 3 -->
+              <tr class="table-row bg-brand-50/30" data-id="#STL-20260314" data-period="08 Mar - 14 Mar" data-orders="55" data-gross="1,42,800" data-fee="7,140" data-gst="4,284" data-net="1,31,376" data-status="Paid" data-payout="21 Mar 2026">
+                <td class="px-5 py-3.5">
+                  <span class="text-sm font-mono font-medium text-brand-600 cursor-pointer hover:underline" onclick="viewSettlement(this)">#STL-20260314</span>
+                </td>
+                <td class="px-5 py-3.5">
+                  <span class="text-sm text-gray-600">08 Mar - 14 Mar</span>
+                </td>
+                <td class="px-5 py-3.5 text-center">
+                  <span class="text-sm font-medium text-gray-800">55</span>
+                </td>
+                <td class="px-5 py-3.5 text-right">
+                  <span class="text-sm font-semibold text-navy-900">&#8377;1,42,800</span>
+                </td>
+                <td class="px-5 py-3.5 text-right">
+                  <span class="text-sm text-danger">-&#8377;7,140</span>
+                </td>
+                <td class="px-5 py-3.5 text-right">
+                  <span class="text-sm text-danger">-&#8377;4,284</span>
+                </td>
+                <td class="px-5 py-3.5 text-right">
+                  <span class="text-sm font-bold text-navy-900">&#8377;1,31,376</span>
+                </td>
+                <td class="px-5 py-3.5 text-center">
+                  <span class="inline-flex items-center gap-1 text-[11px] font-semibold text-green-700 bg-green-50 px-2.5 py-1 rounded-full border border-green-100">
+                    <span class="w-1.5 h-1.5 rounded-full bg-green-500"></span>
+                    Paid
+                  </span>
+                </td>
+                <td class="px-5 py-3.5 text-right">
+                  <span class="text-sm text-gray-500">21 Mar 2026</span>
+                </td>
+                <td class="px-5 py-3.5 text-center">
+                  <div class="flex items-center justify-center gap-1">
+                    <button onclick="viewSettlement(this)" class="p-1.5 text-gray-400 hover:text-brand-500 hover:bg-brand-50 rounded-lg transition" title="View Details">
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z"/><path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                    </button>
+                  </div>
+                </td>
+              </tr>
+              <!-- Row 4 -->
+              <tr class="table-row" data-id="#STL-20260307" data-period="01 Mar - 07 Mar" data-orders="41" data-gross="1,05,600" data-fee="5,280" data-gst="3,168" data-net="97,152" data-status="Paid" data-payout="14 Mar 2026">
+                <td class="px-5 py-3.5">
+                  <span class="text-sm font-mono font-medium text-brand-600 cursor-pointer hover:underline" onclick="viewSettlement(this)">#STL-20260307</span>
+                </td>
+                <td class="px-5 py-3.5">
+                  <span class="text-sm text-gray-600">01 Mar - 07 Mar</span>
+                </td>
+                <td class="px-5 py-3.5 text-center">
+                  <span class="text-sm font-medium text-gray-800">41</span>
+                </td>
+                <td class="px-5 py-3.5 text-right">
+                  <span class="text-sm font-semibold text-navy-900">&#8377;1,05,600</span>
+                </td>
+                <td class="px-5 py-3.5 text-right">
+                  <span class="text-sm text-danger">-&#8377;5,280</span>
+                </td>
+                <td class="px-5 py-3.5 text-right">
+                  <span class="text-sm text-danger">-&#8377;3,168</span>
+                </td>
+                <td class="px-5 py-3.5 text-right">
+                  <span class="text-sm font-bold text-navy-900">&#8377;97,152</span>
+                </td>
+                <td class="px-5 py-3.5 text-center">
+                  <span class="inline-flex items-center gap-1 text-[11px] font-semibold text-green-700 bg-green-50 px-2.5 py-1 rounded-full border border-green-100">
+                    <span class="w-1.5 h-1.5 rounded-full bg-green-500"></span>
+                    Paid
+                  </span>
+                </td>
+                <td class="px-5 py-3.5 text-right">
+                  <span class="text-sm text-gray-500">14 Mar 2026</span>
+                </td>
+                <td class="px-5 py-3.5 text-center">
+                  <div class="flex items-center justify-center gap-1">
+                    <button onclick="viewSettlement(this)" class="p-1.5 text-gray-400 hover:text-brand-500 hover:bg-brand-50 rounded-lg transition" title="View Details">
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z"/><path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                    </button>
+                  </div>
+                </td>
+              </tr>
+              <!-- Row 5 -->
+              <tr class="table-row" data-id="#STL-20260228" data-period="22 Feb - 28 Feb" data-orders="37" data-gross="98,400" data-fee="4,920" data-gst="2,952" data-net="90,528" data-status="Paid" data-payout="07 Mar 2026">
+                <td class="px-5 py-3.5">
+                  <span class="text-sm font-mono font-medium text-brand-600 cursor-pointer hover:underline" onclick="viewSettlement(this)">#STL-20260228</span>
+                </td>
+                <td class="px-5 py-3.5">
+                  <span class="text-sm text-gray-600">22 Feb - 28 Feb</span>
+                </td>
+                <td class="px-5 py-3.5 text-center">
+                  <span class="text-sm font-medium text-gray-800">37</span>
+                </td>
+                <td class="px-5 py-3.5 text-right">
+                  <span class="text-sm font-semibold text-navy-900">&#8377;98,400</span>
+                </td>
+                <td class="px-5 py-3.5 text-right">
+                  <span class="text-sm text-danger">-&#8377;4,920</span>
+                </td>
+                <td class="px-5 py-3.5 text-right">
+                  <span class="text-sm text-danger">-&#8377;2,952</span>
+                </td>
+                <td class="px-5 py-3.5 text-right">
+                  <span class="text-sm font-bold text-navy-900">&#8377;90,528</span>
+                </td>
+                <td class="px-5 py-3.5 text-center">
+                  <span class="inline-flex items-center gap-1 text-[11px] font-semibold text-green-700 bg-green-50 px-2.5 py-1 rounded-full border border-green-100">
+                    <span class="w-1.5 h-1.5 rounded-full bg-green-500"></span>
+                    Paid
+                  </span>
+                </td>
+                <td class="px-5 py-3.5 text-right">
+                  <span class="text-sm text-gray-500">07 Mar 2026</span>
+                </td>
+                <td class="px-5 py-3.5 text-center">
+                  <div class="flex items-center justify-center gap-1">
+                    <button onclick="viewSettlement(this)" class="p-1.5 text-gray-400 hover:text-brand-500 hover:bg-brand-50 rounded-lg transition" title="View Details">
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z"/><path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                    </button>
+                  </div>
+                </td>
+              </tr>
+              <!-- Row 6 -->
+              <tr class="table-row" data-id="#STL-20260221" data-period="15 Feb - 21 Feb" data-orders="53" data-gross="1,36,700" data-fee="6,835" data-gst="4,101" data-net="1,25,764" data-status="Paid" data-payout="28 Feb 2026">
+                <td class="px-5 py-3.5">
+                  <span class="text-sm font-mono font-medium text-brand-600 cursor-pointer hover:underline" onclick="viewSettlement(this)">#STL-20260221</span>
+                </td>
+                <td class="px-5 py-3.5">
+                  <span class="text-sm text-gray-600">15 Feb - 21 Feb</span>
+                </td>
+                <td class="px-5 py-3.5 text-center">
+                  <span class="text-sm font-medium text-gray-800">53</span>
+                </td>
+                <td class="px-5 py-3.5 text-right">
+                  <span class="text-sm font-semibold text-navy-900">&#8377;1,36,700</span>
+                </td>
+                <td class="px-5 py-3.5 text-right">
+                  <span class="text-sm text-danger">-&#8377;6,835</span>
+                </td>
+                <td class="px-5 py-3.5 text-right">
+                  <span class="text-sm text-danger">-&#8377;4,101</span>
+                </td>
+                <td class="px-5 py-3.5 text-right">
+                  <span class="text-sm font-bold text-navy-900">&#8377;1,25,764</span>
+                </td>
+                <td class="px-5 py-3.5 text-center">
+                  <span class="inline-flex items-center gap-1 text-[11px] font-semibold text-green-700 bg-green-50 px-2.5 py-1 rounded-full border border-green-100">
+                    <span class="w-1.5 h-1.5 rounded-full bg-green-500"></span>
+                    Paid
+                  </span>
+                </td>
+                <td class="px-5 py-3.5 text-right">
+                  <span class="text-sm text-gray-500">28 Feb 2026</span>
+                </td>
+                <td class="px-5 py-3.5 text-center">
+                  <div class="flex items-center justify-center gap-1">
+                    <button onclick="viewSettlement(this)" class="p-1.5 text-gray-400 hover:text-brand-500 hover:bg-brand-50 rounded-lg transition" title="View Details">
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z"/><path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                    </button>
+                  </div>
+                </td>
+              </tr>
+              <!-- Row 7 -->
+              <tr class="table-row" data-id="#STL-20260214" data-period="08 Feb - 14 Feb" data-orders="68" data-gross="1,72,300" data-fee="8,615" data-gst="5,169" data-net="1,58,516" data-status="Paid" data-payout="21 Feb 2026">
+                <td class="px-5 py-3.5">
+                  <span class="text-sm font-mono font-medium text-brand-600 cursor-pointer hover:underline" onclick="viewSettlement(this)">#STL-20260214</span>
+                </td>
+                <td class="px-5 py-3.5">
+                  <span class="text-sm text-gray-600">08 Feb - 14 Feb</span>
+                </td>
+                <td class="px-5 py-3.5 text-center">
+                  <span class="text-sm font-medium text-gray-800">68</span>
+                </td>
+                <td class="px-5 py-3.5 text-right">
+                  <span class="text-sm font-semibold text-navy-900">&#8377;1,72,300</span>
+                </td>
+                <td class="px-5 py-3.5 text-right">
+                  <span class="text-sm text-danger">-&#8377;8,615</span>
+                </td>
+                <td class="px-5 py-3.5 text-right">
+                  <span class="text-sm text-danger">-&#8377;5,169</span>
+                </td>
+                <td class="px-5 py-3.5 text-right">
+                  <span class="text-sm font-bold text-navy-900">&#8377;1,58,516</span>
+                </td>
+                <td class="px-5 py-3.5 text-center">
+                  <span class="inline-flex items-center gap-1 text-[11px] font-semibold text-green-700 bg-green-50 px-2.5 py-1 rounded-full border border-green-100">
+                    <span class="w-1.5 h-1.5 rounded-full bg-green-500"></span>
+                    Paid
+                  </span>
+                </td>
+                <td class="px-5 py-3.5 text-right">
+                  <span class="text-sm text-gray-500">21 Feb 2026</span>
+                </td>
+                <td class="px-5 py-3.5 text-center">
+                  <div class="flex items-center justify-center gap-1">
+                    <button onclick="viewSettlement(this)" class="p-1.5 text-gray-400 hover:text-brand-500 hover:bg-brand-50 rounded-lg transition" title="View Details">
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z"/><path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                    </button>
+                  </div>
+                </td>
+              </tr>
+              <!-- Row 8 -->
+              <tr class="table-row" data-id="#STL-20260207" data-period="01 Feb - 07 Feb" data-orders="44" data-gross="1,12,900" data-fee="5,645" data-gst="3,387" data-net="1,03,868" data-status="Paid" data-payout="14 Feb 2026">
+                <td class="px-5 py-3.5">
+                  <span class="text-sm font-mono font-medium text-brand-600 cursor-pointer hover:underline" onclick="viewSettlement(this)">#STL-20260207</span>
+                </td>
+                <td class="px-5 py-3.5">
+                  <span class="text-sm text-gray-600">01 Feb - 07 Feb</span>
+                </td>
+                <td class="px-5 py-3.5 text-center">
+                  <span class="text-sm font-medium text-gray-800">44</span>
+                </td>
+                <td class="px-5 py-3.5 text-right">
+                  <span class="text-sm font-semibold text-navy-900">&#8377;1,12,900</span>
+                </td>
+                <td class="px-5 py-3.5 text-right">
+                  <span class="text-sm text-danger">-&#8377;5,645</span>
+                </td>
+                <td class="px-5 py-3.5 text-right">
+                  <span class="text-sm text-danger">-&#8377;3,387</span>
+                </td>
+                <td class="px-5 py-3.5 text-right">
+                  <span class="text-sm font-bold text-navy-900">&#8377;1,03,868</span>
+                </td>
+                <td class="px-5 py-3.5 text-center">
+                  <span class="inline-flex items-center gap-1 text-[11px] font-semibold text-green-700 bg-green-50 px-2.5 py-1 rounded-full border border-green-100">
+                    <span class="w-1.5 h-1.5 rounded-full bg-green-500"></span>
+                    Paid
+                  </span>
+                </td>
+                <td class="px-5 py-3.5 text-right">
+                  <span class="text-sm text-gray-500">14 Feb 2026</span>
+                </td>
+                <td class="px-5 py-3.5 text-center">
+                  <div class="flex items-center justify-center gap-1">
+                    <button onclick="viewSettlement(this)" class="p-1.5 text-gray-400 hover:text-brand-500 hover:bg-brand-50 rounded-lg transition" title="View Details">
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z"/><path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Transaction Breakdown + Bank Account Details -->
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
+
+        <!-- Transaction Breakdown -->
+        <div class="lg:col-span-2 bg-white rounded-xl border border-gray-100 shadow-sm">
+          <div class="flex items-center justify-between p-5 border-b border-gray-100">
+            <div>
+              <h3 class="text-base font-semibold text-navy-900">Transaction Breakdown</h3>
+              <p class="text-xs text-gray-400 mt-0.5">Settlement #STL-20260314 &mdash; 08 Mar - 14 Mar 2026</p>
+            </div>
+            <select class="bg-gray-50 border border-gray-200 rounded-lg py-1.5 px-3 text-xs outline-none focus:border-brand-400 focus:ring-1 focus:ring-brand-100 text-gray-600">
+              <option>#STL-20260314</option>
+              <option>#STL-20260307</option>
+              <option>#STL-20260228</option>
+              <option>#STL-20260221</option>
+            </select>
+          </div>
+          <div class="p-5">
+            <div class="space-y-0">
+              <!-- Order Sales -->
+              <div class="breakdown-row flex items-center justify-between py-3.5 px-3 rounded-lg">
+                <div class="flex items-center gap-3">
+                  <div class="w-8 h-8 rounded-lg bg-green-50 flex items-center justify-center">
+                    <svg class="w-4 h-4 text-success" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M15.75 10.5V6a3.75 3.75 0 10-7.5 0v4.5m11.356-1.993l1.263 12c.07.665-.45 1.243-1.119 1.243H4.25a1.125 1.125 0 01-1.12-1.243l1.264-12A1.125 1.125 0 015.513 7.5h12.974c.576 0 1.059.435 1.119 1.007zM8.625 10.5a.375.375 0 11-.75 0 .375.375 0 01.75 0zm7.5 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z"/></svg>
+                  </div>
+                  <div>
+                    <p class="text-sm font-medium text-gray-800">Order Sales</p>
+                    <p class="text-[11px] text-gray-400">55 orders delivered</p>
+                  </div>
+                </div>
+                <span class="text-sm font-semibold text-success">+&#8377;1,42,800</span>
+              </div>
+
+              <!-- Shipping Fees Collected -->
+              <div class="breakdown-row flex items-center justify-between py-3.5 px-3 rounded-lg">
+                <div class="flex items-center gap-3">
+                  <div class="w-8 h-8 rounded-lg bg-blue-50 flex items-center justify-center">
+                    <svg class="w-4 h-4 text-blue-500" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M8.25 18.75a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m3 0h6m-9 0H3.375a1.125 1.125 0 01-1.125-1.125V14.25m17.25 4.5a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m3 0H6.375m11.25 3V7.5a.375.375 0 00-.375-.375H14.25m0 0V3h4.5a.375.375 0 01.375.375v3.75m-4.875 0h4.875"/></svg>
+                  </div>
+                  <div>
+                    <p class="text-sm font-medium text-gray-800">Shipping Fees Collected</p>
+                    <p class="text-[11px] text-gray-400">Customer-paid shipping charges</p>
+                  </div>
+                </div>
+                <span class="text-sm font-semibold text-success">+&#8377;4,125</span>
+              </div>
+
+              <!-- Returns & Refunds -->
+              <div class="breakdown-row flex items-center justify-between py-3.5 px-3 rounded-lg">
+                <div class="flex items-center gap-3">
+                  <div class="w-8 h-8 rounded-lg bg-red-50 flex items-center justify-center">
+                    <svg class="w-4 h-4 text-danger" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M9 15L3 9m0 0l6-6M3 9h12a6 6 0 010 12h-3"/></svg>
+                  </div>
+                  <div>
+                    <p class="text-sm font-medium text-gray-800">Returns & Refunds</p>
+                    <p class="text-[11px] text-gray-400">3 items returned</p>
+                  </div>
+                </div>
+                <span class="text-sm font-semibold text-danger">-&#8377;8,450</span>
+              </div>
+
+              <div class="border-t border-gray-100 my-1"></div>
+
+              <!-- Platform Commission -->
+              <div class="breakdown-row flex items-center justify-between py-3.5 px-3 rounded-lg">
+                <div class="flex items-center gap-3">
+                  <div class="w-8 h-8 rounded-lg bg-purple-50 flex items-center justify-center">
+                    <svg class="w-4 h-4 text-purple-500" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M2.25 21h19.5m-18-18v18m10.5-18v18m6-13.5V21M6.75 6.75h.75m-.75 3h.75m-.75 3h.75m3-6h.75m-.75 3h.75m-.75 3h.75M6.75 21v-3.375c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21M3 3h12m-.75 4.5H21m-3.75 3H21m-3.75 3H21"/></svg>
+                  </div>
+                  <div>
+                    <p class="text-sm font-medium text-gray-800">Platform Commission</p>
+                    <p class="text-[11px] text-gray-400">5% of gross sales</p>
+                  </div>
+                </div>
+                <span class="text-sm font-semibold text-danger">-&#8377;7,140</span>
+              </div>
+
+              <!-- Payment Gateway Fee -->
+              <div class="breakdown-row flex items-center justify-between py-3.5 px-3 rounded-lg">
+                <div class="flex items-center gap-3">
+                  <div class="w-8 h-8 rounded-lg bg-indigo-50 flex items-center justify-center">
+                    <svg class="w-4 h-4 text-indigo-500" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M2.25 8.25h19.5M2.25 9h19.5m-16.5 5.25h6m-6 2.25h3m-3.75 3h15a2.25 2.25 0 002.25-2.25V6.75A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25v10.5A2.25 2.25 0 004.5 19.5z"/></svg>
+                  </div>
+                  <div>
+                    <p class="text-sm font-medium text-gray-800">Payment Gateway Fee</p>
+                    <p class="text-[11px] text-gray-400">2% processing charge</p>
+                  </div>
+                </div>
+                <span class="text-sm font-semibold text-danger">-&#8377;2,856</span>
+              </div>
+
+              <!-- GST -->
+              <div class="breakdown-row flex items-center justify-between py-3.5 px-3 rounded-lg">
+                <div class="flex items-center gap-3">
+                  <div class="w-8 h-8 rounded-lg bg-yellow-50 flex items-center justify-center">
+                    <svg class="w-4 h-4 text-yellow-600" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z"/></svg>
+                  </div>
+                  <div>
+                    <p class="text-sm font-medium text-gray-800">GST (on fees)</p>
+                    <p class="text-[11px] text-gray-400">18% on platform + gateway fees</p>
+                  </div>
+                </div>
+                <span class="text-sm font-semibold text-danger">-&#8377;1,799</span>
+              </div>
+
+              <div class="border-t-2 border-navy-900/10 my-2"></div>
+
+              <!-- Net Payout -->
+              <div class="flex items-center justify-between py-4 px-3 bg-green-50/50 rounded-xl">
+                <div class="flex items-center gap-3">
+                  <div class="w-8 h-8 rounded-lg bg-success flex items-center justify-center">
+                    <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4.5 12.75l6 6 9-13.5"/></svg>
+                  </div>
+                  <div>
+                    <p class="text-sm font-bold text-navy-900">Net Payout</p>
+                    <p class="text-[11px] text-gray-500">Credited to bank account</p>
+                  </div>
+                </div>
+                <span class="text-lg font-bold text-success">&#8377;1,26,680</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Bank Account Details -->
+        <div class="bg-white rounded-xl border border-gray-100 shadow-sm">
+          <div class="p-5 border-b border-gray-100">
+            <h3 class="text-base font-semibold text-navy-900">Bank Account Details</h3>
+            <p class="text-xs text-gray-400 mt-0.5">Linked bank for payouts</p>
+          </div>
+          <div class="p-5">
+            <!-- Bank Card Visual -->
+            <div class="bg-gradient-to-br from-navy-800 to-navy-900 rounded-xl p-5 mb-5 relative overflow-hidden">
+              <div class="absolute right-0 top-0 w-40 h-40 bg-white/5 rounded-full -translate-y-1/2 translate-x-1/4"></div>
+              <div class="absolute right-16 bottom-0 w-24 h-24 bg-white/5 rounded-full translate-y-1/3"></div>
+              <div class="relative z-10">
+                <div class="flex items-center justify-between mb-6">
+                  <svg class="w-8 h-8 text-brand-400" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M12 21v-8.25M15.75 21v-8.25M8.25 21v-8.25M3 9l9-6 9 6m-1.5 12V10.332A48.36 48.36 0 0012 9.75c-2.551 0-5.056.2-7.5.582V21M3 21h18M12 6.75h.008v.008H12V6.75z"/></svg>
+                  <span class="text-[10px] text-gray-400 font-medium tracking-wider uppercase">Savings Account</span>
+                </div>
+                <p class="text-white text-lg font-mono tracking-widest mb-1">**** **** **** 4827</p>
+                <p class="text-gray-400 text-xs mt-3">Rajesh Kumar Sharma</p>
+              </div>
+            </div>
+
+            <!-- Bank Details List -->
+            <div class="space-y-4">
+              <div class="flex items-center justify-between">
+                <div>
+                  <p class="text-[11px] text-gray-400 uppercase tracking-wider">Bank Name</p>
+                  <p class="text-sm font-medium text-gray-800 mt-0.5">HDFC Bank</p>
+                </div>
+                <div class="w-8 h-8 rounded-lg bg-blue-50 flex items-center justify-center">
+                  <svg class="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M12 21v-8.25M15.75 21v-8.25M8.25 21v-8.25M3 9l9-6 9 6m-1.5 12V10.332A48.36 48.36 0 0012 9.75c-2.551 0-5.056.2-7.5.582V21M3 21h18M12 6.75h.008v.008H12V6.75z"/></svg>
+                </div>
+              </div>
+              <div class="border-t border-gray-100"></div>
+              <div>
+                <p class="text-[11px] text-gray-400 uppercase tracking-wider">Account Number</p>
+                <p class="text-sm font-medium text-gray-800 mt-0.5 font-mono">XXXX XXXX XXXX 4827</p>
+              </div>
+              <div class="border-t border-gray-100"></div>
+              <div>
+                <p class="text-[11px] text-gray-400 uppercase tracking-wider">IFSC Code</p>
+                <p class="text-sm font-medium text-gray-800 mt-0.5 font-mono">HDFC0001234</p>
+              </div>
+              <div class="border-t border-gray-100"></div>
+              <div>
+                <p class="text-[11px] text-gray-400 uppercase tracking-wider">Account Type</p>
+                <p class="text-sm font-medium text-gray-800 mt-0.5">Current / Savings</p>
+              </div>
+              <div class="border-t border-gray-100"></div>
+              <div class="flex items-center justify-between">
+                <div>
+                  <p class="text-[11px] text-gray-400 uppercase tracking-wider">Verification</p>
+                  <div class="flex items-center gap-1.5 mt-0.5">
+                    <span class="w-1.5 h-1.5 rounded-full bg-green-500"></span>
+                    <p class="text-sm font-medium text-success">Verified</p>
+                  </div>
+                </div>
+                <a href="#" onclick="event.preventDefault();alert('Update Bank Details - Coming Soon')" class="text-xs font-medium text-brand-500 hover:text-brand-600 transition">Update</a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Pagination -->
+      <div class="bg-white rounded-xl border border-gray-100 shadow-sm px-5 py-4 flex items-center justify-between">
+        <p id="showingCount" class="text-sm text-gray-500">Showing 1-8 of 8</p>
+        <div id="paginationBtns" class="flex items-center gap-1.5"></div>
+      </div>
+
+    </main>
+  </div>
+
+
+  <!-- ===== VIEW SETTLEMENT MODAL ===== -->
+  <div id="viewModal" class="fixed inset-0 z-[100] hidden items-center justify-center bg-black/40 backdrop-blur-sm">
+    <div class="relative w-full max-w-lg mx-4 bg-white rounded-2xl shadow-2xl overflow-hidden">
+      <div class="flex items-center justify-between px-6 py-4 border-b border-gray-100 bg-gray-50">
+        <h3 class="text-lg font-bold text-gray-900">Settlement Breakdown</h3>
+        <button onclick="closeViewModal()" class="p-1.5 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M6 18L18 6M6 6l12 12"/></svg>
+        </button>
+      </div>
+      <div class="px-6 py-5 space-y-4" id="viewModalBody"></div>
+      <div class="flex justify-end px-6 py-4 border-t border-gray-100 bg-gray-50">
+        <button onclick="closeViewModal()" class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 transition">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== JavaScript ===== -->
+  <script>
+    function getRowData(btn) {
+      var tr = btn.closest('tr');
+      return { id: tr.dataset.id, period: tr.dataset.period, orders: tr.dataset.orders, gross: tr.dataset.gross, fee: tr.dataset.fee, gst: tr.dataset.gst, net: tr.dataset.net, status: tr.dataset.status, payout: tr.dataset.payout, tr: tr };
+    }
+
+    function viewSettlement(btn) {
+      var d = getRowData(btn);
+      var statusColor = d.status === 'Paid' ? 'bg-green-50 text-green-700' :
+                        d.status === 'Processing' ? 'bg-orange-50 text-orange-700' :
+                        d.status === 'Pending' ? 'bg-yellow-50 text-yellow-700' :
+                        'bg-gray-100 text-gray-600';
+      document.getElementById('viewModalBody').innerHTML =
+        '<div class="grid grid-cols-2 gap-4">' +
+          '<div class="space-y-1"><p class="text-xs font-semibold text-gray-400 uppercase tracking-wider">Settlement ID</p><p class="font-mono text-sm font-semibold text-gray-800 bg-gray-100 inline-block px-2 py-0.5 rounded">' + d.id + '</p></div>' +
+          '<div class="space-y-1"><p class="text-xs font-semibold text-gray-400 uppercase tracking-wider">Status</p><span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold ' + statusColor + '">' + d.status + '</span></div>' +
+          '<div class="space-y-1"><p class="text-xs font-semibold text-gray-400 uppercase tracking-wider">Period</p><p class="text-sm text-gray-700">' + d.period + '</p></div>' +
+          '<div class="space-y-1"><p class="text-xs font-semibold text-gray-400 uppercase tracking-wider">Orders</p><p class="text-sm font-semibold text-gray-900">' + d.orders + ' orders</p></div>' +
+        '</div>' +
+        '<div class="border-t border-gray-100 pt-4 mt-4 space-y-3">' +
+          '<div class="flex items-center justify-between"><span class="text-sm text-gray-600">Gross Amount</span><span class="text-sm font-semibold text-green-600">+&#8377;' + d.gross + '</span></div>' +
+          '<div class="flex items-center justify-between"><span class="text-sm text-gray-600">Platform Fee (5%)</span><span class="text-sm font-semibold text-red-500">-&#8377;' + d.fee + '</span></div>' +
+          '<div class="flex items-center justify-between"><span class="text-sm text-gray-600">GST (18% on fees)</span><span class="text-sm font-semibold text-red-500">-&#8377;' + d.gst + '</span></div>' +
+          '<div class="border-t-2 border-gray-200 pt-3 flex items-center justify-between"><span class="text-sm font-bold text-gray-900">Net Payout</span><span class="text-lg font-bold text-green-600">&#8377;' + d.net + '</span></div>' +
+        '</div>' +
+        '<div class="bg-gray-50 rounded-xl p-3 mt-2"><div class="flex items-center justify-between"><span class="text-xs text-gray-500">Payout Date</span><span class="text-sm font-medium text-gray-800">' + d.payout + '</span></div></div>';
+      var modal = document.getElementById('viewModal');
+      modal.classList.remove('hidden');
+      modal.classList.add('flex');
+    }
+
+    function closeViewModal() { var m = document.getElementById('viewModal'); m.classList.add('hidden'); m.classList.remove('flex'); }
+    document.getElementById('viewModal').addEventListener('click', function(e) { if (e.target === this) closeViewModal(); });
+    document.addEventListener('keydown', function(e) { if (e.key === 'Escape') closeViewModal(); });
+  </script>
+
+  <script>
+  /* ===== Search + Pagination ===== */
+  (function() {
+    var tbody = document.querySelector('table tbody');
+    if (!tbody) return;
+    var allRows = Array.from(tbody.querySelectorAll('tr.table-row'));
+    var countEl = document.getElementById('showingCount');
+    var paginationContainer = document.getElementById('paginationBtns');
+
+    /* ===== Search (debounced) ===== */
+    var searchInput = null;
+    var inputs = document.querySelectorAll('input[type="text"][placeholder*="Search"], input[type="text"][placeholder*="search"]');
+    inputs.forEach(function(inp) { if (inp.closest('main')) searchInput = inp; });
+    var debounceTimer;
+    if (searchInput) {
+      searchInput.addEventListener('keyup', function() {
+        clearTimeout(debounceTimer);
+        var q = this.value.toLowerCase();
+        debounceTimer = setTimeout(function() {
+          allRows.forEach(function(row) {
+            if (row.classList.contains('filter-hidden')) return;
+            var text = row.textContent.toLowerCase();
+            if (!q || text.indexOf(q) !== -1) {
+              row.classList.remove('search-hidden');
+              row.style.display = '';
+            } else {
+              row.classList.add('search-hidden');
+              row.style.display = 'none';
+            }
+          });
+          currentPage = 1;
+          paginate();
+        }, 250);
+      });
+    }
+
+    /* ===== Pagination ===== */
+    var ROWS_PER_PAGE = 8;
+    var currentPage = 1;
+
+    function paginate() {
+      var visible = allRows.filter(function(r) {
+        return !r.classList.contains('filter-hidden') && !r.classList.contains('search-hidden');
+      });
+      var totalPages = Math.max(1, Math.ceil(visible.length / ROWS_PER_PAGE));
+      if (currentPage > totalPages) currentPage = totalPages;
+      var start = (currentPage - 1) * ROWS_PER_PAGE;
+      var end = start + ROWS_PER_PAGE;
+
+      visible.forEach(function(row, i) {
+        row.style.display = (i >= start && i < end) ? '' : 'none';
+      });
+
+      if (countEl) {
+        var showStart = visible.length > 0 ? start + 1 : 0;
+        var showEnd = Math.min(end, visible.length);
+        countEl.textContent = 'Showing ' + showStart + '-' + showEnd + ' of ' + visible.length;
+      }
+
+      if (paginationContainer) {
+        paginationContainer.innerHTML = '';
+        var prevBtn = document.createElement('button');
+        prevBtn.className = 'w-9 h-9 rounded-lg border border-gray-200 text-gray-400 flex items-center justify-center hover:bg-gray-50 transition';
+        prevBtn.innerHTML = '<svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M15.75 19.5L8.25 12l7.5-7.5"/></svg>';
+        prevBtn.onclick = function(e) { e.preventDefault(); if (currentPage > 1) { currentPage--; paginate(); } };
+        prevBtn.style.opacity = currentPage <= 1 ? '0.5' : '1';
+        prevBtn.style.pointerEvents = currentPage <= 1 ? 'none' : 'auto';
+        paginationContainer.appendChild(prevBtn);
+        for (var p = 1; p <= totalPages; p++) {
+          var pgBtn = document.createElement('button');
+          pgBtn.className = p === currentPage
+            ? 'w-9 h-9 rounded-lg bg-brand-500 text-white text-sm font-semibold flex items-center justify-center'
+            : 'w-9 h-9 rounded-lg border border-gray-200 text-sm font-medium text-gray-600 hover:bg-gray-50 transition flex items-center justify-center';
+          pgBtn.textContent = p;
+          pgBtn.onclick = (function(pg) { return function(e) { e.preventDefault(); currentPage = pg; paginate(); }; })(p);
+          paginationContainer.appendChild(pgBtn);
+        }
+        var nextBtn = document.createElement('button');
+        nextBtn.className = 'w-9 h-9 rounded-lg border border-gray-200 text-gray-400 flex items-center justify-center hover:bg-gray-50 transition';
+        nextBtn.innerHTML = '<svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M8.25 4.5l7.5 7.5-7.5 7.5"/></svg>';
+        nextBtn.onclick = function(e) { e.preventDefault(); if (currentPage < totalPages) { currentPage++; paginate(); } };
+        nextBtn.style.opacity = currentPage >= totalPages ? '0.5' : '1';
+        nextBtn.style.pointerEvents = currentPage >= totalPages ? 'none' : 'auto';
+        paginationContainer.appendChild(nextBtn);
+      }
+    }
+    paginate();
+  })();
+  </script>
+
+  <script src="shared-layout.js"></script>
+  <script>renderSellerLayout('settlements');</script>
+</body>
+</html>

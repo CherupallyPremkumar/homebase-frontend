@@ -1,0 +1,764 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HomeBase — Product Detail</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      theme: { extend: { colors: { brand: { 50:'#FFF7ED',100:'#FFEDD5',200:'#FED7AA',300:'#FDBA74',400:'#FB923C',500:'#F97316',600:'#EA580C',700:'#C2410C' }, navy: { 700:'#1E3A5F',800:'#1A2E4A',900:'#0F1B2D' }, success:'#16A34A', warning:'#EAB308', danger:'#DC2626' }, fontFamily: { sans:['Inter','system-ui','sans-serif'] } } }
+    }
+  </script>
+  <style>
+    .sidebar-link { transition: all 0.15s ease; }
+    .sidebar-link:hover { background: rgba(255,255,255,0.06); }
+    .sidebar-link.active { background: rgba(249,115,22,0.15); border-right: 3px solid #F97316; }
+    .detail-tab { transition: all 0.15s ease; }
+    .detail-tab.active { color: #F97316; border-color: #F97316; }
+    .detail-tab:hover:not(.active) { color: #374151; }
+    .tab-panel { display: none; }
+    .tab-panel.active { display: block; }
+    .table-row:hover { background: #FFF7ED; }
+  </style>
+</head>
+<body class="font-sans bg-gray-50 text-gray-900">
+
+  <header id="admin-header" class="fixed top-0 left-0 right-0 z-50 bg-white border-b border-gray-200 h-16"></header>
+  <aside id="admin-sidebar" class="fixed left-0 top-16 bottom-0 w-60 z-40 flex flex-col overflow-y-auto" style="background:#0A1628;"></aside>
+
+  <main class="ml-60 pt-16 p-6 lg:p-8 min-h-screen">
+
+    <!-- Breadcrumb -->
+    <nav class="flex items-center gap-2 text-sm mb-5">
+      <a href="index.html" class="text-gray-400 hover:text-brand-500">Products</a>
+      <svg class="w-3.5 h-3.5 text-gray-300" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M8.25 4.5l7.5 7.5-7.5 7.5"/></svg>
+      <span class="text-gray-700 font-medium">Bosch GSB 500W Impact Drill Kit</span>
+    </nav>
+
+    <!-- ===== PRODUCT HEADER (Image + Info + Actions) ===== -->
+    <div class="bg-white rounded-xl border border-gray-100 shadow-sm p-6 mb-6">
+      <div class="flex flex-col lg:flex-row gap-6">
+        <!-- Image Gallery -->
+        <div class="shrink-0">
+          <div class="w-48 h-48 rounded-xl bg-gray-100 border border-gray-200 flex items-center justify-center mb-3">
+            <svg class="w-16 h-16 text-gray-300" fill="none" stroke="currentColor" stroke-width="0.5" viewBox="0 0 24 24"><path d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.409a2.25 2.25 0 013.182 0l2.909 2.909M6.75 19.5h10.5a2.25 2.25 0 002.25-2.25V6.75a2.25 2.25 0 00-2.25-2.25H6.75A2.25 2.25 0 004.5 6.75v10.5a2.25 2.25 0 002.25 2.25z"/></svg>
+          </div>
+          <div class="flex gap-2">
+            <div class="w-12 h-12 rounded-lg bg-gray-100 border-2 border-brand-500 flex items-center justify-center"><svg class="w-5 h-5 text-gray-300" fill="none" stroke="currentColor" stroke-width="1" viewBox="0 0 24 24"><path d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.409a2.25 2.25 0 013.182 0l2.909 2.909M6.75 19.5h10.5a2.25 2.25 0 002.25-2.25V6.75a2.25 2.25 0 00-2.25-2.25H6.75A2.25 2.25 0 004.5 6.75v10.5a2.25 2.25 0 002.25 2.25z"/></svg></div>
+            <div class="w-12 h-12 rounded-lg bg-gray-100 border border-gray-200 flex items-center justify-center"><svg class="w-5 h-5 text-gray-300" fill="none" stroke="currentColor" stroke-width="1" viewBox="0 0 24 24"><path d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.409a2.25 2.25 0 013.182 0l2.909 2.909M6.75 19.5h10.5a2.25 2.25 0 002.25-2.25V6.75a2.25 2.25 0 00-2.25-2.25H6.75A2.25 2.25 0 004.5 6.75v10.5a2.25 2.25 0 002.25 2.25z"/></svg></div>
+            <div class="w-12 h-12 rounded-lg bg-gray-100 border border-gray-200 flex items-center justify-center"><svg class="w-5 h-5 text-gray-300" fill="none" stroke="currentColor" stroke-width="1" viewBox="0 0 24 24"><path d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.409a2.25 2.25 0 013.182 0l2.909 2.909M6.75 19.5h10.5a2.25 2.25 0 002.25-2.25V6.75a2.25 2.25 0 00-2.25-2.25H6.75A2.25 2.25 0 004.5 6.75v10.5a2.25 2.25 0 002.25 2.25z"/></svg></div>
+            <div class="w-12 h-12 rounded-lg bg-gray-50 border border-dashed border-gray-300 flex items-center justify-center text-xs text-gray-400">+2</div>
+          </div>
+        </div>
+
+        <!-- Product Info -->
+        <div class="flex-1 min-w-0">
+          <div class="flex items-start justify-between gap-4">
+            <div>
+              <div class="flex items-center gap-2 mb-1">
+                <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold bg-green-50 text-green-700"><span class="w-1.5 h-1.5 rounded-full bg-green-500"></span>Published</span>
+                <span class="text-xs text-gray-400">Listed 15 Mar 2026</span>
+              </div>
+              <h1 class="text-xl font-bold text-gray-900">Bosch GSB 500W Impact Drill Kit</h1>
+              <p class="text-sm text-gray-400 mt-0.5">Tools &rsaquo; Power Tools &rsaquo; Drills</p>
+              <div class="flex items-center gap-3 mt-2">
+                <span class="text-xs font-mono bg-gray-100 text-gray-600 px-2 py-0.5 rounded">SKU: BOS-GSB-500W</span>
+                <span class="text-xs font-mono bg-gray-100 text-gray-600 px-2 py-0.5 rounded">HSN: 84672100</span>
+                <div class="flex items-center gap-1"><svg class="w-3.5 h-3.5 text-amber-400" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg><span class="text-sm font-medium text-gray-700">4.5</span><span class="text-xs text-gray-400">(128 reviews)</span></div>
+              </div>
+              <!-- Seller -->
+              <div class="flex items-center gap-2 mt-3">
+                <div class="w-7 h-7 rounded-full bg-gradient-to-br from-blue-400 to-blue-600 flex items-center justify-center text-white text-[10px] font-bold">AT</div>
+                <div>
+                  <a href="../sellers/detail.html" class="text-sm font-medium text-brand-600 hover:underline">Anand Tools & Hardware</a>
+                  <span class="text-xs text-gray-400 ml-1">Premium Seller</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Price + Actions -->
+            <div class="text-right shrink-0">
+              <div class="mb-3">
+                <p class="text-xs text-gray-400 line-through">MRP &#8377;4,299</p>
+                <p class="text-2xl font-bold text-gray-900">&#8377;3,499</p>
+                <p class="text-xs font-semibold text-green-600">19% off &middot; GST 18%</p>
+              </div>
+              <div class="flex items-center gap-2 justify-end">
+                <button onclick="if(confirm('Suspend this product?')) alert('Product suspended')" class="flex items-center gap-1.5 border border-orange-200 text-orange-600 px-3 py-2 rounded-lg text-sm font-medium hover:bg-orange-50 transition">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M15.75 5.25v13.5m-7.5-13.5v13.5"/></svg>Suspend
+                </button>
+                <button onclick="if(confirm('Disable this product?')) alert('Product disabled')" class="flex items-center gap-1.5 border border-red-200 text-red-600 px-3 py-2 rounded-lg text-sm font-medium hover:bg-red-50 transition">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"/></svg>Disable
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== TABS ===== -->
+    <div class="bg-white rounded-xl border border-gray-100 shadow-sm">
+      <div class="border-b border-gray-200 px-6">
+        <div class="flex gap-0 -mb-px">
+          <button onclick="switchTab('overview')" class="detail-tab active text-sm font-semibold px-5 py-4 border-b-2 border-brand-500 text-brand-500">Overview</button>
+          <button onclick="switchTab('variants')" class="detail-tab text-sm font-medium px-5 py-4 border-b-2 border-transparent text-gray-500">Variants & Inventory</button>
+          <button onclick="switchTab('images')" class="detail-tab text-sm font-medium px-5 py-4 border-b-2 border-transparent text-gray-500">Images</button>
+          <button onclick="switchTab('compliance')" class="detail-tab text-sm font-medium px-5 py-4 border-b-2 border-transparent text-gray-500">Compliance <span class="ml-1 bg-green-100 text-green-700 text-[10px] font-bold px-1.5 py-0.5 rounded-full">Passed</span></button>
+          <button onclick="switchTab('reviews')" class="detail-tab text-sm font-medium px-5 py-4 border-b-2 border-transparent text-gray-500">Reviews <span class="ml-1 bg-gray-100 text-gray-600 text-[10px] font-bold px-1.5 py-0.5 rounded-full">128</span></button>
+          <button onclick="switchTab('activity')" class="detail-tab text-sm font-medium px-5 py-4 border-b-2 border-transparent text-gray-500">Activity Log</button>
+        </div>
+      </div>
+
+      <!-- ===== TAB 1: OVERVIEW ===== -->
+      <div id="panel-overview" class="tab-panel active p-6">
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <!-- Left: Details -->
+          <div class="lg:col-span-2 space-y-6">
+            <!-- Vital Info -->
+            <div>
+              <h3 class="text-sm font-semibold text-gray-900 mb-3">Vital Information</h3>
+              <div class="grid grid-cols-2 gap-x-8 gap-y-3 text-sm">
+                <div><p class="text-xs text-gray-400 uppercase tracking-wider mb-0.5">Brand</p><p class="text-gray-800 font-medium">Bosch</p></div>
+                <div><p class="text-xs text-gray-400 uppercase tracking-wider mb-0.5">Manufacturer</p><p class="text-gray-800 font-medium">Robert Bosch GmbH</p></div>
+                <div><p class="text-xs text-gray-400 uppercase tracking-wider mb-0.5">Model Number</p><p class="text-gray-800 font-medium">GSB 500 RE</p></div>
+                <div><p class="text-xs text-gray-400 uppercase tracking-wider mb-0.5">EAN / Barcode</p><p class="text-gray-800 font-mono">8901234567890</p></div>
+                <div><p class="text-xs text-gray-400 uppercase tracking-wider mb-0.5">Weight</p><p class="text-gray-800">1.8 kg</p></div>
+                <div><p class="text-xs text-gray-400 uppercase tracking-wider mb-0.5">Dimensions</p><p class="text-gray-800">28 x 22 x 8 cm</p></div>
+                <div><p class="text-xs text-gray-400 uppercase tracking-wider mb-0.5">Warranty</p><p class="text-gray-800">1 Year Manufacturer</p></div>
+                <div><p class="text-xs text-gray-400 uppercase tracking-wider mb-0.5">Country of Origin</p><p class="text-gray-800">India</p></div>
+              </div>
+            </div>
+            <hr class="border-gray-100">
+            <!-- Description -->
+            <div>
+              <h3 class="text-sm font-semibold text-gray-900 mb-3">Description</h3>
+              <p class="text-sm text-gray-600 leading-relaxed">Bosch GSB 500W Impact Drill Kit is a versatile power tool designed for drilling into wood, metal, and masonry. Comes with a comprehensive 100-piece accessory set including drill bits, driver bits, and hole saws. Features variable speed control and forward/reverse functionality.</p>
+            </div>
+            <hr class="border-gray-100">
+            <!-- Key Features -->
+            <div>
+              <h3 class="text-sm font-semibold text-gray-900 mb-3">Key Features</h3>
+              <ul class="text-sm text-gray-600 space-y-2">
+                <li class="flex items-start gap-2"><svg class="w-4 h-4 text-green-500 mt-0.5 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4.5 12.75l6 6 9-13.5"/></svg>500W powerful motor for heavy-duty applications</li>
+                <li class="flex items-start gap-2"><svg class="w-4 h-4 text-green-500 mt-0.5 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4.5 12.75l6 6 9-13.5"/></svg>Variable speed: 0-2600 RPM with lock-on switch</li>
+                <li class="flex items-start gap-2"><svg class="w-4 h-4 text-green-500 mt-0.5 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4.5 12.75l6 6 9-13.5"/></svg>Impact drilling for masonry up to 13mm</li>
+                <li class="flex items-start gap-2"><svg class="w-4 h-4 text-green-500 mt-0.5 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4.5 12.75l6 6 9-13.5"/></svg>100-piece accessory kit included in carry case</li>
+                <li class="flex items-start gap-2"><svg class="w-4 h-4 text-green-500 mt-0.5 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4.5 12.75l6 6 9-13.5"/></svg>Forward and reverse rotation for screwdriving</li>
+              </ul>
+            </div>
+          </div>
+          <!-- Right: Quick Stats -->
+          <div class="space-y-4">
+            <div class="bg-gray-50 rounded-xl p-4 border border-gray-100">
+              <h4 class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3">Performance</h4>
+              <div class="space-y-2.5 text-sm">
+                <div class="flex justify-between"><span class="text-gray-500">Views (30d)</span><span class="font-semibold">1,245</span></div>
+                <div class="flex justify-between"><span class="text-gray-500">Orders (30d)</span><span class="font-semibold">48</span></div>
+                <div class="flex justify-between"><span class="text-gray-500">Conversion</span><span class="font-semibold text-green-600">3.9%</span></div>
+                <div class="flex justify-between"><span class="text-gray-500">Returns</span><span class="font-semibold">2 (4.2%)</span></div>
+                <div class="flex justify-between"><span class="text-gray-500">Revenue (30d)</span><span class="font-semibold">&#8377;1,67,952</span></div>
+              </div>
+            </div>
+            <div class="bg-gray-50 rounded-xl p-4 border border-gray-100">
+              <h4 class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3">Shipping</h4>
+              <div class="space-y-2.5 text-sm">
+                <div class="flex justify-between"><span class="text-gray-500">Shipping Weight</span><span>2.1 kg</span></div>
+                <div class="flex justify-between"><span class="text-gray-500">Free Shipping</span><span class="text-green-600 font-medium">Yes</span></div>
+                <div class="flex justify-between"><span class="text-gray-500">Est. Delivery</span><span>3-5 days</span></div>
+                <div class="flex justify-between"><span class="text-gray-500">Returnable</span><span>Yes (7 days)</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== TAB 2: VARIANTS & INVENTORY ===== -->
+      <div id="panel-variants" class="tab-panel p-6">
+        <div class="flex items-center justify-between mb-4">
+          <h3 class="text-sm font-semibold text-gray-900">3 Variants</h3>
+          <p class="text-xs text-gray-400">Variation theme: <span class="font-medium text-gray-600">Kit Size</span></p>
+        </div>
+        <div class="overflow-x-auto">
+          <table class="w-full text-sm">
+            <thead>
+              <tr class="border-b border-gray-200">
+                <th class="text-left text-[11px] font-semibold text-gray-400 uppercase tracking-wider py-3 px-4">Variant</th>
+                <th class="text-left text-[11px] font-semibold text-gray-400 uppercase tracking-wider py-3 px-4">SKU</th>
+                <th class="text-right text-[11px] font-semibold text-gray-400 uppercase tracking-wider py-3 px-4">MRP</th>
+                <th class="text-right text-[11px] font-semibold text-gray-400 uppercase tracking-wider py-3 px-4">Selling Price</th>
+                <th class="text-center text-[11px] font-semibold text-gray-400 uppercase tracking-wider py-3 px-4">Available</th>
+                <th class="text-center text-[11px] font-semibold text-gray-400 uppercase tracking-wider py-3 px-4">Reserved</th>
+                <th class="text-center text-[11px] font-semibold text-gray-400 uppercase tracking-wider py-3 px-4">Inbound</th>
+                <th class="text-left text-[11px] font-semibold text-gray-400 uppercase tracking-wider py-3 px-4">Status</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-50">
+              <tr class="table-row">
+                <td class="py-3 px-4 font-medium text-gray-800">Standard Kit (10pc)</td>
+                <td class="py-3 px-4 font-mono text-gray-500 text-xs">BOS-GSB-500W-10</td>
+                <td class="py-3 px-4 text-right text-gray-400 line-through">&#8377;3,999</td>
+                <td class="py-3 px-4 text-right font-semibold text-gray-900">&#8377;2,999</td>
+                <td class="py-3 px-4 text-center font-medium text-green-700">68</td>
+                <td class="py-3 px-4 text-center text-gray-500">5</td>
+                <td class="py-3 px-4 text-center text-blue-600">20</td>
+                <td class="py-3 px-4"><span class="inline-flex items-center gap-1 px-2 py-0.5 bg-green-50 text-green-700 text-xs font-semibold rounded-full"><span class="w-1.5 h-1.5 bg-green-500 rounded-full"></span>Active</span></td>
+              </tr>
+              <tr class="table-row">
+                <td class="py-3 px-4 font-medium text-gray-800">Pro Kit (50pc)</td>
+                <td class="py-3 px-4 font-mono text-gray-500 text-xs">BOS-GSB-500W-50</td>
+                <td class="py-3 px-4 text-right text-gray-400 line-through">&#8377;4,299</td>
+                <td class="py-3 px-4 text-right font-semibold text-gray-900">&#8377;3,499</td>
+                <td class="py-3 px-4 text-center font-medium text-green-700">52</td>
+                <td class="py-3 px-4 text-center text-gray-500">7</td>
+                <td class="py-3 px-4 text-center text-blue-600">0</td>
+                <td class="py-3 px-4"><span class="inline-flex items-center gap-1 px-2 py-0.5 bg-green-50 text-green-700 text-xs font-semibold rounded-full"><span class="w-1.5 h-1.5 bg-green-500 rounded-full"></span>Active</span></td>
+              </tr>
+              <tr class="table-row">
+                <td class="py-3 px-4 font-medium text-gray-800">Master Kit (100pc)</td>
+                <td class="py-3 px-4 font-mono text-gray-500 text-xs">BOS-GSB-500W-100</td>
+                <td class="py-3 px-4 text-right text-gray-400 line-through">&#8377;5,499</td>
+                <td class="py-3 px-4 text-right font-semibold text-gray-900">&#8377;4,499</td>
+                <td class="py-3 px-4 text-center font-medium text-amber-600">22</td>
+                <td class="py-3 px-4 text-center text-gray-500">0</td>
+                <td class="py-3 px-4 text-center text-blue-600">50</td>
+                <td class="py-3 px-4"><span class="inline-flex items-center gap-1 px-2 py-0.5 bg-green-50 text-green-700 text-xs font-semibold rounded-full"><span class="w-1.5 h-1.5 bg-green-500 rounded-full"></span>Active</span></td>
+              </tr>
+            </tbody>
+            <tfoot>
+              <tr class="border-t border-gray-200 bg-gray-50/50">
+                <td class="py-3 px-4 font-semibold text-gray-700" colspan="4">Total</td>
+                <td class="py-3 px-4 text-center font-bold text-gray-900">142</td>
+                <td class="py-3 px-4 text-center font-bold text-gray-900">12</td>
+                <td class="py-3 px-4 text-center font-bold text-gray-900">70</td>
+                <td></td>
+              </tr>
+            </tfoot>
+          </table>
+        </div>
+      </div>
+
+      <!-- ===== TAB 3: IMAGES ===== -->
+      <div id="panel-images" class="tab-panel p-6">
+        <h3 class="text-sm font-semibold text-gray-900 mb-4">Product Images (5 of 9 max)</h3>
+        <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
+          <div class="aspect-square rounded-xl bg-gray-100 border-2 border-brand-500 flex flex-col items-center justify-center relative">
+            <svg class="w-12 h-12 text-gray-300" fill="none" stroke="currentColor" stroke-width="0.5" viewBox="0 0 24 24"><path d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.409a2.25 2.25 0 013.182 0l2.909 2.909M6.75 19.5h10.5a2.25 2.25 0 002.25-2.25V6.75a2.25 2.25 0 00-2.25-2.25H6.75A2.25 2.25 0 004.5 6.75v10.5a2.25 2.25 0 002.25 2.25z"/></svg>
+            <span class="absolute top-2 left-2 bg-brand-500 text-white text-[9px] font-bold px-1.5 py-0.5 rounded">MAIN</span>
+            <span class="absolute bottom-2 right-2 inline-flex items-center gap-0.5 bg-green-100 text-green-700 text-[9px] font-bold px-1.5 py-0.5 rounded"><svg class="w-2.5 h-2.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4.5 12.75l6 6 9-13.5"/></svg>OK</span>
+          </div>
+          <div class="aspect-square rounded-xl bg-gray-100 border border-gray-200 flex flex-col items-center justify-center relative">
+            <svg class="w-12 h-12 text-gray-300" fill="none" stroke="currentColor" stroke-width="0.5" viewBox="0 0 24 24"><path d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.409a2.25 2.25 0 013.182 0l2.909 2.909M6.75 19.5h10.5a2.25 2.25 0 002.25-2.25V6.75a2.25 2.25 0 00-2.25-2.25H6.75A2.25 2.25 0 004.5 6.75v10.5a2.25 2.25 0 002.25 2.25z"/></svg>
+            <span class="absolute bottom-2 right-2 inline-flex items-center gap-0.5 bg-green-100 text-green-700 text-[9px] font-bold px-1.5 py-0.5 rounded"><svg class="w-2.5 h-2.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4.5 12.75l6 6 9-13.5"/></svg>OK</span>
+          </div>
+          <div class="aspect-square rounded-xl bg-gray-100 border border-gray-200 flex flex-col items-center justify-center relative">
+            <svg class="w-12 h-12 text-gray-300" fill="none" stroke="currentColor" stroke-width="0.5" viewBox="0 0 24 24"><path d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.409a2.25 2.25 0 013.182 0l2.909 2.909M6.75 19.5h10.5a2.25 2.25 0 002.25-2.25V6.75a2.25 2.25 0 00-2.25-2.25H6.75A2.25 2.25 0 004.5 6.75v10.5a2.25 2.25 0 002.25 2.25z"/></svg>
+            <span class="absolute bottom-2 right-2 inline-flex items-center gap-0.5 bg-green-100 text-green-700 text-[9px] font-bold px-1.5 py-0.5 rounded"><svg class="w-2.5 h-2.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4.5 12.75l6 6 9-13.5"/></svg>OK</span>
+          </div>
+          <div class="aspect-square rounded-xl bg-gray-100 border border-gray-200 flex flex-col items-center justify-center relative">
+            <svg class="w-12 h-12 text-gray-300" fill="none" stroke="currentColor" stroke-width="0.5" viewBox="0 0 24 24"><path d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.409a2.25 2.25 0 013.182 0l2.909 2.909M6.75 19.5h10.5a2.25 2.25 0 002.25-2.25V6.75a2.25 2.25 0 00-2.25-2.25H6.75A2.25 2.25 0 004.5 6.75v10.5a2.25 2.25 0 002.25 2.25z"/></svg>
+            <span class="absolute bottom-2 right-2 inline-flex items-center gap-0.5 bg-amber-100 text-amber-700 text-[9px] font-bold px-1.5 py-0.5 rounded">LOW RES</span>
+          </div>
+          <div class="aspect-square rounded-xl bg-gray-100 border border-gray-200 flex flex-col items-center justify-center relative">
+            <svg class="w-12 h-12 text-gray-300" fill="none" stroke="currentColor" stroke-width="0.5" viewBox="0 0 24 24"><path d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.409a2.25 2.25 0 013.182 0l2.909 2.909M6.75 19.5h10.5a2.25 2.25 0 002.25-2.25V6.75a2.25 2.25 0 00-2.25-2.25H6.75A2.25 2.25 0 004.5 6.75v10.5a2.25 2.25 0 002.25 2.25z"/></svg>
+            <span class="absolute bottom-2 right-2 inline-flex items-center gap-0.5 bg-green-100 text-green-700 text-[9px] font-bold px-1.5 py-0.5 rounded"><svg class="w-2.5 h-2.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4.5 12.75l6 6 9-13.5"/></svg>OK</span>
+          </div>
+        </div>
+        <p class="text-xs text-gray-400 mt-3">Min 1000x1000px, white background required for main image, max 10MB per image.</p>
+      </div>
+
+      <!-- ===== TAB 4: COMPLIANCE ===== -->
+      <div id="panel-compliance" class="tab-panel p-6">
+        <div class="flex items-center gap-3 mb-5">
+          <div class="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center"><svg class="w-5 h-5 text-green-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg></div>
+          <div>
+            <p class="text-sm font-semibold text-green-800">Compliance Check Passed</p>
+            <p class="text-xs text-gray-500">All listing requirements met. Last checked 1 hour ago.</p>
+          </div>
+        </div>
+        <div class="space-y-3">
+          <div class="flex items-center gap-3 p-3 rounded-lg bg-green-50/50 border border-green-100">
+            <svg class="w-5 h-5 text-green-500 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4.5 12.75l6 6 9-13.5"/></svg>
+            <div class="flex-1"><p class="text-sm text-gray-700">Title length within limit</p><p class="text-xs text-gray-400">38 of 200 characters</p></div>
+          </div>
+          <div class="flex items-center gap-3 p-3 rounded-lg bg-green-50/50 border border-green-100">
+            <svg class="w-5 h-5 text-green-500 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4.5 12.75l6 6 9-13.5"/></svg>
+            <div class="flex-1"><p class="text-sm text-gray-700">Main image meets requirements</p><p class="text-xs text-gray-400">1500x1500px, white background, no watermarks</p></div>
+          </div>
+          <div class="flex items-center gap-3 p-3 rounded-lg bg-green-50/50 border border-green-100">
+            <svg class="w-5 h-5 text-green-500 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4.5 12.75l6 6 9-13.5"/></svg>
+            <div class="flex-1"><p class="text-sm text-gray-700">At least 5 bullet points provided</p><p class="text-xs text-gray-400">5 of 5 minimum</p></div>
+          </div>
+          <div class="flex items-center gap-3 p-3 rounded-lg bg-green-50/50 border border-green-100">
+            <svg class="w-5 h-5 text-green-500 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4.5 12.75l6 6 9-13.5"/></svg>
+            <div class="flex-1"><p class="text-sm text-gray-700">Price within category range</p><p class="text-xs text-gray-400">&#8377;3,499 is within &#8377;500 - &#8377;25,000 for Power Tools</p></div>
+          </div>
+          <div class="flex items-center gap-3 p-3 rounded-lg bg-green-50/50 border border-green-100">
+            <svg class="w-5 h-5 text-green-500 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4.5 12.75l6 6 9-13.5"/></svg>
+            <div class="flex-1"><p class="text-sm text-gray-700">HSN code valid</p><p class="text-xs text-gray-400">84672100 — Hand tools, pneumatic, hydraulic or with self-contained motor</p></div>
+          </div>
+          <div class="flex items-center gap-3 p-3 rounded-lg bg-green-50/50 border border-green-100">
+            <svg class="w-5 h-5 text-green-500 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4.5 12.75l6 6 9-13.5"/></svg>
+            <div class="flex-1"><p class="text-sm text-gray-700">Brand authorization verified</p><p class="text-xs text-gray-400">Seller authorized by Bosch India (doc uploaded)</p></div>
+          </div>
+          <div class="flex items-center gap-3 p-3 rounded-lg bg-amber-50/50 border border-amber-100">
+            <svg class="w-5 h-5 text-amber-500 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z"/></svg>
+            <div class="flex-1"><p class="text-sm text-gray-700">Image #4 below recommended resolution</p><p class="text-xs text-amber-600">800x800px — recommended minimum 1000x1000px (warning, not blocking)</p></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== TAB 5: REVIEWS ===== -->
+      <div id="panel-reviews" class="tab-panel p-6">
+        <div class="flex items-center gap-8 mb-6">
+          <div class="text-center">
+            <p class="text-4xl font-bold text-gray-900">4.5</p>
+            <div class="flex gap-0.5 mt-1 justify-center"><svg class="w-4 h-4 text-amber-400" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg><svg class="w-4 h-4 text-amber-400" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg><svg class="w-4 h-4 text-amber-400" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg><svg class="w-4 h-4 text-amber-400" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg><svg class="w-4 h-4 text-gray-300" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg></div>
+            <p class="text-xs text-gray-400 mt-1">128 reviews</p>
+          </div>
+          <div class="flex-1 space-y-1.5 max-w-xs">
+            <div class="flex items-center gap-2"><span class="text-xs text-gray-500 w-8">5</span><div class="flex-1 bg-gray-100 rounded-full h-2"><div class="bg-amber-400 h-2 rounded-full" style="width:65%"></div></div><span class="text-xs text-gray-400 w-8">65%</span></div>
+            <div class="flex items-center gap-2"><span class="text-xs text-gray-500 w-8">4</span><div class="flex-1 bg-gray-100 rounded-full h-2"><div class="bg-amber-400 h-2 rounded-full" style="width:20%"></div></div><span class="text-xs text-gray-400 w-8">20%</span></div>
+            <div class="flex items-center gap-2"><span class="text-xs text-gray-500 w-8">3</span><div class="flex-1 bg-gray-100 rounded-full h-2"><div class="bg-amber-400 h-2 rounded-full" style="width:8%"></div></div><span class="text-xs text-gray-400 w-8">8%</span></div>
+            <div class="flex items-center gap-2"><span class="text-xs text-gray-500 w-8">2</span><div class="flex-1 bg-gray-100 rounded-full h-2"><div class="bg-amber-400 h-2 rounded-full" style="width:4%"></div></div><span class="text-xs text-gray-400 w-8">4%</span></div>
+            <div class="flex items-center gap-2"><span class="text-xs text-gray-500 w-8">1</span><div class="flex-1 bg-gray-100 rounded-full h-2"><div class="bg-amber-400 h-2 rounded-full" style="width:3%"></div></div><span class="text-xs text-gray-400 w-8">3%</span></div>
+          </div>
+        </div>
+        <!-- Recent Reviews -->
+        <div class="divide-y divide-gray-100">
+          <div class="py-4">
+            <div class="flex items-center gap-2 mb-1"><div class="flex gap-0.5"><svg class="w-3.5 h-3.5 text-amber-400" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg><svg class="w-3.5 h-3.5 text-amber-400" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg><svg class="w-3.5 h-3.5 text-amber-400" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg><svg class="w-3.5 h-3.5 text-amber-400" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg><svg class="w-3.5 h-3.5 text-amber-400" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg></div><span class="text-sm font-semibold text-gray-800">Excellent drill for home use</span></div>
+            <p class="text-xs text-gray-400 mb-1">Reviewed by Amit S. on 28 Mar 2026 &middot; Verified Purchase</p>
+            <p class="text-sm text-gray-600">Very powerful drill. Used it for concrete wall and it worked perfectly. The accessory kit has everything you need. Good value for money.</p>
+          </div>
+          <div class="py-4">
+            <div class="flex items-center gap-2 mb-1"><div class="flex gap-0.5"><svg class="w-3.5 h-3.5 text-amber-400" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg><svg class="w-3.5 h-3.5 text-amber-400" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg><svg class="w-3.5 h-3.5 text-amber-400" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg><svg class="w-3.5 h-3.5 text-gray-300" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg><svg class="w-3.5 h-3.5 text-gray-300" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg></div><span class="text-sm font-semibold text-gray-800">Decent but drill bits could be better</span></div>
+            <p class="text-xs text-gray-400 mb-1">Reviewed by Priya R. on 25 Mar 2026 &middot; Verified Purchase</p>
+            <p class="text-sm text-gray-600">Drill machine itself is good. But the accessory bits feel a bit cheap. The carry case is nice though. 3 stars for the bits quality.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== TAB 6: ACTIVITY LOG ===== -->
+      <div id="panel-activity" class="tab-panel p-6">
+        <h3 class="text-sm font-semibold text-gray-900 mb-4">State Transition History</h3>
+        <div class="relative pl-6 border-l-2 border-gray-200 space-y-6">
+          <div class="relative">
+            <div class="absolute -left-[25px] w-4 h-4 rounded-full bg-green-500 border-2 border-white"></div>
+            <p class="text-sm font-medium text-gray-900">Published</p>
+            <p class="text-xs text-gray-400">By Super Admin &middot; 15 Mar 2026, 10:30 AM</p>
+            <p class="text-xs text-gray-500 mt-1">Product approved and made live on marketplace.</p>
+          </div>
+          <div class="relative">
+            <div class="absolute -left-[25px] w-4 h-4 rounded-full bg-amber-500 border-2 border-white"></div>
+            <p class="text-sm font-medium text-gray-900">Under Review</p>
+            <p class="text-xs text-gray-400">System &middot; 14 Mar 2026, 4:00 PM</p>
+            <p class="text-xs text-gray-500 mt-1">Submitted for platform review. Compliance check passed automatically.</p>
+          </div>
+          <div class="relative">
+            <div class="absolute -left-[25px] w-4 h-4 rounded-full bg-blue-500 border-2 border-white"></div>
+            <p class="text-sm font-medium text-gray-900">Submitted for Review</p>
+            <p class="text-xs text-gray-400">By Anand Tools & Hardware &middot; 14 Mar 2026, 3:45 PM</p>
+            <p class="text-xs text-gray-500 mt-1">Seller submitted product listing for approval.</p>
+          </div>
+          <div class="relative">
+            <div class="absolute -left-[25px] w-4 h-4 rounded-full bg-gray-400 border-2 border-white"></div>
+            <p class="text-sm font-medium text-gray-900">Draft Created</p>
+            <p class="text-xs text-gray-400">By Anand Tools & Hardware &middot; 14 Mar 2026, 2:00 PM</p>
+            <p class="text-xs text-gray-500 mt-1">Initial product listing created as draft.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== NEW SECTIONS BELOW TABS ===== -->
+
+    <!-- ===== PERFORMANCE BENCHMARK + REVIEW SENTIMENT (Row 1) ===== -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-6">
+
+      <!-- Performance Benchmark -->
+      <div class="bg-white rounded-xl border border-gray-100 shadow-sm p-6">
+        <div class="flex items-center gap-2 mb-5">
+          <div class="w-8 h-8 rounded-lg bg-indigo-50 flex items-center justify-center">
+            <svg class="w-4.5 h-4.5 text-indigo-600" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 013 19.875v-6.75zM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v11.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V8.625zM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v15.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V4.125z"/></svg>
+          </div>
+          <div>
+            <h3 class="text-sm font-semibold text-gray-900">Performance Benchmark</h3>
+            <p class="text-xs text-gray-400">This product vs category average (Power Tools)</p>
+          </div>
+        </div>
+        <div class="space-y-4">
+          <!-- Conversion Rate -->
+          <div class="flex items-center justify-between">
+            <div class="flex-1 min-w-0">
+              <p class="text-sm text-gray-600">Conversion Rate</p>
+              <div class="flex items-center gap-3 mt-1">
+                <div class="flex-1 bg-gray-100 rounded-full h-2 max-w-[180px]">
+                  <div class="bg-green-500 h-2 rounded-full" style="width:62%"></div>
+                </div>
+              </div>
+            </div>
+            <div class="text-right shrink-0 ml-4">
+              <span class="text-sm font-bold text-green-600">3.1%</span>
+              <span class="text-xs text-gray-400 ml-1">vs 2.4% avg</span>
+            </div>
+            <div class="ml-2 shrink-0">
+              <svg class="w-4 h-4 text-green-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4.5 12.75l6 6 9-13.5"/></svg>
+            </div>
+          </div>
+          <!-- Return Rate -->
+          <div class="flex items-center justify-between">
+            <div class="flex-1 min-w-0">
+              <p class="text-sm text-gray-600">Return Rate</p>
+              <div class="flex items-center gap-3 mt-1">
+                <div class="flex-1 bg-gray-100 rounded-full h-2 max-w-[180px]">
+                  <div class="bg-green-500 h-2 rounded-full" style="width:28%"></div>
+                </div>
+              </div>
+            </div>
+            <div class="text-right shrink-0 ml-4">
+              <span class="text-sm font-bold text-green-600">2.8%</span>
+              <span class="text-xs text-gray-400 ml-1">vs 4.1% avg</span>
+            </div>
+            <div class="ml-2 shrink-0">
+              <svg class="w-4 h-4 text-green-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4.5 12.75l6 6 9-13.5"/></svg>
+            </div>
+          </div>
+          <!-- Avg Reviews -->
+          <div class="flex items-center justify-between">
+            <div class="flex-1 min-w-0">
+              <p class="text-sm text-gray-600">Avg Review Rating</p>
+              <div class="flex items-center gap-3 mt-1">
+                <div class="flex-1 bg-gray-100 rounded-full h-2 max-w-[180px]">
+                  <div class="bg-green-500 h-2 rounded-full" style="width:92%"></div>
+                </div>
+              </div>
+            </div>
+            <div class="text-right shrink-0 ml-4">
+              <span class="text-sm font-bold text-green-600">4.6</span>
+              <span class="text-xs text-gray-400 ml-1">vs 4.2 avg</span>
+            </div>
+            <div class="ml-2 shrink-0">
+              <svg class="w-4 h-4 text-green-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4.5 12.75l6 6 9-13.5"/></svg>
+            </div>
+          </div>
+          <!-- Views/day -->
+          <div class="flex items-center justify-between">
+            <div class="flex-1 min-w-0">
+              <p class="text-sm text-gray-600">Views / Day</p>
+              <div class="flex items-center gap-3 mt-1">
+                <div class="flex-1 bg-gray-100 rounded-full h-2 max-w-[180px]">
+                  <div class="bg-green-500 h-2 rounded-full" style="width:80%"></div>
+                </div>
+              </div>
+            </div>
+            <div class="text-right shrink-0 ml-4">
+              <span class="text-sm font-bold text-green-600">142</span>
+              <span class="text-xs text-gray-400 ml-1">vs 89 avg</span>
+            </div>
+            <div class="ml-2 shrink-0">
+              <svg class="w-4 h-4 text-green-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4.5 12.75l6 6 9-13.5"/></svg>
+            </div>
+          </div>
+        </div>
+        <div class="mt-4 pt-4 border-t border-gray-100">
+          <p class="text-xs text-gray-400">All metrics beat category averages. This is a <span class="font-semibold text-green-600">top-performing</span> listing in Power Tools.</p>
+        </div>
+      </div>
+
+      <!-- Review Sentiment Analysis -->
+      <div class="bg-white rounded-xl border border-gray-100 shadow-sm p-6">
+        <div class="flex items-center gap-2 mb-5">
+          <div class="w-8 h-8 rounded-lg bg-violet-50 flex items-center justify-center">
+            <svg class="w-4.5 h-4.5 text-violet-600" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M7.5 8.25h9m-9 3H12m-9.75 1.51c0 1.6 1.123 2.994 2.707 3.227 1.129.166 2.27.293 3.423.379.35.026.67.21.865.501L12 21l2.755-4.133a1.14 1.14 0 01.865-.501 48.172 48.172 0 003.423-.379c1.584-.233 2.707-1.626 2.707-3.228V6.741c0-1.602-1.123-2.995-2.707-3.228A48.394 48.394 0 0012 3c-2.392 0-4.744.175-7.043.513C3.373 3.746 2.25 5.14 2.25 6.741v6.018z"/></svg>
+          </div>
+          <div>
+            <h3 class="text-sm font-semibold text-gray-900">Review Sentiment Analysis</h3>
+            <p class="text-xs text-gray-400">Based on 128 reviews, AI-analyzed</p>
+          </div>
+        </div>
+
+        <!-- Sentiment Bars -->
+        <div class="space-y-3 mb-5">
+          <div>
+            <div class="flex items-center justify-between mb-1">
+              <span class="text-sm font-medium text-green-700">Positive</span>
+              <span class="text-sm font-bold text-green-700">89%</span>
+            </div>
+            <div class="w-full bg-gray-100 rounded-full h-2.5">
+              <div class="bg-green-500 h-2.5 rounded-full" style="width:89%"></div>
+            </div>
+          </div>
+          <div>
+            <div class="flex items-center justify-between mb-1">
+              <span class="text-sm font-medium text-gray-500">Neutral</span>
+              <span class="text-sm font-bold text-gray-500">7%</span>
+            </div>
+            <div class="w-full bg-gray-100 rounded-full h-2.5">
+              <div class="bg-gray-400 h-2.5 rounded-full" style="width:7%"></div>
+            </div>
+          </div>
+          <div>
+            <div class="flex items-center justify-between mb-1">
+              <span class="text-sm font-medium text-red-600">Negative</span>
+              <span class="text-sm font-bold text-red-600">4%</span>
+            </div>
+            <div class="w-full bg-gray-100 rounded-full h-2.5">
+              <div class="bg-red-500 h-2.5 rounded-full" style="width:4%"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Recent Snippets -->
+        <h4 class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3">Recent Snippets</h4>
+        <div class="space-y-2.5">
+          <div class="flex items-start gap-2 p-2.5 rounded-lg bg-green-50/60 border border-green-100">
+            <span class="shrink-0 mt-0.5 w-5 h-5 rounded-full bg-green-100 flex items-center justify-center"><svg class="w-3 h-3 text-green-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4.5 12.75l6 6 9-13.5"/></svg></span>
+            <p class="text-xs text-gray-600 leading-relaxed">"Powerful motor, drilled through concrete effortlessly. Best value in this range." <span class="text-gray-400">-- Amit S.</span></p>
+          </div>
+          <div class="flex items-start gap-2 p-2.5 rounded-lg bg-gray-50 border border-gray-100">
+            <span class="shrink-0 mt-0.5 w-5 h-5 rounded-full bg-gray-200 flex items-center justify-center"><svg class="w-3 h-3 text-gray-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M5 12h14"/></svg></span>
+            <p class="text-xs text-gray-600 leading-relaxed">"Does the job but nothing extraordinary. Carry case is decent." <span class="text-gray-400">-- Sanjay M.</span></p>
+          </div>
+          <div class="flex items-start gap-2 p-2.5 rounded-lg bg-red-50/60 border border-red-100">
+            <span class="shrink-0 mt-0.5 w-5 h-5 rounded-full bg-red-100 flex items-center justify-center"><svg class="w-3 h-3 text-red-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M6 18L18 6M6 6l12 12"/></svg></span>
+            <p class="text-xs text-gray-600 leading-relaxed">"Accessory bits broke on first use. Drill itself is fine but kit quality is poor." <span class="text-gray-400">-- Priya R.</span></p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== RESTOCK FORECAST + SUPPLIER CONTACT (Row 2) ===== -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-6">
+
+      <!-- Restock Forecast -->
+      <div class="bg-white rounded-xl border border-gray-100 shadow-sm p-6">
+        <div class="flex items-center gap-2 mb-5">
+          <div class="w-8 h-8 rounded-lg bg-amber-50 flex items-center justify-center">
+            <svg class="w-4.5 h-4.5 text-amber-600" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M20.25 7.5l-.625 10.632a2.25 2.25 0 01-2.247 2.118H6.622a2.25 2.25 0 01-2.247-2.118L3.75 7.5M10 11.25h4M3.375 7.5h17.25c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125z"/></svg>
+          </div>
+          <div>
+            <h3 class="text-sm font-semibold text-gray-900">Restock Forecast</h3>
+            <p class="text-xs text-gray-400">Based on 30-day sales velocity</p>
+          </div>
+        </div>
+
+        <!-- Stock Gauge -->
+        <div class="bg-amber-50 border border-amber-200 rounded-xl p-4 mb-4">
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-full bg-amber-100 flex items-center justify-center shrink-0">
+              <svg class="w-5 h-5 text-amber-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z"/></svg>
+            </div>
+            <div>
+              <p class="text-sm font-semibold text-amber-800">Stock running low</p>
+              <p class="text-xs text-amber-700 mt-0.5">At current velocity (<span class="font-semibold">12 units/day</span>), stock runs out in <span class="font-bold">8 days</span>.</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Velocity Stats -->
+        <div class="grid grid-cols-3 gap-3 mb-4">
+          <div class="bg-gray-50 rounded-lg p-3 text-center border border-gray-100">
+            <p class="text-lg font-bold text-gray-900">142</p>
+            <p class="text-[10px] text-gray-400 uppercase tracking-wider font-semibold mt-0.5">Available</p>
+          </div>
+          <div class="bg-gray-50 rounded-lg p-3 text-center border border-gray-100">
+            <p class="text-lg font-bold text-gray-900">12</p>
+            <p class="text-[10px] text-gray-400 uppercase tracking-wider font-semibold mt-0.5">Units/Day</p>
+          </div>
+          <div class="bg-gray-50 rounded-lg p-3 text-center border border-gray-100">
+            <p class="text-lg font-bold text-amber-600">8</p>
+            <p class="text-[10px] text-gray-400 uppercase tracking-wider font-semibold mt-0.5">Days Left</p>
+          </div>
+        </div>
+
+        <!-- Recommendation -->
+        <div class="bg-blue-50 border border-blue-200 rounded-lg p-3 mb-4">
+          <div class="flex items-start gap-2">
+            <svg class="w-4 h-4 text-blue-500 mt-0.5 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M11.25 11.25l.041-.02a.75.75 0 011.063.852l-.708 2.836a.75.75 0 001.063.853l.041-.021M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9-3.75h.008v.008H12V8.25z"/></svg>
+            <p class="text-xs text-blue-800">Recommended reorder: <span class="font-bold">200 units</span> by <span class="font-bold">Apr 10, 2026</span> to maintain 14-day buffer stock.</p>
+          </div>
+        </div>
+
+        <button onclick="alert('Reorder request sent to supplier Rajesh Store')" class="w-full flex items-center justify-center gap-2 bg-brand-500 hover:bg-brand-600 text-white px-4 py-2.5 rounded-lg text-sm font-semibold transition">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M6 12L3.269 3.126A59.768 59.768 0 0121.485 12 59.77 59.77 0 013.27 20.876L5.999 12zm0 0h7.5"/></svg>
+          Send Reorder Request
+        </button>
+      </div>
+
+      <!-- Supplier Contact Card -->
+      <div class="bg-white rounded-xl border border-gray-100 shadow-sm p-6">
+        <div class="flex items-center gap-2 mb-5">
+          <div class="w-8 h-8 rounded-lg bg-blue-50 flex items-center justify-center">
+            <svg class="w-4.5 h-4.5 text-blue-600" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M15 19.128a9.38 9.38 0 002.625.372 9.337 9.337 0 004.121-.952 4.125 4.125 0 00-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 018.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0111.964-3.07M12 6.375a3.375 3.375 0 11-6.75 0 3.375 3.375 0 016.75 0zm8.25 2.25a2.625 2.625 0 11-5.25 0 2.625 2.625 0 015.25 0z"/></svg>
+          </div>
+          <div>
+            <h3 class="text-sm font-semibold text-gray-900">Supplier Contact</h3>
+            <p class="text-xs text-gray-400">Primary supplier for this product</p>
+          </div>
+        </div>
+
+        <!-- Supplier Info -->
+        <div class="flex items-center gap-4 mb-5 pb-5 border-b border-gray-100">
+          <div class="w-14 h-14 rounded-xl bg-gradient-to-br from-emerald-400 to-emerald-600 flex items-center justify-center text-white text-lg font-bold shrink-0">RS</div>
+          <div class="min-w-0">
+            <p class="text-base font-semibold text-gray-900">Rajesh Store</p>
+            <p class="text-xs text-gray-400 mt-0.5">Verified Supplier &middot; Since Jan 2024</p>
+            <div class="flex items-center gap-1 mt-1">
+              <svg class="w-3.5 h-3.5 text-amber-400" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+              <span class="text-xs font-medium text-gray-600">4.8 supplier rating</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Contact Details -->
+        <div class="space-y-3 mb-5">
+          <div class="flex items-center gap-3">
+            <div class="w-8 h-8 rounded-lg bg-gray-50 flex items-center justify-center shrink-0 border border-gray-100">
+              <svg class="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M2.25 6.75c0 8.284 6.716 15 15 15h2.25a2.25 2.25 0 002.25-2.25v-1.372c0-.516-.351-.966-.852-1.091l-4.423-1.106c-.44-.11-.902.055-1.173.417l-.97 1.293c-.282.376-.769.542-1.21.38a12.035 12.035 0 01-7.143-7.143c-.162-.441.004-.928.38-1.21l1.293-.97c.363-.271.527-.734.417-1.173L6.963 3.102a1.125 1.125 0 00-1.091-.852H4.5A2.25 2.25 0 002.25 4.5v2.25z"/></svg>
+            </div>
+            <div>
+              <p class="text-[10px] text-gray-400 uppercase tracking-wider font-semibold">Contact Number</p>
+              <p class="text-sm font-medium text-gray-800">+91 98765 43210</p>
+            </div>
+          </div>
+          <div class="flex items-center gap-3">
+            <div class="w-8 h-8 rounded-lg bg-gray-50 flex items-center justify-center shrink-0 border border-gray-100">
+              <svg class="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+            </div>
+            <div>
+              <p class="text-[10px] text-gray-400 uppercase tracking-wider font-semibold">Avg Lead Time</p>
+              <p class="text-sm font-medium text-gray-800">5 days</p>
+            </div>
+          </div>
+          <div class="flex items-center gap-3">
+            <div class="w-8 h-8 rounded-lg bg-gray-50 flex items-center justify-center shrink-0 border border-gray-100">
+              <svg class="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M8.25 18.75a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m3 0h6m-9 0H3.375a1.125 1.125 0 01-1.125-1.125V14.25m17.25 4.5a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m3 0h1.125c.621 0 1.129-.504 1.09-1.124a17.902 17.902 0 00-3.213-9.193 2.056 2.056 0 00-1.58-.86H14.25M16.5 18.75h-2.25m0-11.177v-.958c0-.568-.422-1.048-.987-1.106a48.554 48.554 0 00-10.026 0 1.106 1.106 0 00-.987 1.106v7.635m12-6.677v6.677m0 4.5v-4.5m0 0h-12"/></svg>
+            </div>
+            <div>
+              <p class="text-[10px] text-gray-400 uppercase tracking-wider font-semibold">Last Restock</p>
+              <p class="text-sm font-medium text-gray-800">22 Mar 2026 <span class="text-xs text-gray-400 font-normal">(11 days ago)</span></p>
+            </div>
+          </div>
+        </div>
+
+        <button onclick="alert('Opening message composer for Rajesh Store')" class="w-full flex items-center justify-center gap-2 bg-white border-2 border-gray-200 hover:border-brand-300 hover:bg-brand-50 text-gray-700 hover:text-brand-600 px-4 py-2.5 rounded-lg text-sm font-semibold transition">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0L3.32 8.91a2.25 2.25 0 01-1.07-1.916V6.75"/></svg>
+          Message Supplier
+        </button>
+      </div>
+    </div>
+
+    <!-- ===== COMPETITOR PRICING WIDGET (Row 3) ===== -->
+    <div class="bg-white rounded-xl border border-gray-100 shadow-sm p-6 mt-6">
+      <div class="flex items-center justify-between mb-5">
+        <div class="flex items-center gap-2">
+          <div class="w-8 h-8 rounded-lg bg-rose-50 flex items-center justify-center">
+            <svg class="w-4.5 h-4.5 text-rose-600" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M2.25 18.75a60.07 60.07 0 0115.797 2.101c.727.198 1.453-.342 1.453-1.096V18.75M3.75 4.5v.75A.75.75 0 013 6h-.75m0 0v-.375c0-.621.504-1.125 1.125-1.125H20.25M2.25 6v9m18-10.5v.75c0 .414.336.75.75.75h.75m-1.5-1.5h.375c.621 0 1.125.504 1.125 1.125v9.75c0 .621-.504 1.125-1.125 1.125h-.375m1.5-1.5H21a.75.75 0 00-.75.75v.75m0 0H3.75m0 0h-.375a1.125 1.125 0 01-1.125-1.125V15m1.5 1.5v-.75A.75.75 0 003 15h-.75M15 10.5a3 3 0 11-6 0 3 3 0 016 0zm3 0h.008v.008H18V10.5zm-12 0h.008v.008H6V10.5z"/></svg>
+          </div>
+          <div>
+            <h3 class="text-sm font-semibold text-gray-900">Competitor Pricing</h3>
+            <p class="text-xs text-gray-400">Similar products on platform — cannibalization detection</p>
+          </div>
+        </div>
+        <span class="inline-flex items-center px-2.5 py-1 rounded-full text-[10px] font-bold bg-blue-50 text-blue-700 uppercase tracking-wider">3 Similar Listings</span>
+      </div>
+
+      <div class="overflow-x-auto">
+        <table class="w-full text-sm">
+          <thead>
+            <tr class="border-b border-gray-200">
+              <th class="text-left text-[11px] font-semibold text-gray-400 uppercase tracking-wider py-3 px-4">Product Name</th>
+              <th class="text-left text-[11px] font-semibold text-gray-400 uppercase tracking-wider py-3 px-4">Seller</th>
+              <th class="text-right text-[11px] font-semibold text-gray-400 uppercase tracking-wider py-3 px-4">Price</th>
+              <th class="text-center text-[11px] font-semibold text-gray-400 uppercase tracking-wider py-3 px-4">Rating</th>
+              <th class="text-center text-[11px] font-semibold text-gray-400 uppercase tracking-wider py-3 px-4">Price Diff</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-gray-50">
+            <tr class="table-row">
+              <td class="py-3 px-4">
+                <p class="font-medium text-gray-800">Bosch GSB 500W Drill (10pc Kit)</p>
+                <p class="text-xs text-gray-400 mt-0.5">SKU: BOS-GSB-500-10PC</p>
+              </td>
+              <td class="py-3 px-4">
+                <div class="flex items-center gap-2">
+                  <div class="w-6 h-6 rounded-full bg-gradient-to-br from-green-400 to-green-600 flex items-center justify-center text-white text-[9px] font-bold">KH</div>
+                  <span class="text-gray-700">Kumar Hardware</span>
+                </div>
+              </td>
+              <td class="py-3 px-4 text-right font-semibold text-gray-900">&#8377;3,299</td>
+              <td class="py-3 px-4 text-center">
+                <div class="flex items-center justify-center gap-1"><svg class="w-3.5 h-3.5 text-amber-400" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg><span class="text-sm text-gray-700">4.3</span></div>
+              </td>
+              <td class="py-3 px-4 text-center"><span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold bg-red-50 text-red-600">-&#8377;200</span></td>
+            </tr>
+            <tr class="table-row">
+              <td class="py-3 px-4">
+                <p class="font-medium text-gray-800">Stanley SDH600 Impact Drill Kit</p>
+                <p class="text-xs text-gray-400 mt-0.5">SKU: STN-SDH-600</p>
+              </td>
+              <td class="py-3 px-4">
+                <div class="flex items-center gap-2">
+                  <div class="w-6 h-6 rounded-full bg-gradient-to-br from-yellow-400 to-yellow-600 flex items-center justify-center text-white text-[9px] font-bold">PT</div>
+                  <span class="text-gray-700">Patel Tools</span>
+                </div>
+              </td>
+              <td class="py-3 px-4 text-right font-semibold text-gray-900">&#8377;3,599</td>
+              <td class="py-3 px-4 text-center">
+                <div class="flex items-center justify-center gap-1"><svg class="w-3.5 h-3.5 text-amber-400" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg><span class="text-sm text-gray-700">4.1</span></div>
+              </td>
+              <td class="py-3 px-4 text-center"><span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold bg-green-50 text-green-600">+&#8377;100</span></td>
+            </tr>
+            <tr class="table-row">
+              <td class="py-3 px-4">
+                <p class="font-medium text-gray-800">Black+Decker KR504RE Drill Kit</p>
+                <p class="text-xs text-gray-400 mt-0.5">SKU: BD-KR504-RE</p>
+              </td>
+              <td class="py-3 px-4">
+                <div class="flex items-center gap-2">
+                  <div class="w-6 h-6 rounded-full bg-gradient-to-br from-orange-400 to-orange-600 flex items-center justify-center text-white text-[9px] font-bold">AT</div>
+                  <span class="text-gray-700">Anand Tools</span>
+                </div>
+              </td>
+              <td class="py-3 px-4 text-right font-semibold text-gray-900">&#8377;3,199</td>
+              <td class="py-3 px-4 text-center">
+                <div class="flex items-center justify-center gap-1"><svg class="w-3.5 h-3.5 text-amber-400" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg><span class="text-sm text-gray-700">3.9</span></div>
+              </td>
+              <td class="py-3 px-4 text-center"><span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold bg-red-50 text-red-600">-&#8377;300</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="mt-4 pt-4 border-t border-gray-100 flex items-center justify-between">
+        <p class="text-xs text-gray-400">This product is priced <span class="font-semibold text-gray-600">mid-range</span> among similar listings. 1 competitor is cheaper with lower rating.</p>
+        <a href="#" class="text-xs font-semibold text-brand-500 hover:text-brand-600 transition">View Full Market Analysis &rarr;</a>
+      </div>
+    </div>
+
+  </main>
+
+<script>
+  function switchTab(tabId) {
+    document.querySelectorAll('.detail-tab').forEach(function(t) {
+      t.classList.remove('active', 'text-brand-500');
+      t.classList.add('text-gray-500');
+      t.style.borderBottomColor = 'transparent';
+    });
+    document.querySelectorAll('.tab-panel').forEach(function(p) {
+      p.classList.remove('active');
+    });
+    var clickedBtn = event.target.closest('.detail-tab');
+    clickedBtn.classList.add('active', 'text-brand-500');
+    clickedBtn.classList.remove('text-gray-500');
+    clickedBtn.style.borderBottomColor = '#F97316';
+    document.getElementById('panel-' + tabId).classList.add('active');
+  }
+</script>
+
+<script src="../shared-layout.js"></script>
+<script>renderAdminLayout('products', '../');</script>
+</body>
+</html>

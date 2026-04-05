@@ -16,7 +16,10 @@ export const homebasePreset: Partial<Config> = {
     extend: {
       colors: {
         primary: { ...colors.primary },
-        accent: { ...colors.accent },
+        brand: { ...colors.primary },
+        navy: { ...colors.navy },
+        admin: { ...colors.admin },
+        warehouse: { ...colors.warehouse },
         success: { ...colors.success },
         warning: { ...colors.warning },
         error: { ...colors.error },

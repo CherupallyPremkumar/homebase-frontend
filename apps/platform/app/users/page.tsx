@@ -1,7 +1,7 @@
 'use client';
 
-import { UserList } from '@/features/user/ui';
+import { UserList } from '@/features/user/components';
 
-export default function UsersPage() {
+export default function Page() {
   return <UserList />;
 }

@@ -1,0 +1,1006 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HomeBase — Platform Analytics</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              50: '#FFF7ED',
+              100: '#FFEDD5',
+              200: '#FED7AA',
+              300: '#FDBA74',
+              400: '#FB923C',
+              500: '#F97316',
+              600: '#EA580C',
+              700: '#C2410C',
+            },
+            navy: {
+              700: '#1E3A5F',
+              800: '#1A2E4A',
+              900: '#0A1628',
+            },
+            success: '#16A34A',
+            warning: '#EAB308',
+            danger: '#DC2626',
+          },
+          fontFamily: {
+            sans: ['Inter', 'system-ui', 'sans-serif'],
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+    .scrollbar-hide::-webkit-scrollbar { display: none; }
+    .sidebar-link { transition: all 0.15s ease; }
+    .sidebar-link:hover { background: rgba(255,255,255,0.08); }
+    .sidebar-link.active { background: rgba(249,115,22,0.15); border-right: 3px solid #F97316; }
+    .stat-card { transition: all 0.2s ease; }
+    .stat-card:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,0.08); }
+    .table-row { transition: background 0.15s ease; }
+    .table-row:hover { background: #FFF7ED; }
+    .dropdown-menu { display: none; }
+    .dropdown:hover .dropdown-menu { display: block; }
+    .sidebar-scroll::-webkit-scrollbar { width: 4px; }
+    .sidebar-scroll::-webkit-scrollbar-track { background: transparent; }
+    .sidebar-scroll::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); border-radius: 2px; }
+
+    /* Revenue chart bar animation */
+    .chart-bar { transition: height 0.6s ease; }
+    .chart-bar:hover { opacity: 0.85; }
+
+    /* Progress bar animation */
+    .progress-bar { transition: width 0.8s ease; }
+  </style>
+</head>
+<body class="font-sans bg-gray-50 text-gray-900">
+
+  <!-- ===== TOP HEADER BAR ===== -->
+  <header id="admin-header" class="fixed top-0 left-0 right-0 z-50 bg-white border-b border-gray-200 h-16"></header>
+
+  <!-- ===== LAYOUT: SIDEBAR + MAIN ===== -->
+  <div class="flex pt-16 min-h-screen">
+
+    <!-- ===== LEFT SIDEBAR ===== -->
+    <aside id="admin-sidebar" class="fixed left-0 top-16 bottom-0 w-60 z-40 flex flex-col overflow-y-auto" style="background:#0A1628;"></aside>
+
+    <!-- ===== MAIN CONTENT ===== -->
+    <main class="flex-1 ml-60 p-8">
+
+      <!-- Page Header -->
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
+        <div>
+          <h1 class="text-2xl font-bold text-navy-900">Platform Analytics</h1>
+          <p class="text-sm text-gray-500 mt-1">Comprehensive overview of platform performance and trends</p>
+        </div>
+        <div class="flex items-center gap-3">
+          <!-- Date Range Picker -->
+          <div class="flex items-center gap-2 bg-white border border-gray-200 rounded-lg px-4 py-2.5 shadow-sm">
+            <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5"/></svg>
+            <span class="text-sm font-medium text-gray-700">Mar 1 - Mar 28, 2026</span>
+            <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M19.5 8.25l-7.5 7.5-7.5-7.5"/></svg>
+          </div>
+          <!-- Period Selector -->
+          <div class="flex bg-white border border-gray-200 rounded-lg shadow-sm overflow-hidden">
+            <button class="px-3 py-2.5 text-xs font-medium text-gray-500 hover:bg-gray-50 transition">7D</button>
+            <button class="px-3 py-2.5 text-xs font-medium bg-brand-500 text-white">30D</button>
+            <button class="px-3 py-2.5 text-xs font-medium text-gray-500 hover:bg-gray-50 transition">90D</button>
+            <button class="px-3 py-2.5 text-xs font-medium text-gray-500 hover:bg-gray-50 transition">1Y</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Sub-page Navigation -->
+      <div class="flex items-center gap-2 mb-6">
+        <span class="text-xs text-gray-400">Related:</span>
+        <a href="segments.html" class="text-xs text-brand-500 bg-brand-50 px-3 py-1 rounded-full hover:bg-brand-100 transition">Segments</a>
+        <a href="sessions.html" class="text-xs text-brand-500 bg-brand-50 px-3 py-1 rounded-full hover:bg-brand-100 transition">Session Analytics</a>
+        <a href="abandoned-carts.html" class="text-xs text-brand-500 bg-brand-50 px-3 py-1 rounded-full hover:bg-brand-100 transition">Abandoned Carts</a>
+      </div>
+
+      <!-- ===== KEY METRICS CARDS ===== -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 mb-8">
+        <!-- GMV -->
+        <div class="stat-card bg-white rounded-xl p-5 border border-gray-100 shadow-sm">
+          <div class="flex items-center justify-between mb-3">
+            <span class="text-xs font-semibold text-gray-500 uppercase tracking-wider">Gross Merchandise Value</span>
+            <div class="w-9 h-9 rounded-lg bg-brand-50 flex items-center justify-center">
+              <svg class="w-5 h-5 text-brand-500" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M15 8.25H9m6 3H9m3 6l-3-3h1.5a3 3 0 100-6M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+            </div>
+          </div>
+          <p class="text-2xl font-bold text-navy-900">&#x20B9;2.4 Cr</p>
+          <div class="flex items-center gap-1.5 mt-2">
+            <span class="flex items-center gap-0.5 text-xs font-semibold text-success">
+              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4.5 19.5l15-15m0 0H8.25m11.25 0v11.25"/></svg>
+              18.2%
+            </span>
+            <span class="text-xs text-gray-400">vs last month</span>
+          </div>
+        </div>
+
+        <!-- AOV -->
+        <div class="stat-card bg-white rounded-xl p-5 border border-gray-100 shadow-sm">
+          <div class="flex items-center justify-between mb-3">
+            <span class="text-xs font-semibold text-gray-500 uppercase tracking-wider">Avg Order Value</span>
+            <div class="w-9 h-9 rounded-lg bg-blue-50 flex items-center justify-center">
+              <svg class="w-5 h-5 text-blue-500" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25a3 3 0 00-3 3h15.75m-12.75-3h11.218c1.121-2.3 2.1-4.684 2.924-7.138a60.114 60.114 0 00-16.536-1.84M7.5 14.25L5.106 5.272M6 20.25a.75.75 0 11-1.5 0 .75.75 0 011.5 0zm12.75 0a.75.75 0 11-1.5 0 .75.75 0 011.5 0z"/></svg>
+            </div>
+          </div>
+          <p class="text-2xl font-bold text-navy-900">&#x20B9;1,920</p>
+          <div class="flex items-center gap-1.5 mt-2">
+            <span class="flex items-center gap-0.5 text-xs font-semibold text-success">
+              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4.5 19.5l15-15m0 0H8.25m11.25 0v11.25"/></svg>
+              5.4%
+            </span>
+            <span class="text-xs text-gray-400">vs last month</span>
+          </div>
+        </div>
+
+        <!-- Conversion Rate -->
+        <div class="stat-card bg-white rounded-xl p-5 border border-gray-100 shadow-sm">
+          <div class="flex items-center justify-between mb-3">
+            <span class="text-xs font-semibold text-gray-500 uppercase tracking-wider">Conversion Rate</span>
+            <div class="w-9 h-9 rounded-lg bg-green-50 flex items-center justify-center">
+              <svg class="w-5 h-5 text-green-500" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 013 19.875v-6.75zM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v11.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V8.625zM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v15.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V4.125z"/></svg>
+            </div>
+          </div>
+          <p class="text-2xl font-bold text-navy-900">3.2%</p>
+          <div class="flex items-center gap-1.5 mt-2">
+            <span class="flex items-center gap-0.5 text-xs font-semibold text-success">
+              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4.5 19.5l15-15m0 0H8.25m11.25 0v11.25"/></svg>
+              0.8%
+            </span>
+            <span class="text-xs text-gray-400">vs last month</span>
+          </div>
+        </div>
+
+        <!-- Customer Retention -->
+        <div class="stat-card bg-white rounded-xl p-5 border border-gray-100 shadow-sm">
+          <div class="flex items-center justify-between mb-3">
+            <span class="text-xs font-semibold text-gray-500 uppercase tracking-wider">Customer Retention</span>
+            <div class="w-9 h-9 rounded-lg bg-purple-50 flex items-center justify-center">
+              <svg class="w-5 h-5 text-purple-500" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M19 7.5v3m0 0v3m0-3h3m-3 0h-3m-2.25-4.125a3.375 3.375 0 11-6.75 0 3.375 3.375 0 016.75 0zM4 19.235v-.11a6.375 6.375 0 0112.75 0v.109A12.318 12.318 0 0110.374 21c-2.331 0-4.512-.645-6.374-1.766z"/></svg>
+            </div>
+          </div>
+          <p class="text-2xl font-bold text-navy-900">68%</p>
+          <div class="flex items-center gap-1.5 mt-2">
+            <span class="flex items-center gap-0.5 text-xs font-semibold text-danger">
+              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M19.5 4.5l-15 15m0 0h11.25m-11.25 0V8.25"/></svg>
+              2.1%
+            </span>
+            <span class="text-xs text-gray-400">vs last month</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== REVENUE CHART + CATEGORY PIE ===== -->
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+
+        <!-- Revenue Chart (12 Months) -->
+        <div class="lg:col-span-2 bg-white rounded-xl border border-gray-100 shadow-sm p-6">
+          <div class="flex items-center justify-between mb-6">
+            <div>
+              <h2 class="text-base font-bold text-navy-900">Monthly Revenue</h2>
+              <p class="text-xs text-gray-400 mt-0.5">Last 12 months trend</p>
+            </div>
+            <div class="flex items-center gap-4">
+              <div class="flex items-center gap-1.5">
+                <span class="w-2.5 h-2.5 rounded-full bg-brand-500"></span>
+                <span class="text-xs text-gray-500">Revenue</span>
+              </div>
+              <div class="flex items-center gap-1.5">
+                <span class="w-2.5 h-2.5 rounded-full bg-brand-200"></span>
+                <span class="text-xs text-gray-500">Target</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Chart Area -->
+          <div class="relative">
+            <!-- Y-axis labels -->
+            <div class="absolute left-0 top-0 bottom-6 flex flex-col justify-between text-[10px] text-gray-400 w-10">
+              <span>25L</span>
+              <span>20L</span>
+              <span>15L</span>
+              <span>10L</span>
+              <span>5L</span>
+              <span>0</span>
+            </div>
+            <!-- Bars -->
+            <div class="ml-12 flex items-end gap-2 h-56">
+              <!-- Apr -->
+              <div class="flex-1 flex flex-col items-center gap-1">
+                <div class="w-full relative flex items-end justify-center gap-0.5">
+                  <div class="chart-bar w-[45%] bg-brand-500 rounded-t-sm cursor-pointer" style="height: 112px" title="&#x20B9;12.5L"></div>
+                  <div class="chart-bar w-[45%] bg-brand-200 rounded-t-sm" style="height: 134px" title="Target: &#x20B9;15L"></div>
+                </div>
+                <span class="text-[10px] text-gray-400">Apr</span>
+              </div>
+              <!-- May -->
+              <div class="flex-1 flex flex-col items-center gap-1">
+                <div class="w-full relative flex items-end justify-center gap-0.5">
+                  <div class="chart-bar w-[45%] bg-brand-500 rounded-t-sm cursor-pointer" style="height: 125px" title="&#x20B9;14L"></div>
+                  <div class="chart-bar w-[45%] bg-brand-200 rounded-t-sm" style="height: 134px" title="Target: &#x20B9;15L"></div>
+                </div>
+                <span class="text-[10px] text-gray-400">May</span>
+              </div>
+              <!-- Jun -->
+              <div class="flex-1 flex flex-col items-center gap-1">
+                <div class="w-full relative flex items-end justify-center gap-0.5">
+                  <div class="chart-bar w-[45%] bg-brand-500 rounded-t-sm cursor-pointer" style="height: 143px" title="&#x20B9;16L"></div>
+                  <div class="chart-bar w-[45%] bg-brand-200 rounded-t-sm" style="height: 143px" title="Target: &#x20B9;16L"></div>
+                </div>
+                <span class="text-[10px] text-gray-400">Jun</span>
+              </div>
+              <!-- Jul -->
+              <div class="flex-1 flex flex-col items-center gap-1">
+                <div class="w-full relative flex items-end justify-center gap-0.5">
+                  <div class="chart-bar w-[45%] bg-brand-500 rounded-t-sm cursor-pointer" style="height: 130px" title="&#x20B9;14.5L"></div>
+                  <div class="chart-bar w-[45%] bg-brand-200 rounded-t-sm" style="height: 152px" title="Target: &#x20B9;17L"></div>
+                </div>
+                <span class="text-[10px] text-gray-400">Jul</span>
+              </div>
+              <!-- Aug -->
+              <div class="flex-1 flex flex-col items-center gap-1">
+                <div class="w-full relative flex items-end justify-center gap-0.5">
+                  <div class="chart-bar w-[45%] bg-brand-500 rounded-t-sm cursor-pointer" style="height: 161px" title="&#x20B9;18L"></div>
+                  <div class="chart-bar w-[45%] bg-brand-200 rounded-t-sm" style="height: 152px" title="Target: &#x20B9;17L"></div>
+                </div>
+                <span class="text-[10px] text-gray-400">Aug</span>
+              </div>
+              <!-- Sep -->
+              <div class="flex-1 flex flex-col items-center gap-1">
+                <div class="w-full relative flex items-end justify-center gap-0.5">
+                  <div class="chart-bar w-[45%] bg-brand-500 rounded-t-sm cursor-pointer" style="height: 148px" title="&#x20B9;16.5L"></div>
+                  <div class="chart-bar w-[45%] bg-brand-200 rounded-t-sm" style="height: 161px" title="Target: &#x20B9;18L"></div>
+                </div>
+                <span class="text-[10px] text-gray-400">Sep</span>
+              </div>
+              <!-- Oct -->
+              <div class="flex-1 flex flex-col items-center gap-1">
+                <div class="w-full relative flex items-end justify-center gap-0.5">
+                  <div class="chart-bar w-[45%] bg-brand-500 rounded-t-sm cursor-pointer" style="height: 188px" title="&#x20B9;21L"></div>
+                  <div class="chart-bar w-[45%] bg-brand-200 rounded-t-sm" style="height: 170px" title="Target: &#x20B9;19L"></div>
+                </div>
+                <span class="text-[10px] text-gray-400">Oct</span>
+              </div>
+              <!-- Nov -->
+              <div class="flex-1 flex flex-col items-center gap-1">
+                <div class="w-full relative flex items-end justify-center gap-0.5">
+                  <div class="chart-bar w-[45%] bg-brand-500 rounded-t-sm cursor-pointer" style="height: 215px" title="&#x20B9;24L"></div>
+                  <div class="chart-bar w-[45%] bg-brand-200 rounded-t-sm" style="height: 197px" title="Target: &#x20B9;22L"></div>
+                </div>
+                <span class="text-[10px] text-gray-400">Nov</span>
+              </div>
+              <!-- Dec -->
+              <div class="flex-1 flex flex-col items-center gap-1">
+                <div class="w-full relative flex items-end justify-center gap-0.5">
+                  <div class="chart-bar w-[45%] bg-brand-500 rounded-t-sm cursor-pointer" style="height: 206px" title="&#x20B9;23L"></div>
+                  <div class="chart-bar w-[45%] bg-brand-200 rounded-t-sm" style="height: 197px" title="Target: &#x20B9;22L"></div>
+                </div>
+                <span class="text-[10px] text-gray-400">Dec</span>
+              </div>
+              <!-- Jan -->
+              <div class="flex-1 flex flex-col items-center gap-1">
+                <div class="w-full relative flex items-end justify-center gap-0.5">
+                  <div class="chart-bar w-[45%] bg-brand-500 rounded-t-sm cursor-pointer" style="height: 170px" title="&#x20B9;19L"></div>
+                  <div class="chart-bar w-[45%] bg-brand-200 rounded-t-sm" style="height: 179px" title="Target: &#x20B9;20L"></div>
+                </div>
+                <span class="text-[10px] text-gray-400">Jan</span>
+              </div>
+              <!-- Feb -->
+              <div class="flex-1 flex flex-col items-center gap-1">
+                <div class="w-full relative flex items-end justify-center gap-0.5">
+                  <div class="chart-bar w-[45%] bg-brand-500 rounded-t-sm cursor-pointer" style="height: 179px" title="&#x20B9;20L"></div>
+                  <div class="chart-bar w-[45%] bg-brand-200 rounded-t-sm" style="height: 179px" title="Target: &#x20B9;20L"></div>
+                </div>
+                <span class="text-[10px] text-gray-400">Feb</span>
+              </div>
+              <!-- Mar -->
+              <div class="flex-1 flex flex-col items-center gap-1">
+                <div class="w-full relative flex items-end justify-center gap-0.5">
+                  <div class="chart-bar w-[45%] bg-brand-500 rounded-t-sm cursor-pointer" style="height: 197px" title="&#x20B9;22L"></div>
+                  <div class="chart-bar w-[45%] bg-brand-200 rounded-t-sm" style="height: 188px" title="Target: &#x20B9;21L"></div>
+                </div>
+                <span class="text-[10px] text-gray-400">Mar</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Summary Row -->
+          <div class="mt-5 pt-4 border-t border-gray-100 flex items-center gap-8">
+            <div>
+              <p class="text-xs text-gray-400">Total Revenue (FY)</p>
+              <p class="text-lg font-bold text-navy-900">&#x20B9;2.4 Cr</p>
+            </div>
+            <div>
+              <p class="text-xs text-gray-400">Target Achievement</p>
+              <p class="text-lg font-bold text-success">104.2%</p>
+            </div>
+            <div>
+              <p class="text-xs text-gray-400">Best Month</p>
+              <p class="text-lg font-bold text-brand-500">November</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Orders by Category (Horizontal Bars) -->
+        <div class="bg-white rounded-xl border border-gray-100 shadow-sm p-6">
+          <div class="flex items-center justify-between mb-6">
+            <div>
+              <h2 class="text-base font-bold text-navy-900">Orders by Category</h2>
+              <p class="text-xs text-gray-400 mt-0.5">Distribution across categories</p>
+            </div>
+          </div>
+
+          <div class="space-y-4">
+            <!-- Furniture -->
+            <div>
+              <div class="flex items-center justify-between mb-1.5">
+                <span class="text-sm font-medium text-gray-700">Furniture</span>
+                <span class="text-sm font-bold text-navy-900">35%</span>
+              </div>
+              <div class="w-full h-3 bg-gray-100 rounded-full overflow-hidden">
+                <div class="progress-bar h-full bg-brand-500 rounded-full" style="width: 35%"></div>
+              </div>
+              <p class="text-[10px] text-gray-400 mt-1">4,380 orders</p>
+            </div>
+            <!-- Home Decor -->
+            <div>
+              <div class="flex items-center justify-between mb-1.5">
+                <span class="text-sm font-medium text-gray-700">Home Decor</span>
+                <span class="text-sm font-bold text-navy-900">25%</span>
+              </div>
+              <div class="w-full h-3 bg-gray-100 rounded-full overflow-hidden">
+                <div class="progress-bar h-full bg-blue-500 rounded-full" style="width: 25%"></div>
+              </div>
+              <p class="text-[10px] text-gray-400 mt-1">3,128 orders</p>
+            </div>
+            <!-- Kitchen & Dining -->
+            <div>
+              <div class="flex items-center justify-between mb-1.5">
+                <span class="text-sm font-medium text-gray-700">Kitchen & Dining</span>
+                <span class="text-sm font-bold text-navy-900">18%</span>
+              </div>
+              <div class="w-full h-3 bg-gray-100 rounded-full overflow-hidden">
+                <div class="progress-bar h-full bg-green-500 rounded-full" style="width: 18%"></div>
+              </div>
+              <p class="text-[10px] text-gray-400 mt-1">2,252 orders</p>
+            </div>
+            <!-- Lighting -->
+            <div>
+              <div class="flex items-center justify-between mb-1.5">
+                <span class="text-sm font-medium text-gray-700">Lighting</span>
+                <span class="text-sm font-bold text-navy-900">12%</span>
+              </div>
+              <div class="w-full h-3 bg-gray-100 rounded-full overflow-hidden">
+                <div class="progress-bar h-full bg-purple-500 rounded-full" style="width: 12%"></div>
+              </div>
+              <p class="text-[10px] text-gray-400 mt-1">1,502 orders</p>
+            </div>
+            <!-- Bathroom -->
+            <div>
+              <div class="flex items-center justify-between mb-1.5">
+                <span class="text-sm font-medium text-gray-700">Bathroom</span>
+                <span class="text-sm font-bold text-navy-900">6%</span>
+              </div>
+              <div class="w-full h-3 bg-gray-100 rounded-full overflow-hidden">
+                <div class="progress-bar h-full bg-yellow-500 rounded-full" style="width: 6%"></div>
+              </div>
+              <p class="text-[10px] text-gray-400 mt-1">751 orders</p>
+            </div>
+            <!-- Others -->
+            <div>
+              <div class="flex items-center justify-between mb-1.5">
+                <span class="text-sm font-medium text-gray-700">Others</span>
+                <span class="text-sm font-bold text-navy-900">4%</span>
+              </div>
+              <div class="w-full h-3 bg-gray-100 rounded-full overflow-hidden">
+                <div class="progress-bar h-full bg-gray-400 rounded-full" style="width: 4%"></div>
+              </div>
+              <p class="text-[10px] text-gray-400 mt-1">501 orders</p>
+            </div>
+          </div>
+
+          <div class="mt-5 pt-4 border-t border-gray-100">
+            <div class="flex items-center justify-between">
+              <span class="text-xs text-gray-400">Total Orders</span>
+              <span class="text-sm font-bold text-navy-900">12,514</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== TOP PERFORMING CATEGORIES TABLE ===== -->
+      <div class="bg-white rounded-xl border border-gray-100 shadow-sm mb-8">
+        <div class="flex items-center justify-between p-6 pb-4">
+          <div>
+            <h2 class="text-base font-bold text-navy-900">Top Performing Categories</h2>
+            <p class="text-xs text-gray-400 mt-0.5">Revenue and growth metrics by category</p>
+          </div>
+          <button class="text-xs font-medium text-brand-500 hover:text-brand-600 transition">View All Categories</button>
+        </div>
+        <div class="overflow-x-auto">
+          <table class="w-full">
+            <thead>
+              <tr class="border-t border-b border-gray-100">
+                <th class="text-left text-[11px] font-semibold text-gray-500 uppercase tracking-wider px-6 py-3">Category</th>
+                <th class="text-left text-[11px] font-semibold text-gray-500 uppercase tracking-wider px-6 py-3">Revenue</th>
+                <th class="text-left text-[11px] font-semibold text-gray-500 uppercase tracking-wider px-6 py-3">Orders</th>
+                <th class="text-left text-[11px] font-semibold text-gray-500 uppercase tracking-wider px-6 py-3">Avg Order Value</th>
+                <th class="text-left text-[11px] font-semibold text-gray-500 uppercase tracking-wider px-6 py-3">Growth</th>
+                <th class="text-left text-[11px] font-semibold text-gray-500 uppercase tracking-wider px-6 py-3">Trend</th>
+              </tr>
+            </thead>
+            <tbody>
+              <!-- Furniture -->
+              <tr class="table-row border-b border-gray-50">
+                <td class="px-6 py-4">
+                  <div class="flex items-center gap-3">
+                    <div class="w-8 h-8 rounded-lg bg-brand-50 flex items-center justify-center">
+                      <svg class="w-4 h-4 text-brand-500" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M20.25 7.5l-.625 10.632a2.25 2.25 0 01-2.247 2.118H6.622a2.25 2.25 0 01-2.247-2.118L3.75 7.5M10 11.25h4M3.375 7.5h17.25c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125z"/></svg>
+                    </div>
+                    <div>
+                      <p class="text-sm font-semibold text-gray-800">Furniture</p>
+                      <p class="text-[11px] text-gray-400">142 products</p>
+                    </div>
+                  </div>
+                </td>
+                <td class="px-6 py-4">
+                  <p class="text-sm font-semibold text-gray-800">&#x20B9;84.0L</p>
+                </td>
+                <td class="px-6 py-4">
+                  <p class="text-sm text-gray-600">4,380</p>
+                </td>
+                <td class="px-6 py-4">
+                  <p class="text-sm text-gray-600">&#x20B9;1,918</p>
+                </td>
+                <td class="px-6 py-4">
+                  <span class="inline-flex items-center gap-1 text-xs font-semibold text-success bg-green-50 px-2 py-1 rounded-full">
+                    <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4.5 19.5l15-15m0 0H8.25m11.25 0v11.25"/></svg>
+                    22.4%
+                  </span>
+                </td>
+                <td class="px-6 py-4">
+                  <!-- Mini trend bars -->
+                  <div class="flex items-end gap-0.5 h-5">
+                    <div class="w-1 bg-brand-300 rounded-sm" style="height: 40%"></div>
+                    <div class="w-1 bg-brand-300 rounded-sm" style="height: 55%"></div>
+                    <div class="w-1 bg-brand-300 rounded-sm" style="height: 45%"></div>
+                    <div class="w-1 bg-brand-400 rounded-sm" style="height: 70%"></div>
+                    <div class="w-1 bg-brand-400 rounded-sm" style="height: 65%"></div>
+                    <div class="w-1 bg-brand-500 rounded-sm" style="height: 85%"></div>
+                    <div class="w-1 bg-brand-500 rounded-sm" style="height: 100%"></div>
+                  </div>
+                </td>
+              </tr>
+              <!-- Home Decor -->
+              <tr class="table-row border-b border-gray-50">
+                <td class="px-6 py-4">
+                  <div class="flex items-center gap-3">
+                    <div class="w-8 h-8 rounded-lg bg-blue-50 flex items-center justify-center">
+                      <svg class="w-4 h-4 text-blue-500" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M2.25 12l8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25"/></svg>
+                    </div>
+                    <div>
+                      <p class="text-sm font-semibold text-gray-800">Home Decor</p>
+                      <p class="text-[11px] text-gray-400">238 products</p>
+                    </div>
+                  </div>
+                </td>
+                <td class="px-6 py-4">
+                  <p class="text-sm font-semibold text-gray-800">&#x20B9;60.0L</p>
+                </td>
+                <td class="px-6 py-4">
+                  <p class="text-sm text-gray-600">3,128</p>
+                </td>
+                <td class="px-6 py-4">
+                  <p class="text-sm text-gray-600">&#x20B9;1,918</p>
+                </td>
+                <td class="px-6 py-4">
+                  <span class="inline-flex items-center gap-1 text-xs font-semibold text-success bg-green-50 px-2 py-1 rounded-full">
+                    <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4.5 19.5l15-15m0 0H8.25m11.25 0v11.25"/></svg>
+                    18.7%
+                  </span>
+                </td>
+                <td class="px-6 py-4">
+                  <div class="flex items-end gap-0.5 h-5">
+                    <div class="w-1 bg-blue-200 rounded-sm" style="height: 50%"></div>
+                    <div class="w-1 bg-blue-300 rounded-sm" style="height: 55%"></div>
+                    <div class="w-1 bg-blue-300 rounded-sm" style="height: 60%"></div>
+                    <div class="w-1 bg-blue-400 rounded-sm" style="height: 70%"></div>
+                    <div class="w-1 bg-blue-400 rounded-sm" style="height: 75%"></div>
+                    <div class="w-1 bg-blue-500 rounded-sm" style="height: 80%"></div>
+                    <div class="w-1 bg-blue-500 rounded-sm" style="height: 90%"></div>
+                  </div>
+                </td>
+              </tr>
+              <!-- Kitchen & Dining -->
+              <tr class="table-row border-b border-gray-50">
+                <td class="px-6 py-4">
+                  <div class="flex items-center gap-3">
+                    <div class="w-8 h-8 rounded-lg bg-green-50 flex items-center justify-center">
+                      <svg class="w-4 h-4 text-green-500" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M12 8.25v-1.5m0 1.5c-1.355 0-2.697.056-4.024.166C6.845 8.51 6 9.473 6 10.608v2.513m6-4.871c1.355 0 2.697.056 4.024.166C17.155 8.51 18 9.473 18 10.608v2.513M15 8.25v-1.5m-6 1.5v-1.5m12 9.75l-1.5.75a3.354 3.354 0 01-3 0 3.354 3.354 0 00-3 0 3.354 3.354 0 01-3 0 3.354 3.354 0 00-3 0 3.354 3.354 0 01-3 0L3 16.5m15-3.379a48.474 48.474 0 00-6-.371c-2.032 0-4.034.126-6 .371m12 0c.39.049.777.102 1.163.16 1.07.16 1.837 1.094 1.837 2.175v5.169c0 .621-.504 1.125-1.125 1.125H4.125A1.125 1.125 0 013 20.625v-5.17c0-1.08.768-2.014 1.837-2.174A47.78 47.78 0 016 13.12M16.5 6.75a.75.75 0 11-1.5 0 .75.75 0 011.5 0zM8.25 6.75a.75.75 0 11-1.5 0 .75.75 0 011.5 0z"/></svg>
+                    </div>
+                    <div>
+                      <p class="text-sm font-semibold text-gray-800">Kitchen & Dining</p>
+                      <p class="text-[11px] text-gray-400">189 products</p>
+                    </div>
+                  </div>
+                </td>
+                <td class="px-6 py-4">
+                  <p class="text-sm font-semibold text-gray-800">&#x20B9;43.2L</p>
+                </td>
+                <td class="px-6 py-4">
+                  <p class="text-sm text-gray-600">2,252</p>
+                </td>
+                <td class="px-6 py-4">
+                  <p class="text-sm text-gray-600">&#x20B9;1,918</p>
+                </td>
+                <td class="px-6 py-4">
+                  <span class="inline-flex items-center gap-1 text-xs font-semibold text-success bg-green-50 px-2 py-1 rounded-full">
+                    <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4.5 19.5l15-15m0 0H8.25m11.25 0v11.25"/></svg>
+                    14.2%
+                  </span>
+                </td>
+                <td class="px-6 py-4">
+                  <div class="flex items-end gap-0.5 h-5">
+                    <div class="w-1 bg-green-200 rounded-sm" style="height: 45%"></div>
+                    <div class="w-1 bg-green-200 rounded-sm" style="height: 50%"></div>
+                    <div class="w-1 bg-green-300 rounded-sm" style="height: 55%"></div>
+                    <div class="w-1 bg-green-300 rounded-sm" style="height: 65%"></div>
+                    <div class="w-1 bg-green-400 rounded-sm" style="height: 60%"></div>
+                    <div class="w-1 bg-green-400 rounded-sm" style="height: 75%"></div>
+                    <div class="w-1 bg-green-500 rounded-sm" style="height: 85%"></div>
+                  </div>
+                </td>
+              </tr>
+              <!-- Lighting -->
+              <tr class="table-row border-b border-gray-50">
+                <td class="px-6 py-4">
+                  <div class="flex items-center gap-3">
+                    <div class="w-8 h-8 rounded-lg bg-purple-50 flex items-center justify-center">
+                      <svg class="w-4 h-4 text-purple-500" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M12 18v-5.25m0 0a6.01 6.01 0 001.5-.189m-1.5.189a6.01 6.01 0 01-1.5-.189m3.75 7.478a12.06 12.06 0 01-4.5 0m3.75 2.383a14.406 14.406 0 01-3 0M14.25 18v-.192c0-.983.658-1.823 1.508-2.316a7.5 7.5 0 10-7.517 0c.85.493 1.509 1.333 1.509 2.316V18"/></svg>
+                    </div>
+                    <div>
+                      <p class="text-sm font-semibold text-gray-800">Lighting</p>
+                      <p class="text-[11px] text-gray-400">95 products</p>
+                    </div>
+                  </div>
+                </td>
+                <td class="px-6 py-4">
+                  <p class="text-sm font-semibold text-gray-800">&#x20B9;28.8L</p>
+                </td>
+                <td class="px-6 py-4">
+                  <p class="text-sm text-gray-600">1,502</p>
+                </td>
+                <td class="px-6 py-4">
+                  <p class="text-sm text-gray-600">&#x20B9;1,918</p>
+                </td>
+                <td class="px-6 py-4">
+                  <span class="inline-flex items-center gap-1 text-xs font-semibold text-success bg-green-50 px-2 py-1 rounded-full">
+                    <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4.5 19.5l15-15m0 0H8.25m11.25 0v11.25"/></svg>
+                    9.8%
+                  </span>
+                </td>
+                <td class="px-6 py-4">
+                  <div class="flex items-end gap-0.5 h-5">
+                    <div class="w-1 bg-purple-200 rounded-sm" style="height: 55%"></div>
+                    <div class="w-1 bg-purple-200 rounded-sm" style="height: 50%"></div>
+                    <div class="w-1 bg-purple-300 rounded-sm" style="height: 60%"></div>
+                    <div class="w-1 bg-purple-300 rounded-sm" style="height: 55%"></div>
+                    <div class="w-1 bg-purple-400 rounded-sm" style="height: 70%"></div>
+                    <div class="w-1 bg-purple-400 rounded-sm" style="height: 75%"></div>
+                    <div class="w-1 bg-purple-500 rounded-sm" style="height: 80%"></div>
+                  </div>
+                </td>
+              </tr>
+              <!-- Bathroom -->
+              <tr class="table-row">
+                <td class="px-6 py-4">
+                  <div class="flex items-center gap-3">
+                    <div class="w-8 h-8 rounded-lg bg-yellow-50 flex items-center justify-center">
+                      <svg class="w-4 h-4 text-yellow-500" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M9.75 3.104v5.714a2.25 2.25 0 01-.659 1.591L5 14.5M9.75 3.104c-.251.023-.501.05-.75.082m.75-.082a24.301 24.301 0 014.5 0m0 0v5.714c0 .597.237 1.17.659 1.591L19.8 15.3M14.25 3.104c.251.023.501.05.75.082M19.8 15.3l-1.57.393A9.065 9.065 0 0112 15a9.065 9.065 0 00-6.23.693L5 14.5m14.8.8l1.402 1.402c1.232 1.232.65 3.318-1.067 3.611A48.309 48.309 0 0112 21c-2.773 0-5.491-.235-8.135-.687-1.718-.293-2.3-2.379-1.067-3.61L5 14.5"/></svg>
+                    </div>
+                    <div>
+                      <p class="text-sm font-semibold text-gray-800">Bathroom</p>
+                      <p class="text-[11px] text-gray-400">67 products</p>
+                    </div>
+                  </div>
+                </td>
+                <td class="px-6 py-4">
+                  <p class="text-sm font-semibold text-gray-800">&#x20B9;14.4L</p>
+                </td>
+                <td class="px-6 py-4">
+                  <p class="text-sm text-gray-600">751</p>
+                </td>
+                <td class="px-6 py-4">
+                  <p class="text-sm text-gray-600">&#x20B9;1,918</p>
+                </td>
+                <td class="px-6 py-4">
+                  <span class="inline-flex items-center gap-1 text-xs font-semibold text-danger bg-red-50 px-2 py-1 rounded-full">
+                    <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M19.5 4.5l-15 15m0 0h11.25m-11.25 0V8.25"/></svg>
+                    3.1%
+                  </span>
+                </td>
+                <td class="px-6 py-4">
+                  <div class="flex items-end gap-0.5 h-5">
+                    <div class="w-1 bg-yellow-300 rounded-sm" style="height: 70%"></div>
+                    <div class="w-1 bg-yellow-300 rounded-sm" style="height: 65%"></div>
+                    <div class="w-1 bg-yellow-200 rounded-sm" style="height: 55%"></div>
+                    <div class="w-1 bg-yellow-200 rounded-sm" style="height: 60%"></div>
+                    <div class="w-1 bg-yellow-200 rounded-sm" style="height: 50%"></div>
+                    <div class="w-1 bg-yellow-200 rounded-sm" style="height: 45%"></div>
+                    <div class="w-1 bg-yellow-100 rounded-sm" style="height: 40%"></div>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- ===== GEOGRAPHIC DISTRIBUTION + USER ACQUISITION + PAYMENT METHODS ===== -->
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+
+        <!-- Geographic Distribution: Top 5 Cities -->
+        <div class="bg-white rounded-xl border border-gray-100 shadow-sm p-6">
+          <div class="flex items-center justify-between mb-6">
+            <div>
+              <h2 class="text-base font-bold text-navy-900">Geographic Distribution</h2>
+              <p class="text-xs text-gray-400 mt-0.5">Top 5 cities by order volume</p>
+            </div>
+            <div class="w-9 h-9 rounded-lg bg-brand-50 flex items-center justify-center">
+              <svg class="w-5 h-5 text-brand-500" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z"/><path d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z"/></svg>
+            </div>
+          </div>
+
+          <div class="space-y-4">
+            <!-- Mumbai -->
+            <div class="flex items-center gap-4">
+              <div class="w-8 h-8 rounded-full bg-brand-50 flex items-center justify-center text-xs font-bold text-brand-600">1</div>
+              <div class="flex-1 min-w-0">
+                <div class="flex items-center justify-between mb-1">
+                  <span class="text-sm font-semibold text-gray-800">Mumbai</span>
+                  <span class="text-sm font-bold text-navy-900">3,842</span>
+                </div>
+                <div class="w-full h-2 bg-gray-100 rounded-full overflow-hidden">
+                  <div class="h-full bg-brand-500 rounded-full" style="width: 100%"></div>
+                </div>
+              </div>
+            </div>
+            <!-- Delhi NCR -->
+            <div class="flex items-center gap-4">
+              <div class="w-8 h-8 rounded-full bg-blue-50 flex items-center justify-center text-xs font-bold text-blue-600">2</div>
+              <div class="flex-1 min-w-0">
+                <div class="flex items-center justify-between mb-1">
+                  <span class="text-sm font-semibold text-gray-800">Delhi NCR</span>
+                  <span class="text-sm font-bold text-navy-900">3,156</span>
+                </div>
+                <div class="w-full h-2 bg-gray-100 rounded-full overflow-hidden">
+                  <div class="h-full bg-blue-500 rounded-full" style="width: 82%"></div>
+                </div>
+              </div>
+            </div>
+            <!-- Bangalore -->
+            <div class="flex items-center gap-4">
+              <div class="w-8 h-8 rounded-full bg-green-50 flex items-center justify-center text-xs font-bold text-green-600">3</div>
+              <div class="flex-1 min-w-0">
+                <div class="flex items-center justify-between mb-1">
+                  <span class="text-sm font-semibold text-gray-800">Bangalore</span>
+                  <span class="text-sm font-bold text-navy-900">2,489</span>
+                </div>
+                <div class="w-full h-2 bg-gray-100 rounded-full overflow-hidden">
+                  <div class="h-full bg-green-500 rounded-full" style="width: 65%"></div>
+                </div>
+              </div>
+            </div>
+            <!-- Hyderabad -->
+            <div class="flex items-center gap-4">
+              <div class="w-8 h-8 rounded-full bg-purple-50 flex items-center justify-center text-xs font-bold text-purple-600">4</div>
+              <div class="flex-1 min-w-0">
+                <div class="flex items-center justify-between mb-1">
+                  <span class="text-sm font-semibold text-gray-800">Hyderabad</span>
+                  <span class="text-sm font-bold text-navy-900">1,678</span>
+                </div>
+                <div class="w-full h-2 bg-gray-100 rounded-full overflow-hidden">
+                  <div class="h-full bg-purple-500 rounded-full" style="width: 44%"></div>
+                </div>
+              </div>
+            </div>
+            <!-- Pune -->
+            <div class="flex items-center gap-4">
+              <div class="w-8 h-8 rounded-full bg-yellow-50 flex items-center justify-center text-xs font-bold text-yellow-600">5</div>
+              <div class="flex-1 min-w-0">
+                <div class="flex items-center justify-between mb-1">
+                  <span class="text-sm font-semibold text-gray-800">Pune</span>
+                  <span class="text-sm font-bold text-navy-900">1,349</span>
+                </div>
+                <div class="w-full h-2 bg-gray-100 rounded-full overflow-hidden">
+                  <div class="h-full bg-yellow-500 rounded-full" style="width: 35%"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="mt-5 pt-4 border-t border-gray-100 flex items-center justify-between">
+            <span class="text-xs text-gray-400">Other cities</span>
+            <span class="text-sm font-semibold text-gray-600">4,286 orders</span>
+          </div>
+        </div>
+
+        <!-- User Acquisition: New vs Returning -->
+        <div class="bg-white rounded-xl border border-gray-100 shadow-sm p-6">
+          <div class="flex items-center justify-between mb-6">
+            <div>
+              <h2 class="text-base font-bold text-navy-900">User Acquisition</h2>
+              <p class="text-xs text-gray-400 mt-0.5">New vs returning customer analysis</p>
+            </div>
+            <div class="w-9 h-9 rounded-lg bg-green-50 flex items-center justify-center">
+              <svg class="w-5 h-5 text-green-500" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M15 19.128a9.38 9.38 0 002.625.372 9.337 9.337 0 004.121-.952 4.125 4.125 0 00-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 018.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0111.964-3.07M12 6.375a3.375 3.375 0 11-6.75 0 3.375 3.375 0 016.75 0zm8.25 2.25a2.625 2.625 0 11-5.25 0 2.625 2.625 0 015.25 0z"/></svg>
+            </div>
+          </div>
+
+          <!-- Summary Ring -->
+          <div class="flex items-center justify-center gap-8 mb-6">
+            <div class="relative w-28 h-28">
+              <!-- Ring chart via SVG -->
+              <svg class="w-28 h-28 -rotate-90" viewBox="0 0 100 100">
+                <circle cx="50" cy="50" r="40" fill="none" stroke="#F3F4F6" stroke-width="12"/>
+                <circle cx="50" cy="50" r="40" fill="none" stroke="#F97316" stroke-width="12" stroke-dasharray="251.2" stroke-dashoffset="75.36" stroke-linecap="round"/>
+                <circle cx="50" cy="50" r="40" fill="none" stroke="#3B82F6" stroke-width="12" stroke-dasharray="251.2" stroke-dashoffset="175.84" stroke-linecap="round" transform="rotate(108, 50, 50)"/>
+              </svg>
+              <div class="absolute inset-0 flex flex-col items-center justify-center">
+                <span class="text-xl font-bold text-navy-900">48.2K</span>
+                <span class="text-[10px] text-gray-400">Total Users</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Stats -->
+          <div class="space-y-4">
+            <!-- New Users -->
+            <div class="bg-brand-50 rounded-xl p-4">
+              <div class="flex items-center justify-between">
+                <div class="flex items-center gap-3">
+                  <div class="w-3 h-3 rounded-full bg-brand-500"></div>
+                  <div>
+                    <p class="text-sm font-semibold text-gray-800">New Users</p>
+                    <p class="text-xs text-gray-500">First-time visitors</p>
+                  </div>
+                </div>
+                <div class="text-right">
+                  <p class="text-lg font-bold text-navy-900">15,420</p>
+                  <p class="text-[11px] text-success font-semibold">+24.3%</p>
+                </div>
+              </div>
+            </div>
+            <!-- Returning Users -->
+            <div class="bg-blue-50 rounded-xl p-4">
+              <div class="flex items-center justify-between">
+                <div class="flex items-center gap-3">
+                  <div class="w-3 h-3 rounded-full bg-blue-500"></div>
+                  <div>
+                    <p class="text-sm font-semibold text-gray-800">Returning Users</p>
+                    <p class="text-xs text-gray-500">Repeat customers</p>
+                  </div>
+                </div>
+                <div class="text-right">
+                  <p class="text-lg font-bold text-navy-900">32,780</p>
+                  <p class="text-[11px] text-success font-semibold">+12.8%</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Ratio -->
+          <div class="mt-5 pt-4 border-t border-gray-100">
+            <div class="flex items-center justify-between text-xs">
+              <span class="text-gray-400">New : Returning Ratio</span>
+              <span class="font-bold text-navy-900">32% : 68%</span>
+            </div>
+            <div class="flex gap-0.5 mt-2">
+              <div class="h-2 bg-brand-500 rounded-l-full" style="width: 32%"></div>
+              <div class="h-2 bg-blue-500 rounded-r-full" style="width: 68%"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Payment Method Distribution -->
+        <div class="bg-white rounded-xl border border-gray-100 shadow-sm p-6">
+          <div class="flex items-center justify-between mb-6">
+            <div>
+              <h2 class="text-base font-bold text-navy-900">Payment Methods</h2>
+              <p class="text-xs text-gray-400 mt-0.5">Distribution by payment type</p>
+            </div>
+            <div class="w-9 h-9 rounded-lg bg-purple-50 flex items-center justify-center">
+              <svg class="w-5 h-5 text-purple-500" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M2.25 8.25h19.5M2.25 9h19.5m-16.5 5.25h6m-6 2.25h3m-3.75 3h15a2.25 2.25 0 002.25-2.25V6.75A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25v10.5A2.25 2.25 0 004.5 19.5z"/></svg>
+            </div>
+          </div>
+
+          <div class="space-y-5">
+            <!-- UPI -->
+            <div>
+              <div class="flex items-center justify-between mb-2">
+                <div class="flex items-center gap-2.5">
+                  <div class="w-8 h-8 rounded-lg bg-brand-50 flex items-center justify-center">
+                    <span class="text-xs font-bold text-brand-600">UPI</span>
+                  </div>
+                  <div>
+                    <p class="text-sm font-semibold text-gray-800">UPI</p>
+                    <p class="text-[10px] text-gray-400">GPay, PhonePe, Paytm</p>
+                  </div>
+                </div>
+                <div class="text-right">
+                  <p class="text-sm font-bold text-navy-900">45%</p>
+                  <p class="text-[10px] text-gray-400">5,631 txns</p>
+                </div>
+              </div>
+              <div class="w-full h-3 bg-gray-100 rounded-full overflow-hidden">
+                <div class="progress-bar h-full bg-brand-500 rounded-full" style="width: 45%"></div>
+              </div>
+            </div>
+
+            <!-- Card -->
+            <div>
+              <div class="flex items-center justify-between mb-2">
+                <div class="flex items-center gap-2.5">
+                  <div class="w-8 h-8 rounded-lg bg-blue-50 flex items-center justify-center">
+                    <svg class="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M2.25 8.25h19.5M2.25 9h19.5m-16.5 5.25h6m-6 2.25h3m-3.75 3h15a2.25 2.25 0 002.25-2.25V6.75A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25v10.5A2.25 2.25 0 004.5 19.5z"/></svg>
+                  </div>
+                  <div>
+                    <p class="text-sm font-semibold text-gray-800">Credit/Debit Card</p>
+                    <p class="text-[10px] text-gray-400">Visa, Mastercard, RuPay</p>
+                  </div>
+                </div>
+                <div class="text-right">
+                  <p class="text-sm font-bold text-navy-900">30%</p>
+                  <p class="text-[10px] text-gray-400">3,754 txns</p>
+                </div>
+              </div>
+              <div class="w-full h-3 bg-gray-100 rounded-full overflow-hidden">
+                <div class="progress-bar h-full bg-blue-500 rounded-full" style="width: 30%"></div>
+              </div>
+            </div>
+
+            <!-- COD -->
+            <div>
+              <div class="flex items-center justify-between mb-2">
+                <div class="flex items-center gap-2.5">
+                  <div class="w-8 h-8 rounded-lg bg-green-50 flex items-center justify-center">
+                    <svg class="w-4 h-4 text-green-600" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M2.25 18.75a60.07 60.07 0 0115.797 2.101c.727.198 1.453-.342 1.453-1.096V18.75M3.75 4.5v.75A.75.75 0 013 6h-.75m0 0v-.375c0-.621.504-1.125 1.125-1.125H20.25M2.25 6v9m18-10.5v.75c0 .414.336.75.75.75h.75m-1.5-1.5h.375c.621 0 1.125.504 1.125 1.125v9.75c0 .621-.504 1.125-1.125 1.125h-.375m1.5-1.5H21a.75.75 0 00-.75.75v.75m0 0H3.75m0 0h-.375a1.125 1.125 0 01-1.125-1.125V15m1.5 1.5v-.75A.75.75 0 003 15h-.75M15 10.5a3 3 0 11-6 0 3 3 0 016 0zm3 0h.008v.008H18V10.5zm-12 0h.008v.008H6V10.5z"/></svg>
+                  </div>
+                  <div>
+                    <p class="text-sm font-semibold text-gray-800">Cash on Delivery</p>
+                    <p class="text-[10px] text-gray-400">Pay at doorstep</p>
+                  </div>
+                </div>
+                <div class="text-right">
+                  <p class="text-sm font-bold text-navy-900">15%</p>
+                  <p class="text-[10px] text-gray-400">1,877 txns</p>
+                </div>
+              </div>
+              <div class="w-full h-3 bg-gray-100 rounded-full overflow-hidden">
+                <div class="progress-bar h-full bg-green-500 rounded-full" style="width: 15%"></div>
+              </div>
+            </div>
+
+            <!-- Others -->
+            <div>
+              <div class="flex items-center justify-between mb-2">
+                <div class="flex items-center gap-2.5">
+                  <div class="w-8 h-8 rounded-lg bg-gray-100 flex items-center justify-center">
+                    <svg class="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M6.75 12a.75.75 0 11-1.5 0 .75.75 0 011.5 0zM12.75 12a.75.75 0 11-1.5 0 .75.75 0 011.5 0zM18.75 12a.75.75 0 11-1.5 0 .75.75 0 011.5 0z"/></svg>
+                  </div>
+                  <div>
+                    <p class="text-sm font-semibold text-gray-800">Others</p>
+                    <p class="text-[10px] text-gray-400">Net Banking, Wallets, EMI</p>
+                  </div>
+                </div>
+                <div class="text-right">
+                  <p class="text-sm font-bold text-navy-900">10%</p>
+                  <p class="text-[10px] text-gray-400">1,252 txns</p>
+                </div>
+              </div>
+              <div class="w-full h-3 bg-gray-100 rounded-full overflow-hidden">
+                <div class="progress-bar h-full bg-gray-400 rounded-full" style="width: 10%"></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="mt-5 pt-4 border-t border-gray-100 flex items-center justify-between">
+            <span class="text-xs text-gray-400">Total Transactions</span>
+            <span class="text-sm font-bold text-navy-900">12,514</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== FOOTER ===== -->
+      <footer class="border-t border-gray-200 pt-6 pb-4 mt-4">
+        <div class="flex flex-col sm:flex-row items-center justify-between gap-3">
+          <div class="flex items-center gap-2">
+            <div class="w-6 h-6 rounded bg-brand-500 flex items-center justify-center">
+              <svg class="w-3.5 h-3.5 text-white" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-4 0a1 1 0 01-1-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 01-1 1"/></svg>
+            </div>
+            <span class="text-xs text-gray-400">HomeBase Platform Admin &copy; 2026. All rights reserved.</span>
+          </div>
+          <div class="flex items-center gap-4 text-xs text-gray-400">
+            <span>v2.4.1</span>
+            <span class="flex items-center gap-1">
+              <span class="w-1.5 h-1.5 rounded-full bg-success"></span>
+              All systems operational
+            </span>
+          </div>
+        </div>
+      </footer>
+
+    </main>
+  </div>
+
+
+<script>
+  /* ===== Notification Bell Toggle ===== */
+  (function() {
+    var bellBtn = document.querySelector('button.relative.p-2');
+    if (!bellBtn) return;
+    var notifDrop = document.getElementById('notifDropdown');
+    if (!notifDrop) return;
+    bellBtn.addEventListener('click', function(e) {
+      e.stopPropagation();
+      notifDrop.classList.toggle('hidden');
+    });
+    document.addEventListener('click', function(e) {
+      if (!notifDrop.contains(e.target) && e.target !== bellBtn) {
+        notifDrop.classList.add('hidden');
+      }
+    });
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape') notifDrop.classList.add('hidden');
+    });
+  })();
+</script>
+
+<script>
+  /* ===== Analytics: Date Range Toggle ===== */
+  (function() {
+    var btns = document.querySelectorAll('button');
+    var dateRangeBtns = [];
+    btns.forEach(function(b) {
+      var t = b.textContent.trim();
+      if (['7D','30D','90D','1Y','7 Days','30 Days','90 Days','1 Year','Custom'].indexOf(t) !== -1) {
+        dateRangeBtns.push(b);
+      }
+    });
+    dateRangeBtns.forEach(function(btn) {
+      btn.addEventListener('click', function() {
+        dateRangeBtns.forEach(function(b) {
+          b.classList.remove('bg-brand-500','text-white');
+          b.classList.add('bg-white','text-gray-600');
+        });
+        this.classList.remove('bg-white','text-gray-600');
+        this.classList.add('bg-brand-500','text-white');
+        alert('Date range changed to: ' + this.textContent.trim());
+      });
+    });
+  })();
+
+  /* ===== Analytics: Export ===== */
+  document.querySelectorAll('button').forEach(function(btn) {
+    var t = btn.textContent.trim().toLowerCase();
+    if (t.indexOf('export') !== -1 && !btn.onclick) {
+      btn.onclick = function() { alert('Exporting analytics report to CSV...'); };
+    }
+  });
+</script>
+
+<script src="../shared-layout.js"></script>
+<script>renderAdminLayout('analytics', '../');</script>
+</body>
+</html>

@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HomeBase — Bulk Upload Products</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              50: '#FFF7ED',
+              100: '#FFEDD5',
+              200: '#FED7AA',
+              300: '#FDBA74',
+              400: '#FB923C',
+              500: '#F97316',
+              600: '#EA580C',
+              700: '#C2410C',
+            },
+            navy: {
+              700: '#1E3A5F',
+              800: '#1A2E4A',
+              900: '#0F1B2D',
+            },
+            success: '#16A34A',
+            warning: '#EAB308',
+            danger: '#DC2626',
+          },
+          fontFamily: {
+            sans: ['Inter', 'system-ui', 'sans-serif'],
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+    .scrollbar-hide::-webkit-scrollbar { display: none; }
+    .sidebar-link { transition: all 0.15s ease; }
+    .sidebar-link:hover { background: rgba(255,255,255,0.08); }
+    .sidebar-link.active { background: rgba(249,115,22,0.15); border-right: 3px solid #F97316; }
+    .dropdown-menu { display: none; }
+    .dropdown:hover .dropdown-menu { display: block; }
+    .sidebar-scroll::-webkit-scrollbar { width: 4px; }
+    .sidebar-scroll::-webkit-scrollbar-track { background: transparent; }
+    .sidebar-scroll::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); border-radius: 2px; }
+    .drop-zone { border: 2px dashed #D1D5DB; transition: all 0.2s ease; }
+    .drop-zone:hover, .drop-zone.dragover { border-color: #F97316; background: #FFF7ED; }
+    .step-badge { width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 14px; }
+  </style>
+</head>
+<body class="font-sans bg-gray-50 text-gray-900">
+
+  <!-- ===== TOP HEADER BAR ===== -->
+  <header id="seller-header" class="fixed top-0 left-0 right-0 z-50 bg-white border-b border-gray-200 h-16"></header>
+
+  <!-- ===== LAYOUT: SIDEBAR + MAIN ===== -->
+  <div class="flex pt-16 min-h-screen">
+
+    <!-- ===== LEFT SIDEBAR ===== -->
+    <aside id="seller-sidebar" class="fixed left-0 top-16 bottom-0 w-60 z-40 flex flex-col overflow-y-auto" style="background:#0F1B2D;"></aside>
+
+    <!-- ===== MAIN CONTENT ===== -->
+    <main class="flex-1 ml-60 p-6">
+
+      <!-- Page Header -->
+      <div class="flex items-center justify-between mb-6">
+        <div>
+          <h1 class="text-2xl font-bold text-navy-900">Bulk Upload Products</h1>
+          <p class="text-sm text-gray-500 mt-1">Add multiple products at once via CSV</p>
+        </div>
+        <a href="seller-products.html" class="text-sm font-medium text-brand-500 hover:text-brand-600 flex items-center gap-1">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18"/></svg>
+          Back to Products
+        </a>
+      </div>
+
+      <!-- Step 1: Download Template -->
+      <div class="bg-white rounded-xl border border-gray-100 shadow-sm p-6 mb-5">
+        <div class="flex items-start gap-4">
+          <div class="step-badge bg-brand-500 text-white shrink-0">1</div>
+          <div class="flex-1">
+            <h2 class="text-lg font-bold text-navy-900">Download CSV Template</h2>
+            <p class="text-sm text-gray-500 mt-1 mb-4">Start by downloading our template. Fill in your product details following the column format.</p>
+            <button onclick="alert('Downloading homebase-product-template.csv')" class="inline-flex items-center gap-2 bg-brand-500 hover:bg-brand-600 text-white text-sm font-semibold px-5 py-2.5 rounded-lg transition">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3"/></svg>
+              Download Template (.csv)
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Step 2: Upload CSV -->
+      <div class="bg-white rounded-xl border border-gray-100 shadow-sm p-6 mb-5">
+        <div class="flex items-start gap-4">
+          <div class="step-badge bg-brand-500 text-white shrink-0">2</div>
+          <div class="flex-1">
+            <h2 class="text-lg font-bold text-navy-900">Upload Your CSV File</h2>
+            <p class="text-sm text-gray-500 mt-1 mb-4">Drag and drop your filled CSV file or click to browse.</p>
+            <div id="dropZone" class="drop-zone rounded-xl p-10 text-center cursor-pointer"
+                 ondragover="event.preventDefault(); this.classList.add('dragover')"
+                 ondragleave="this.classList.remove('dragover')"
+                 ondrop="event.preventDefault(); this.classList.remove('dragover'); handleUpload()"
+                 onclick="document.getElementById('csvInput').click()">
+              <input type="file" id="csvInput" accept=".csv" class="hidden" onchange="handleUpload()">
+              <div class="w-16 h-16 rounded-full bg-gray-100 flex items-center justify-center mx-auto mb-4">
+                <svg class="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5m-13.5-9L12 3m0 0l4.5 4.5M12 3v13.5"/></svg>
+              </div>
+              <p class="text-sm font-semibold text-gray-700">Drag & drop your CSV file here</p>
+              <p class="text-xs text-gray-400 mt-1">or click to browse &middot; Max 5MB &middot; .csv only</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Step 3: Preview Table -->
+      <div class="bg-white rounded-xl border border-gray-100 shadow-sm p-6 mb-5">
+        <div class="flex items-start gap-4">
+          <div class="step-badge bg-brand-500 text-white shrink-0">3</div>
+          <div class="flex-1">
+            <h2 class="text-lg font-bold text-navy-900">Preview & Confirm</h2>
+            <p class="text-sm text-gray-500 mt-1 mb-4">Review your products before uploading. Showing first 5 rows.</p>
+            <div class="overflow-x-auto border border-gray-100 rounded-lg">
+              <table class="w-full text-sm">
+                <thead class="bg-gray-50">
+                  <tr>
+                    <th class="text-left py-3 px-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">Name</th>
+                    <th class="text-left py-3 px-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">SKU</th>
+                    <th class="text-left py-3 px-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">Price</th>
+                    <th class="text-left py-3 px-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">Stock</th>
+                    <th class="text-left py-3 px-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">Category</th>
+                  </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-50">
+                  <tr class="hover:bg-brand-50/30 transition">
+                    <td class="py-3 px-4 font-medium text-navy-900">Wooden Bookshelf 4-Tier</td>
+                    <td class="py-3 px-4 text-gray-500 font-mono text-xs">HB-FURN-0421</td>
+                    <td class="py-3 px-4 text-gray-700">&#8377;4,299</td>
+                    <td class="py-3 px-4"><span class="bg-green-50 text-success text-xs font-semibold px-2 py-0.5 rounded-full">120</span></td>
+                    <td class="py-3 px-4 text-gray-700">Furniture</td>
+                  </tr>
+                  <tr class="hover:bg-brand-50/30 transition">
+                    <td class="py-3 px-4 font-medium text-navy-900">LED Desk Lamp</td>
+                    <td class="py-3 px-4 text-gray-500 font-mono text-xs">HB-LGHT-0188</td>
+                    <td class="py-3 px-4 text-gray-700">&#8377;1,199</td>
+                    <td class="py-3 px-4"><span class="bg-green-50 text-success text-xs font-semibold px-2 py-0.5 rounded-full">350</span></td>
+                    <td class="py-3 px-4 text-gray-700">Lighting</td>
+                  </tr>
+                  <tr class="hover:bg-brand-50/30 transition">
+                    <td class="py-3 px-4 font-medium text-navy-900">Cotton Cushion Set (5pc)</td>
+                    <td class="py-3 px-4 text-gray-500 font-mono text-xs">HB-DECO-0732</td>
+                    <td class="py-3 px-4 text-gray-700">&#8377;899</td>
+                    <td class="py-3 px-4"><span class="bg-yellow-50 text-warning text-xs font-semibold px-2 py-0.5 rounded-full">28</span></td>
+                    <td class="py-3 px-4 text-gray-700">Decor</td>
+                  </tr>
+                  <tr class="hover:bg-brand-50/30 transition">
+                    <td class="py-3 px-4 font-medium text-navy-900">Wall Mounted Spice Rack</td>
+                    <td class="py-3 px-4 text-gray-500 font-mono text-xs">HB-KTCH-0295</td>
+                    <td class="py-3 px-4 text-gray-700">&#8377;649</td>
+                    <td class="py-3 px-4"><span class="bg-green-50 text-success text-xs font-semibold px-2 py-0.5 rounded-full">200</span></td>
+                    <td class="py-3 px-4 text-gray-700">Kitchen</td>
+                  </tr>
+                  <tr class="hover:bg-brand-50/30 transition">
+                    <td class="py-3 px-4 font-medium text-navy-900">Bamboo Bath Mat</td>
+                    <td class="py-3 px-4 text-gray-500 font-mono text-xs">HB-BATH-0143</td>
+                    <td class="py-3 px-4 text-gray-700">&#8377;1,499</td>
+                    <td class="py-3 px-4"><span class="bg-red-50 text-danger text-xs font-semibold px-2 py-0.5 rounded-full">8</span></td>
+                    <td class="py-3 px-4 text-gray-700">Bathroom</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="flex items-center justify-between mt-4">
+              <p class="text-xs text-gray-400">5 products ready to upload</p>
+              <button onclick="alert('Uploading 5 products...')" class="bg-brand-500 hover:bg-brand-600 text-white text-sm font-semibold px-6 py-2.5 rounded-lg transition">
+                Upload 5 Products
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Upload History -->
+      <div class="bg-white rounded-xl border border-gray-100 shadow-sm p-6 mb-5">
+        <h2 class="text-lg font-bold text-navy-900 mb-1">Upload History</h2>
+        <p class="text-sm text-gray-500 mb-4">Previous bulk uploads</p>
+        <div class="overflow-x-auto">
+          <table class="w-full text-sm">
+            <thead>
+              <tr class="border-b border-gray-100">
+                <th class="text-left py-3 px-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">Date</th>
+                <th class="text-left py-3 px-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">File</th>
+                <th class="text-left py-3 px-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">Products</th>
+                <th class="text-left py-3 px-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">Errors</th>
+                <th class="text-left py-3 px-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">Status</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-50">
+              <tr class="hover:bg-brand-50/30 transition">
+                <td class="py-3 px-4 text-gray-700">25 Mar 2026</td>
+                <td class="py-3 px-4 text-gray-700 font-mono text-xs">spring-collection.csv</td>
+                <td class="py-3 px-4 font-semibold text-navy-900">48</td>
+                <td class="py-3 px-4"><span class="text-success font-semibold">0</span></td>
+                <td class="py-3 px-4"><span class="bg-green-50 text-success text-xs font-semibold px-2.5 py-1 rounded-full">Completed</span></td>
+              </tr>
+              <tr class="hover:bg-brand-50/30 transition">
+                <td class="py-3 px-4 text-gray-700">18 Mar 2026</td>
+                <td class="py-3 px-4 text-gray-700 font-mono text-xs">kitchen-items.csv</td>
+                <td class="py-3 px-4 font-semibold text-navy-900">23</td>
+                <td class="py-3 px-4"><span class="text-danger font-semibold">3</span></td>
+                <td class="py-3 px-4"><span class="bg-yellow-50 text-warning text-xs font-semibold px-2.5 py-1 rounded-full">Partial</span></td>
+              </tr>
+              <tr class="hover:bg-brand-50/30 transition">
+                <td class="py-3 px-4 text-gray-700">10 Mar 2026</td>
+                <td class="py-3 px-4 text-gray-700 font-mono text-xs">lighting-range.csv</td>
+                <td class="py-3 px-4 font-semibold text-navy-900">15</td>
+                <td class="py-3 px-4"><span class="text-success font-semibold">0</span></td>
+                <td class="py-3 px-4"><span class="bg-green-50 text-success text-xs font-semibold px-2.5 py-1 rounded-full">Completed</span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Format Rules -->
+      <div class="bg-white rounded-xl border border-gray-100 shadow-sm p-6">
+        <h2 class="text-lg font-bold text-navy-900 mb-1">CSV Format Rules</h2>
+        <p class="text-sm text-gray-500 mb-4">Follow these guidelines to avoid upload errors</p>
+        <ul class="space-y-2.5">
+          <li class="flex items-start gap-2.5 text-sm text-gray-700">
+            <svg class="w-5 h-5 text-brand-500 shrink-0 mt-0.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+            <span><strong>File format:</strong> UTF-8 encoded CSV with comma delimiters.</span>
+          </li>
+          <li class="flex items-start gap-2.5 text-sm text-gray-700">
+            <svg class="w-5 h-5 text-brand-500 shrink-0 mt-0.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+            <span><strong>Required columns:</strong> Name, SKU, Price, Stock, Category.</span>
+          </li>
+          <li class="flex items-start gap-2.5 text-sm text-gray-700">
+            <svg class="w-5 h-5 text-brand-500 shrink-0 mt-0.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+            <span><strong>SKU:</strong> Must be unique. Use format HB-XXXX-0000.</span>
+          </li>
+          <li class="flex items-start gap-2.5 text-sm text-gray-700">
+            <svg class="w-5 h-5 text-brand-500 shrink-0 mt-0.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+            <span><strong>Price:</strong> Numeric only, no currency symbols. Minimum value 1.</span>
+          </li>
+          <li class="flex items-start gap-2.5 text-sm text-gray-700">
+            <svg class="w-5 h-5 text-brand-500 shrink-0 mt-0.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+            <span><strong>Stock:</strong> Whole numbers only. Set 0 for out-of-stock.</span>
+          </li>
+          <li class="flex items-start gap-2.5 text-sm text-gray-700">
+            <svg class="w-5 h-5 text-brand-500 shrink-0 mt-0.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+            <span><strong>Category:</strong> Must match an existing HomeBase category (Furniture, Lighting, Decor, Kitchen, Bathroom, Bedroom, Garden, Storage).</span>
+          </li>
+          <li class="flex items-start gap-2.5 text-sm text-gray-700">
+            <svg class="w-5 h-5 text-brand-500 shrink-0 mt-0.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+            <span><strong>Max rows:</strong> 500 products per upload. Split larger files.</span>
+          </li>
+        </ul>
+      </div>
+
+    </main>
+  </div>
+
+  <script src="shared-layout.js"></script>
+  <script>renderSellerLayout('products');</script>
+  <script>
+    function handleUpload() {
+      var zone = document.getElementById('dropZone');
+      zone.innerHTML = '<div class="flex items-center justify-center gap-3"><svg class="w-6 h-6 text-success" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg><span class="text-sm font-semibold text-success">File uploaded successfully! Scroll down to preview.</span></div>';
+    }
+  </script>
+</body>
+</html>

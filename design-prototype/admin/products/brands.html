@@ -1,0 +1,576 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HomeBase — Brand Management</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brand: { 50:'#FFF7ED',100:'#FFEDD5',200:'#FED7AA',300:'#FDBA74',400:'#FB923C',500:'#F97316',600:'#EA580C',700:'#C2410C' },
+            navy: { 700:'#1E3A5F',800:'#0F1E30',900:'#0A1628' },
+          },
+          fontFamily: { sans: ['Inter','system-ui','sans-serif'] }
+        }
+      }
+    }
+  </script>
+  <style>
+    .stat-card{transition:all .2s ease}.stat-card:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(0,0,0,.08)}
+    .table-row{transition:background .15s ease}.table-row:hover{background:#FFF7ED}
+    .tab-btn.active{border-color:#F97316;color:#F97316;font-weight:600}
+    .filter-tab{transition:all .15s ease}.filter-tab:hover{background:#FFF7ED}
+    .filter-tab.active{border-color:#F97316;color:#F97316;font-weight:600}
+    .dropdown-menu{display:none}.dropdown:hover .dropdown-menu{display:block}
+    .modal-backdrop{background:rgba(10,22,40,.45);backdrop-filter:blur(4px)}
+  </style>
+</head>
+<body class="font-sans bg-gray-50 text-gray-900">
+
+  <!-- TOP HEADER -->
+  <header id="admin-header" class="fixed top-0 left-0 right-0 z-50 bg-white border-b border-gray-200 h-16"></header>
+
+  <div class="flex pt-16 min-h-screen">
+    <!-- SIDEBAR -->
+    <aside id="admin-sidebar" class="fixed left-0 top-16 bottom-0 w-60 z-40 flex flex-col overflow-y-auto" style="background:#0A1628;"></aside>
+
+    <!-- MAIN CONTENT -->
+    <main class="flex-1 ml-60 p-6 lg:p-8">
+
+      <!-- ===== PAGE HEADER ===== -->
+      <div class="flex items-center justify-between mb-6">
+        <div>
+          <h1 class="text-2xl font-bold text-gray-900">Brand Management</h1>
+          <p class="text-sm text-gray-500 mt-1">Manage and verify brand registrations across the platform</p>
+        </div>
+        <div class="flex items-center gap-3">
+          <button class="flex items-center gap-2 bg-white border border-gray-200 text-gray-700 px-4 py-2.5 rounded-lg text-sm font-medium shadow-sm hover:bg-gray-50 transition">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3"/></svg>
+            Export
+          </button>
+          <button onclick="openAddBrandModal()" class="flex items-center gap-2 bg-brand-500 hover:bg-brand-600 text-white px-4 py-2.5 rounded-lg text-sm font-medium shadow-sm transition">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 4.5v15m7.5-7.5h-15"/></svg>
+            Add Brand
+          </button>
+        </div>
+      </div>
+
+      <!-- ===== STATS ROW ===== -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+        <!-- Total Brands -->
+        <div class="stat-card bg-white rounded-xl border border-gray-100 p-5 shadow-sm">
+          <div class="flex items-center justify-between mb-3">
+            <p class="text-sm font-medium text-gray-500">Total Brands</p>
+            <div class="w-9 h-9 rounded-lg bg-gray-50 flex items-center justify-center">
+              <svg class="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M9.568 3H5.25A2.25 2.25 0 003 5.25v4.318c0 .597.237 1.17.659 1.591l9.581 9.581c.699.699 1.78.872 2.607.33a18.095 18.095 0 005.223-5.223c.542-.827.369-1.908-.33-2.607L11.16 3.66A2.25 2.25 0 009.568 3z"/><path d="M6 6h.008v.008H6V6z"/></svg>
+            </div>
+          </div>
+          <p class="text-2xl font-bold text-gray-900">847</p>
+          <p class="text-xs text-gray-400 mt-1">Registered on the platform</p>
+        </div>
+        <!-- Verified -->
+        <div class="stat-card bg-white rounded-xl border border-gray-100 p-5 shadow-sm">
+          <div class="flex items-center justify-between mb-3">
+            <p class="text-sm font-medium text-gray-500">Verified</p>
+            <div class="w-9 h-9 rounded-lg bg-green-50 flex items-center justify-center">
+              <svg class="w-5 h-5 text-green-600" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+            </div>
+          </div>
+          <p class="text-2xl font-bold text-green-600">612</p>
+          <p class="text-xs text-green-600 mt-1">72.3% approval rate</p>
+        </div>
+        <!-- Pending Approval -->
+        <div class="stat-card bg-white rounded-xl border border-gray-100 p-5 shadow-sm">
+          <div class="flex items-center justify-between mb-3">
+            <p class="text-sm font-medium text-gray-500">Pending Approval</p>
+            <div class="w-9 h-9 rounded-lg bg-yellow-50 flex items-center justify-center">
+              <svg class="w-5 h-5 text-yellow-600" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+            </div>
+          </div>
+          <p class="text-2xl font-bold text-yellow-600">89</p>
+          <p class="text-xs text-yellow-600 mt-1">Awaiting review</p>
+        </div>
+        <!-- Rejected -->
+        <div class="stat-card bg-white rounded-xl border border-gray-100 p-5 shadow-sm">
+          <div class="flex items-center justify-between mb-3">
+            <p class="text-sm font-medium text-gray-500">Rejected</p>
+            <div class="w-9 h-9 rounded-lg bg-red-50 flex items-center justify-center">
+              <svg class="w-5 h-5 text-red-600" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M9.75 9.75l4.5 4.5m0-4.5l-4.5 4.5M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+            </div>
+          </div>
+          <p class="text-2xl font-bold text-red-600">146</p>
+          <p class="text-xs text-red-600 mt-1">Failed verification</p>
+        </div>
+      </div>
+
+      <!-- ===== BRANDS TABLE ===== -->
+      <div class="bg-white rounded-xl border border-gray-100 shadow-sm">
+        <!-- Tabs + Search + Filters -->
+        <div class="px-6 pt-5 pb-0 flex items-center justify-between">
+          <nav class="-mb-px flex items-center gap-0 border-b border-gray-200">
+            <button class="tab-btn active border-b-2 px-4 pb-3 text-sm font-medium" onclick="filterBrands('all',this)">All <span class="ml-1 bg-gray-100 text-gray-600 text-[11px] font-bold px-1.5 py-0.5 rounded-full">847</span></button>
+            <button class="tab-btn border-b-2 border-transparent px-4 pb-3 text-sm font-medium text-gray-500" onclick="filterBrands('verified',this)">Verified <span class="ml-1 bg-green-100 text-green-700 text-[11px] font-bold px-1.5 py-0.5 rounded-full">612</span></button>
+            <button class="tab-btn border-b-2 border-transparent px-4 pb-3 text-sm font-medium text-gray-500" onclick="filterBrands('pending',this)">Pending <span class="ml-1 bg-yellow-100 text-yellow-700 text-[11px] font-bold px-1.5 py-0.5 rounded-full">89</span></button>
+            <button class="tab-btn border-b-2 border-transparent px-4 pb-3 text-sm font-medium text-gray-500" onclick="filterBrands('rejected',this)">Rejected <span class="ml-1 bg-red-100 text-red-700 text-[11px] font-bold px-1.5 py-0.5 rounded-full">146</span></button>
+          </nav>
+          <div class="flex items-center gap-3 mb-3">
+            <!-- Category filter -->
+            <select class="text-xs border border-gray-200 rounded-lg px-3 py-2 bg-gray-50 text-gray-600 outline-none focus:border-brand-400">
+              <option>All Categories</option>
+              <option>Power Tools</option>
+              <option>Paints & Coatings</option>
+              <option>Electrical</option>
+              <option>Home & Living</option>
+              <option>Fans & Lighting</option>
+              <option>Appliances</option>
+              <option>Lighting</option>
+              <option>Switches & Wiring</option>
+              <option>Stabilizers</option>
+            </select>
+            <!-- Search -->
+            <div class="relative">
+              <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z"/></svg>
+              <input type="search" placeholder="Search brand name..." class="w-56 rounded-lg border border-gray-200 bg-gray-50 py-2 pl-9 pr-4 text-sm outline-none focus:border-brand-400 focus:ring-2 focus:ring-brand-100 transition">
+            </div>
+          </div>
+        </div>
+
+        <!-- Table -->
+        <div class="overflow-x-auto">
+          <table class="w-full text-sm">
+            <thead>
+              <tr class="bg-gray-50 text-left">
+                <th class="px-6 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Brand</th>
+                <th class="px-6 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Category</th>
+                <th class="px-6 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider text-right">Products</th>
+                <th class="px-6 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider text-right">Sellers</th>
+                <th class="px-6 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Status</th>
+                <th class="px-6 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Applied Date</th>
+                <th class="px-6 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Actions</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-100">
+              <!-- Row 1: Bosch India -->
+              <tr class="table-row">
+                <td class="px-6 py-4">
+                  <div class="flex items-center gap-3">
+                    <div class="w-9 h-9 rounded-lg bg-blue-600 flex items-center justify-center text-white text-sm font-bold shrink-0">B</div>
+                    <div>
+                      <a href="#" class="font-medium text-gray-900 hover:text-brand-500 transition">Bosch India</a>
+                      <p class="text-xs text-gray-400">bosch-india.com</p>
+                    </div>
+                  </div>
+                </td>
+                <td class="px-6 py-4 text-gray-600">Power Tools</td>
+                <td class="px-6 py-4 text-right font-medium text-gray-900">234</td>
+                <td class="px-6 py-4 text-right font-medium text-gray-900">12</td>
+                <td class="px-6 py-4"><span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-700">Verified</span></td>
+                <td class="px-6 py-4 text-gray-500">14 Jan 2025</td>
+                <td class="px-6 py-4">
+                  <div class="flex items-center gap-2">
+                    <button class="text-gray-400 hover:text-brand-500 p-1 rounded transition" title="View details"><svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z"/><path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg></button>
+                  </div>
+                </td>
+              </tr>
+              <!-- Row 2: Asian Paints -->
+              <tr class="table-row">
+                <td class="px-6 py-4">
+                  <div class="flex items-center gap-3">
+                    <div class="w-9 h-9 rounded-lg bg-red-500 flex items-center justify-center text-white text-sm font-bold shrink-0">A</div>
+                    <div>
+                      <a href="#" class="font-medium text-gray-900 hover:text-brand-500 transition">Asian Paints</a>
+                      <p class="text-xs text-gray-400">asianpaints.com</p>
+                    </div>
+                  </div>
+                </td>
+                <td class="px-6 py-4 text-gray-600">Paints & Coatings</td>
+                <td class="px-6 py-4 text-right font-medium text-gray-900">567</td>
+                <td class="px-6 py-4 text-right font-medium text-gray-900">45</td>
+                <td class="px-6 py-4"><span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-700">Verified</span></td>
+                <td class="px-6 py-4 text-gray-500">03 Dec 2024</td>
+                <td class="px-6 py-4">
+                  <div class="flex items-center gap-2">
+                    <button class="text-gray-400 hover:text-brand-500 p-1 rounded transition" title="View details"><svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z"/><path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg></button>
+                  </div>
+                </td>
+              </tr>
+              <!-- Row 3: Havells -->
+              <tr class="table-row">
+                <td class="px-6 py-4">
+                  <div class="flex items-center gap-3">
+                    <div class="w-9 h-9 rounded-lg bg-brand-500 flex items-center justify-center text-white text-sm font-bold shrink-0">H</div>
+                    <div>
+                      <a href="#" class="font-medium text-gray-900 hover:text-brand-500 transition">Havells</a>
+                      <p class="text-xs text-gray-400">havells.com</p>
+                    </div>
+                  </div>
+                </td>
+                <td class="px-6 py-4 text-gray-600">Electrical</td>
+                <td class="px-6 py-4 text-right font-medium text-gray-900">891</td>
+                <td class="px-6 py-4 text-right font-medium text-gray-900">67</td>
+                <td class="px-6 py-4"><span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-700">Verified</span></td>
+                <td class="px-6 py-4 text-gray-500">28 Nov 2024</td>
+                <td class="px-6 py-4">
+                  <div class="flex items-center gap-2">
+                    <button class="text-gray-400 hover:text-brand-500 p-1 rounded transition" title="View details"><svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z"/><path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg></button>
+                  </div>
+                </td>
+              </tr>
+              <!-- Row 4: Godrej -->
+              <tr class="table-row">
+                <td class="px-6 py-4">
+                  <div class="flex items-center gap-3">
+                    <div class="w-9 h-9 rounded-lg bg-emerald-600 flex items-center justify-center text-white text-sm font-bold shrink-0">G</div>
+                    <div>
+                      <a href="#" class="font-medium text-gray-900 hover:text-brand-500 transition">Godrej</a>
+                      <p class="text-xs text-gray-400">godrej.com</p>
+                    </div>
+                  </div>
+                </td>
+                <td class="px-6 py-4 text-gray-600">Home & Living</td>
+                <td class="px-6 py-4 text-right font-medium text-gray-900">345</td>
+                <td class="px-6 py-4 text-right font-medium text-gray-900">23</td>
+                <td class="px-6 py-4"><span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-700">Verified</span></td>
+                <td class="px-6 py-4 text-gray-500">15 Oct 2024</td>
+                <td class="px-6 py-4">
+                  <div class="flex items-center gap-2">
+                    <button class="text-gray-400 hover:text-brand-500 p-1 rounded transition" title="View details"><svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z"/><path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg></button>
+                  </div>
+                </td>
+              </tr>
+              <!-- Row 5: Crompton (Pending) -->
+              <tr class="table-row">
+                <td class="px-6 py-4">
+                  <div class="flex items-center gap-3">
+                    <div class="w-9 h-9 rounded-lg bg-sky-500 flex items-center justify-center text-white text-sm font-bold shrink-0">C</div>
+                    <div>
+                      <a href="#" class="font-medium text-gray-900 hover:text-brand-500 transition">Crompton</a>
+                      <p class="text-xs text-gray-400">crompton.co.in</p>
+                    </div>
+                  </div>
+                </td>
+                <td class="px-6 py-4 text-gray-600">Fans & Lighting</td>
+                <td class="px-6 py-4 text-right font-medium text-gray-900">78</td>
+                <td class="px-6 py-4 text-right font-medium text-gray-900">5</td>
+                <td class="px-6 py-4"><span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-700">Pending</span></td>
+                <td class="px-6 py-4 text-gray-500">28 Mar 2026</td>
+                <td class="px-6 py-4">
+                  <div class="flex items-center gap-2">
+                    <button class="text-gray-400 hover:text-brand-500 p-1 rounded transition" title="View details"><svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z"/><path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg></button>
+                    <button onclick="approveBrand('Crompton')" class="bg-green-500 hover:bg-green-600 text-white px-3 py-1.5 rounded-lg text-xs font-medium transition">Approve</button>
+                    <button onclick="rejectBrand('Crompton')" class="bg-white border border-red-200 text-red-600 hover:bg-red-50 px-3 py-1.5 rounded-lg text-xs font-medium transition">Reject</button>
+                  </div>
+                </td>
+              </tr>
+              <!-- Row 6: Bajaj Electricals -->
+              <tr class="table-row">
+                <td class="px-6 py-4">
+                  <div class="flex items-center gap-3">
+                    <div class="w-9 h-9 rounded-lg bg-indigo-600 flex items-center justify-center text-white text-sm font-bold shrink-0">B</div>
+                    <div>
+                      <a href="#" class="font-medium text-gray-900 hover:text-brand-500 transition">Bajaj Electricals</a>
+                      <p class="text-xs text-gray-400">bajajelectricals.com</p>
+                    </div>
+                  </div>
+                </td>
+                <td class="px-6 py-4 text-gray-600">Appliances</td>
+                <td class="px-6 py-4 text-right font-medium text-gray-900">456</td>
+                <td class="px-6 py-4 text-right font-medium text-gray-900">34</td>
+                <td class="px-6 py-4"><span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-700">Verified</span></td>
+                <td class="px-6 py-4 text-gray-500">09 Sep 2024</td>
+                <td class="px-6 py-4">
+                  <div class="flex items-center gap-2">
+                    <button class="text-gray-400 hover:text-brand-500 p-1 rounded transition" title="View details"><svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z"/><path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg></button>
+                  </div>
+                </td>
+              </tr>
+              <!-- Row 7: Philips India -->
+              <tr class="table-row">
+                <td class="px-6 py-4">
+                  <div class="flex items-center gap-3">
+                    <div class="w-9 h-9 rounded-lg bg-blue-500 flex items-center justify-center text-white text-sm font-bold shrink-0">P</div>
+                    <div>
+                      <a href="#" class="font-medium text-gray-900 hover:text-brand-500 transition">Philips India</a>
+                      <p class="text-xs text-gray-400">philips.co.in</p>
+                    </div>
+                  </div>
+                </td>
+                <td class="px-6 py-4 text-gray-600">Lighting</td>
+                <td class="px-6 py-4 text-right font-medium text-gray-900">123</td>
+                <td class="px-6 py-4 text-right font-medium text-gray-900">8</td>
+                <td class="px-6 py-4"><span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-700">Verified</span></td>
+                <td class="px-6 py-4 text-gray-500">21 Aug 2024</td>
+                <td class="px-6 py-4">
+                  <div class="flex items-center gap-2">
+                    <button class="text-gray-400 hover:text-brand-500 p-1 rounded transition" title="View details"><svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z"/><path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg></button>
+                  </div>
+                </td>
+              </tr>
+              <!-- Row 8: Orient Electric (Pending) -->
+              <tr class="table-row">
+                <td class="px-6 py-4">
+                  <div class="flex items-center gap-3">
+                    <div class="w-9 h-9 rounded-lg bg-teal-500 flex items-center justify-center text-white text-sm font-bold shrink-0">O</div>
+                    <div>
+                      <a href="#" class="font-medium text-gray-900 hover:text-brand-500 transition">Orient Electric</a>
+                      <p class="text-xs text-gray-400">orientelectric.com</p>
+                    </div>
+                  </div>
+                </td>
+                <td class="px-6 py-4 text-gray-600">Fans</td>
+                <td class="px-6 py-4 text-right font-medium text-gray-900">45</td>
+                <td class="px-6 py-4 text-right font-medium text-gray-900">3</td>
+                <td class="px-6 py-4"><span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-700">Pending</span></td>
+                <td class="px-6 py-4 text-gray-500">31 Mar 2026</td>
+                <td class="px-6 py-4">
+                  <div class="flex items-center gap-2">
+                    <button class="text-gray-400 hover:text-brand-500 p-1 rounded transition" title="View details"><svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z"/><path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg></button>
+                    <button onclick="approveBrand('Orient Electric')" class="bg-green-500 hover:bg-green-600 text-white px-3 py-1.5 rounded-lg text-xs font-medium transition">Approve</button>
+                    <button onclick="rejectBrand('Orient Electric')" class="bg-white border border-red-200 text-red-600 hover:bg-red-50 px-3 py-1.5 rounded-lg text-xs font-medium transition">Reject</button>
+                  </div>
+                </td>
+              </tr>
+              <!-- Row 9: Anchor by Panasonic -->
+              <tr class="table-row">
+                <td class="px-6 py-4">
+                  <div class="flex items-center gap-3">
+                    <div class="w-9 h-9 rounded-lg bg-navy-700 flex items-center justify-center text-white text-sm font-bold shrink-0">A</div>
+                    <div>
+                      <a href="#" class="font-medium text-gray-900 hover:text-brand-500 transition">Anchor by Panasonic</a>
+                      <p class="text-xs text-gray-400">anchor-panasonic.com</p>
+                    </div>
+                  </div>
+                </td>
+                <td class="px-6 py-4 text-gray-600">Switches & Wiring</td>
+                <td class="px-6 py-4 text-right font-medium text-gray-900">234</td>
+                <td class="px-6 py-4 text-right font-medium text-gray-900">15</td>
+                <td class="px-6 py-4"><span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-700">Verified</span></td>
+                <td class="px-6 py-4 text-gray-500">07 Jul 2024</td>
+                <td class="px-6 py-4">
+                  <div class="flex items-center gap-2">
+                    <button class="text-gray-400 hover:text-brand-500 p-1 rounded transition" title="View details"><svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z"/><path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg></button>
+                  </div>
+                </td>
+              </tr>
+              <!-- Row 10: Syska LED (Rejected) -->
+              <tr class="table-row">
+                <td class="px-6 py-4">
+                  <div class="flex items-center gap-3">
+                    <div class="w-9 h-9 rounded-lg bg-gray-400 flex items-center justify-center text-white text-sm font-bold shrink-0">S</div>
+                    <div>
+                      <a href="#" class="font-medium text-gray-900 hover:text-brand-500 transition">Syska LED</a>
+                      <p class="text-xs text-gray-400">syska.co.in</p>
+                    </div>
+                  </div>
+                </td>
+                <td class="px-6 py-4 text-gray-600">Lighting</td>
+                <td class="px-6 py-4 text-right font-medium text-gray-900">12</td>
+                <td class="px-6 py-4 text-right font-medium text-gray-900">1</td>
+                <td class="px-6 py-4"><span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-700">Rejected</span></td>
+                <td class="px-6 py-4 text-gray-500">15 Mar 2026</td>
+                <td class="px-6 py-4">
+                  <div class="flex items-center gap-2">
+                    <button class="text-gray-400 hover:text-brand-500 p-1 rounded transition" title="View details"><svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z"/><path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg></button>
+                    <button onclick="alert('Re-review initiated for Syska LED')" class="bg-white border border-gray-200 text-gray-600 hover:bg-gray-50 px-3 py-1.5 rounded-lg text-xs font-medium transition">Re-review</button>
+                  </div>
+                </td>
+              </tr>
+              <!-- Row 11: Usha International (Pending) -->
+              <tr class="table-row">
+                <td class="px-6 py-4">
+                  <div class="flex items-center gap-3">
+                    <div class="w-9 h-9 rounded-lg bg-purple-500 flex items-center justify-center text-white text-sm font-bold shrink-0">U</div>
+                    <div>
+                      <a href="#" class="font-medium text-gray-900 hover:text-brand-500 transition">Usha International</a>
+                      <p class="text-xs text-gray-400">usha.com</p>
+                    </div>
+                  </div>
+                </td>
+                <td class="px-6 py-4 text-gray-600">Appliances</td>
+                <td class="px-6 py-4 text-right font-medium text-gray-900">67</td>
+                <td class="px-6 py-4 text-right font-medium text-gray-900">4</td>
+                <td class="px-6 py-4"><span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-700">Pending</span></td>
+                <td class="px-6 py-4 text-gray-500">01 Apr 2026</td>
+                <td class="px-6 py-4">
+                  <div class="flex items-center gap-2">
+                    <button class="text-gray-400 hover:text-brand-500 p-1 rounded transition" title="View details"><svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z"/><path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg></button>
+                    <button onclick="approveBrand('Usha International')" class="bg-green-500 hover:bg-green-600 text-white px-3 py-1.5 rounded-lg text-xs font-medium transition">Approve</button>
+                    <button onclick="rejectBrand('Usha International')" class="bg-white border border-red-200 text-red-600 hover:bg-red-50 px-3 py-1.5 rounded-lg text-xs font-medium transition">Reject</button>
+                  </div>
+                </td>
+              </tr>
+              <!-- Row 12: V-Guard -->
+              <tr class="table-row">
+                <td class="px-6 py-4">
+                  <div class="flex items-center gap-3">
+                    <div class="w-9 h-9 rounded-lg bg-rose-500 flex items-center justify-center text-white text-sm font-bold shrink-0">V</div>
+                    <div>
+                      <a href="#" class="font-medium text-gray-900 hover:text-brand-500 transition">V-Guard</a>
+                      <p class="text-xs text-gray-400">vguard.in</p>
+                    </div>
+                  </div>
+                </td>
+                <td class="px-6 py-4 text-gray-600">Stabilizers</td>
+                <td class="px-6 py-4 text-right font-medium text-gray-900">189</td>
+                <td class="px-6 py-4 text-right font-medium text-gray-900">11</td>
+                <td class="px-6 py-4"><span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-700">Verified</span></td>
+                <td class="px-6 py-4 text-gray-500">12 Jun 2024</td>
+                <td class="px-6 py-4">
+                  <div class="flex items-center gap-2">
+                    <button class="text-gray-400 hover:text-brand-500 p-1 rounded transition" title="View details"><svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z"/><path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg></button>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Pagination -->
+        <div class="px-6 py-4 border-t border-gray-100 flex items-center justify-between">
+          <p class="text-xs text-gray-400">Showing 1-12 of 847 brands</p>
+          <div class="flex items-center gap-1">
+            <button class="px-3 py-1.5 text-xs font-medium text-gray-400 bg-gray-50 rounded-lg border border-gray-200">Previous</button>
+            <button class="px-3 py-1.5 text-xs font-semibold text-white bg-brand-500 rounded-lg">1</button>
+            <button class="px-3 py-1.5 text-xs font-medium text-gray-600 bg-gray-50 rounded-lg border border-gray-200 hover:bg-gray-100">2</button>
+            <button class="px-3 py-1.5 text-xs font-medium text-gray-600 bg-gray-50 rounded-lg border border-gray-200 hover:bg-gray-100">3</button>
+            <span class="px-2 text-gray-400">...</span>
+            <button class="px-3 py-1.5 text-xs font-medium text-gray-600 bg-gray-50 rounded-lg border border-gray-200 hover:bg-gray-100">71</button>
+            <button class="px-3 py-1.5 text-xs font-medium text-gray-600 bg-gray-50 rounded-lg border border-gray-200 hover:bg-gray-100">Next</button>
+          </div>
+        </div>
+      </div>
+
+    </main>
+  </div>
+
+  <!-- ===== ADD BRAND MODAL ===== -->
+  <div id="addBrandModal" class="fixed inset-0 z-[60] hidden">
+    <div class="modal-backdrop absolute inset-0" onclick="closeAddBrandModal()"></div>
+    <div class="relative z-10 flex items-center justify-center min-h-screen p-4">
+      <div class="bg-white rounded-2xl shadow-2xl w-full max-w-lg overflow-hidden">
+        <!-- Modal Header -->
+        <div class="px-6 py-4 border-b border-gray-100 flex items-center justify-between">
+          <div>
+            <h3 class="text-lg font-bold text-gray-900">Add New Brand</h3>
+            <p class="text-xs text-gray-400 mt-0.5">Register a new brand on the platform</p>
+          </div>
+          <button onclick="closeAddBrandModal()" class="p-1.5 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M6 18L18 6M6 6l12 12"/></svg>
+          </button>
+        </div>
+        <!-- Modal Body -->
+        <div class="px-6 py-5 space-y-4 max-h-[70vh] overflow-y-auto">
+          <!-- Brand Name -->
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Brand Name <span class="text-red-500">*</span></label>
+            <input type="text" placeholder="e.g. Crompton Greaves" class="w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm outline-none focus:border-brand-400 focus:ring-2 focus:ring-brand-100 transition">
+          </div>
+          <!-- Category -->
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Category <span class="text-red-500">*</span></label>
+            <select class="w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm outline-none focus:border-brand-400 focus:ring-2 focus:ring-brand-100 transition text-gray-600">
+              <option value="" disabled selected>Select a category</option>
+              <option>Power Tools</option>
+              <option>Paints & Coatings</option>
+              <option>Electrical</option>
+              <option>Home & Living</option>
+              <option>Fans & Lighting</option>
+              <option>Appliances</option>
+              <option>Lighting</option>
+              <option>Switches & Wiring</option>
+              <option>Stabilizers</option>
+              <option>Plumbing</option>
+              <option>Building Materials</option>
+              <option>Hardware</option>
+            </select>
+          </div>
+          <!-- Description -->
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Description</label>
+            <textarea rows="3" placeholder="Brief description of the brand and its product range..." class="w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm outline-none focus:border-brand-400 focus:ring-2 focus:ring-brand-100 transition resize-none"></textarea>
+          </div>
+          <!-- Logo Upload -->
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Brand Logo</label>
+            <div class="border-2 border-dashed border-gray-200 rounded-lg p-6 text-center hover:border-brand-300 transition cursor-pointer" onclick="document.getElementById('logoInput').click()">
+              <svg class="w-8 h-8 text-gray-300 mx-auto mb-2" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.409a2.25 2.25 0 013.182 0l2.909 2.909M3 16.5V18a2.25 2.25 0 002.25 2.25h13.5A2.25 2.25 0 0021 18v-1.5m-18 0V6a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 6v10.5"/></svg>
+              <p class="text-sm text-gray-500">Click to upload or drag and drop</p>
+              <p class="text-xs text-gray-400 mt-1">PNG, JPG or SVG (max. 2MB)</p>
+              <input type="file" id="logoInput" class="hidden" accept="image/png,image/jpeg,image/svg+xml">
+            </div>
+          </div>
+          <!-- Website URL -->
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Website URL</label>
+            <input type="url" placeholder="https://www.example.com" class="w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm outline-none focus:border-brand-400 focus:ring-2 focus:ring-brand-100 transition">
+          </div>
+          <!-- Registration Certificate -->
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Registration Certificate <span class="text-red-500">*</span></label>
+            <div class="border-2 border-dashed border-gray-200 rounded-lg p-4 text-center hover:border-brand-300 transition cursor-pointer" onclick="document.getElementById('certInput').click()">
+              <svg class="w-6 h-6 text-gray-300 mx-auto mb-1" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m6.75 12l-3-3m0 0l-3 3m3-3v6m-1.5-15H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z"/></svg>
+              <p class="text-xs text-gray-500">Upload trademark or registration certificate (PDF, max 5MB)</p>
+              <input type="file" id="certInput" class="hidden" accept="application/pdf">
+            </div>
+          </div>
+        </div>
+        <!-- Modal Footer -->
+        <div class="px-6 py-4 border-t border-gray-100 flex items-center justify-end gap-3 bg-gray-50/50">
+          <button onclick="closeAddBrandModal()" class="px-4 py-2.5 text-sm font-medium text-gray-600 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 transition">Cancel</button>
+          <button onclick="submitBrand()" class="px-5 py-2.5 text-sm font-medium text-white bg-brand-500 hover:bg-brand-600 rounded-lg shadow-sm transition">Submit for Review</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+<script src="../shared-layout.js"></script>
+<script>renderAdminLayout('brands', '../');</script>
+<script>
+  function filterBrands(type, btn) {
+    document.querySelectorAll('.tab-btn').forEach(function(b) {
+      b.classList.remove('active');
+      b.classList.add('border-transparent','text-gray-500');
+    });
+    btn.classList.add('active');
+    btn.classList.remove('border-transparent','text-gray-500');
+  }
+
+  function openAddBrandModal() {
+    document.getElementById('addBrandModal').classList.remove('hidden');
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closeAddBrandModal() {
+    document.getElementById('addBrandModal').classList.add('hidden');
+    document.body.style.overflow = '';
+  }
+
+  function submitBrand() {
+    alert('Brand submitted for review. It will appear under Pending Approval.');
+    closeAddBrandModal();
+  }
+
+  function approveBrand(name) {
+    if (confirm('Approve brand "' + name + '"? This will mark it as Verified.')) {
+      alert(name + ' has been approved and marked as Verified.');
+    }
+  }
+
+  function rejectBrand(name) {
+    var reason = prompt('Reject brand "' + name + '"? Enter reason for rejection:');
+    if (reason) {
+      alert(name + ' has been rejected. Reason: ' + reason);
+    }
+  }
+
+  // Close modal on Escape key
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') closeAddBrandModal();
+  });
+</script>
+</body>
+</html>

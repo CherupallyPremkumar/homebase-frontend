@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Compare Products — HomeBase</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              50: '#FFF7ED',
+              100: '#FFEDD5',
+              200: '#FED7AA',
+              300: '#FDBA74',
+              400: '#FB923C',
+              500: '#F97316',
+              600: '#EA580C',
+              700: '#C2410C',
+            },
+            navy: {
+              700: '#1E3A5F',
+              800: '#1A2E4A',
+              900: '#0F1B2D',
+            },
+            success: '#16A34A',
+            warning: '#EAB308',
+            danger: '#DC2626',
+          },
+          fontFamily: {
+            sans: ['Inter', 'system-ui', 'sans-serif'],
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    .btn-brand { background: #F97316; transition: all 0.2s; }
+    .btn-brand:hover { background: #EA580C; }
+    .compare-col { transition: all 0.2s ease; }
+    .compare-col:hover { background: #FFFBF7; }
+    .add-col:hover { background: #FFF7ED; border-color: #F97316; }
+  </style>
+</head>
+<body class="font-sans bg-gray-50 text-gray-900">
+
+  <!-- ===== SIMPLE HEADER ===== -->
+  <header class="bg-white border-b border-gray-100 sticky top-0 z-50 shadow-sm">
+    <div class="max-w-7xl mx-auto px-4 flex items-center justify-between h-14">
+      <div class="flex items-center gap-4">
+        <a href="storefront.html" class="flex items-center gap-2">
+          <div class="w-8 h-8 rounded-lg bg-brand-500 flex items-center justify-center">
+            <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-4 0a1 1 0 01-1-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 01-1 1"/></svg>
+          </div>
+          <span class="text-lg font-extrabold tracking-tight text-navy-900">Home<span class="text-brand-500">Base</span></span>
+        </a>
+        <span class="text-gray-300">|</span>
+        <a href="javascript:history.back()" class="flex items-center gap-1 text-sm text-gray-500 hover:text-brand-500 transition">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18"/></svg>
+          Back
+        </a>
+      </div>
+      <h1 class="text-sm font-semibold text-gray-700">Compare Products</h1>
+    </div>
+  </header>
+
+  <!-- ===== MAIN CONTENT ===== -->
+  <div class="max-w-7xl mx-auto px-4 py-8">
+
+    <!-- Compare Heading -->
+    <div class="flex items-center justify-between mb-6">
+      <div>
+        <h1 class="text-2xl font-bold text-navy-900">Compare Products</h1>
+        <p class="text-sm text-gray-400 mt-1">Compare specifications side by side to find the best product</p>
+      </div>
+      <button onclick="alert('Comparison cleared')" class="text-sm text-gray-500 hover:text-danger transition font-medium">Clear All</button>
+    </div>
+
+    <!-- Compare Table -->
+    <div class="bg-white rounded-xl border border-gray-100 shadow-sm overflow-x-auto">
+      <table class="w-full text-sm">
+        <colgroup>
+          <col class="w-44">
+          <col>
+          <col>
+          <col>
+          <col class="w-48">
+        </colgroup>
+
+        <!-- Image Row -->
+        <tr class="border-b border-gray-100">
+          <td class="px-5 py-4 font-semibold text-gray-400 text-xs uppercase tracking-wider">Product</td>
+          <!-- Product 1 -->
+          <td class="px-5 py-6 text-center compare-col relative">
+            <button onclick="alert('Product 1 removed')" class="absolute top-2 right-2 w-6 h-6 rounded-full bg-gray-100 hover:bg-red-100 flex items-center justify-center transition" title="Remove">
+              <svg class="w-3.5 h-3.5 text-gray-400 hover:text-danger" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M6 18L18 6M6 6l12 12"/></svg>
+            </button>
+            <div class="w-32 h-32 mx-auto bg-gray-50 rounded-xl flex items-center justify-center mb-3">
+              <svg class="w-16 h-16 text-gray-200" fill="none" stroke="currentColor" stroke-width="1" viewBox="0 0 24 24"><path d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.409a2.25 2.25 0 013.182 0l2.909 2.909M3.75 21h16.5"/></svg>
+            </div>
+          </td>
+          <!-- Product 2 -->
+          <td class="px-5 py-6 text-center compare-col relative">
+            <button onclick="alert('Product 2 removed')" class="absolute top-2 right-2 w-6 h-6 rounded-full bg-gray-100 hover:bg-red-100 flex items-center justify-center transition" title="Remove">
+              <svg class="w-3.5 h-3.5 text-gray-400 hover:text-danger" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M6 18L18 6M6 6l12 12"/></svg>
+            </button>
+            <div class="w-32 h-32 mx-auto bg-gray-50 rounded-xl flex items-center justify-center mb-3">
+              <svg class="w-16 h-16 text-gray-200" fill="none" stroke="currentColor" stroke-width="1" viewBox="0 0 24 24"><path d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.409a2.25 2.25 0 013.182 0l2.909 2.909M3.75 21h16.5"/></svg>
+            </div>
+          </td>
+          <!-- Product 3 -->
+          <td class="px-5 py-6 text-center compare-col relative">
+            <button onclick="alert('Product 3 removed')" class="absolute top-2 right-2 w-6 h-6 rounded-full bg-gray-100 hover:bg-red-100 flex items-center justify-center transition" title="Remove">
+              <svg class="w-3.5 h-3.5 text-gray-400 hover:text-danger" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M6 18L18 6M6 6l12 12"/></svg>
+            </button>
+            <div class="w-32 h-32 mx-auto bg-gray-50 rounded-xl flex items-center justify-center mb-3">
+              <svg class="w-16 h-16 text-gray-200" fill="none" stroke="currentColor" stroke-width="1" viewBox="0 0 24 24"><path d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.409a2.25 2.25 0 013.182 0l2.909 2.909M3.75 21h16.5"/></svg>
+            </div>
+          </td>
+          <!-- Add Product Column -->
+          <td class="px-5 py-6 text-center">
+            <button onclick="alert('Add a product to compare')" class="add-col w-32 h-32 mx-auto border-2 border-dashed border-gray-200 rounded-xl flex flex-col items-center justify-center gap-2 cursor-pointer transition">
+              <svg class="w-8 h-8 text-gray-300" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M12 4.5v15m7.5-7.5h-15"/></svg>
+              <span class="text-xs text-gray-400 font-medium">Add Product</span>
+            </button>
+          </td>
+        </tr>
+
+        <!-- Name Row -->
+        <tr class="border-b border-gray-100">
+          <td class="px-5 py-3 font-semibold text-gray-400 text-xs uppercase tracking-wider">Name</td>
+          <td class="px-5 py-3 text-center compare-col">
+            <p class="font-semibold text-gray-800">Samsung 55" Crystal 4K Smart TV</p>
+          </td>
+          <td class="px-5 py-3 text-center compare-col">
+            <p class="font-semibold text-gray-800">LG 55" OLED C3 Smart TV</p>
+          </td>
+          <td class="px-5 py-3 text-center compare-col">
+            <p class="font-semibold text-gray-800">Sony Bravia 55" X90L 4K TV</p>
+          </td>
+          <td class="px-5 py-3"></td>
+        </tr>
+
+        <!-- Price Row -->
+        <tr class="border-b border-gray-100 bg-gray-50/50">
+          <td class="px-5 py-3 font-semibold text-gray-400 text-xs uppercase tracking-wider">Price</td>
+          <td class="px-5 py-3 text-center compare-col">
+            <p class="text-lg font-bold text-navy-900">&#8377;42,990</p>
+            <p class="text-xs text-gray-400 line-through">&#8377;54,990</p>
+          </td>
+          <td class="px-5 py-3 text-center compare-col">
+            <p class="text-lg font-bold text-navy-900">&#8377;1,09,990</p>
+            <p class="text-xs text-gray-400 line-through">&#8377;1,39,990</p>
+          </td>
+          <td class="px-5 py-3 text-center compare-col">
+            <p class="text-lg font-bold text-navy-900">&#8377;79,990</p>
+            <p class="text-xs text-gray-400 line-through">&#8377;99,990</p>
+          </td>
+          <td class="px-5 py-3"></td>
+        </tr>
+
+        <!-- Rating Row -->
+        <tr class="border-b border-gray-100">
+          <td class="px-5 py-3 font-semibold text-gray-400 text-xs uppercase tracking-wider">Rating</td>
+          <td class="px-5 py-3 text-center compare-col">
+            <div class="flex items-center justify-center gap-1">
+              <div class="flex text-yellow-400">
+                <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+                <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+                <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+                <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+              </div>
+              <span class="text-sm font-semibold text-gray-700">4.3</span>
+              <span class="text-xs text-gray-400">(2,456)</span>
+            </div>
+          </td>
+          <td class="px-5 py-3 text-center compare-col">
+            <div class="flex items-center justify-center gap-1">
+              <div class="flex text-yellow-400">
+                <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+                <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+                <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+                <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+                <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+              </div>
+              <span class="text-sm font-semibold text-gray-700">4.8</span>
+              <span class="text-xs text-gray-400">(1,890)</span>
+            </div>
+          </td>
+          <td class="px-5 py-3 text-center compare-col">
+            <div class="flex items-center justify-center gap-1">
+              <div class="flex text-yellow-400">
+                <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+                <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+                <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+                <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+              </div>
+              <span class="text-sm font-semibold text-gray-700">4.6</span>
+              <span class="text-xs text-gray-400">(3,102)</span>
+            </div>
+          </td>
+          <td class="px-5 py-3"></td>
+        </tr>
+
+        <!-- Brand Row -->
+        <tr class="border-b border-gray-100 bg-gray-50/50">
+          <td class="px-5 py-3 font-semibold text-gray-400 text-xs uppercase tracking-wider">Brand</td>
+          <td class="px-5 py-3 text-center compare-col text-sm text-gray-700">Samsung</td>
+          <td class="px-5 py-3 text-center compare-col text-sm text-gray-700">LG</td>
+          <td class="px-5 py-3 text-center compare-col text-sm text-gray-700">Sony</td>
+          <td class="px-5 py-3"></td>
+        </tr>
+
+        <!-- Display Type -->
+        <tr class="border-b border-gray-100">
+          <td class="px-5 py-3 font-semibold text-gray-400 text-xs uppercase tracking-wider">Display Type</td>
+          <td class="px-5 py-3 text-center compare-col text-sm text-gray-700">Crystal UHD LED</td>
+          <td class="px-5 py-3 text-center compare-col text-sm text-gray-700 font-semibold text-success">OLED</td>
+          <td class="px-5 py-3 text-center compare-col text-sm text-gray-700">Full Array LED</td>
+          <td class="px-5 py-3"></td>
+        </tr>
+
+        <!-- Resolution -->
+        <tr class="border-b border-gray-100 bg-gray-50/50">
+          <td class="px-5 py-3 font-semibold text-gray-400 text-xs uppercase tracking-wider">Resolution</td>
+          <td class="px-5 py-3 text-center compare-col text-sm text-gray-700">3840 x 2160 (4K)</td>
+          <td class="px-5 py-3 text-center compare-col text-sm text-gray-700">3840 x 2160 (4K)</td>
+          <td class="px-5 py-3 text-center compare-col text-sm text-gray-700">3840 x 2160 (4K)</td>
+          <td class="px-5 py-3"></td>
+        </tr>
+
+        <!-- Refresh Rate -->
+        <tr class="border-b border-gray-100">
+          <td class="px-5 py-3 font-semibold text-gray-400 text-xs uppercase tracking-wider">Refresh Rate</td>
+          <td class="px-5 py-3 text-center compare-col text-sm text-gray-700">60 Hz</td>
+          <td class="px-5 py-3 text-center compare-col text-sm text-gray-700 font-semibold text-success">120 Hz</td>
+          <td class="px-5 py-3 text-center compare-col text-sm text-gray-700 font-semibold text-success">120 Hz</td>
+          <td class="px-5 py-3"></td>
+        </tr>
+
+        <!-- Smart Platform -->
+        <tr class="border-b border-gray-100 bg-gray-50/50">
+          <td class="px-5 py-3 font-semibold text-gray-400 text-xs uppercase tracking-wider">Smart Platform</td>
+          <td class="px-5 py-3 text-center compare-col text-sm text-gray-700">Tizen OS</td>
+          <td class="px-5 py-3 text-center compare-col text-sm text-gray-700">webOS</td>
+          <td class="px-5 py-3 text-center compare-col text-sm text-gray-700">Google TV</td>
+          <td class="px-5 py-3"></td>
+        </tr>
+
+        <!-- HDR -->
+        <tr class="border-b border-gray-100">
+          <td class="px-5 py-3 font-semibold text-gray-400 text-xs uppercase tracking-wider">HDR Support</td>
+          <td class="px-5 py-3 text-center compare-col text-sm text-gray-700">HDR10, HLG</td>
+          <td class="px-5 py-3 text-center compare-col text-sm text-gray-700 font-semibold text-success">Dolby Vision, HDR10, HLG</td>
+          <td class="px-5 py-3 text-center compare-col text-sm text-gray-700">Dolby Vision, HDR10, HLG</td>
+          <td class="px-5 py-3"></td>
+        </tr>
+
+        <!-- Availability Row -->
+        <tr class="border-b border-gray-100 bg-gray-50/50">
+          <td class="px-5 py-3 font-semibold text-gray-400 text-xs uppercase tracking-wider">Availability</td>
+          <td class="px-5 py-3 text-center compare-col">
+            <span class="inline-flex items-center px-2.5 py-1 rounded-full text-[11px] font-bold bg-green-50 text-success">In Stock</span>
+          </td>
+          <td class="px-5 py-3 text-center compare-col">
+            <span class="inline-flex items-center px-2.5 py-1 rounded-full text-[11px] font-bold bg-green-50 text-success">In Stock</span>
+          </td>
+          <td class="px-5 py-3 text-center compare-col">
+            <span class="inline-flex items-center px-2.5 py-1 rounded-full text-[11px] font-bold bg-yellow-50 text-yellow-600">Only 3 Left</span>
+          </td>
+          <td class="px-5 py-3"></td>
+        </tr>
+
+        <!-- Add to Cart Row -->
+        <tr>
+          <td class="px-5 py-5 font-semibold text-gray-400 text-xs uppercase tracking-wider">Action</td>
+          <td class="px-5 py-5 text-center compare-col">
+            <button onclick="alert('Added Samsung TV to cart')" class="btn-brand text-white text-sm font-semibold px-6 py-2.5 rounded-lg w-full">
+              Add to Cart
+            </button>
+          </td>
+          <td class="px-5 py-5 text-center compare-col">
+            <button onclick="alert('Added LG TV to cart')" class="btn-brand text-white text-sm font-semibold px-6 py-2.5 rounded-lg w-full">
+              Add to Cart
+            </button>
+          </td>
+          <td class="px-5 py-5 text-center compare-col">
+            <button onclick="alert('Added Sony TV to cart')" class="btn-brand text-white text-sm font-semibold px-6 py-2.5 rounded-lg w-full">
+              Add to Cart
+            </button>
+          </td>
+          <td class="px-5 py-5"></td>
+        </tr>
+      </table>
+    </div>
+
+  </div>
+
+</body>
+</html>

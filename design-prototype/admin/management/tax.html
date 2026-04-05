@@ -1,0 +1,1125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HomeBase — Tax & GST Management</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              50: '#FFF7ED',
+              100: '#FFEDD5',
+              200: '#FED7AA',
+              300: '#FDBA74',
+              400: '#FB923C',
+              500: '#F97316',
+              600: '#EA580C',
+              700: '#C2410C',
+            },
+            navy: {
+              700: '#1E3A5F',
+              800: '#152238',
+              900: '#0A1628',
+            },
+            success: '#16A34A',
+            warning: '#EAB308',
+            danger: '#DC2626',
+          },
+          fontFamily: {
+            sans: ['Inter', 'system-ui', 'sans-serif'],
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+    .scrollbar-hide::-webkit-scrollbar { display: none; }
+    .sidebar-link { transition: all 0.15s ease; }
+    .sidebar-link:hover { background: rgba(255,255,255,0.08); }
+    .sidebar-link.active { background: rgba(249,115,22,0.15); border-right: 3px solid #F97316; }
+    .stat-card { transition: all 0.2s ease; }
+    .stat-card:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,0.08); }
+    .table-row { transition: background 0.15s ease; }
+    .table-row:hover { background: #FFF7ED; }
+    .filter-tab { transition: all 0.15s ease; }
+    .filter-tab.active { color: #F97316; border-color: #F97316; }
+    .filter-tab:hover:not(.active) { color: #374151; border-color: #D1D5DB; }
+    .dropdown-menu { display: none; }
+    .dropdown:hover .dropdown-menu { display: block; }
+    .sidebar-scroll::-webkit-scrollbar { width: 4px; }
+    .sidebar-scroll::-webkit-scrollbar-track { background: transparent; }
+    .sidebar-scroll::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); border-radius: 2px; }
+    .calc-result { animation: slideUp 0.3s ease; }
+    @keyframes slideUp {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .toggle-switch { position: relative; width: 36px; height: 20px; }
+    .toggle-switch input { opacity: 0; width: 0; height: 0; }
+    .toggle-slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #D1D5DB; border-radius: 20px; transition: 0.2s; }
+    .toggle-slider:before { content: ""; position: absolute; height: 16px; width: 16px; left: 2px; bottom: 2px; background-color: white; border-radius: 50%; transition: 0.2s; }
+    .toggle-switch input:checked + .toggle-slider { background-color: #16A34A; }
+    .toggle-switch input:checked + .toggle-slider:before { transform: translateX(16px); }
+  </style>
+</head>
+<body class="font-sans bg-gray-50 text-gray-900">
+
+  <!-- ===== TOP HEADER BAR ===== -->
+  <header id="admin-header" class="fixed top-0 left-0 right-0 z-50 bg-white border-b border-gray-200 h-16"></header>
+
+  <!-- ===== LAYOUT: SIDEBAR + MAIN ===== -->
+  <div class="flex pt-16 min-h-screen">
+
+    <!-- ===== LEFT SIDEBAR ===== -->
+    <aside id="admin-sidebar" class="fixed left-0 top-16 bottom-0 w-60 z-40 flex flex-col overflow-y-auto" style="background:#0A1628;"></aside>
+
+    <!-- ===== MAIN CONTENT ===== -->
+    <main class="flex-1 ml-60 p-6 lg:p-8">
+
+      <!-- Page Header -->
+      <div class="flex items-center justify-between mb-8">
+        <div>
+          <h1 class="text-2xl font-bold text-gray-900">Tax & GST Management</h1>
+          <p class="text-sm text-gray-500 mt-1">Configure GST rates, HSN codes, and generate tax reports</p>
+        </div>
+        <div class="flex items-center gap-3">
+          <button class="flex items-center gap-2 bg-white border border-gray-200 text-gray-700 text-sm font-medium px-4 py-2.5 rounded-lg hover:bg-gray-50 transition shadow-sm">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3"/></svg>
+            Export
+          </button>
+          <button onclick="openAddTaxModal()" class="flex items-center gap-2 bg-brand-500 text-white rounded-lg px-4 py-2.5 text-sm font-semibold hover:bg-brand-600 transition shadow-sm">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 4.5v15m7.5-7.5h-15"/></svg>
+            Add Tax Rule
+          </button>
+        </div>
+      </div>
+
+      <!-- Stats Cards -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 mb-8">
+        <!-- Tax Rules -->
+        <div class="stat-card bg-white rounded-xl border border-gray-100 p-5 shadow-sm">
+          <div class="flex items-center justify-between mb-3">
+            <span class="text-sm font-medium text-gray-500">Tax Rules</span>
+            <div class="w-9 h-9 rounded-lg bg-blue-50 flex items-center justify-center">
+              <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M15 8.25H9m6 3H9m3 6l-3-3h1.5a3 3 0 100-6M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+            </div>
+          </div>
+          <p class="text-2xl font-bold text-gray-900">24</p>
+          <div class="flex items-center gap-1 mt-1">
+            <svg class="w-3.5 h-3.5 text-green-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4.5 12.75l6 6 9-13.5"/></svg>
+            <span class="text-xs font-semibold text-green-600">All rules active</span>
+          </div>
+        </div>
+
+        <!-- HSN Codes -->
+        <div class="stat-card bg-white rounded-xl border border-gray-100 p-5 shadow-sm">
+          <div class="flex items-center justify-between mb-3">
+            <span class="text-sm font-medium text-gray-500">HSN Codes</span>
+            <div class="w-9 h-9 rounded-lg bg-purple-50 flex items-center justify-center">
+              <svg class="w-5 h-5 text-purple-600" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M5.25 8.25h15m-16.5 7.5h15m-1.8-13.5l-3.9 19.5m-2.1-19.5l-3.9 19.5"/></svg>
+            </div>
+          </div>
+          <p class="text-2xl font-bold text-gray-900">156</p>
+          <div class="flex items-center gap-1 mt-1">
+            <span class="text-xs font-semibold text-gray-500">Mapped across categories</span>
+          </div>
+        </div>
+
+        <!-- Compliant Sellers -->
+        <div class="stat-card bg-white rounded-xl border border-gray-100 p-5 shadow-sm">
+          <div class="flex items-center justify-between mb-3">
+            <span class="text-sm font-medium text-gray-500">Compliant Sellers</span>
+            <div class="w-9 h-9 rounded-lg bg-green-50 flex items-center justify-center">
+              <svg class="w-5 h-5 text-green-600" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z"/></svg>
+            </div>
+          </div>
+          <p class="text-2xl font-bold text-gray-900">220 <span class="text-base font-medium text-gray-400">/ 234</span></p>
+          <div class="flex items-center gap-1 mt-1">
+            <svg class="w-3.5 h-3.5 text-amber-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z"/></svg>
+            <span class="text-xs font-semibold text-amber-600">14 need GST verification</span>
+          </div>
+        </div>
+
+        <!-- GST Revenue -->
+        <div class="stat-card bg-white rounded-xl border border-gray-100 p-5 shadow-sm">
+          <div class="flex items-center justify-between mb-3">
+            <span class="text-sm font-medium text-gray-500">GST Collected (Mar)</span>
+            <div class="w-9 h-9 rounded-lg bg-amber-50 flex items-center justify-center">
+              <svg class="w-5 h-5 text-amber-600" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M2.25 18.75a60.07 60.07 0 0115.797 2.101c.727.198 1.453-.342 1.453-1.096V18.75M3.75 4.5v.75A.75.75 0 013 6h-.75m0 0v-.375c0-.621.504-1.125 1.125-1.125H20.25M2.25 6v9m18-10.5v.75c0 .414.336.75.75.75h.75m-1.5-1.5h.375c.621 0 1.125.504 1.125 1.125v9.75c0 .621-.504 1.125-1.125 1.125h-.375m1.5-1.5H21a.75.75 0 00-.75.75v.75m0 0H3.75m0 0h-.375a1.125 1.125 0 01-1.125-1.125V15m1.5 1.5v-.75A.75.75 0 003 15h-.75M15 10.5a3 3 0 11-6 0 3 3 0 016 0zm3 0h.008v.008H18V10.5zm-12 0h.008v.008H6V10.5z"/></svg>
+            </div>
+          </div>
+          <p class="text-2xl font-bold text-gray-900">Rs.18.4L</p>
+          <div class="flex items-center gap-1 mt-1">
+            <svg class="w-3.5 h-3.5 text-green-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M2.25 18L9 11.25l4.306 4.307a11.95 11.95 0 015.814-5.519l2.74-1.22m0 0l-5.94-2.281m5.94 2.28l-2.28 5.941"/></svg>
+            <span class="text-xs font-semibold text-green-600">+12.3% vs last month</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tax Slab Summary Cards -->
+      <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4 mb-8">
+        <div class="bg-white rounded-xl border border-gray-100 p-4 shadow-sm text-center">
+          <p class="text-2xl font-bold text-emerald-600">0%</p>
+          <p class="text-xs text-gray-500 mt-1">Exempt</p>
+          <p class="text-sm font-semibold text-gray-800 mt-2">342 products</p>
+        </div>
+        <div class="bg-white rounded-xl border border-gray-100 p-4 shadow-sm text-center">
+          <p class="text-2xl font-bold text-blue-600">5%</p>
+          <p class="text-xs text-gray-500 mt-1">Essential</p>
+          <p class="text-sm font-semibold text-gray-800 mt-2">1,245 products</p>
+        </div>
+        <div class="bg-white rounded-xl border border-gray-100 p-4 shadow-sm text-center">
+          <p class="text-2xl font-bold text-purple-600">12%</p>
+          <p class="text-xs text-gray-500 mt-1">Standard Low</p>
+          <p class="text-sm font-semibold text-gray-800 mt-2">2,890 products</p>
+        </div>
+        <div class="bg-white rounded-xl border border-gray-100 p-4 shadow-sm text-center">
+          <p class="text-2xl font-bold text-amber-600">18%</p>
+          <p class="text-xs text-gray-500 mt-1">Standard</p>
+          <p class="text-sm font-semibold text-gray-800 mt-2">3,456 products</p>
+        </div>
+        <div class="bg-white rounded-xl border border-gray-100 p-4 shadow-sm text-center">
+          <p class="text-2xl font-bold text-red-600">28%</p>
+          <p class="text-xs text-gray-500 mt-1">Luxury</p>
+          <p class="text-sm font-semibold text-gray-800 mt-2">987 products</p>
+        </div>
+      </div>
+
+      <!-- ===== COMPLIANCE ALERTS ===== -->
+      <div class="bg-white rounded-xl border border-gray-100 shadow-sm mb-8 p-6">
+        <div class="flex items-center justify-between mb-5">
+          <div>
+            <h2 class="text-lg font-bold text-gray-900">Compliance Alerts</h2>
+            <p class="text-sm text-gray-500 mt-0.5">Action items requiring immediate attention</p>
+          </div>
+          <span class="inline-flex items-center gap-1 px-2.5 py-1 bg-red-50 text-red-700 text-xs font-semibold rounded-full">
+            <span class="w-1.5 h-1.5 bg-red-500 rounded-full"></span> 4 Alerts
+          </span>
+        </div>
+        <div class="space-y-3">
+          <div class="flex items-center justify-between p-4 bg-red-50 border border-red-100 rounded-lg">
+            <div class="flex items-center gap-3">
+              <div class="w-10 h-10 rounded-lg bg-red-100 flex items-center justify-center">
+                <svg class="w-5 h-5 text-red-600" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z"/></svg>
+              </div>
+              <div>
+                <p class="text-sm font-semibold text-gray-900">4 sellers with missing GSTIN</p>
+                <p class="text-xs text-gray-500">Sellers cannot process orders without valid GSTIN. Last reminder sent 3 days ago.</p>
+              </div>
+            </div>
+            <button onclick="alert('Opening seller compliance list...\n\nMissing GSTIN:\n1. Sharma Electronics (seller_045)\n2. QuickMart India (seller_078)\n3. FashionHub (seller_112)\n4. GreenGrocer (seller_189)')" class="flex items-center gap-1.5 bg-red-600 text-white text-xs font-semibold px-3.5 py-2 rounded-lg hover:bg-red-700 transition whitespace-nowrap">
+              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M13.5 6H5.25A2.25 2.25 0 003 8.25v10.5A2.25 2.25 0 005.25 21h10.5A2.25 2.25 0 0018 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25"/></svg>
+              View Sellers
+            </button>
+          </div>
+          <div class="flex items-center justify-between p-4 bg-amber-50 border border-amber-100 rounded-lg">
+            <div class="flex items-center gap-3">
+              <div class="w-10 h-10 rounded-lg bg-amber-100 flex items-center justify-center">
+                <svg class="w-5 h-5 text-amber-600" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z"/></svg>
+              </div>
+              <div>
+                <p class="text-sm font-semibold text-gray-900">12 products without HSN code</p>
+                <p class="text-xs text-gray-500">Products listed in last 7 days need HSN mapping for correct tax calculation.</p>
+              </div>
+            </div>
+            <button onclick="alert('Opening product HSN mapping tool...\n\n12 products need HSN codes assigned.\nCategories affected: Home Decor (5), Kitchen (4), Garden (3)')" class="flex items-center gap-1.5 bg-amber-600 text-white text-xs font-semibold px-3.5 py-2 rounded-lg hover:bg-amber-700 transition whitespace-nowrap">
+              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931z"/></svg>
+              Map HSN Codes
+            </button>
+          </div>
+          <div class="flex items-center justify-between p-4 bg-blue-50 border border-blue-100 rounded-lg">
+            <div class="flex items-center gap-3">
+              <div class="w-10 h-10 rounded-lg bg-blue-100 flex items-center justify-center">
+                <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5"/></svg>
+              </div>
+              <div>
+                <p class="text-sm font-semibold text-gray-900">GSTR-3B filing due Apr 20, 2026</p>
+                <p class="text-xs text-gray-500">18 days remaining. March data reconciliation is 98.2% complete.</p>
+              </div>
+            </div>
+            <button onclick="alert('Opening GSTR-3B preparation wizard...')" class="flex items-center gap-1.5 bg-blue-600 text-white text-xs font-semibold px-3.5 py-2 rounded-lg hover:bg-blue-700 transition whitespace-nowrap">
+              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z"/></svg>
+              Prepare Filing
+            </button>
+          </div>
+          <div class="flex items-center justify-between p-4 bg-gray-50 border border-gray-100 rounded-lg">
+            <div class="flex items-center gap-3">
+              <div class="w-10 h-10 rounded-lg bg-gray-200 flex items-center justify-center">
+                <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M10.5 6a7.5 7.5 0 107.5 7.5h-7.5V6z"/><path d="M13.5 10.5H21A7.5 7.5 0 0013.5 3v7.5z"/></svg>
+              </div>
+              <div>
+                <p class="text-sm font-semibold text-gray-900">GST rate revision effective May 1, 2026</p>
+                <p class="text-xs text-gray-500">3 categories affected: Packaged food (5% to 12%), AC parts (28% to 18%), Solar panels (12% to 5%)</p>
+              </div>
+            </div>
+            <button onclick="alert('Opening rate revision scheduler...')" class="flex items-center gap-1.5 bg-gray-700 text-white text-xs font-semibold px-3.5 py-2 rounded-lg hover:bg-gray-800 transition whitespace-nowrap">
+              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+              Schedule Update
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== TAX RATE CONFIGURATION (Editable Table for 5 Slabs) ===== -->
+      <div class="bg-white rounded-xl border border-gray-100 shadow-sm mb-8">
+        <div class="flex items-center justify-between px-6 py-5 border-b border-gray-100">
+          <div>
+            <h2 class="text-lg font-bold text-gray-900">Tax Rate Configuration</h2>
+            <p class="text-sm text-gray-500 mt-0.5">Configure GST rates for the 5 main tax slabs with HSN codes</p>
+          </div>
+          <button onclick="alert('All tax rate changes saved successfully!')" class="flex items-center gap-2 bg-brand-500 text-white text-sm font-semibold px-4 py-2 rounded-lg hover:bg-brand-600 transition">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4.5 12.75l6 6 9-13.5"/></svg>
+            Save All Changes
+          </button>
+        </div>
+        <div class="overflow-x-auto">
+          <table class="w-full">
+            <thead>
+              <tr class="border-b border-gray-100">
+                <th class="text-left text-[11px] font-semibold text-gray-400 uppercase tracking-wider px-6 py-3">HSN Code</th>
+                <th class="text-left text-[11px] font-semibold text-gray-400 uppercase tracking-wider px-4 py-3">Description</th>
+                <th class="text-right text-[11px] font-semibold text-gray-400 uppercase tracking-wider px-4 py-3">CGST %</th>
+                <th class="text-right text-[11px] font-semibold text-gray-400 uppercase tracking-wider px-4 py-3">SGST %</th>
+                <th class="text-right text-[11px] font-semibold text-gray-400 uppercase tracking-wider px-4 py-3">IGST %</th>
+                <th class="text-right text-[11px] font-semibold text-gray-400 uppercase tracking-wider px-4 py-3">Cess %</th>
+                <th class="text-left text-[11px] font-semibold text-gray-400 uppercase tracking-wider px-4 py-3">Effective Date</th>
+                <th class="text-center text-[11px] font-semibold text-gray-400 uppercase tracking-wider px-4 py-3">Status</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-50">
+              <!-- 0% Exempt -->
+              <tr class="table-row">
+                <td class="px-6 py-3"><input type="text" value="0801" class="font-mono text-sm font-semibold text-gray-800 bg-gray-50 border border-gray-200 rounded-md px-2.5 py-1.5 w-20 outline-none focus:border-brand-400 focus:ring-2 focus:ring-brand-100 transition"></td>
+                <td class="px-4 py-3">
+                  <div class="flex items-center gap-2">
+                    <span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span>
+                    <input type="text" value="Fresh Fruits, Vegetables, Milk, Grains" class="text-sm text-gray-800 bg-transparent border border-transparent rounded-md px-2 py-1.5 w-64 outline-none hover:border-gray-200 focus:border-brand-400 focus:ring-2 focus:ring-brand-100 focus:bg-white transition">
+                  </div>
+                </td>
+                <td class="px-4 py-3 text-right"><input type="number" value="0" step="0.5" class="text-sm font-semibold text-emerald-600 bg-gray-50 border border-gray-200 rounded-md px-2 py-1.5 w-16 text-right outline-none focus:border-brand-400 focus:ring-2 focus:ring-brand-100 transition"></td>
+                <td class="px-4 py-3 text-right"><input type="number" value="0" step="0.5" class="text-sm font-semibold text-emerald-600 bg-gray-50 border border-gray-200 rounded-md px-2 py-1.5 w-16 text-right outline-none focus:border-brand-400 focus:ring-2 focus:ring-brand-100 transition"></td>
+                <td class="px-4 py-3 text-right"><input type="number" value="0" step="0.5" class="text-sm font-semibold text-emerald-600 bg-gray-50 border border-gray-200 rounded-md px-2 py-1.5 w-16 text-right outline-none focus:border-brand-400 focus:ring-2 focus:ring-brand-100 transition"></td>
+                <td class="px-4 py-3 text-right"><input type="number" value="0" step="0.5" class="text-sm font-semibold text-gray-600 bg-gray-50 border border-gray-200 rounded-md px-2 py-1.5 w-16 text-right outline-none focus:border-brand-400 focus:ring-2 focus:ring-brand-100 transition"></td>
+                <td class="px-4 py-3"><input type="date" value="2017-07-01" class="text-sm text-gray-700 bg-gray-50 border border-gray-200 rounded-md px-2 py-1.5 outline-none focus:border-brand-400 focus:ring-2 focus:ring-brand-100 transition"></td>
+                <td class="px-4 py-3 text-center">
+                  <label class="toggle-switch inline-block"><input type="checkbox" checked><span class="toggle-slider"></span></label>
+                </td>
+              </tr>
+              <!-- 5% Essential -->
+              <tr class="table-row">
+                <td class="px-6 py-3"><input type="text" value="6109" class="font-mono text-sm font-semibold text-gray-800 bg-gray-50 border border-gray-200 rounded-md px-2.5 py-1.5 w-20 outline-none focus:border-brand-400 focus:ring-2 focus:ring-brand-100 transition"></td>
+                <td class="px-4 py-3">
+                  <div class="flex items-center gap-2">
+                    <span class="w-2.5 h-2.5 rounded-full bg-blue-500"></span>
+                    <input type="text" value="Apparel below Rs.1000, Packaged Food, Footwear" class="text-sm text-gray-800 bg-transparent border border-transparent rounded-md px-2 py-1.5 w-64 outline-none hover:border-gray-200 focus:border-brand-400 focus:ring-2 focus:ring-brand-100 focus:bg-white transition">
+                  </div>
+                </td>
+                <td class="px-4 py-3 text-right"><input type="number" value="2.5" step="0.5" class="text-sm font-semibold text-blue-600 bg-gray-50 border border-gray-200 rounded-md px-2 py-1.5 w-16 text-right outline-none focus:border-brand-400 focus:ring-2 focus:ring-brand-100 transition"></td>
+                <td class="px-4 py-3 text-right"><input type="number" value="2.5" step="0.5" class="text-sm font-semibold text-blue-600 bg-gray-50 border border-gray-200 rounded-md px-2 py-1.5 w-16 text-right outline-none focus:border-brand-400 focus:ring-2 focus:ring-brand-100 transition"></td>
+                <td class="px-4 py-3 text-right"><input type="number" value="5" step="0.5" class="text-sm font-semibold text-blue-600 bg-gray-50 border border-gray-200 rounded-md px-2 py-1.5 w-16 text-right outline-none focus:border-brand-400 focus:ring-2 focus:ring-brand-100 transition"></td>
+                <td class="px-4 py-3 text-right"><input type="number" value="0" step="0.5" class="text-sm font-semibold text-gray-600 bg-gray-50 border border-gray-200 rounded-md px-2 py-1.5 w-16 text-right outline-none focus:border-brand-400 focus:ring-2 focus:ring-brand-100 transition"></td>
+                <td class="px-4 py-3"><input type="date" value="2022-01-01" class="text-sm text-gray-700 bg-gray-50 border border-gray-200 rounded-md px-2 py-1.5 outline-none focus:border-brand-400 focus:ring-2 focus:ring-brand-100 transition"></td>
+                <td class="px-4 py-3 text-center">
+                  <label class="toggle-switch inline-block"><input type="checkbox" checked><span class="toggle-slider"></span></label>
+                </td>
+              </tr>
+              <!-- 12% Standard Low -->
+              <tr class="table-row">
+                <td class="px-6 py-3"><input type="text" value="8517" class="font-mono text-sm font-semibold text-gray-800 bg-gray-50 border border-gray-200 rounded-md px-2.5 py-1.5 w-20 outline-none focus:border-brand-400 focus:ring-2 focus:ring-brand-100 transition"></td>
+                <td class="px-4 py-3">
+                  <div class="flex items-center gap-2">
+                    <span class="w-2.5 h-2.5 rounded-full bg-purple-500"></span>
+                    <input type="text" value="Mobile Phones, Apparel above Rs.1000, Processed Food" class="text-sm text-gray-800 bg-transparent border border-transparent rounded-md px-2 py-1.5 w-64 outline-none hover:border-gray-200 focus:border-brand-400 focus:ring-2 focus:ring-brand-100 focus:bg-white transition">
+                  </div>
+                </td>
+                <td class="px-4 py-3 text-right"><input type="number" value="6" step="0.5" class="text-sm font-semibold text-purple-600 bg-gray-50 border border-gray-200 rounded-md px-2 py-1.5 w-16 text-right outline-none focus:border-brand-400 focus:ring-2 focus:ring-brand-100 transition"></td>
+                <td class="px-4 py-3 text-right"><input type="number" value="6" step="0.5" class="text-sm font-semibold text-purple-600 bg-gray-50 border border-gray-200 rounded-md px-2 py-1.5 w-16 text-right outline-none focus:border-brand-400 focus:ring-2 focus:ring-brand-100 transition"></td>
+                <td class="px-4 py-3 text-right"><input type="number" value="12" step="0.5" class="text-sm font-semibold text-purple-600 bg-gray-50 border border-gray-200 rounded-md px-2 py-1.5 w-16 text-right outline-none focus:border-brand-400 focus:ring-2 focus:ring-brand-100 transition"></td>
+                <td class="px-4 py-3 text-right"><input type="number" value="0" step="0.5" class="text-sm font-semibold text-gray-600 bg-gray-50 border border-gray-200 rounded-md px-2 py-1.5 w-16 text-right outline-none focus:border-brand-400 focus:ring-2 focus:ring-brand-100 transition"></td>
+                <td class="px-4 py-3"><input type="date" value="2017-07-01" class="text-sm text-gray-700 bg-gray-50 border border-gray-200 rounded-md px-2 py-1.5 outline-none focus:border-brand-400 focus:ring-2 focus:ring-brand-100 transition"></td>
+                <td class="px-4 py-3 text-center">
+                  <label class="toggle-switch inline-block"><input type="checkbox" checked><span class="toggle-slider"></span></label>
+                </td>
+              </tr>
+              <!-- 18% Standard -->
+              <tr class="table-row">
+                <td class="px-6 py-3"><input type="text" value="9403" class="font-mono text-sm font-semibold text-gray-800 bg-gray-50 border border-gray-200 rounded-md px-2.5 py-1.5 w-20 outline-none focus:border-brand-400 focus:ring-2 focus:ring-brand-100 transition"></td>
+                <td class="px-4 py-3">
+                  <div class="flex items-center gap-2">
+                    <span class="w-2.5 h-2.5 rounded-full bg-amber-500"></span>
+                    <input type="text" value="Furniture, Electronics, Laptops, AC, Refrigerators" class="text-sm text-gray-800 bg-transparent border border-transparent rounded-md px-2 py-1.5 w-64 outline-none hover:border-gray-200 focus:border-brand-400 focus:ring-2 focus:ring-brand-100 focus:bg-white transition">
+                  </div>
+                </td>
+                <td class="px-4 py-3 text-right"><input type="number" value="9" step="0.5" class="text-sm font-semibold text-amber-600 bg-gray-50 border border-gray-200 rounded-md px-2 py-1.5 w-16 text-right outline-none focus:border-brand-400 focus:ring-2 focus:ring-brand-100 transition"></td>
+                <td class="px-4 py-3 text-right"><input type="number" value="9" step="0.5" class="text-sm font-semibold text-amber-600 bg-gray-50 border border-gray-200 rounded-md px-2 py-1.5 w-16 text-right outline-none focus:border-brand-400 focus:ring-2 focus:ring-brand-100 transition"></td>
+                <td class="px-4 py-3 text-right"><input type="number" value="18" step="0.5" class="text-sm font-semibold text-amber-600 bg-gray-50 border border-gray-200 rounded-md px-2 py-1.5 w-16 text-right outline-none focus:border-brand-400 focus:ring-2 focus:ring-brand-100 transition"></td>
+                <td class="px-4 py-3 text-right"><input type="number" value="0" step="0.5" class="text-sm font-semibold text-gray-600 bg-gray-50 border border-gray-200 rounded-md px-2 py-1.5 w-16 text-right outline-none focus:border-brand-400 focus:ring-2 focus:ring-brand-100 transition"></td>
+                <td class="px-4 py-3"><input type="date" value="2017-07-01" class="text-sm text-gray-700 bg-gray-50 border border-gray-200 rounded-md px-2 py-1.5 outline-none focus:border-brand-400 focus:ring-2 focus:ring-brand-100 transition"></td>
+                <td class="px-4 py-3 text-center">
+                  <label class="toggle-switch inline-block"><input type="checkbox" checked><span class="toggle-slider"></span></label>
+                </td>
+              </tr>
+              <!-- 28% Luxury -->
+              <tr class="table-row">
+                <td class="px-6 py-3"><input type="text" value="8703" class="font-mono text-sm font-semibold text-gray-800 bg-gray-50 border border-gray-200 rounded-md px-2.5 py-1.5 w-20 outline-none focus:border-brand-400 focus:ring-2 focus:ring-brand-100 transition"></td>
+                <td class="px-4 py-3">
+                  <div class="flex items-center gap-2">
+                    <span class="w-2.5 h-2.5 rounded-full bg-red-500"></span>
+                    <input type="text" value="Automobiles, Luxury Watches, Premium Cosmetics" class="text-sm text-gray-800 bg-transparent border border-transparent rounded-md px-2 py-1.5 w-64 outline-none hover:border-gray-200 focus:border-brand-400 focus:ring-2 focus:ring-brand-100 focus:bg-white transition">
+                  </div>
+                </td>
+                <td class="px-4 py-3 text-right"><input type="number" value="14" step="0.5" class="text-sm font-semibold text-red-600 bg-gray-50 border border-gray-200 rounded-md px-2 py-1.5 w-16 text-right outline-none focus:border-brand-400 focus:ring-2 focus:ring-brand-100 transition"></td>
+                <td class="px-4 py-3 text-right"><input type="number" value="14" step="0.5" class="text-sm font-semibold text-red-600 bg-gray-50 border border-gray-200 rounded-md px-2 py-1.5 w-16 text-right outline-none focus:border-brand-400 focus:ring-2 focus:ring-brand-100 transition"></td>
+                <td class="px-4 py-3 text-right"><input type="number" value="28" step="0.5" class="text-sm font-semibold text-red-600 bg-gray-50 border border-gray-200 rounded-md px-2 py-1.5 w-16 text-right outline-none focus:border-brand-400 focus:ring-2 focus:ring-brand-100 transition"></td>
+                <td class="px-4 py-3 text-right"><input type="number" value="12" step="0.5" class="text-sm font-semibold text-red-600 bg-gray-50 border border-gray-200 rounded-md px-2 py-1.5 w-16 text-right outline-none focus:border-brand-400 focus:ring-2 focus:ring-brand-100 transition"></td>
+                <td class="px-4 py-3"><input type="date" value="2017-07-01" class="text-sm text-gray-700 bg-gray-50 border border-gray-200 rounded-md px-2 py-1.5 outline-none focus:border-brand-400 focus:ring-2 focus:ring-brand-100 transition"></td>
+                <td class="px-4 py-3 text-center">
+                  <label class="toggle-switch inline-block"><input type="checkbox" checked><span class="toggle-slider"></span></label>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- ===== TAX CALCULATION SIMULATOR + GST FILING STATUS ===== -->
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+
+        <!-- Tax Calculation Simulator -->
+        <div class="bg-white rounded-xl border border-gray-100 shadow-sm p-6">
+          <div class="mb-5">
+            <h2 class="text-lg font-bold text-gray-900">Tax Calculation Simulator</h2>
+            <p class="text-sm text-gray-500 mt-0.5">Calculate GST breakdown for any product and route</p>
+          </div>
+          <div class="grid grid-cols-2 gap-4 mb-4">
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1.5">Product Price (Rs.)</label>
+              <input id="simPrice" type="number" value="15000" step="100" class="w-full border border-gray-200 rounded-lg py-2.5 px-4 text-sm outline-none focus:border-brand-400 focus:ring-2 focus:ring-brand-100 transition font-semibold">
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1.5">HSN Code</label>
+              <select id="simHsn" class="w-full border border-gray-200 rounded-lg py-2.5 px-4 text-sm outline-none focus:border-brand-400 focus:ring-2 focus:ring-brand-100 transition bg-white font-mono">
+                <option value="0">0801 - Exempt (0%)</option>
+                <option value="5">6109 - Essential (5%)</option>
+                <option value="12">8517 - Standard Low (12%)</option>
+                <option value="18" selected>9403 - Standard (18%)</option>
+                <option value="28">8703 - Luxury (28%)</option>
+              </select>
+            </div>
+          </div>
+          <div class="grid grid-cols-2 gap-4 mb-5">
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1.5">From State</label>
+              <select id="simFromState" class="w-full border border-gray-200 rounded-lg py-2.5 px-4 text-sm outline-none focus:border-brand-400 focus:ring-2 focus:ring-brand-100 transition bg-white">
+                <option value="KA" selected>Karnataka</option>
+                <option value="MH">Maharashtra</option>
+                <option value="DL">Delhi</option>
+                <option value="TN">Tamil Nadu</option>
+                <option value="WB">West Bengal</option>
+                <option value="GJ">Gujarat</option>
+                <option value="UP">Uttar Pradesh</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1.5">To State</label>
+              <select id="simToState" class="w-full border border-gray-200 rounded-lg py-2.5 px-4 text-sm outline-none focus:border-brand-400 focus:ring-2 focus:ring-brand-100 transition bg-white">
+                <option value="KA" selected>Karnataka</option>
+                <option value="MH">Maharashtra</option>
+                <option value="DL">Delhi</option>
+                <option value="TN">Tamil Nadu</option>
+                <option value="WB">West Bengal</option>
+                <option value="GJ">Gujarat</option>
+                <option value="UP">Uttar Pradesh</option>
+              </select>
+            </div>
+          </div>
+          <button onclick="calculateTax()" class="w-full flex items-center justify-center gap-2 bg-brand-500 text-white rounded-lg px-4 py-2.5 text-sm font-semibold hover:bg-brand-600 transition mb-5">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M15.75 15.75V18m-7.5-6.75h.008v.008H8.25v-.008zm0 2.25h.008v.008H8.25V13.5zm0 2.25h.008v.008H8.25v-.008zm0 2.25h.008v.008H8.25V18zm2.498-6.75h.007v.008h-.007v-.008zm0 2.25h.007v.008h-.007V13.5zm0 2.25h.007v.008h-.007v-.008zm0 2.25h.007v.008h-.007V18zm2.504-6.75h.008v.008h-.008v-.008zm0 2.25h.008v.008h-.008V13.5zm0 2.25h.008v.008h-.008v-.008zm0 2.25h.008v.008h-.008V18zm2.498-6.75h.008v.008h-.008v-.008zm0 2.25h.008v.008h-.008V13.5zM8.25 6h7.5v2.25h-7.5V6zM12 2.25c-1.892 0-3.758.11-5.593.322C5.307 2.7 4.5 3.65 4.5 4.757V19.5a2.25 2.25 0 002.25 2.25h10.5a2.25 2.25 0 002.25-2.25V4.757c0-1.108-.806-2.057-1.907-2.185A48.507 48.507 0 0012 2.25z"/></svg>
+            Calculate Tax
+          </button>
+          <!-- Result -->
+          <div id="taxCalcResult">
+            <div class="calc-result border border-gray-200 rounded-xl overflow-hidden">
+              <div class="bg-gray-50 px-4 py-3 border-b border-gray-200">
+                <div class="flex items-center justify-between">
+                  <span class="text-sm font-semibold text-gray-700">Intra-state (Karnataka to Karnataka)</span>
+                  <span class="inline-flex items-center gap-1 px-2 py-0.5 bg-blue-100 text-blue-700 text-xs font-semibold rounded-full">CGST + SGST</span>
+                </div>
+              </div>
+              <div class="p-4 space-y-3">
+                <div class="flex items-center justify-between">
+                  <span class="text-sm text-gray-600">Base Price</span>
+                  <span class="text-sm font-semibold text-gray-900">Rs.12,712</span>
+                </div>
+                <div class="flex items-center justify-between">
+                  <span class="text-sm text-gray-600">CGST @ 9%</span>
+                  <span class="text-sm font-semibold text-blue-600">Rs.1,144</span>
+                </div>
+                <div class="flex items-center justify-between">
+                  <span class="text-sm text-gray-600">SGST @ 9%</span>
+                  <span class="text-sm font-semibold text-blue-600">Rs.1,144</span>
+                </div>
+                <div class="flex items-center justify-between">
+                  <span class="text-sm text-gray-600">IGST @ 0%</span>
+                  <span class="text-sm font-semibold text-gray-400">Rs.0</span>
+                </div>
+                <div class="border-t border-gray-200 pt-3 flex items-center justify-between">
+                  <span class="text-sm font-bold text-gray-900">Total Tax</span>
+                  <span class="text-sm font-bold text-brand-600">Rs.2,288</span>
+                </div>
+                <div class="flex items-center justify-between">
+                  <span class="text-sm font-bold text-gray-900">Total Amount</span>
+                  <span class="text-lg font-bold text-gray-900">Rs.15,000</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- GST Filing Status -->
+        <div class="bg-white rounded-xl border border-gray-100 shadow-sm p-6">
+          <div class="mb-5">
+            <h2 class="text-lg font-bold text-gray-900">GST Filing Status</h2>
+            <p class="text-sm text-gray-500 mt-0.5">Current status of all GST return filings</p>
+          </div>
+          <div class="space-y-4">
+            <!-- GSTR-1 -->
+            <div class="flex items-center justify-between p-4 bg-green-50 border border-green-100 rounded-lg">
+              <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-lg bg-green-100 flex items-center justify-center">
+                  <svg class="w-5 h-5 text-green-600" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                </div>
+                <div>
+                  <p class="text-sm font-semibold text-gray-900">GSTR-1 (Outward Supplies)</p>
+                  <p class="text-xs text-gray-500">March 2026 - Filed on 11 Apr 2026</p>
+                </div>
+              </div>
+              <span class="inline-flex items-center gap-1 px-2.5 py-1 bg-green-100 text-green-700 text-xs font-semibold rounded-full">
+                <span class="w-1.5 h-1.5 bg-green-500 rounded-full"></span> Filed
+              </span>
+            </div>
+
+            <!-- GSTR-3B -->
+            <div class="flex items-center justify-between p-4 bg-amber-50 border border-amber-100 rounded-lg">
+              <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-lg bg-amber-100 flex items-center justify-center">
+                  <svg class="w-5 h-5 text-amber-600" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                </div>
+                <div>
+                  <p class="text-sm font-semibold text-gray-900">GSTR-3B (Summary Return)</p>
+                  <p class="text-xs text-gray-500">March 2026 - Due 20 Apr 2026 (18 days left)</p>
+                </div>
+              </div>
+              <span class="inline-flex items-center gap-1 px-2.5 py-1 bg-amber-100 text-amber-700 text-xs font-semibold rounded-full">
+                <span class="w-1.5 h-1.5 bg-amber-500 rounded-full"></span> Due
+              </span>
+            </div>
+
+            <!-- GSTR-2A -->
+            <div class="flex items-center justify-between p-4 bg-blue-50 border border-blue-100 rounded-lg">
+              <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-lg bg-blue-100 flex items-center justify-center">
+                  <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M10.5 6a7.5 7.5 0 107.5 7.5h-7.5V6z"/><path d="M13.5 10.5H21A7.5 7.5 0 0013.5 3v7.5z"/></svg>
+                </div>
+                <div>
+                  <p class="text-sm font-semibold text-gray-900">GSTR-2A (Inward Supplies)</p>
+                  <p class="text-xs text-gray-500">March 2026 - Auto-reconciliation running</p>
+                </div>
+              </div>
+              <div class="text-right">
+                <span class="inline-flex items-center gap-1 px-2.5 py-1 bg-blue-100 text-blue-700 text-xs font-semibold rounded-full">
+                  <span class="w-1.5 h-1.5 bg-blue-500 rounded-full"></span> 98.2% Reconciled
+                </span>
+                <p class="text-[10px] text-gray-500 mt-1">27 invoices pending match</p>
+              </div>
+            </div>
+
+            <!-- Annual Return -->
+            <div class="flex items-center justify-between p-4 bg-gray-50 border border-gray-100 rounded-lg">
+              <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-lg bg-gray-200 flex items-center justify-center">
+                  <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5"/></svg>
+                </div>
+                <div>
+                  <p class="text-sm font-semibold text-gray-900">GSTR-9 (Annual Return)</p>
+                  <p class="text-xs text-gray-500">FY 2025-26 - Due 31 Dec 2026</p>
+                </div>
+              </div>
+              <span class="inline-flex items-center gap-1 px-2.5 py-1 bg-gray-100 text-gray-600 text-xs font-semibold rounded-full">
+                <span class="w-1.5 h-1.5 bg-gray-400 rounded-full"></span> Upcoming
+              </span>
+            </div>
+          </div>
+
+          <!-- Filing Timeline -->
+          <div class="mt-5 pt-4 border-t border-gray-100">
+            <p class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3">Upcoming Deadlines</p>
+            <div class="space-y-2">
+              <div class="flex items-center gap-3">
+                <span class="w-2 h-2 rounded-full bg-amber-500"></span>
+                <span class="text-xs text-gray-700 flex-1">GSTR-3B (Mar 2026)</span>
+                <span class="text-xs font-semibold text-amber-600">20 Apr 2026</span>
+              </div>
+              <div class="flex items-center gap-3">
+                <span class="w-2 h-2 rounded-full bg-gray-300"></span>
+                <span class="text-xs text-gray-700 flex-1">GSTR-1 (Apr 2026)</span>
+                <span class="text-xs font-medium text-gray-500">11 May 2026</span>
+              </div>
+              <div class="flex items-center gap-3">
+                <span class="w-2 h-2 rounded-full bg-gray-300"></span>
+                <span class="text-xs text-gray-700 flex-1">GSTR-3B (Apr 2026)</span>
+                <span class="text-xs font-medium text-gray-500">20 May 2026</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- ===== TCS/TDS SUMMARY ===== -->
+      <div class="bg-white rounded-xl border border-gray-100 shadow-sm mb-8">
+        <div class="flex items-center justify-between px-6 py-5 border-b border-gray-100">
+          <div>
+            <h2 class="text-lg font-bold text-gray-900">TCS / TDS Summary</h2>
+            <p class="text-sm text-gray-500 mt-0.5">Tax Collected at Source and Tax Deducted at Source for FY 2025-26</p>
+          </div>
+          <button onclick="alert('Downloading TCS/TDS report for FY 2025-26...')" class="flex items-center gap-2 bg-white border border-gray-200 text-gray-700 text-sm font-medium px-3 py-2 rounded-lg hover:bg-gray-50 transition">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3"/></svg>
+            Download Report
+          </button>
+        </div>
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-0 divide-y lg:divide-y-0 lg:divide-x divide-gray-100">
+          <!-- TCS Section -->
+          <div class="p-6">
+            <div class="flex items-center gap-3 mb-5">
+              <div class="w-10 h-10 rounded-lg bg-blue-50 flex items-center justify-center">
+                <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M2.25 18.75a60.07 60.07 0 0115.797 2.101c.727.198 1.453-.342 1.453-1.096V18.75M3.75 4.5v.75A.75.75 0 013 6h-.75m0 0v-.375c0-.621.504-1.125 1.125-1.125H20.25M2.25 6v9m18-10.5v.75c0 .414.336.75.75.75h.75m-1.5-1.5h.375c.621 0 1.125.504 1.125 1.125v9.75c0 .621-.504 1.125-1.125 1.125h-.375m1.5-1.5H21a.75.75 0 00-.75.75v.75m0 0H3.75m0 0h-.375a1.125 1.125 0 01-1.125-1.125V15m1.5 1.5v-.75A.75.75 0 003 15h-.75M15 10.5a3 3 0 11-6 0 3 3 0 016 0zm3 0h.008v.008H18V10.5zm-12 0h.008v.008H6V10.5z"/></svg>
+              </div>
+              <div>
+                <p class="text-lg font-bold text-gray-900">TCS Collected</p>
+                <p class="text-xs text-gray-500">Tax Collected at Source (1% on marketplace)</p>
+              </div>
+            </div>
+            <div class="space-y-3">
+              <div class="flex items-center justify-between py-2.5 border-b border-gray-100">
+                <span class="text-sm text-gray-600">Total TCS Collected (YTD)</span>
+                <span class="text-sm font-bold text-gray-900">Rs.1,72,450</span>
+              </div>
+              <div class="flex items-center justify-between py-2.5 border-b border-gray-100">
+                <span class="text-sm text-gray-600">March 2026</span>
+                <span class="text-sm font-semibold text-gray-900">Rs.18,320</span>
+              </div>
+              <div class="flex items-center justify-between py-2.5 border-b border-gray-100">
+                <span class="text-sm text-gray-600">Sellers Covered</span>
+                <span class="text-sm font-semibold text-gray-900">234</span>
+              </div>
+              <div class="flex items-center justify-between py-2.5">
+                <span class="text-sm text-gray-600">Challan Status</span>
+                <span class="inline-flex items-center gap-1 px-2.5 py-1 bg-green-50 text-green-700 text-xs font-semibold rounded-full">
+                  <span class="w-1.5 h-1.5 bg-green-500 rounded-full"></span> Deposited
+                </span>
+              </div>
+            </div>
+          </div>
+          <!-- TDS Section -->
+          <div class="p-6">
+            <div class="flex items-center gap-3 mb-5">
+              <div class="w-10 h-10 rounded-lg bg-purple-50 flex items-center justify-center">
+                <svg class="w-5 h-5 text-purple-600" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m2.25 0H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z"/></svg>
+              </div>
+              <div>
+                <p class="text-lg font-bold text-gray-900">TDS Deducted</p>
+                <p class="text-xs text-gray-500">Tax Deducted at Source (vendor payments)</p>
+              </div>
+            </div>
+            <div class="space-y-3">
+              <div class="flex items-center justify-between py-2.5 border-b border-gray-100">
+                <span class="text-sm text-gray-600">Total TDS Deducted (YTD)</span>
+                <span class="text-sm font-bold text-gray-900">Rs.8,12,300</span>
+              </div>
+              <div class="flex items-center justify-between py-2.5 border-b border-gray-100">
+                <span class="text-sm text-gray-600">March 2026</span>
+                <span class="text-sm font-semibold text-gray-900">Rs.76,400</span>
+              </div>
+              <div class="flex items-center justify-between py-2.5 border-b border-gray-100">
+                <span class="text-sm text-gray-600">Vendors / Payees</span>
+                <span class="text-sm font-semibold text-gray-900">47</span>
+              </div>
+              <div class="flex items-center justify-between py-2.5">
+                <span class="text-sm text-gray-600">Challan Status</span>
+                <span class="inline-flex items-center gap-1 px-2.5 py-1 bg-amber-50 text-amber-700 text-xs font-semibold rounded-full">
+                  <span class="w-1.5 h-1.5 bg-amber-500 rounded-full"></span> Pending (Mar)
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- Challan Timeline -->
+        <div class="px-6 py-4 bg-gray-50 border-t border-gray-100 rounded-b-xl">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-6">
+              <div class="flex items-center gap-2">
+                <span class="w-2.5 h-2.5 rounded-full bg-green-500"></span>
+                <span class="text-xs text-gray-600">Jan-Feb: Deposited</span>
+              </div>
+              <div class="flex items-center gap-2">
+                <span class="w-2.5 h-2.5 rounded-full bg-amber-500"></span>
+                <span class="text-xs text-gray-600">Mar: Pending deposit by 7 Apr</span>
+              </div>
+            </div>
+            <button onclick="alert('Opening challan deposit workflow...')" class="text-xs font-semibold text-brand-600 hover:text-brand-700 transition">Deposit Now</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== GST RATES TABLE (Full) ===== -->
+      <div class="bg-white rounded-xl border border-gray-100 shadow-sm mb-8">
+        <div class="flex items-center justify-between px-6 pt-5 pb-0">
+          <div class="flex items-center gap-0 border-b border-gray-200 -mb-px">
+            <button class="filter-tab active text-sm font-semibold px-4 pb-3 border-b-2 border-brand-500 text-brand-500" onclick="filterTax('all', this)">All Rules <span class="ml-1 bg-gray-100 text-gray-600 text-[11px] font-bold px-1.5 py-0.5 rounded-full">24</span></button>
+            <button class="filter-tab text-sm font-medium px-4 pb-3 border-b-2 border-transparent text-gray-500" onclick="filterTax('active', this)">Active <span class="ml-1 bg-green-100 text-green-700 text-[11px] font-bold px-1.5 py-0.5 rounded-full">22</span></button>
+            <button class="filter-tab text-sm font-medium px-4 pb-3 border-b-2 border-transparent text-gray-500" onclick="filterTax('draft', this)">Draft <span class="ml-1 bg-amber-100 text-amber-700 text-[11px] font-bold px-1.5 py-0.5 rounded-full">2</span></button>
+          </div>
+          <div class="relative mb-3">
+            <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+            <input type="text" placeholder="Search HSN code..." class="bg-gray-50 border border-gray-200 rounded-lg py-2 pl-9 pr-4 text-sm outline-none focus:border-brand-400 focus:ring-2 focus:ring-brand-100 transition w-64">
+          </div>
+        </div>
+
+        <div class="overflow-x-auto">
+          <table class="w-full">
+            <thead>
+              <tr class="border-b border-gray-100">
+                <th class="text-left text-[11px] font-semibold text-gray-400 uppercase tracking-wider px-6 py-3">Category</th>
+                <th class="text-left text-[11px] font-semibold text-gray-400 uppercase tracking-wider px-4 py-3">HSN Code</th>
+                <th class="text-right text-[11px] font-semibold text-gray-400 uppercase tracking-wider px-4 py-3">CGST %</th>
+                <th class="text-right text-[11px] font-semibold text-gray-400 uppercase tracking-wider px-4 py-3">SGST %</th>
+                <th class="text-right text-[11px] font-semibold text-gray-400 uppercase tracking-wider px-4 py-3">IGST %</th>
+                <th class="text-left text-[11px] font-semibold text-gray-400 uppercase tracking-wider px-4 py-3">Status</th>
+                <th class="text-right text-[11px] font-semibold text-gray-400 uppercase tracking-wider px-6 py-3">Actions</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-50">
+              <!-- Row 1 -->
+              <tr class="table-row">
+                <td class="px-6 py-4">
+                  <div class="flex items-center gap-3">
+                    <div class="w-8 h-8 rounded-lg bg-emerald-50 flex items-center justify-center text-sm">&#127822;</div>
+                    <div>
+                      <p class="text-sm font-semibold text-gray-900">Fresh Fruits & Vegetables</p>
+                      <p class="text-xs text-gray-400">Essential goods</p>
+                    </div>
+                  </div>
+                </td>
+                <td class="px-4 py-4"><span class="font-mono text-sm font-semibold text-gray-800 bg-gray-100 px-2 py-0.5 rounded">0801</span></td>
+                <td class="px-4 py-4 text-right"><span class="text-sm font-semibold text-emerald-600">0%</span></td>
+                <td class="px-4 py-4 text-right"><span class="text-sm font-semibold text-emerald-600">0%</span></td>
+                <td class="px-4 py-4 text-right"><span class="text-sm font-semibold text-emerald-600">0%</span></td>
+                <td class="px-4 py-4">
+                  <span class="inline-flex items-center gap-1 px-2.5 py-1 bg-green-50 text-green-700 text-xs font-semibold rounded-full">
+                    <span class="w-1.5 h-1.5 bg-green-500 rounded-full"></span> Active
+                  </span>
+                </td>
+                <td class="px-6 py-4">
+                  <div class="flex items-center justify-end gap-1.5">
+                    <button onclick="editTaxRule('Fresh Fruits & Vegetables')" class="p-1.5 text-gray-400 hover:text-brand-500 hover:bg-brand-50 rounded-md transition" title="Edit">
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10"/></svg>
+                    </button>
+                    <button onclick="deleteTaxRule('Fresh Fruits & Vegetables')" class="p-1.5 text-red-400 hover:text-red-600 hover:bg-red-50 rounded-md transition" title="Delete">
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0"/></svg>
+                    </button>
+                  </div>
+                </td>
+              </tr>
+              <!-- Row 2 -->
+              <tr class="table-row">
+                <td class="px-6 py-4">
+                  <div class="flex items-center gap-3">
+                    <div class="w-8 h-8 rounded-lg bg-blue-50 flex items-center justify-center text-sm">&#128085;</div>
+                    <div>
+                      <p class="text-sm font-semibold text-gray-900">Apparel (below Rs.1000)</p>
+                      <p class="text-xs text-gray-400">Clothing & footwear</p>
+                    </div>
+                  </div>
+                </td>
+                <td class="px-4 py-4"><span class="font-mono text-sm font-semibold text-gray-800 bg-gray-100 px-2 py-0.5 rounded">6109</span></td>
+                <td class="px-4 py-4 text-right"><span class="text-sm font-semibold text-blue-600">2.5%</span></td>
+                <td class="px-4 py-4 text-right"><span class="text-sm font-semibold text-blue-600">2.5%</span></td>
+                <td class="px-4 py-4 text-right"><span class="text-sm font-semibold text-blue-600">5%</span></td>
+                <td class="px-4 py-4">
+                  <span class="inline-flex items-center gap-1 px-2.5 py-1 bg-green-50 text-green-700 text-xs font-semibold rounded-full">
+                    <span class="w-1.5 h-1.5 bg-green-500 rounded-full"></span> Active
+                  </span>
+                </td>
+                <td class="px-6 py-4">
+                  <div class="flex items-center justify-end gap-1.5">
+                    <button onclick="editTaxRule('Apparel (below Rs.1000)')" class="p-1.5 text-gray-400 hover:text-brand-500 hover:bg-brand-50 rounded-md transition" title="Edit"><svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10"/></svg></button>
+                    <button onclick="deleteTaxRule('Apparel (below Rs.1000)')" class="p-1.5 text-red-400 hover:text-red-600 hover:bg-red-50 rounded-md transition" title="Delete"><svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0"/></svg></button>
+                  </div>
+                </td>
+              </tr>
+              <!-- Row 3 -->
+              <tr class="table-row">
+                <td class="px-6 py-4">
+                  <div class="flex items-center gap-3">
+                    <div class="w-8 h-8 rounded-lg bg-purple-50 flex items-center justify-center text-sm">&#128087;</div>
+                    <div>
+                      <p class="text-sm font-semibold text-gray-900">Apparel (above Rs.1000)</p>
+                      <p class="text-xs text-gray-400">Premium clothing</p>
+                    </div>
+                  </div>
+                </td>
+                <td class="px-4 py-4"><span class="font-mono text-sm font-semibold text-gray-800 bg-gray-100 px-2 py-0.5 rounded">6110</span></td>
+                <td class="px-4 py-4 text-right"><span class="text-sm font-semibold text-purple-600">6%</span></td>
+                <td class="px-4 py-4 text-right"><span class="text-sm font-semibold text-purple-600">6%</span></td>
+                <td class="px-4 py-4 text-right"><span class="text-sm font-semibold text-purple-600">12%</span></td>
+                <td class="px-4 py-4">
+                  <span class="inline-flex items-center gap-1 px-2.5 py-1 bg-green-50 text-green-700 text-xs font-semibold rounded-full">
+                    <span class="w-1.5 h-1.5 bg-green-500 rounded-full"></span> Active
+                  </span>
+                </td>
+                <td class="px-6 py-4">
+                  <div class="flex items-center justify-end gap-1.5">
+                    <button onclick="editTaxRule('Apparel (above Rs.1000)')" class="p-1.5 text-gray-400 hover:text-brand-500 hover:bg-brand-50 rounded-md transition" title="Edit"><svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10"/></svg></button>
+                    <button onclick="deleteTaxRule('Apparel (above Rs.1000)')" class="p-1.5 text-red-400 hover:text-red-600 hover:bg-red-50 rounded-md transition" title="Delete"><svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0"/></svg></button>
+                  </div>
+                </td>
+              </tr>
+              <!-- Row 4 -->
+              <tr class="table-row">
+                <td class="px-6 py-4">
+                  <div class="flex items-center gap-3">
+                    <div class="w-8 h-8 rounded-lg bg-amber-50 flex items-center justify-center text-sm">&#127968;</div>
+                    <div>
+                      <p class="text-sm font-semibold text-gray-900">Furniture & Fixtures</p>
+                      <p class="text-xs text-gray-400">Home furnishing</p>
+                    </div>
+                  </div>
+                </td>
+                <td class="px-4 py-4"><span class="font-mono text-sm font-semibold text-gray-800 bg-gray-100 px-2 py-0.5 rounded">9403</span></td>
+                <td class="px-4 py-4 text-right"><span class="text-sm font-semibold text-amber-600">9%</span></td>
+                <td class="px-4 py-4 text-right"><span class="text-sm font-semibold text-amber-600">9%</span></td>
+                <td class="px-4 py-4 text-right"><span class="text-sm font-semibold text-amber-600">18%</span></td>
+                <td class="px-4 py-4">
+                  <span class="inline-flex items-center gap-1 px-2.5 py-1 bg-green-50 text-green-700 text-xs font-semibold rounded-full">
+                    <span class="w-1.5 h-1.5 bg-green-500 rounded-full"></span> Active
+                  </span>
+                </td>
+                <td class="px-6 py-4">
+                  <div class="flex items-center justify-end gap-1.5">
+                    <button onclick="editTaxRule('Furniture & Fixtures')" class="p-1.5 text-gray-400 hover:text-brand-500 hover:bg-brand-50 rounded-md transition" title="Edit"><svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10"/></svg></button>
+                    <button onclick="deleteTaxRule('Furniture & Fixtures')" class="p-1.5 text-red-400 hover:text-red-600 hover:bg-red-50 rounded-md transition" title="Delete"><svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0"/></svg></button>
+                  </div>
+                </td>
+              </tr>
+              <!-- Row 5 -->
+              <tr class="table-row">
+                <td class="px-6 py-4">
+                  <div class="flex items-center gap-3">
+                    <div class="w-8 h-8 rounded-lg bg-red-50 flex items-center justify-center text-sm">&#128663;</div>
+                    <div>
+                      <p class="text-sm font-semibold text-gray-900">Automobiles & Parts</p>
+                      <p class="text-xs text-gray-400">Luxury goods</p>
+                    </div>
+                  </div>
+                </td>
+                <td class="px-4 py-4"><span class="font-mono text-sm font-semibold text-gray-800 bg-gray-100 px-2 py-0.5 rounded">8703</span></td>
+                <td class="px-4 py-4 text-right"><span class="text-sm font-semibold text-red-600">14%</span></td>
+                <td class="px-4 py-4 text-right"><span class="text-sm font-semibold text-red-600">14%</span></td>
+                <td class="px-4 py-4 text-right"><span class="text-sm font-semibold text-red-600">28%</span></td>
+                <td class="px-4 py-4">
+                  <span class="inline-flex items-center gap-1 px-2.5 py-1 bg-green-50 text-green-700 text-xs font-semibold rounded-full">
+                    <span class="w-1.5 h-1.5 bg-green-500 rounded-full"></span> Active
+                  </span>
+                </td>
+                <td class="px-6 py-4">
+                  <div class="flex items-center justify-end gap-1.5">
+                    <button onclick="editTaxRule('Automobiles & Parts')" class="p-1.5 text-gray-400 hover:text-brand-500 hover:bg-brand-50 rounded-md transition" title="Edit"><svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10"/></svg></button>
+                    <button onclick="deleteTaxRule('Automobiles & Parts')" class="p-1.5 text-red-400 hover:text-red-600 hover:bg-red-50 rounded-md transition" title="Delete"><svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0"/></svg></button>
+                  </div>
+                </td>
+              </tr>
+              <!-- Row 6 -->
+              <tr class="table-row">
+                <td class="px-6 py-4">
+                  <div class="flex items-center gap-3">
+                    <div class="w-8 h-8 rounded-lg bg-yellow-50 flex items-center justify-center text-sm">&#128142;</div>
+                    <div>
+                      <p class="text-sm font-semibold text-gray-900">Luxury Watches & Jewelry</p>
+                      <p class="text-xs text-gray-400">Luxury category</p>
+                    </div>
+                  </div>
+                </td>
+                <td class="px-4 py-4"><span class="font-mono text-sm font-semibold text-gray-800 bg-gray-100 px-2 py-0.5 rounded">7113</span></td>
+                <td class="px-4 py-4 text-right"><span class="text-sm font-semibold text-red-600">14%</span></td>
+                <td class="px-4 py-4 text-right"><span class="text-sm font-semibold text-red-600">14%</span></td>
+                <td class="px-4 py-4 text-right"><span class="text-sm font-semibold text-red-600">28%</span></td>
+                <td class="px-4 py-4">
+                  <span class="inline-flex items-center gap-1 px-2.5 py-1 bg-amber-50 text-amber-700 text-xs font-semibold rounded-full">
+                    <span class="w-1.5 h-1.5 bg-amber-500 rounded-full"></span> Draft
+                  </span>
+                </td>
+                <td class="px-6 py-4">
+                  <div class="flex items-center justify-end gap-1.5">
+                    <button onclick="editTaxRule('Luxury Watches & Jewelry')" class="p-1.5 text-gray-400 hover:text-brand-500 hover:bg-brand-50 rounded-md transition" title="Edit"><svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10"/></svg></button>
+                    <button onclick="deleteTaxRule('Luxury Watches & Jewelry')" class="p-1.5 text-red-400 hover:text-red-600 hover:bg-red-50 rounded-md transition" title="Delete"><svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0"/></svg></button>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Pagination -->
+        <div class="flex items-center justify-between px-6 py-4 border-t border-gray-100">
+          <div class="flex items-center gap-2">
+            <span class="text-sm text-gray-500">Showing</span>
+            <select class="bg-white border border-gray-200 rounded-lg text-sm px-2.5 py-1.5 outline-none focus:border-brand-400">
+              <option>10</option>
+              <option>25</option>
+            </select>
+            <span class="text-sm text-gray-500">of 24 rules</span>
+          </div>
+          <div class="flex items-center gap-1">
+            <button class="w-9 h-9 flex items-center justify-center rounded-lg border border-gray-200 text-gray-400 hover:bg-gray-50 transition" disabled>
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M15.75 19.5L8.25 12l7.5-7.5"/></svg>
+            </button>
+            <button class="w-9 h-9 flex items-center justify-center rounded-lg bg-brand-500 text-white text-sm font-semibold">1</button>
+            <button class="w-9 h-9 flex items-center justify-center rounded-lg border border-gray-200 text-gray-700 text-sm font-medium hover:bg-gray-50 transition">2</button>
+            <button class="w-9 h-9 flex items-center justify-center rounded-lg border border-gray-200 text-gray-700 text-sm font-medium hover:bg-gray-50 transition">3</button>
+            <button class="w-9 h-9 flex items-center justify-center rounded-lg border border-gray-200 text-gray-700 hover:bg-gray-50 transition">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M8.25 4.5l7.5 7.5-7.5 7.5"/></svg>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Generate GST Report -->
+      <div class="bg-white rounded-xl border border-gray-100 shadow-sm p-6">
+        <div class="flex items-center justify-between mb-5">
+          <div>
+            <h2 class="text-lg font-bold text-gray-900">Generate GST Report</h2>
+            <p class="text-sm text-gray-500 mt-0.5">Download GSTR-1, GSTR-3B or custom tax reports</p>
+          </div>
+        </div>
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1.5">Report Type</label>
+            <select id="reportType" class="w-full border border-gray-200 rounded-lg py-2.5 px-4 text-sm outline-none focus:border-brand-400 focus:ring-2 focus:ring-brand-100 transition bg-white">
+              <option>GSTR-1 (Outward Supplies)</option>
+              <option>GSTR-3B (Summary Return)</option>
+              <option>HSN Summary</option>
+              <option>Tax Collected Report</option>
+              <option>TCS Report</option>
+              <option>TDS Report</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1.5">From Date</label>
+            <input type="date" value="2026-03-01" class="w-full border border-gray-200 rounded-lg py-2.5 px-4 text-sm outline-none focus:border-brand-400 focus:ring-2 focus:ring-brand-100 transition">
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1.5">To Date</label>
+            <input type="date" value="2026-03-31" class="w-full border border-gray-200 rounded-lg py-2.5 px-4 text-sm outline-none focus:border-brand-400 focus:ring-2 focus:ring-brand-100 transition">
+          </div>
+          <div class="flex items-end">
+            <button onclick="generateGSTReport()" class="w-full flex items-center justify-center gap-2 bg-brand-500 text-white rounded-lg px-4 py-2.5 text-sm font-semibold hover:bg-brand-600 transition">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3"/></svg>
+              Download Report
+            </button>
+          </div>
+        </div>
+      </div>
+
+    </main>
+  </div>
+
+  <!-- ===== ADD/EDIT TAX RULE MODAL ===== -->
+  <div id="addTaxModal" class="fixed inset-0 z-[100] hidden items-center justify-center bg-black/40 backdrop-blur-sm">
+    <div class="relative w-full max-w-lg mx-4 bg-white rounded-2xl shadow-2xl overflow-hidden">
+      <div class="flex items-center justify-between px-6 py-4 border-b border-gray-100 bg-gray-50">
+        <h3 id="taxModalTitle" class="text-lg font-bold text-gray-900">Add Tax Rule</h3>
+        <button onclick="closeAddTaxModal()" class="p-1.5 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M6 18L18 6M6 6l12 12"/></svg>
+        </button>
+      </div>
+      <div class="px-6 py-5 space-y-4">
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1.5">Category</label>
+          <select class="w-full border border-gray-200 rounded-lg py-2.5 px-4 text-sm outline-none focus:border-brand-400 focus:ring-2 focus:ring-brand-100 transition bg-white">
+            <option>Select category...</option>
+            <option>Electronics</option>
+            <option>Fashion</option>
+            <option>Home & Living</option>
+            <option>Automobiles</option>
+            <option>Luxury Goods</option>
+          </select>
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1.5">HSN Code</label>
+          <input type="text" placeholder="e.g. 8517" class="w-full border border-gray-200 rounded-lg py-2.5 px-4 text-sm outline-none focus:border-brand-400 focus:ring-2 focus:ring-brand-100 transition font-mono">
+        </div>
+        <div class="grid grid-cols-4 gap-3">
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1.5">CGST %</label>
+            <input type="number" placeholder="0" step="0.5" class="w-full border border-gray-200 rounded-lg py-2.5 px-4 text-sm outline-none focus:border-brand-400 focus:ring-2 focus:ring-brand-100 transition">
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1.5">SGST %</label>
+            <input type="number" placeholder="0" step="0.5" class="w-full border border-gray-200 rounded-lg py-2.5 px-4 text-sm outline-none focus:border-brand-400 focus:ring-2 focus:ring-brand-100 transition">
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1.5">IGST %</label>
+            <input type="number" placeholder="0" step="0.5" class="w-full border border-gray-200 rounded-lg py-2.5 px-4 text-sm outline-none focus:border-brand-400 focus:ring-2 focus:ring-brand-100 transition">
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1.5">Cess %</label>
+            <input type="number" placeholder="0" step="0.5" class="w-full border border-gray-200 rounded-lg py-2.5 px-4 text-sm outline-none focus:border-brand-400 focus:ring-2 focus:ring-brand-100 transition">
+          </div>
+        </div>
+        <div class="grid grid-cols-2 gap-4">
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1.5">Effective Date</label>
+            <input type="date" class="w-full border border-gray-200 rounded-lg py-2.5 px-4 text-sm outline-none focus:border-brand-400 focus:ring-2 focus:ring-brand-100 transition">
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1.5">Status</label>
+            <select class="w-full border border-gray-200 rounded-lg py-2.5 px-4 text-sm outline-none focus:border-brand-400 focus:ring-2 focus:ring-brand-100 transition bg-white">
+              <option>Active</option>
+              <option>Draft</option>
+            </select>
+          </div>
+        </div>
+      </div>
+      <div class="flex justify-end gap-3 px-6 py-4 border-t border-gray-100 bg-gray-50">
+        <button onclick="closeAddTaxModal()" class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 transition">Cancel</button>
+        <button onclick="saveTaxRule()" class="px-5 py-2 text-sm font-semibold text-white bg-brand-500 rounded-lg hover:bg-brand-600 transition">Save Rule</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== JAVASCRIPT ===== -->
+  <script>
+    function openAddTaxModal() {
+      document.getElementById('taxModalTitle').textContent = 'Add Tax Rule';
+      var modal = document.getElementById('addTaxModal');
+      modal.classList.remove('hidden');
+      modal.classList.add('flex');
+    }
+
+    function closeAddTaxModal() {
+      var modal = document.getElementById('addTaxModal');
+      modal.classList.add('hidden');
+      modal.classList.remove('flex');
+    }
+
+    function editTaxRule(name) {
+      document.getElementById('taxModalTitle').textContent = 'Edit Tax Rule: ' + name;
+      var modal = document.getElementById('addTaxModal');
+      modal.classList.remove('hidden');
+      modal.classList.add('flex');
+    }
+
+    function deleteTaxRule(name) {
+      if (confirm('Delete tax rule for "' + name + '"?\n\nThis will affect all products in this category.')) {
+        alert('Tax rule for "' + name + '" deleted.');
+      }
+    }
+
+    function saveTaxRule() {
+      alert('Tax rule saved successfully!');
+      closeAddTaxModal();
+    }
+
+    function generateGSTReport() {
+      var type = document.getElementById('reportType').value;
+      alert('Generating ' + type + ' report...\n\nThe report will be downloaded shortly.');
+    }
+
+    function filterTax(filter, btn) {
+      document.querySelectorAll('.filter-tab').forEach(function(t) {
+        t.classList.remove('active', 'text-brand-500', 'border-brand-500');
+        t.classList.add('text-gray-500', 'border-transparent');
+      });
+      btn.classList.add('active', 'text-brand-500', 'border-brand-500');
+      btn.classList.remove('text-gray-500', 'border-transparent');
+    }
+
+    function calculateTax() {
+      var price = parseFloat(document.getElementById('simPrice').value) || 0;
+      var gstRate = parseFloat(document.getElementById('simHsn').value) || 0;
+      var fromState = document.getElementById('simFromState').value;
+      var toState = document.getElementById('simToState').value;
+
+      var isInterState = fromState !== toState;
+      var basePrice = Math.round(price / (1 + gstRate / 100));
+      var totalTax = price - basePrice;
+
+      var fromName = document.getElementById('simFromState').options[document.getElementById('simFromState').selectedIndex].text;
+      var toName = document.getElementById('simToState').options[document.getElementById('simToState').selectedIndex].text;
+
+      var html = '<div class="calc-result border border-gray-200 rounded-xl overflow-hidden">';
+      html += '<div class="bg-gray-50 px-4 py-3 border-b border-gray-200">';
+      html += '<div class="flex items-center justify-between">';
+
+      if (isInterState) {
+        html += '<span class="text-sm font-semibold text-gray-700">Inter-state (' + fromName + ' to ' + toName + ')</span>';
+        html += '<span class="inline-flex items-center gap-1 px-2 py-0.5 bg-purple-100 text-purple-700 text-xs font-semibold rounded-full">IGST Only</span>';
+      } else {
+        html += '<span class="text-sm font-semibold text-gray-700">Intra-state (' + fromName + ' to ' + toName + ')</span>';
+        html += '<span class="inline-flex items-center gap-1 px-2 py-0.5 bg-blue-100 text-blue-700 text-xs font-semibold rounded-full">CGST + SGST</span>';
+      }
+      html += '</div></div>';
+      html += '<div class="p-4 space-y-3">';
+      html += '<div class="flex items-center justify-between"><span class="text-sm text-gray-600">Base Price</span>';
+      html += '<span class="text-sm font-semibold text-gray-900">Rs.' + basePrice.toLocaleString('en-IN') + '</span></div>';
+
+      if (isInterState) {
+        html += '<div class="flex items-center justify-between"><span class="text-sm text-gray-600">CGST @ 0%</span>';
+        html += '<span class="text-sm font-semibold text-gray-400">Rs.0</span></div>';
+        html += '<div class="flex items-center justify-between"><span class="text-sm text-gray-600">SGST @ 0%</span>';
+        html += '<span class="text-sm font-semibold text-gray-400">Rs.0</span></div>';
+        html += '<div class="flex items-center justify-between"><span class="text-sm text-gray-600">IGST @ ' + gstRate + '%</span>';
+        html += '<span class="text-sm font-semibold text-purple-600">Rs.' + totalTax.toLocaleString('en-IN') + '</span></div>';
+      } else {
+        var halfTax = Math.round(totalTax / 2);
+        var halfRate = gstRate / 2;
+        html += '<div class="flex items-center justify-between"><span class="text-sm text-gray-600">CGST @ ' + halfRate + '%</span>';
+        html += '<span class="text-sm font-semibold text-blue-600">Rs.' + halfTax.toLocaleString('en-IN') + '</span></div>';
+        html += '<div class="flex items-center justify-between"><span class="text-sm text-gray-600">SGST @ ' + halfRate + '%</span>';
+        html += '<span class="text-sm font-semibold text-blue-600">Rs.' + halfTax.toLocaleString('en-IN') + '</span></div>';
+        html += '<div class="flex items-center justify-between"><span class="text-sm text-gray-600">IGST @ 0%</span>';
+        html += '<span class="text-sm font-semibold text-gray-400">Rs.0</span></div>';
+      }
+
+      html += '<div class="border-t border-gray-200 pt-3 flex items-center justify-between">';
+      html += '<span class="text-sm font-bold text-gray-900">Total Tax</span>';
+      html += '<span class="text-sm font-bold text-brand-600">Rs.' + totalTax.toLocaleString('en-IN') + '</span></div>';
+      html += '<div class="flex items-center justify-between">';
+      html += '<span class="text-sm font-bold text-gray-900">Total Amount</span>';
+      html += '<span class="text-lg font-bold text-gray-900">Rs.' + price.toLocaleString('en-IN') + '</span></div>';
+      html += '</div></div>';
+
+      document.getElementById('taxCalcResult').innerHTML = html;
+    }
+
+    document.getElementById('addTaxModal').addEventListener('click', function(e) {
+      if (e.target === this) closeAddTaxModal();
+    });
+
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape') closeAddTaxModal();
+    });
+  </script>
+
+  <script src="../shared-layout.js"></script>
+  <script>renderAdminLayout('tax', '../');</script>
+
+</body>
+</html>

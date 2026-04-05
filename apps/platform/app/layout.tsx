@@ -24,18 +24,23 @@ export const metadata: Metadata = {
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
   const user = await getServerUser();
+  const isAuthenticated = !!user;
 
   return (
     <html lang="en" className={inter.variable}>
-      <body>
+      <body className="bg-gray-50">
         <Providers>
-          <div className="flex h-screen overflow-hidden">
-            <PlatformSidebar />
-            <div className="flex flex-1 flex-col overflow-hidden">
+          {isAuthenticated ? (
+            <>
               <PlatformHeader user={user} />
-              <main className="flex-1 overflow-y-auto p-6">{children}</main>
-            </div>
-          </div>
+              <PlatformSidebar />
+              <main className="ml-60 pt-16 min-h-screen">
+                <div className="p-6 lg:p-8">{children}</div>
+              </main>
+            </>
+          ) : (
+            <main className="min-h-screen">{children}</main>
+          )}
           <Toaster position="top-right" />
         </Providers>
       </body>

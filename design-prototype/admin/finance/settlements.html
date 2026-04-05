@@ -1,0 +1,1392 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HomeBase — Settlement Management</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              50: '#FFF7ED',
+              100: '#FFEDD5',
+              200: '#FED7AA',
+              300: '#FDBA74',
+              400: '#FB923C',
+              500: '#F97316',
+              600: '#EA580C',
+              700: '#C2410C',
+            },
+            navy: {
+              700: '#1E3A5F',
+              800: '#0F1E30',
+              900: '#0A1628',
+            },
+            success: '#16A34A',
+            warning: '#EAB308',
+            danger: '#DC2626',
+          },
+          fontFamily: {
+            sans: ['Inter', 'system-ui', 'sans-serif'],
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+    .scrollbar-hide::-webkit-scrollbar { display: none; }
+    .sidebar-link { transition: all 0.15s ease; }
+    .sidebar-link:hover { background: rgba(255,255,255,0.06); }
+    .sidebar-link.active { background: rgba(249,115,22,0.15); border-right: 3px solid #F97316; }
+    .stat-card { transition: all 0.2s ease; }
+    .stat-card:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,0.1); }
+    .table-row { transition: background 0.15s ease; }
+    .table-row:hover { background: #FFF7ED; }
+    .dropdown-menu { display: none; }
+    .dropdown:hover .dropdown-menu { display: block; }
+    .filter-tab { transition: all 0.15s ease; }
+    .filter-tab:hover { color: #F97316; }
+    .filter-tab.active { color: #F97316; border-bottom-color: #F97316; }
+    .expand-row { display: none; }
+    .expand-row.open { display: table-row; }
+    .expand-trigger { cursor: pointer; }
+    .expand-trigger .chevron { transition: transform 0.2s ease; }
+    .expand-trigger.expanded .chevron { transform: rotate(90deg); }
+    .bar-chart-bar { transition: all 0.3s ease; }
+    .bar-chart-bar:hover { opacity: 0.85; }
+  </style>
+</head>
+<body class="font-sans bg-gray-50 text-gray-900">
+
+  <!-- ===== TOP HEADER BAR ===== -->
+  <header id="admin-header" class="fixed top-0 left-0 right-0 z-50 bg-white border-b border-gray-200 h-16"></header>
+
+  <!-- ===== LAYOUT: SIDEBAR + MAIN ===== -->
+  <div class="flex pt-16 min-h-screen">
+
+    <!-- ===== LEFT SIDEBAR ===== -->
+    <aside id="admin-sidebar" class="fixed left-0 top-16 bottom-0 w-60 z-40 flex flex-col overflow-y-auto" style="background:#0A1628;"></aside>
+
+    <!-- ===== MAIN CONTENT ===== -->
+    <main class="flex-1 ml-60 p-6 lg:p-8">
+
+      <!-- Page Header -->
+      <div class="mb-8">
+        <div class="flex items-center justify-between">
+          <div>
+            <h1 class="text-2xl font-bold text-gray-900">Settlement Management</h1>
+            <p class="text-sm text-gray-500 mt-1">Process payouts, manage seller settlements, and resolve disputes.</p>
+          </div>
+          <div class="flex items-center gap-3">
+            <button onclick="processBatch()" class="flex items-center gap-2 bg-brand-500 text-white rounded-lg px-4 py-2.5 text-sm font-semibold hover:bg-brand-600 transition shadow-sm">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M5.25 5.653c0-.856.917-1.398 1.667-.986l11.54 6.348a1.125 1.125 0 010 1.971l-11.54 6.347a1.125 1.125 0 01-1.667-.985V5.653z"/></svg>
+              Process Batch
+            </button>
+            <button onclick="alert('Exporting settlements to CSV...')" class="flex items-center gap-2 bg-white border border-gray-200 rounded-lg px-4 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50 transition shadow-sm">
+              <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3"/></svg>
+              Export
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== 4 STATS CARDS ===== -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 mb-8">
+        <!-- Total Pending -->
+        <div class="stat-card bg-white rounded-xl border border-gray-100 p-5 shadow-sm">
+          <div class="flex items-center justify-between mb-3">
+            <div class="w-10 h-10 rounded-lg bg-yellow-50 flex items-center justify-center">
+              <svg class="w-5 h-5 text-yellow-500" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+            </div>
+            <span class="text-xs font-medium text-warning bg-yellow-50 px-2 py-1 rounded-full">Awaiting</span>
+          </div>
+          <p class="text-2xl font-bold text-gray-900">&#8377;45,80,000</p>
+          <p class="text-xs text-gray-500 mt-1">Total Pending</p>
+          <div class="mt-3 h-1 bg-gray-100 rounded-full overflow-hidden">
+            <div class="h-full bg-yellow-400 rounded-full" style="width: 27%"></div>
+          </div>
+        </div>
+
+        <!-- Processed This Week -->
+        <div class="stat-card bg-white rounded-xl border border-gray-100 p-5 shadow-sm">
+          <div class="flex items-center justify-between mb-3">
+            <div class="w-10 h-10 rounded-lg bg-green-50 flex items-center justify-center">
+              <svg class="w-5 h-5 text-green-500" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+            </div>
+          </div>
+          <p class="text-2xl font-bold text-gray-900">&#8377;1,24,50,000</p>
+          <p class="text-xs text-gray-500 mt-1">Processed This Week</p>
+          <div class="mt-3 h-1 bg-gray-100 rounded-full overflow-hidden">
+            <div class="h-full bg-green-500 rounded-full" style="width: 73%"></div>
+          </div>
+        </div>
+
+        <!-- Active Sellers -->
+        <div class="stat-card bg-white rounded-xl border border-gray-100 p-5 shadow-sm">
+          <div class="flex items-center justify-between mb-3">
+            <div class="w-10 h-10 rounded-lg bg-blue-50 flex items-center justify-center">
+              <svg class="w-5 h-5 text-blue-500" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M13.5 21v-7.5a.75.75 0 01.75-.75h3a.75.75 0 01.75.75V21m-4.5 0H2.36m11.14 0H18m0 0h3.64m-1.39 0V9.349m-16.5 11.65V9.35m0 0a3.001 3.001 0 003.75-.615A2.993 2.993 0 009.75 9.75c.896 0 1.7-.393 2.25-1.016a2.993 2.993 0 002.25 1.016c.896 0 1.7-.393 2.25-1.016A3.001 3.001 0 0021 9.349m-18 0a2.993 2.993 0 00.397-1.599A3 3 0 016 4.5h12a3 3 0 012.603 3.25 2.993 2.993 0 00.397 1.599"/></svg>
+            </div>
+          </div>
+          <p class="text-2xl font-bold text-gray-900">234</p>
+          <p class="text-xs text-gray-500 mt-1">Active Sellers</p>
+          <div class="mt-3 h-1 bg-gray-100 rounded-full overflow-hidden">
+            <div class="h-full bg-blue-500 rounded-full" style="width: 85%"></div>
+          </div>
+        </div>
+
+        <!-- Avg Settlement Time -->
+        <div class="stat-card bg-white rounded-xl border border-gray-100 p-5 shadow-sm">
+          <div class="flex items-center justify-between mb-3">
+            <div class="w-10 h-10 rounded-lg bg-purple-50 flex items-center justify-center">
+              <svg class="w-5 h-5 text-purple-500" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+            </div>
+          </div>
+          <p class="text-2xl font-bold text-gray-900">3.2 days</p>
+          <p class="text-xs text-gray-500 mt-1">Avg Settlement Time</p>
+          <div class="mt-3 h-1 bg-gray-100 rounded-full overflow-hidden">
+            <div class="h-full bg-purple-500 rounded-full" style="width: 40%"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== SETTLEMENT BATCH PREVIEW ===== -->
+      <div class="bg-gradient-to-r from-brand-50 to-orange-50 rounded-xl border border-brand-200 shadow-sm p-6 mb-8">
+        <div class="flex items-start justify-between">
+          <div class="flex-1">
+            <div class="flex items-center gap-3 mb-2">
+              <div class="w-10 h-10 rounded-lg bg-brand-500 flex items-center justify-center">
+                <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5"/></svg>
+              </div>
+              <div>
+                <h2 class="text-lg font-bold text-gray-900">Next Settlement Batch</h2>
+                <p class="text-sm text-gray-600">Scheduled for <span class="font-semibold text-brand-600">April 5, 2026</span></p>
+              </div>
+            </div>
+            <div class="grid grid-cols-3 gap-6 mt-4">
+              <div class="bg-white/70 rounded-lg p-3 border border-brand-100">
+                <p class="text-xs font-semibold text-gray-500 uppercase tracking-wider">Sellers</p>
+                <p class="text-xl font-bold text-gray-900 mt-1">42</p>
+                <p class="text-xs text-gray-500">eligible for payout</p>
+              </div>
+              <div class="bg-white/70 rounded-lg p-3 border border-brand-100">
+                <p class="text-xs font-semibold text-gray-500 uppercase tracking-wider">Batch Total</p>
+                <p class="text-xl font-bold text-gray-900 mt-1">&#8377;45,80,000</p>
+                <p class="text-xs text-gray-500">net payout amount</p>
+              </div>
+              <div class="bg-white/70 rounded-lg p-3 border border-brand-100">
+                <p class="text-xs font-semibold text-gray-500 uppercase tracking-wider">Period</p>
+                <p class="text-xl font-bold text-gray-900 mt-1">Mar 29 - Apr 4</p>
+                <p class="text-xs text-gray-500">settlement window</p>
+              </div>
+            </div>
+            <p class="text-xs text-gray-500 mt-3">Preview before processing to verify seller eligibility, hold statuses, and deduction accuracy.</p>
+          </div>
+          <div class="flex flex-col gap-2 ml-6 shrink-0">
+            <button onclick="previewBatch()" class="flex items-center gap-2 bg-white border border-brand-300 text-brand-600 rounded-lg px-5 py-2.5 text-sm font-semibold hover:bg-brand-50 transition shadow-sm">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z"/><path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+              Preview Batch
+            </button>
+            <button onclick="processNow()" class="flex items-center gap-2 bg-brand-500 text-white rounded-lg px-5 py-2.5 text-sm font-semibold hover:bg-brand-600 transition shadow-sm">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M5.25 5.653c0-.856.917-1.398 1.667-.986l11.54 6.348a1.125 1.125 0 010 1.971l-11.54 6.347a1.125 1.125 0 01-1.667-.985V5.653z"/></svg>
+              Process Now
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== SETTLEMENT HISTORY CHART ===== -->
+      <div class="bg-white rounded-xl border border-gray-100 shadow-sm p-6 mb-8">
+        <div class="flex items-center justify-between mb-5">
+          <div>
+            <h2 class="text-lg font-semibold text-gray-900">Settlement Volume Trend</h2>
+            <p class="text-xs text-gray-500 mt-0.5">Monthly payout volume over the last 6 months</p>
+          </div>
+          <div class="flex items-center gap-2">
+            <span class="inline-flex items-center gap-1.5 text-xs font-semibold text-green-700 bg-green-50 px-2.5 py-1 rounded-full">
+              <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M2.25 18L9 11.25l4.306 4.307a11.95 11.95 0 015.814-5.519l2.74-1.22m0 0l-5.94-2.28m5.94 2.28l-2.28 5.941"/></svg>
+              +46% growth
+            </span>
+          </div>
+        </div>
+        <div class="flex items-end gap-4 h-40">
+          <!-- Oct -->
+          <div class="flex-1 flex flex-col items-center gap-2">
+            <div class="w-full relative group">
+              <div class="bar-chart-bar w-full bg-brand-200 rounded-t-lg" style="height: 68px;"></div>
+              <div class="absolute -top-8 left-1/2 -translate-x-1/2 bg-gray-800 text-white text-[10px] font-semibold px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition whitespace-nowrap">&#8377;82L</div>
+            </div>
+            <span class="text-[10px] font-medium text-gray-500">Oct</span>
+          </div>
+          <!-- Nov -->
+          <div class="flex-1 flex flex-col items-center gap-2">
+            <div class="w-full relative group">
+              <div class="bar-chart-bar w-full bg-brand-300 rounded-t-lg" style="height: 80px;"></div>
+              <div class="absolute -top-8 left-1/2 -translate-x-1/2 bg-gray-800 text-white text-[10px] font-semibold px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition whitespace-nowrap">&#8377;91L</div>
+            </div>
+            <span class="text-[10px] font-medium text-gray-500">Nov</span>
+          </div>
+          <!-- Dec -->
+          <div class="flex-1 flex flex-col items-center gap-2">
+            <div class="w-full relative group">
+              <div class="bar-chart-bar w-full bg-brand-400 rounded-t-lg" style="height: 104px;"></div>
+              <div class="absolute -top-8 left-1/2 -translate-x-1/2 bg-gray-800 text-white text-[10px] font-semibold px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition whitespace-nowrap">&#8377;1.05Cr</div>
+            </div>
+            <span class="text-[10px] font-medium text-gray-500">Dec</span>
+          </div>
+          <!-- Jan -->
+          <div class="flex-1 flex flex-col items-center gap-2">
+            <div class="w-full relative group">
+              <div class="bar-chart-bar w-full bg-brand-400 rounded-t-lg" style="height: 96px;"></div>
+              <div class="absolute -top-8 left-1/2 -translate-x-1/2 bg-gray-800 text-white text-[10px] font-semibold px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition whitespace-nowrap">&#8377;98L</div>
+            </div>
+            <span class="text-[10px] font-medium text-gray-500">Jan</span>
+          </div>
+          <!-- Feb -->
+          <div class="flex-1 flex flex-col items-center gap-2">
+            <div class="w-full relative group">
+              <div class="bar-chart-bar w-full bg-brand-500 rounded-t-lg" style="height: 116px;"></div>
+              <div class="absolute -top-8 left-1/2 -translate-x-1/2 bg-gray-800 text-white text-[10px] font-semibold px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition whitespace-nowrap">&#8377;1.1Cr</div>
+            </div>
+            <span class="text-[10px] font-medium text-gray-500">Feb</span>
+          </div>
+          <!-- Mar -->
+          <div class="flex-1 flex flex-col items-center gap-2">
+            <div class="w-full relative group">
+              <div class="bar-chart-bar w-full bg-brand-600 rounded-t-lg" style="height: 140px;"></div>
+              <div class="absolute -top-8 left-1/2 -translate-x-1/2 bg-gray-800 text-white text-[10px] font-semibold px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition whitespace-nowrap">&#8377;1.2Cr</div>
+            </div>
+            <span class="text-[10px] font-medium text-gray-500">Mar</span>
+          </div>
+        </div>
+        <!-- Chart footer -->
+        <div class="flex items-center justify-between mt-4 pt-4 border-t border-gray-100">
+          <div class="flex items-center gap-4">
+            <div class="text-xs text-gray-500">Total (6 months): <span class="font-bold text-gray-800">&#8377;6.06 Cr</span></div>
+            <div class="text-xs text-gray-500">Avg monthly: <span class="font-bold text-gray-800">&#8377;1.01 Cr</span></div>
+          </div>
+          <div class="text-xs text-gray-500">234 active sellers across all periods</div>
+        </div>
+      </div>
+
+      <!-- ===== FILTER TABS + SEARCH ===== -->
+      <div class="bg-white rounded-xl border border-gray-100 shadow-sm mb-6">
+        <div class="border-b border-gray-100 px-6 overflow-x-auto scrollbar-hide">
+          <div class="flex gap-0 min-w-max">
+            <button class="filter-tab active text-sm font-medium px-4 py-3.5 border-b-2 border-brand-500 text-brand-500">All (48)</button>
+            <button class="filter-tab text-sm font-medium px-4 py-3.5 border-b-2 border-transparent text-gray-500 hover:text-gray-700">Pending (12)</button>
+            <button class="filter-tab text-sm font-medium px-4 py-3.5 border-b-2 border-transparent text-gray-500 hover:text-gray-700">Processing (8)</button>
+            <button class="filter-tab text-sm font-medium px-4 py-3.5 border-b-2 border-transparent text-gray-500 hover:text-gray-700">Completed (22)</button>
+            <button class="filter-tab text-sm font-medium px-4 py-3.5 border-b-2 border-transparent text-gray-500 hover:text-gray-700">Failed (4)</button>
+            <button class="filter-tab text-sm font-medium px-4 py-3.5 border-b-2 border-transparent text-gray-500 hover:text-gray-700">Disputed (2)</button>
+          </div>
+        </div>
+
+        <!-- Search & Filters -->
+        <div class="p-4 flex flex-wrap items-center gap-3">
+          <div class="relative flex-1 min-w-[240px]">
+            <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+            <input type="text" placeholder="Search by settlement ID, seller name..." class="w-full bg-gray-50 border border-gray-200 rounded-lg py-2.5 pl-10 pr-4 text-sm outline-none focus:border-brand-400 focus:ring-2 focus:ring-brand-100 transition">
+          </div>
+          <!-- Seller Filter -->
+          <select class="bg-gray-50 border border-gray-200 rounded-lg px-3 py-2.5 text-sm text-gray-600 outline-none focus:border-brand-400 focus:ring-2 focus:ring-brand-100">
+            <option>All Sellers</option>
+            <option>Rajesh Store</option>
+            <option>Krishna Home Decor</option>
+            <option>Priya Fashion Hub</option>
+            <option>TechWorld India</option>
+            <option>Mumbai Essentials</option>
+            <option>Sharma Electronics</option>
+            <option>Gupta Textiles</option>
+          </select>
+          <!-- Date Range -->
+          <div class="flex items-center gap-2 bg-gray-50 border border-gray-200 rounded-lg px-3 py-2.5">
+            <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5"/></svg>
+            <span class="text-sm text-gray-600">Mar 1 - Mar 28, 2026</span>
+            <svg class="w-3.5 h-3.5 text-gray-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M19.5 8.25l-7.5 7.5-7.5-7.5"/></svg>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== SETTLEMENTS TABLE WITH EXPANDABLE EARNINGS BREAKDOWN ===== -->
+      <div class="bg-white rounded-xl border border-gray-100 shadow-sm mb-6 overflow-hidden">
+        <div class="overflow-x-auto">
+          <table class="w-full" id="settlements-table">
+            <thead>
+              <tr class="bg-gray-50/80">
+                <th class="text-left text-[10px] font-semibold text-gray-500 uppercase tracking-wider px-3 py-3 w-8"></th>
+                <th class="text-left text-[10px] font-semibold text-gray-500 uppercase tracking-wider px-3 py-3">Settlement ID</th>
+                <th class="text-left text-[10px] font-semibold text-gray-500 uppercase tracking-wider px-3 py-3">Seller Name</th>
+                <th class="text-left text-[10px] font-semibold text-gray-500 uppercase tracking-wider px-3 py-3">Period</th>
+                <th class="text-right text-[10px] font-semibold text-gray-500 uppercase tracking-wider px-3 py-3">Gross Amount</th>
+                <th class="text-right text-[10px] font-semibold text-gray-500 uppercase tracking-wider px-3 py-3">Platform Fee (5%)</th>
+                <th class="text-right text-[10px] font-semibold text-gray-500 uppercase tracking-wider px-3 py-3">GST</th>
+                <th class="text-right text-[10px] font-semibold text-gray-500 uppercase tracking-wider px-3 py-3">Net Payout</th>
+                <th class="text-center text-[10px] font-semibold text-gray-500 uppercase tracking-wider px-3 py-3">Status</th>
+                <th class="text-left text-[10px] font-semibold text-gray-500 uppercase tracking-wider px-3 py-3">Payout Date</th>
+                <th class="text-center text-[10px] font-semibold text-gray-500 uppercase tracking-wider px-6 py-3">Actions</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-50">
+              <!-- Row 1 - Pending -->
+              <tr class="table-row expand-trigger" data-id="STL-20260328-001" data-seller="Rajesh Store" data-status="Pending" onclick="toggleEarnings(this)">
+                <td class="px-3 py-3.5 text-center">
+                  <svg class="w-4 h-4 text-gray-400 chevron" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M8.25 4.5l7.5 7.5-7.5 7.5"/></svg>
+                </td>
+                <td class="px-3 py-3.5"><span class="text-sm font-semibold text-brand-600">STL-20260328-001</span></td>
+                <td class="px-3 py-3.5">
+                  <div class="flex items-center gap-2.5">
+                    <div class="w-7 h-7 rounded-full bg-gradient-to-br from-blue-400 to-blue-600 flex items-center justify-center text-white text-[10px] font-bold shrink-0">RS</div>
+                    <span class="text-sm text-gray-800 font-medium">Rajesh Store</span>
+                  </div>
+                </td>
+                <td class="px-3 py-3.5 text-sm text-gray-600">Mar 15 - 21</td>
+                <td class="px-3 py-3.5 text-right text-sm font-medium text-gray-800">&#8377;8,45,200</td>
+                <td class="px-3 py-3.5 text-right text-sm text-red-500">-&#8377;42,260</td>
+                <td class="px-3 py-3.5 text-right text-sm text-red-500">-&#8377;7,605</td>
+                <td class="px-3 py-3.5 text-right text-sm font-bold text-gray-900">&#8377;7,95,335</td>
+                <td class="px-3 py-3.5 text-center">
+                  <span class="inline-flex items-center gap-1 text-[11px] font-semibold text-yellow-700 bg-yellow-50 border border-yellow-200 px-2.5 py-1 rounded-full">
+                    <span class="w-1.5 h-1.5 rounded-full bg-yellow-500"></span>Pending
+                  </span>
+                </td>
+                <td class="px-3 py-3.5 text-sm text-gray-500">--</td>
+                <td class="px-6 py-3.5 text-center" onclick="event.stopPropagation()">
+                  <div class="flex items-center justify-center gap-1.5">
+                    <button onclick="processSettlement(this)" class="p-1.5 text-green-600 hover:bg-green-50 rounded-lg transition" title="Process">
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M5.25 5.653c0-.856.917-1.398 1.667-.986l11.54 6.348a1.125 1.125 0 010 1.971l-11.54 6.347a1.125 1.125 0 01-1.667-.985V5.653z"/></svg>
+                    </button>
+                    <button onclick="viewSettlement(this)" class="p-1.5 text-gray-400 hover:bg-gray-100 rounded-lg transition" title="View">
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z"/><path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                    </button>
+                  </div>
+                </td>
+              </tr>
+              <!-- Expandable Earnings Breakdown for Row 1 -->
+              <tr class="expand-row" id="earnings-STL-20260328-001">
+                <td colspan="11" class="px-0 py-0">
+                  <div class="bg-gray-50 border-t border-b border-gray-100 px-8 py-4">
+                    <p class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3">Seller Earnings Breakdown</p>
+                    <div class="flex items-center gap-0">
+                      <!-- Gross Sales -->
+                      <div class="flex-1 bg-white rounded-l-lg border border-gray-200 p-3 text-center">
+                        <p class="text-[10px] font-semibold text-gray-500 uppercase">Gross Sales</p>
+                        <p class="text-sm font-bold text-gray-900 mt-1">&#8377;8,45,200</p>
+                      </div>
+                      <div class="text-gray-300 text-lg font-light px-1">&rarr;</div>
+                      <!-- Commission -->
+                      <div class="flex-1 bg-white border border-gray-200 p-3 text-center">
+                        <p class="text-[10px] font-semibold text-red-500 uppercase">Commission (5%)</p>
+                        <p class="text-sm font-bold text-red-600 mt-1">-&#8377;42,260</p>
+                      </div>
+                      <div class="text-gray-300 text-lg font-light px-1">&rarr;</div>
+                      <!-- GST -->
+                      <div class="flex-1 bg-white border border-gray-200 p-3 text-center">
+                        <p class="text-[10px] font-semibold text-red-500 uppercase">GST (18% on fee)</p>
+                        <p class="text-sm font-bold text-red-600 mt-1">-&#8377;7,605</p>
+                      </div>
+                      <div class="text-gray-300 text-lg font-light px-1">&rarr;</div>
+                      <!-- TDS -->
+                      <div class="flex-1 bg-white border border-gray-200 p-3 text-center">
+                        <p class="text-[10px] font-semibold text-red-500 uppercase">TDS (1%)</p>
+                        <p class="text-sm font-bold text-red-600 mt-1">-&#8377;8,452</p>
+                      </div>
+                      <div class="text-gray-300 text-lg font-light px-1">&rarr;</div>
+                      <!-- Adjustments -->
+                      <div class="flex-1 bg-white border border-gray-200 p-3 text-center">
+                        <p class="text-[10px] font-semibold text-gray-500 uppercase">Adjustments</p>
+                        <p class="text-sm font-bold text-green-600 mt-1">+&#8377;8,452</p>
+                        <p class="text-[9px] text-gray-400 mt-0.5">Return reversal</p>
+                      </div>
+                      <div class="text-gray-300 text-lg font-light px-1">&rarr;</div>
+                      <!-- Net Payout -->
+                      <div class="flex-1 bg-green-50 rounded-r-lg border border-green-200 p-3 text-center">
+                        <p class="text-[10px] font-semibold text-green-700 uppercase">Net Payout</p>
+                        <p class="text-sm font-bold text-green-700 mt-1">&#8377;7,95,335</p>
+                      </div>
+                    </div>
+                  </div>
+                </td>
+              </tr>
+
+              <!-- Row 2 - Processing -->
+              <tr class="table-row expand-trigger" data-id="STL-20260327-002" data-seller="TechWorld India" data-status="Processing" onclick="toggleEarnings(this)">
+                <td class="px-3 py-3.5 text-center">
+                  <svg class="w-4 h-4 text-gray-400 chevron" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M8.25 4.5l7.5 7.5-7.5 7.5"/></svg>
+                </td>
+                <td class="px-3 py-3.5"><span class="text-sm font-semibold text-brand-600">STL-20260327-002</span></td>
+                <td class="px-3 py-3.5">
+                  <div class="flex items-center gap-2.5">
+                    <div class="w-7 h-7 rounded-full bg-gradient-to-br from-emerald-400 to-emerald-600 flex items-center justify-center text-white text-[10px] font-bold shrink-0">TW</div>
+                    <span class="text-sm text-gray-800 font-medium">TechWorld India</span>
+                  </div>
+                </td>
+                <td class="px-3 py-3.5 text-sm text-gray-600">Mar 15 - 21</td>
+                <td class="px-3 py-3.5 text-right text-sm font-medium text-gray-800">&#8377;15,72,800</td>
+                <td class="px-3 py-3.5 text-right text-sm text-red-500">-&#8377;78,640</td>
+                <td class="px-3 py-3.5 text-right text-sm text-red-500">-&#8377;14,155</td>
+                <td class="px-3 py-3.5 text-right text-sm font-bold text-gray-900">&#8377;14,80,005</td>
+                <td class="px-3 py-3.5 text-center">
+                  <span class="inline-flex items-center gap-1 text-[11px] font-semibold text-blue-700 bg-blue-50 border border-blue-200 px-2.5 py-1 rounded-full">
+                    <span class="w-1.5 h-1.5 rounded-full bg-blue-500 animate-pulse"></span>Processing
+                  </span>
+                </td>
+                <td class="px-3 py-3.5 text-sm text-gray-500">28 Mar 2026</td>
+                <td class="px-6 py-3.5 text-center" onclick="event.stopPropagation()">
+                  <div class="flex items-center justify-center gap-1.5">
+                    <button onclick="viewSettlement(this)" class="p-1.5 text-gray-400 hover:bg-gray-100 rounded-lg transition" title="View">
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z"/><path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                    </button>
+                  </div>
+                </td>
+              </tr>
+              <!-- Expandable Earnings Breakdown for Row 2 -->
+              <tr class="expand-row" id="earnings-STL-20260327-002">
+                <td colspan="11" class="px-0 py-0">
+                  <div class="bg-gray-50 border-t border-b border-gray-100 px-8 py-4">
+                    <p class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3">Seller Earnings Breakdown</p>
+                    <div class="flex items-center gap-0">
+                      <div class="flex-1 bg-white rounded-l-lg border border-gray-200 p-3 text-center">
+                        <p class="text-[10px] font-semibold text-gray-500 uppercase">Gross Sales</p>
+                        <p class="text-sm font-bold text-gray-900 mt-1">&#8377;15,72,800</p>
+                      </div>
+                      <div class="text-gray-300 text-lg font-light px-1">&rarr;</div>
+                      <div class="flex-1 bg-white border border-gray-200 p-3 text-center">
+                        <p class="text-[10px] font-semibold text-red-500 uppercase">Commission (5%)</p>
+                        <p class="text-sm font-bold text-red-600 mt-1">-&#8377;78,640</p>
+                      </div>
+                      <div class="text-gray-300 text-lg font-light px-1">&rarr;</div>
+                      <div class="flex-1 bg-white border border-gray-200 p-3 text-center">
+                        <p class="text-[10px] font-semibold text-red-500 uppercase">GST (18% on fee)</p>
+                        <p class="text-sm font-bold text-red-600 mt-1">-&#8377;14,155</p>
+                      </div>
+                      <div class="text-gray-300 text-lg font-light px-1">&rarr;</div>
+                      <div class="flex-1 bg-white border border-gray-200 p-3 text-center">
+                        <p class="text-[10px] font-semibold text-red-500 uppercase">TDS (1%)</p>
+                        <p class="text-sm font-bold text-red-600 mt-1">-&#8377;15,728</p>
+                      </div>
+                      <div class="text-gray-300 text-lg font-light px-1">&rarr;</div>
+                      <div class="flex-1 bg-white border border-gray-200 p-3 text-center">
+                        <p class="text-[10px] font-semibold text-gray-500 uppercase">Adjustments</p>
+                        <p class="text-sm font-bold text-gray-500 mt-1">&#8377;0</p>
+                        <p class="text-[9px] text-gray-400 mt-0.5">No adjustments</p>
+                      </div>
+                      <div class="text-gray-300 text-lg font-light px-1">&rarr;</div>
+                      <div class="flex-1 bg-green-50 rounded-r-lg border border-green-200 p-3 text-center">
+                        <p class="text-[10px] font-semibold text-green-700 uppercase">Net Payout</p>
+                        <p class="text-sm font-bold text-green-700 mt-1">&#8377;14,80,005</p>
+                      </div>
+                    </div>
+                  </div>
+                </td>
+              </tr>
+
+              <!-- Row 3 - Completed -->
+              <tr class="table-row expand-trigger" data-id="STL-20260321-003" data-seller="Priya Fashion Hub" data-status="Completed" onclick="toggleEarnings(this)">
+                <td class="px-3 py-3.5 text-center">
+                  <svg class="w-4 h-4 text-gray-400 chevron" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M8.25 4.5l7.5 7.5-7.5 7.5"/></svg>
+                </td>
+                <td class="px-3 py-3.5"><span class="text-sm font-semibold text-brand-600">STL-20260321-003</span></td>
+                <td class="px-3 py-3.5">
+                  <div class="flex items-center gap-2.5">
+                    <div class="w-7 h-7 rounded-full bg-gradient-to-br from-pink-400 to-pink-600 flex items-center justify-center text-white text-[10px] font-bold shrink-0">PF</div>
+                    <span class="text-sm text-gray-800 font-medium">Priya Fashion Hub</span>
+                  </div>
+                </td>
+                <td class="px-3 py-3.5 text-sm text-gray-600">Mar 8 - 14</td>
+                <td class="px-3 py-3.5 text-right text-sm font-medium text-gray-800">&#8377;6,89,400</td>
+                <td class="px-3 py-3.5 text-right text-sm text-red-500">-&#8377;34,470</td>
+                <td class="px-3 py-3.5 text-right text-sm text-red-500">-&#8377;6,205</td>
+                <td class="px-3 py-3.5 text-right text-sm font-bold text-gray-900">&#8377;6,48,725</td>
+                <td class="px-3 py-3.5 text-center">
+                  <span class="inline-flex items-center gap-1 text-[11px] font-semibold text-green-700 bg-green-50 border border-green-200 px-2.5 py-1 rounded-full">
+                    <span class="w-1.5 h-1.5 rounded-full bg-green-500"></span>Completed
+                  </span>
+                </td>
+                <td class="px-3 py-3.5 text-sm text-gray-500">21 Mar 2026</td>
+                <td class="px-6 py-3.5 text-center" onclick="event.stopPropagation()">
+                  <div class="flex items-center justify-center gap-1.5">
+                    <button onclick="viewSettlement(this)" class="p-1.5 text-gray-400 hover:bg-gray-100 rounded-lg transition" title="View">
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z"/><path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                    </button>
+                  </div>
+                </td>
+              </tr>
+              <!-- Expandable Earnings Breakdown for Row 3 -->
+              <tr class="expand-row" id="earnings-STL-20260321-003">
+                <td colspan="11" class="px-0 py-0">
+                  <div class="bg-gray-50 border-t border-b border-gray-100 px-8 py-4">
+                    <p class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3">Seller Earnings Breakdown</p>
+                    <div class="flex items-center gap-0">
+                      <div class="flex-1 bg-white rounded-l-lg border border-gray-200 p-3 text-center">
+                        <p class="text-[10px] font-semibold text-gray-500 uppercase">Gross Sales</p>
+                        <p class="text-sm font-bold text-gray-900 mt-1">&#8377;6,89,400</p>
+                      </div>
+                      <div class="text-gray-300 text-lg font-light px-1">&rarr;</div>
+                      <div class="flex-1 bg-white border border-gray-200 p-3 text-center">
+                        <p class="text-[10px] font-semibold text-red-500 uppercase">Commission (5%)</p>
+                        <p class="text-sm font-bold text-red-600 mt-1">-&#8377;34,470</p>
+                      </div>
+                      <div class="text-gray-300 text-lg font-light px-1">&rarr;</div>
+                      <div class="flex-1 bg-white border border-gray-200 p-3 text-center">
+                        <p class="text-[10px] font-semibold text-red-500 uppercase">GST (18% on fee)</p>
+                        <p class="text-sm font-bold text-red-600 mt-1">-&#8377;6,205</p>
+                      </div>
+                      <div class="text-gray-300 text-lg font-light px-1">&rarr;</div>
+                      <div class="flex-1 bg-white border border-gray-200 p-3 text-center">
+                        <p class="text-[10px] font-semibold text-red-500 uppercase">TDS (1%)</p>
+                        <p class="text-sm font-bold text-red-600 mt-1">-&#8377;6,894</p>
+                      </div>
+                      <div class="text-gray-300 text-lg font-light px-1">&rarr;</div>
+                      <div class="flex-1 bg-white border border-gray-200 p-3 text-center">
+                        <p class="text-[10px] font-semibold text-gray-500 uppercase">Adjustments</p>
+                        <p class="text-sm font-bold text-green-600 mt-1">+&#8377;6,894</p>
+                        <p class="text-[9px] text-gray-400 mt-0.5">Promo credit</p>
+                      </div>
+                      <div class="text-gray-300 text-lg font-light px-1">&rarr;</div>
+                      <div class="flex-1 bg-green-50 rounded-r-lg border border-green-200 p-3 text-center">
+                        <p class="text-[10px] font-semibold text-green-700 uppercase">Net Payout</p>
+                        <p class="text-sm font-bold text-green-700 mt-1">&#8377;6,48,725</p>
+                      </div>
+                    </div>
+                  </div>
+                </td>
+              </tr>
+
+              <!-- Row 4 - Pending -->
+              <tr class="table-row expand-trigger" data-id="STL-20260328-004" data-seller="Krishna Home Decor" data-status="Pending" onclick="toggleEarnings(this)">
+                <td class="px-3 py-3.5 text-center">
+                  <svg class="w-4 h-4 text-gray-400 chevron" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M8.25 4.5l7.5 7.5-7.5 7.5"/></svg>
+                </td>
+                <td class="px-3 py-3.5"><span class="text-sm font-semibold text-brand-600">STL-20260328-004</span></td>
+                <td class="px-3 py-3.5">
+                  <div class="flex items-center gap-2.5">
+                    <div class="w-7 h-7 rounded-full bg-gradient-to-br from-violet-400 to-violet-600 flex items-center justify-center text-white text-[10px] font-bold shrink-0">KH</div>
+                    <span class="text-sm text-gray-800 font-medium">Krishna Home Decor</span>
+                  </div>
+                </td>
+                <td class="px-3 py-3.5 text-sm text-gray-600">Mar 22 - 28</td>
+                <td class="px-3 py-3.5 text-right text-sm font-medium text-gray-800">&#8377;4,23,600</td>
+                <td class="px-3 py-3.5 text-right text-sm text-red-500">-&#8377;21,180</td>
+                <td class="px-3 py-3.5 text-right text-sm text-red-500">-&#8377;3,812</td>
+                <td class="px-3 py-3.5 text-right text-sm font-bold text-gray-900">&#8377;3,98,608</td>
+                <td class="px-3 py-3.5 text-center">
+                  <span class="inline-flex items-center gap-1 text-[11px] font-semibold text-yellow-700 bg-yellow-50 border border-yellow-200 px-2.5 py-1 rounded-full">
+                    <span class="w-1.5 h-1.5 rounded-full bg-yellow-500"></span>Pending
+                  </span>
+                </td>
+                <td class="px-3 py-3.5 text-sm text-gray-500">--</td>
+                <td class="px-6 py-3.5 text-center" onclick="event.stopPropagation()">
+                  <div class="flex items-center justify-center gap-1.5">
+                    <button onclick="processSettlement(this)" class="p-1.5 text-green-600 hover:bg-green-50 rounded-lg transition" title="Process">
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M5.25 5.653c0-.856.917-1.398 1.667-.986l11.54 6.348a1.125 1.125 0 010 1.971l-11.54 6.347a1.125 1.125 0 01-1.667-.985V5.653z"/></svg>
+                    </button>
+                    <button onclick="viewSettlement(this)" class="p-1.5 text-gray-400 hover:bg-gray-100 rounded-lg transition" title="View">
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z"/><path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                    </button>
+                  </div>
+                </td>
+              </tr>
+              <!-- Expandable Earnings Breakdown for Row 4 -->
+              <tr class="expand-row" id="earnings-STL-20260328-004">
+                <td colspan="11" class="px-0 py-0">
+                  <div class="bg-gray-50 border-t border-b border-gray-100 px-8 py-4">
+                    <p class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3">Seller Earnings Breakdown</p>
+                    <div class="flex items-center gap-0">
+                      <div class="flex-1 bg-white rounded-l-lg border border-gray-200 p-3 text-center">
+                        <p class="text-[10px] font-semibold text-gray-500 uppercase">Gross Sales</p>
+                        <p class="text-sm font-bold text-gray-900 mt-1">&#8377;4,23,600</p>
+                      </div>
+                      <div class="text-gray-300 text-lg font-light px-1">&rarr;</div>
+                      <div class="flex-1 bg-white border border-gray-200 p-3 text-center">
+                        <p class="text-[10px] font-semibold text-red-500 uppercase">Commission (5%)</p>
+                        <p class="text-sm font-bold text-red-600 mt-1">-&#8377;21,180</p>
+                      </div>
+                      <div class="text-gray-300 text-lg font-light px-1">&rarr;</div>
+                      <div class="flex-1 bg-white border border-gray-200 p-3 text-center">
+                        <p class="text-[10px] font-semibold text-red-500 uppercase">GST (18% on fee)</p>
+                        <p class="text-sm font-bold text-red-600 mt-1">-&#8377;3,812</p>
+                      </div>
+                      <div class="text-gray-300 text-lg font-light px-1">&rarr;</div>
+                      <div class="flex-1 bg-white border border-gray-200 p-3 text-center">
+                        <p class="text-[10px] font-semibold text-red-500 uppercase">TDS (1%)</p>
+                        <p class="text-sm font-bold text-red-600 mt-1">-&#8377;4,236</p>
+                      </div>
+                      <div class="text-gray-300 text-lg font-light px-1">&rarr;</div>
+                      <div class="flex-1 bg-white border border-gray-200 p-3 text-center">
+                        <p class="text-[10px] font-semibold text-gray-500 uppercase">Adjustments</p>
+                        <p class="text-sm font-bold text-green-600 mt-1">+&#8377;4,236</p>
+                        <p class="text-[9px] text-gray-400 mt-0.5">Shipping subsidy</p>
+                      </div>
+                      <div class="text-gray-300 text-lg font-light px-1">&rarr;</div>
+                      <div class="flex-1 bg-green-50 rounded-r-lg border border-green-200 p-3 text-center">
+                        <p class="text-[10px] font-semibold text-green-700 uppercase">Net Payout</p>
+                        <p class="text-sm font-bold text-green-700 mt-1">&#8377;3,98,608</p>
+                      </div>
+                    </div>
+                  </div>
+                </td>
+              </tr>
+
+              <!-- Row 5 - Failed -->
+              <tr class="table-row expand-trigger" data-id="STL-20260325-005" data-seller="Mumbai Essentials" data-status="Failed" onclick="toggleEarnings(this)">
+                <td class="px-3 py-3.5 text-center">
+                  <svg class="w-4 h-4 text-gray-400 chevron" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M8.25 4.5l7.5 7.5-7.5 7.5"/></svg>
+                </td>
+                <td class="px-3 py-3.5"><span class="text-sm font-semibold text-brand-600">STL-20260325-005</span></td>
+                <td class="px-3 py-3.5">
+                  <div class="flex items-center gap-2.5">
+                    <div class="w-7 h-7 rounded-full bg-gradient-to-br from-amber-400 to-amber-600 flex items-center justify-center text-white text-[10px] font-bold shrink-0">ME</div>
+                    <span class="text-sm text-gray-800 font-medium">Mumbai Essentials</span>
+                  </div>
+                </td>
+                <td class="px-3 py-3.5 text-sm text-gray-600">Mar 8 - 14</td>
+                <td class="px-3 py-3.5 text-right text-sm font-medium text-gray-800">&#8377;2,15,800</td>
+                <td class="px-3 py-3.5 text-right text-sm text-red-500">-&#8377;10,790</td>
+                <td class="px-3 py-3.5 text-right text-sm text-red-500">-&#8377;1,942</td>
+                <td class="px-3 py-3.5 text-right text-sm font-bold text-gray-900">&#8377;2,03,068</td>
+                <td class="px-3 py-3.5 text-center">
+                  <span class="inline-flex items-center gap-1 text-[11px] font-semibold text-red-700 bg-red-50 border border-red-200 px-2.5 py-1 rounded-full">
+                    <span class="w-1.5 h-1.5 rounded-full bg-red-500"></span>Failed
+                  </span>
+                </td>
+                <td class="px-3 py-3.5 text-sm text-gray-500">25 Mar 2026</td>
+                <td class="px-6 py-3.5 text-center" onclick="event.stopPropagation()">
+                  <div class="flex items-center justify-center gap-1.5">
+                    <button onclick="retrySettlement(this)" class="p-1.5 text-orange-500 hover:bg-orange-50 rounded-lg transition" title="Retry">
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182"/></svg>
+                    </button>
+                    <button onclick="viewSettlement(this)" class="p-1.5 text-gray-400 hover:bg-gray-100 rounded-lg transition" title="View">
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z"/><path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                    </button>
+                  </div>
+                </td>
+              </tr>
+              <tr class="expand-row" id="earnings-STL-20260325-005">
+                <td colspan="11" class="px-0 py-0">
+                  <div class="bg-gray-50 border-t border-b border-gray-100 px-8 py-4">
+                    <p class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3">Seller Earnings Breakdown</p>
+                    <div class="flex items-center gap-0">
+                      <div class="flex-1 bg-white rounded-l-lg border border-gray-200 p-3 text-center">
+                        <p class="text-[10px] font-semibold text-gray-500 uppercase">Gross Sales</p>
+                        <p class="text-sm font-bold text-gray-900 mt-1">&#8377;2,15,800</p>
+                      </div>
+                      <div class="text-gray-300 text-lg font-light px-1">&rarr;</div>
+                      <div class="flex-1 bg-white border border-gray-200 p-3 text-center">
+                        <p class="text-[10px] font-semibold text-red-500 uppercase">Commission (5%)</p>
+                        <p class="text-sm font-bold text-red-600 mt-1">-&#8377;10,790</p>
+                      </div>
+                      <div class="text-gray-300 text-lg font-light px-1">&rarr;</div>
+                      <div class="flex-1 bg-white border border-gray-200 p-3 text-center">
+                        <p class="text-[10px] font-semibold text-red-500 uppercase">GST (18% on fee)</p>
+                        <p class="text-sm font-bold text-red-600 mt-1">-&#8377;1,942</p>
+                      </div>
+                      <div class="text-gray-300 text-lg font-light px-1">&rarr;</div>
+                      <div class="flex-1 bg-white border border-gray-200 p-3 text-center">
+                        <p class="text-[10px] font-semibold text-red-500 uppercase">TDS (1%)</p>
+                        <p class="text-sm font-bold text-red-600 mt-1">-&#8377;2,158</p>
+                      </div>
+                      <div class="text-gray-300 text-lg font-light px-1">&rarr;</div>
+                      <div class="flex-1 bg-white border border-gray-200 p-3 text-center">
+                        <p class="text-[10px] font-semibold text-gray-500 uppercase">Adjustments</p>
+                        <p class="text-sm font-bold text-green-600 mt-1">+&#8377;2,158</p>
+                        <p class="text-[9px] text-gray-400 mt-0.5">Penalty waiver</p>
+                      </div>
+                      <div class="text-gray-300 text-lg font-light px-1">&rarr;</div>
+                      <div class="flex-1 bg-green-50 rounded-r-lg border border-green-200 p-3 text-center">
+                        <p class="text-[10px] font-semibold text-green-700 uppercase">Net Payout</p>
+                        <p class="text-sm font-bold text-green-700 mt-1">&#8377;2,03,068</p>
+                      </div>
+                    </div>
+                  </div>
+                </td>
+              </tr>
+
+              <!-- Row 6 - Completed -->
+              <tr class="table-row expand-trigger" data-id="STL-20260321-006" data-seller="Sharma Electronics" data-status="Completed" onclick="toggleEarnings(this)">
+                <td class="px-3 py-3.5 text-center">
+                  <svg class="w-4 h-4 text-gray-400 chevron" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M8.25 4.5l7.5 7.5-7.5 7.5"/></svg>
+                </td>
+                <td class="px-3 py-3.5"><span class="text-sm font-semibold text-brand-600">STL-20260321-006</span></td>
+                <td class="px-3 py-3.5">
+                  <div class="flex items-center gap-2.5">
+                    <div class="w-7 h-7 rounded-full bg-gradient-to-br from-teal-400 to-teal-600 flex items-center justify-center text-white text-[10px] font-bold shrink-0">SE</div>
+                    <span class="text-sm text-gray-800 font-medium">Sharma Electronics</span>
+                  </div>
+                </td>
+                <td class="px-3 py-3.5 text-sm text-gray-600">Mar 8 - 14</td>
+                <td class="px-3 py-3.5 text-right text-sm font-medium text-gray-800">&#8377;22,34,500</td>
+                <td class="px-3 py-3.5 text-right text-sm text-red-500">-&#8377;1,11,725</td>
+                <td class="px-3 py-3.5 text-right text-sm text-red-500">-&#8377;20,111</td>
+                <td class="px-3 py-3.5 text-right text-sm font-bold text-gray-900">&#8377;21,02,664</td>
+                <td class="px-3 py-3.5 text-center">
+                  <span class="inline-flex items-center gap-1 text-[11px] font-semibold text-green-700 bg-green-50 border border-green-200 px-2.5 py-1 rounded-full">
+                    <span class="w-1.5 h-1.5 rounded-full bg-green-500"></span>Completed
+                  </span>
+                </td>
+                <td class="px-3 py-3.5 text-sm text-gray-500">21 Mar 2026</td>
+                <td class="px-6 py-3.5 text-center" onclick="event.stopPropagation()">
+                  <div class="flex items-center justify-center gap-1.5">
+                    <button onclick="viewSettlement(this)" class="p-1.5 text-gray-400 hover:bg-gray-100 rounded-lg transition" title="View">
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z"/><path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                    </button>
+                  </div>
+                </td>
+              </tr>
+              <tr class="expand-row" id="earnings-STL-20260321-006">
+                <td colspan="11" class="px-0 py-0">
+                  <div class="bg-gray-50 border-t border-b border-gray-100 px-8 py-4">
+                    <p class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3">Seller Earnings Breakdown</p>
+                    <div class="flex items-center gap-0">
+                      <div class="flex-1 bg-white rounded-l-lg border border-gray-200 p-3 text-center">
+                        <p class="text-[10px] font-semibold text-gray-500 uppercase">Gross Sales</p>
+                        <p class="text-sm font-bold text-gray-900 mt-1">&#8377;22,34,500</p>
+                      </div>
+                      <div class="text-gray-300 text-lg font-light px-1">&rarr;</div>
+                      <div class="flex-1 bg-white border border-gray-200 p-3 text-center">
+                        <p class="text-[10px] font-semibold text-red-500 uppercase">Commission (5%)</p>
+                        <p class="text-sm font-bold text-red-600 mt-1">-&#8377;1,11,725</p>
+                      </div>
+                      <div class="text-gray-300 text-lg font-light px-1">&rarr;</div>
+                      <div class="flex-1 bg-white border border-gray-200 p-3 text-center">
+                        <p class="text-[10px] font-semibold text-red-500 uppercase">GST (18% on fee)</p>
+                        <p class="text-sm font-bold text-red-600 mt-1">-&#8377;20,111</p>
+                      </div>
+                      <div class="text-gray-300 text-lg font-light px-1">&rarr;</div>
+                      <div class="flex-1 bg-white border border-gray-200 p-3 text-center">
+                        <p class="text-[10px] font-semibold text-red-500 uppercase">TDS (1%)</p>
+                        <p class="text-sm font-bold text-red-600 mt-1">-&#8377;22,345</p>
+                      </div>
+                      <div class="text-gray-300 text-lg font-light px-1">&rarr;</div>
+                      <div class="flex-1 bg-white border border-gray-200 p-3 text-center">
+                        <p class="text-[10px] font-semibold text-gray-500 uppercase">Adjustments</p>
+                        <p class="text-sm font-bold text-green-600 mt-1">+&#8377;22,345</p>
+                        <p class="text-[9px] text-gray-400 mt-0.5">Festival bonus</p>
+                      </div>
+                      <div class="text-gray-300 text-lg font-light px-1">&rarr;</div>
+                      <div class="flex-1 bg-green-50 rounded-r-lg border border-green-200 p-3 text-center">
+                        <p class="text-[10px] font-semibold text-green-700 uppercase">Net Payout</p>
+                        <p class="text-sm font-bold text-green-700 mt-1">&#8377;21,02,664</p>
+                      </div>
+                    </div>
+                  </div>
+                </td>
+              </tr>
+
+              <!-- Row 7 - Processing -->
+              <tr class="table-row expand-trigger" data-id="STL-20260327-007" data-seller="Gupta Textiles" data-status="Processing" onclick="toggleEarnings(this)">
+                <td class="px-3 py-3.5 text-center">
+                  <svg class="w-4 h-4 text-gray-400 chevron" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M8.25 4.5l7.5 7.5-7.5 7.5"/></svg>
+                </td>
+                <td class="px-3 py-3.5"><span class="text-sm font-semibold text-brand-600">STL-20260327-007</span></td>
+                <td class="px-3 py-3.5">
+                  <div class="flex items-center gap-2.5">
+                    <div class="w-7 h-7 rounded-full bg-gradient-to-br from-rose-400 to-rose-600 flex items-center justify-center text-white text-[10px] font-bold shrink-0">GT</div>
+                    <span class="text-sm text-gray-800 font-medium">Gupta Textiles</span>
+                  </div>
+                </td>
+                <td class="px-3 py-3.5 text-sm text-gray-600">Mar 15 - 21</td>
+                <td class="px-3 py-3.5 text-right text-sm font-medium text-gray-800">&#8377;9,67,300</td>
+                <td class="px-3 py-3.5 text-right text-sm text-red-500">-&#8377;48,365</td>
+                <td class="px-3 py-3.5 text-right text-sm text-red-500">-&#8377;8,706</td>
+                <td class="px-3 py-3.5 text-right text-sm font-bold text-gray-900">&#8377;9,10,229</td>
+                <td class="px-3 py-3.5 text-center">
+                  <span class="inline-flex items-center gap-1 text-[11px] font-semibold text-blue-700 bg-blue-50 border border-blue-200 px-2.5 py-1 rounded-full">
+                    <span class="w-1.5 h-1.5 rounded-full bg-blue-500 animate-pulse"></span>Processing
+                  </span>
+                </td>
+                <td class="px-3 py-3.5 text-sm text-gray-500">28 Mar 2026</td>
+                <td class="px-6 py-3.5 text-center" onclick="event.stopPropagation()">
+                  <div class="flex items-center justify-center gap-1.5">
+                    <button onclick="viewSettlement(this)" class="p-1.5 text-gray-400 hover:bg-gray-100 rounded-lg transition" title="View">
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z"/><path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                    </button>
+                  </div>
+                </td>
+              </tr>
+              <tr class="expand-row" id="earnings-STL-20260327-007">
+                <td colspan="11" class="px-0 py-0">
+                  <div class="bg-gray-50 border-t border-b border-gray-100 px-8 py-4">
+                    <p class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3">Seller Earnings Breakdown</p>
+                    <div class="flex items-center gap-0">
+                      <div class="flex-1 bg-white rounded-l-lg border border-gray-200 p-3 text-center">
+                        <p class="text-[10px] font-semibold text-gray-500 uppercase">Gross Sales</p>
+                        <p class="text-sm font-bold text-gray-900 mt-1">&#8377;9,67,300</p>
+                      </div>
+                      <div class="text-gray-300 text-lg font-light px-1">&rarr;</div>
+                      <div class="flex-1 bg-white border border-gray-200 p-3 text-center">
+                        <p class="text-[10px] font-semibold text-red-500 uppercase">Commission (5%)</p>
+                        <p class="text-sm font-bold text-red-600 mt-1">-&#8377;48,365</p>
+                      </div>
+                      <div class="text-gray-300 text-lg font-light px-1">&rarr;</div>
+                      <div class="flex-1 bg-white border border-gray-200 p-3 text-center">
+                        <p class="text-[10px] font-semibold text-red-500 uppercase">GST (18% on fee)</p>
+                        <p class="text-sm font-bold text-red-600 mt-1">-&#8377;8,706</p>
+                      </div>
+                      <div class="text-gray-300 text-lg font-light px-1">&rarr;</div>
+                      <div class="flex-1 bg-white border border-gray-200 p-3 text-center">
+                        <p class="text-[10px] font-semibold text-red-500 uppercase">TDS (1%)</p>
+                        <p class="text-sm font-bold text-red-600 mt-1">-&#8377;9,673</p>
+                      </div>
+                      <div class="text-gray-300 text-lg font-light px-1">&rarr;</div>
+                      <div class="flex-1 bg-white border border-gray-200 p-3 text-center">
+                        <p class="text-[10px] font-semibold text-gray-500 uppercase">Adjustments</p>
+                        <p class="text-sm font-bold text-green-600 mt-1">+&#8377;9,673</p>
+                        <p class="text-[9px] text-gray-400 mt-0.5">Late delivery credit</p>
+                      </div>
+                      <div class="text-gray-300 text-lg font-light px-1">&rarr;</div>
+                      <div class="flex-1 bg-green-50 rounded-r-lg border border-green-200 p-3 text-center">
+                        <p class="text-[10px] font-semibold text-green-700 uppercase">Net Payout</p>
+                        <p class="text-sm font-bold text-green-700 mt-1">&#8377;9,10,229</p>
+                      </div>
+                    </div>
+                  </div>
+                </td>
+              </tr>
+
+              <!-- Row 8 - Failed -->
+              <tr class="table-row expand-trigger" data-id="STL-20260325-008" data-seller="Rajesh Store" data-status="Failed" onclick="toggleEarnings(this)">
+                <td class="px-3 py-3.5 text-center">
+                  <svg class="w-4 h-4 text-gray-400 chevron" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M8.25 4.5l7.5 7.5-7.5 7.5"/></svg>
+                </td>
+                <td class="px-3 py-3.5"><span class="text-sm font-semibold text-brand-600">STL-20260325-008</span></td>
+                <td class="px-3 py-3.5">
+                  <div class="flex items-center gap-2.5">
+                    <div class="w-7 h-7 rounded-full bg-gradient-to-br from-blue-400 to-blue-600 flex items-center justify-center text-white text-[10px] font-bold shrink-0">RS</div>
+                    <span class="text-sm text-gray-800 font-medium">Rajesh Store</span>
+                  </div>
+                </td>
+                <td class="px-3 py-3.5 text-sm text-gray-600">Mar 1 - 7</td>
+                <td class="px-3 py-3.5 text-right text-sm font-medium text-gray-800">&#8377;5,12,900</td>
+                <td class="px-3 py-3.5 text-right text-sm text-red-500">-&#8377;25,645</td>
+                <td class="px-3 py-3.5 text-right text-sm text-red-500">-&#8377;4,616</td>
+                <td class="px-3 py-3.5 text-right text-sm font-bold text-gray-900">&#8377;4,82,639</td>
+                <td class="px-3 py-3.5 text-center">
+                  <span class="inline-flex items-center gap-1 text-[11px] font-semibold text-red-700 bg-red-50 border border-red-200 px-2.5 py-1 rounded-full">
+                    <span class="w-1.5 h-1.5 rounded-full bg-red-500"></span>Failed
+                  </span>
+                </td>
+                <td class="px-3 py-3.5 text-sm text-gray-500">25 Mar 2026</td>
+                <td class="px-6 py-3.5 text-center" onclick="event.stopPropagation()">
+                  <div class="flex items-center justify-center gap-1.5">
+                    <button onclick="retrySettlement(this)" class="p-1.5 text-orange-500 hover:bg-orange-50 rounded-lg transition" title="Retry">
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182"/></svg>
+                    </button>
+                    <button onclick="viewSettlement(this)" class="p-1.5 text-gray-400 hover:bg-gray-100 rounded-lg transition" title="View">
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z"/><path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                    </button>
+                  </div>
+                </td>
+              </tr>
+              <tr class="expand-row" id="earnings-STL-20260325-008">
+                <td colspan="11" class="px-0 py-0">
+                  <div class="bg-gray-50 border-t border-b border-gray-100 px-8 py-4">
+                    <p class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3">Seller Earnings Breakdown</p>
+                    <div class="flex items-center gap-0">
+                      <div class="flex-1 bg-white rounded-l-lg border border-gray-200 p-3 text-center">
+                        <p class="text-[10px] font-semibold text-gray-500 uppercase">Gross Sales</p>
+                        <p class="text-sm font-bold text-gray-900 mt-1">&#8377;5,12,900</p>
+                      </div>
+                      <div class="text-gray-300 text-lg font-light px-1">&rarr;</div>
+                      <div class="flex-1 bg-white border border-gray-200 p-3 text-center">
+                        <p class="text-[10px] font-semibold text-red-500 uppercase">Commission (5%)</p>
+                        <p class="text-sm font-bold text-red-600 mt-1">-&#8377;25,645</p>
+                      </div>
+                      <div class="text-gray-300 text-lg font-light px-1">&rarr;</div>
+                      <div class="flex-1 bg-white border border-gray-200 p-3 text-center">
+                        <p class="text-[10px] font-semibold text-red-500 uppercase">GST (18% on fee)</p>
+                        <p class="text-sm font-bold text-red-600 mt-1">-&#8377;4,616</p>
+                      </div>
+                      <div class="text-gray-300 text-lg font-light px-1">&rarr;</div>
+                      <div class="flex-1 bg-white border border-gray-200 p-3 text-center">
+                        <p class="text-[10px] font-semibold text-red-500 uppercase">TDS (1%)</p>
+                        <p class="text-sm font-bold text-red-600 mt-1">-&#8377;5,129</p>
+                      </div>
+                      <div class="text-gray-300 text-lg font-light px-1">&rarr;</div>
+                      <div class="flex-1 bg-white border border-gray-200 p-3 text-center">
+                        <p class="text-[10px] font-semibold text-gray-500 uppercase">Adjustments</p>
+                        <p class="text-sm font-bold text-green-600 mt-1">+&#8377;5,129</p>
+                        <p class="text-[9px] text-gray-400 mt-0.5">Damage claim</p>
+                      </div>
+                      <div class="text-gray-300 text-lg font-light px-1">&rarr;</div>
+                      <div class="flex-1 bg-green-50 rounded-r-lg border border-green-200 p-3 text-center">
+                        <p class="text-[10px] font-semibold text-green-700 uppercase">Net Payout</p>
+                        <p class="text-sm font-bold text-green-700 mt-1">&#8377;4,82,639</p>
+                      </div>
+                    </div>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- ===== HOLD REASONS TRACKER + FAILED SETTLEMENT RETRY (side by side) ===== -->
+      <div class="grid grid-cols-1 xl:grid-cols-5 gap-6 mb-8">
+
+        <!-- Hold Reasons Tracker -->
+        <div class="xl:col-span-3 bg-white rounded-xl border border-gray-100 shadow-sm p-6">
+          <div class="flex items-center justify-between mb-5">
+            <div class="flex items-center gap-3">
+              <h2 class="text-lg font-semibold text-gray-900">Sellers on Hold</h2>
+              <span class="text-xs font-semibold text-red-600 bg-red-50 px-2.5 py-1 rounded-full">8 Sellers</span>
+            </div>
+            <div class="flex items-center gap-4 text-xs text-gray-500">
+              <span class="flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-yellow-400"></span>KYC (3)</span>
+              <span class="flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-purple-400"></span>Dispute (2)</span>
+              <span class="flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-blue-400"></span>Low Balance (1)</span>
+              <span class="flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-red-500"></span>Fraud (2)</span>
+            </div>
+          </div>
+          <div class="space-y-3">
+            <!-- Hold 1 - KYC Pending -->
+            <div class="flex items-center justify-between bg-yellow-50/50 border border-yellow-100 rounded-lg px-4 py-3">
+              <div class="flex items-center gap-3">
+                <div class="w-8 h-8 rounded-full bg-gradient-to-br from-blue-400 to-blue-600 flex items-center justify-center text-white text-[10px] font-bold shrink-0">RS</div>
+                <div>
+                  <p class="text-sm font-medium text-gray-800">Rajesh Store</p>
+                  <p class="text-[11px] text-gray-500">Pending: &#8377;7,95,335 | Held since: 25 Mar 2026</p>
+                </div>
+              </div>
+              <div class="flex items-center gap-3">
+                <span class="inline-flex items-center gap-1 text-[10px] font-semibold text-yellow-700 bg-yellow-100 border border-yellow-200 px-2 py-0.5 rounded-full">KYC pending</span>
+                <button onclick="releaseHold('Rajesh Store','KYC pending')" class="text-xs font-semibold text-brand-600 hover:text-brand-700 bg-white border border-brand-200 px-3 py-1.5 rounded-lg hover:bg-brand-50 transition">Release Hold</button>
+              </div>
+            </div>
+            <!-- Hold 2 - KYC Pending -->
+            <div class="flex items-center justify-between bg-yellow-50/50 border border-yellow-100 rounded-lg px-4 py-3">
+              <div class="flex items-center gap-3">
+                <div class="w-8 h-8 rounded-full bg-gradient-to-br from-cyan-400 to-cyan-600 flex items-center justify-center text-white text-[10px] font-bold shrink-0">AK</div>
+                <div>
+                  <p class="text-sm font-medium text-gray-800">Anand Kitchen</p>
+                  <p class="text-[11px] text-gray-500">Pending: &#8377;3,12,400 | Held since: 22 Mar 2026</p>
+                </div>
+              </div>
+              <div class="flex items-center gap-3">
+                <span class="inline-flex items-center gap-1 text-[10px] font-semibold text-yellow-700 bg-yellow-100 border border-yellow-200 px-2 py-0.5 rounded-full">KYC pending</span>
+                <button onclick="releaseHold('Anand Kitchen','KYC pending')" class="text-xs font-semibold text-brand-600 hover:text-brand-700 bg-white border border-brand-200 px-3 py-1.5 rounded-lg hover:bg-brand-50 transition">Release Hold</button>
+              </div>
+            </div>
+            <!-- Hold 3 - KYC Pending -->
+            <div class="flex items-center justify-between bg-yellow-50/50 border border-yellow-100 rounded-lg px-4 py-3">
+              <div class="flex items-center gap-3">
+                <div class="w-8 h-8 rounded-full bg-gradient-to-br from-lime-400 to-lime-600 flex items-center justify-center text-white text-[10px] font-bold shrink-0">PB</div>
+                <div>
+                  <p class="text-sm font-medium text-gray-800">Patel Books</p>
+                  <p class="text-[11px] text-gray-500">Pending: &#8377;1,45,700 | Held since: 28 Mar 2026</p>
+                </div>
+              </div>
+              <div class="flex items-center gap-3">
+                <span class="inline-flex items-center gap-1 text-[10px] font-semibold text-yellow-700 bg-yellow-100 border border-yellow-200 px-2 py-0.5 rounded-full">KYC pending</span>
+                <button onclick="releaseHold('Patel Books','KYC pending')" class="text-xs font-semibold text-brand-600 hover:text-brand-700 bg-white border border-brand-200 px-3 py-1.5 rounded-lg hover:bg-brand-50 transition">Release Hold</button>
+              </div>
+            </div>
+            <!-- Hold 4 - Dispute Resolution -->
+            <div class="flex items-center justify-between bg-purple-50/50 border border-purple-100 rounded-lg px-4 py-3">
+              <div class="flex items-center gap-3">
+                <div class="w-8 h-8 rounded-full bg-gradient-to-br from-emerald-400 to-emerald-600 flex items-center justify-center text-white text-[10px] font-bold shrink-0">TW</div>
+                <div>
+                  <p class="text-sm font-medium text-gray-800">TechWorld India</p>
+                  <p class="text-[11px] text-gray-500">Pending: &#8377;11,45,230 | Held since: 20 Mar 2026</p>
+                </div>
+              </div>
+              <div class="flex items-center gap-3">
+                <span class="inline-flex items-center gap-1 text-[10px] font-semibold text-purple-700 bg-purple-100 border border-purple-200 px-2 py-0.5 rounded-full">Dispute resolution</span>
+                <button onclick="releaseHold('TechWorld India','Dispute resolution')" class="text-xs font-semibold text-brand-600 hover:text-brand-700 bg-white border border-brand-200 px-3 py-1.5 rounded-lg hover:bg-brand-50 transition">Release Hold</button>
+              </div>
+            </div>
+            <!-- Hold 5 - Dispute Resolution -->
+            <div class="flex items-center justify-between bg-purple-50/50 border border-purple-100 rounded-lg px-4 py-3">
+              <div class="flex items-center gap-3">
+                <div class="w-8 h-8 rounded-full bg-gradient-to-br from-pink-400 to-pink-600 flex items-center justify-center text-white text-[10px] font-bold shrink-0">PF</div>
+                <div>
+                  <p class="text-sm font-medium text-gray-800">Priya Fashion Hub</p>
+                  <p class="text-[11px] text-gray-500">Pending: &#8377;5,89,120 | Held since: 18 Mar 2026</p>
+                </div>
+              </div>
+              <div class="flex items-center gap-3">
+                <span class="inline-flex items-center gap-1 text-[10px] font-semibold text-purple-700 bg-purple-100 border border-purple-200 px-2 py-0.5 rounded-full">Dispute resolution</span>
+                <button onclick="releaseHold('Priya Fashion Hub','Dispute resolution')" class="text-xs font-semibold text-brand-600 hover:text-brand-700 bg-white border border-brand-200 px-3 py-1.5 rounded-lg hover:bg-brand-50 transition">Release Hold</button>
+              </div>
+            </div>
+            <!-- Hold 6 - Low Balance -->
+            <div class="flex items-center justify-between bg-blue-50/50 border border-blue-100 rounded-lg px-4 py-3">
+              <div class="flex items-center gap-3">
+                <div class="w-8 h-8 rounded-full bg-gradient-to-br from-orange-400 to-orange-600 flex items-center justify-center text-white text-[10px] font-bold shrink-0">NS</div>
+                <div>
+                  <p class="text-sm font-medium text-gray-800">Nair Spices</p>
+                  <p class="text-[11px] text-gray-500">Pending: &#8377;48,200 | Held since: 30 Mar 2026</p>
+                </div>
+              </div>
+              <div class="flex items-center gap-3">
+                <span class="inline-flex items-center gap-1 text-[10px] font-semibold text-blue-700 bg-blue-100 border border-blue-200 px-2 py-0.5 rounded-full">Low balance</span>
+                <button onclick="releaseHold('Nair Spices','Low balance')" class="text-xs font-semibold text-brand-600 hover:text-brand-700 bg-white border border-brand-200 px-3 py-1.5 rounded-lg hover:bg-brand-50 transition">Release Hold</button>
+              </div>
+            </div>
+            <!-- Hold 7 - Fraud Investigation -->
+            <div class="flex items-center justify-between bg-red-50/50 border border-red-100 rounded-lg px-4 py-3">
+              <div class="flex items-center gap-3">
+                <div class="w-8 h-8 rounded-full bg-gradient-to-br from-gray-400 to-gray-600 flex items-center justify-center text-white text-[10px] font-bold shrink-0">DM</div>
+                <div>
+                  <p class="text-sm font-medium text-gray-800">Delhi Mart</p>
+                  <p class="text-[11px] text-gray-500">Pending: &#8377;8,22,500 | Held since: 15 Mar 2026</p>
+                </div>
+              </div>
+              <div class="flex items-center gap-3">
+                <span class="inline-flex items-center gap-1 text-[10px] font-semibold text-red-700 bg-red-100 border border-red-200 px-2 py-0.5 rounded-full">Fraud investigation</span>
+                <button onclick="releaseHold('Delhi Mart','Fraud investigation')" class="text-xs font-semibold text-brand-600 hover:text-brand-700 bg-white border border-brand-200 px-3 py-1.5 rounded-lg hover:bg-brand-50 transition">Release Hold</button>
+              </div>
+            </div>
+            <!-- Hold 8 - Fraud Investigation -->
+            <div class="flex items-center justify-between bg-red-50/50 border border-red-100 rounded-lg px-4 py-3">
+              <div class="flex items-center gap-3">
+                <div class="w-8 h-8 rounded-full bg-gradient-to-br from-indigo-400 to-indigo-600 flex items-center justify-center text-white text-[10px] font-bold shrink-0">SK</div>
+                <div>
+                  <p class="text-sm font-medium text-gray-800">Singh Krafts</p>
+                  <p class="text-[11px] text-gray-500">Pending: &#8377;4,67,800 | Held since: 19 Mar 2026</p>
+                </div>
+              </div>
+              <div class="flex items-center gap-3">
+                <span class="inline-flex items-center gap-1 text-[10px] font-semibold text-red-700 bg-red-100 border border-red-200 px-2 py-0.5 rounded-full">Fraud investigation</span>
+                <button onclick="releaseHold('Singh Krafts','Fraud investigation')" class="text-xs font-semibold text-brand-600 hover:text-brand-700 bg-white border border-brand-200 px-3 py-1.5 rounded-lg hover:bg-brand-50 transition">Release Hold</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Failed Settlement Retry -->
+        <div class="xl:col-span-2 bg-white rounded-xl border border-gray-100 shadow-sm p-6">
+          <div class="flex items-center justify-between mb-5">
+            <h2 class="text-lg font-semibold text-gray-900">Failed Settlements</h2>
+            <span class="text-xs font-semibold text-red-600 bg-red-50 px-2.5 py-1 rounded-full">3 Failed</span>
+          </div>
+          <div class="space-y-4">
+            <!-- Failed 1 -->
+            <div class="bg-red-50/50 border border-red-100 rounded-xl p-4">
+              <div class="flex items-center gap-3 mb-2">
+                <span class="text-sm font-semibold text-brand-600">STL-20260325-005</span>
+                <span class="inline-flex items-center gap-1 text-[10px] font-semibold text-red-700 bg-red-100 px-2 py-0.5 rounded-full">Failed</span>
+              </div>
+              <p class="text-sm font-medium text-gray-800">Mumbai Essentials</p>
+              <p class="text-xs text-gray-500 mt-1">Net Payout: &#8377;2,03,068</p>
+              <div class="mt-2 bg-white rounded-lg p-2.5 border border-red-100">
+                <p class="text-xs font-semibold text-gray-500 uppercase mb-1">Failure Reason</p>
+                <p class="text-sm text-gray-700">Bank account number invalid. NEFT transfer rejected by HDFC Bank. Error code: ACCT_INVALID.</p>
+              </div>
+              <div class="flex items-center justify-between mt-3">
+                <span class="text-[11px] text-gray-400">Failed: 25 Mar 2026, 14:32 IST</span>
+                <button onclick="retryFailed('STL-20260325-005','Mumbai Essentials')" class="flex items-center gap-1.5 text-xs font-semibold text-white bg-brand-500 px-3.5 py-1.5 rounded-lg hover:bg-brand-600 transition">
+                  <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182"/></svg>
+                  Retry
+                </button>
+              </div>
+            </div>
+            <!-- Failed 2 -->
+            <div class="bg-red-50/50 border border-red-100 rounded-xl p-4">
+              <div class="flex items-center gap-3 mb-2">
+                <span class="text-sm font-semibold text-brand-600">STL-20260325-008</span>
+                <span class="inline-flex items-center gap-1 text-[10px] font-semibold text-red-700 bg-red-100 px-2 py-0.5 rounded-full">Failed</span>
+              </div>
+              <p class="text-sm font-medium text-gray-800">Rajesh Store</p>
+              <p class="text-xs text-gray-500 mt-1">Net Payout: &#8377;4,82,639</p>
+              <div class="mt-2 bg-white rounded-lg p-2.5 border border-red-100">
+                <p class="text-xs font-semibold text-gray-500 uppercase mb-1">Failure Reason</p>
+                <p class="text-sm text-gray-700">IFSC code mismatch. Beneficiary verification failed at SBI clearing house.</p>
+              </div>
+              <div class="flex items-center justify-between mt-3">
+                <span class="text-[11px] text-gray-400">Failed: 25 Mar 2026, 15:10 IST</span>
+                <button onclick="retryFailed('STL-20260325-008','Rajesh Store')" class="flex items-center gap-1.5 text-xs font-semibold text-white bg-brand-500 px-3.5 py-1.5 rounded-lg hover:bg-brand-600 transition">
+                  <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182"/></svg>
+                  Retry
+                </button>
+              </div>
+            </div>
+            <!-- Failed 3 -->
+            <div class="bg-red-50/50 border border-red-100 rounded-xl p-4">
+              <div class="flex items-center gap-3 mb-2">
+                <span class="text-sm font-semibold text-brand-600">STL-20260322-014</span>
+                <span class="inline-flex items-center gap-1 text-[10px] font-semibold text-red-700 bg-red-100 px-2 py-0.5 rounded-full">Failed</span>
+              </div>
+              <p class="text-sm font-medium text-gray-800">Gupta Textiles</p>
+              <p class="text-xs text-gray-500 mt-1">Net Payout: &#8377;6,34,200</p>
+              <div class="mt-2 bg-white rounded-lg p-2.5 border border-red-100">
+                <p class="text-xs font-semibold text-gray-500 uppercase mb-1">Failure Reason</p>
+                <p class="text-sm text-gray-700">Payment gateway timeout. Transaction timed out after 30s during IMPS transfer to Kotak Bank.</p>
+              </div>
+              <div class="flex items-center justify-between mt-3">
+                <span class="text-[11px] text-gray-400">Failed: 22 Mar 2026, 09:45 IST</span>
+                <button onclick="retryFailed('STL-20260322-014','Gupta Textiles')" class="flex items-center gap-1.5 text-xs font-semibold text-white bg-brand-500 px-3.5 py-1.5 rounded-lg hover:bg-brand-600 transition">
+                  <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182"/></svg>
+                  Retry
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== BATCH PROCESSING + DISPUTES (side by side) ===== -->
+      <div class="grid grid-cols-1 xl:grid-cols-3 gap-6 mb-8">
+
+        <!-- Batch Processing Card -->
+        <div class="xl:col-span-1 bg-white rounded-xl border border-gray-100 shadow-sm p-6">
+          <h2 class="text-lg font-semibold text-gray-900 mb-5">Batch Processing</h2>
+          <div class="space-y-4">
+            <div>
+              <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5">Date Range</label>
+              <div class="flex items-center gap-2">
+                <input type="date" value="2026-03-22" class="flex-1 bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 text-sm outline-none focus:border-brand-400 focus:ring-2 focus:ring-brand-100">
+                <span class="text-gray-400 text-sm">to</span>
+                <input type="date" value="2026-03-28" class="flex-1 bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 text-sm outline-none focus:border-brand-400 focus:ring-2 focus:ring-brand-100">
+              </div>
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5">Sellers</label>
+              <select class="w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 text-sm text-gray-700 outline-none focus:border-brand-400 focus:ring-2 focus:ring-brand-100">
+                <option>All Sellers (234)</option>
+                <option>Specific Sellers...</option>
+              </select>
+            </div>
+            <div class="pt-2 space-y-2">
+              <button onclick="calculateBatch()" class="w-full flex items-center justify-center gap-2 bg-gray-100 text-gray-700 rounded-lg px-4 py-2.5 text-sm font-semibold hover:bg-gray-200 transition">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M15.75 15.75V18m-7.5-6.75h.008v.008H8.25v-.008zm0 2.25h.008v.008H8.25V13.5zm0 2.25h.008v.008H8.25v-.008zm0 2.25h.008v.008H8.25V18zm2.498-6.75h.007v.008h-.007v-.008zm0 2.25h.007v.008h-.007V13.5zm0 2.25h.007v.008h-.007v-.008zm0 2.25h.007v.008h-.007V18zm2.504-6.75h.008v.008h-.008v-.008zm0 2.25h.008v.008h-.008V13.5zm0 2.25h.008v.008h-.008v-.008zm0 2.25h.008v.008h-.008V18zm2.498-6.75h.008v.008h-.008v-.008zm0 2.25h.008v.008h-.008V13.5zM8.25 6h7.5v2.25h-7.5V6zM12 2.25c-1.892 0-3.758.11-5.593.322C5.307 2.7 4.5 3.65 4.5 4.757V19.5a2.25 2.25 0 002.25 2.25h10.5a2.25 2.25 0 002.25-2.25V4.757c0-1.108-.806-2.057-1.907-2.185A48.507 48.507 0 0012 2.25z"/></svg>
+                Calculate
+              </button>
+              <button onclick="processBatch()" class="w-full flex items-center justify-center gap-2 bg-brand-500 text-white rounded-lg px-4 py-2.5 text-sm font-semibold hover:bg-brand-600 transition">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M5.25 5.653c0-.856.917-1.398 1.667-.986l11.54 6.348a1.125 1.125 0 010 1.971l-11.54 6.347a1.125 1.125 0 01-1.667-.985V5.653z"/></svg>
+                Process Batch
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Disputed Settlements -->
+        <div class="xl:col-span-2 bg-white rounded-xl border border-gray-100 shadow-sm p-6">
+          <div class="flex items-center justify-between mb-5">
+            <h2 class="text-lg font-semibold text-gray-900">Disputed Settlements</h2>
+            <span class="text-xs font-semibold text-red-600 bg-red-50 px-2.5 py-1 rounded-full">2 Active</span>
+          </div>
+          <div class="space-y-4">
+            <!-- Dispute 1 -->
+            <div class="bg-red-50/50 border border-red-100 rounded-xl p-4">
+              <div class="flex items-start justify-between">
+                <div class="flex-1">
+                  <div class="flex items-center gap-3 mb-2">
+                    <span class="text-sm font-semibold text-brand-600">STL-20260314-019</span>
+                    <span class="inline-flex items-center gap-1 text-[10px] font-semibold text-red-700 bg-red-100 px-2 py-0.5 rounded-full">Disputed</span>
+                  </div>
+                  <p class="text-sm font-medium text-gray-800">TechWorld India</p>
+                  <p class="text-xs text-gray-500 mt-1">Period: Mar 1 - 7 | Net Payout: &#8377;11,45,230</p>
+                  <div class="mt-2 bg-white rounded-lg p-2.5 border border-red-100">
+                    <p class="text-xs font-semibold text-gray-500 uppercase mb-1">Dispute Reason</p>
+                    <p class="text-sm text-gray-700">Seller claims 3 orders worth &#8377;45,200 were cancelled after delivery confirmation but deducted from settlement. Requesting reversal.</p>
+                  </div>
+                </div>
+                <button onclick="resolveDispute('STL-20260314-019')" class="ml-4 px-4 py-2 text-sm font-semibold text-white bg-red-500 rounded-lg hover:bg-red-600 transition shrink-0">Resolve</button>
+              </div>
+            </div>
+
+            <!-- Dispute 2 -->
+            <div class="bg-red-50/50 border border-red-100 rounded-xl p-4">
+              <div class="flex items-start justify-between">
+                <div class="flex-1">
+                  <div class="flex items-center gap-3 mb-2">
+                    <span class="text-sm font-semibold text-brand-600">STL-20260314-022</span>
+                    <span class="inline-flex items-center gap-1 text-[10px] font-semibold text-red-700 bg-red-100 px-2 py-0.5 rounded-full">Disputed</span>
+                  </div>
+                  <p class="text-sm font-medium text-gray-800">Priya Fashion Hub</p>
+                  <p class="text-xs text-gray-500 mt-1">Period: Mar 1 - 7 | Net Payout: &#8377;5,89,120</p>
+                  <div class="mt-2 bg-white rounded-lg p-2.5 border border-red-100">
+                    <p class="text-xs font-semibold text-gray-500 uppercase mb-1">Dispute Reason</p>
+                    <p class="text-sm text-gray-700">Platform fee charged at 7% instead of agreed 5%. Seller has raised support ticket #TKT-8821. Difference: &#8377;11,782.</p>
+                  </div>
+                </div>
+                <button onclick="resolveDispute('STL-20260314-022')" class="ml-4 px-4 py-2 text-sm font-semibold text-white bg-red-500 rounded-lg hover:bg-red-600 transition shrink-0">Resolve</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== PAGINATION ===== -->
+      <div class="bg-white rounded-xl border border-gray-100 shadow-sm px-6 py-4">
+        <div class="flex items-center justify-between">
+          <p class="text-sm text-gray-500">Showing <span class="font-medium text-gray-700">1 - 8</span> of <span class="font-medium text-gray-700">48</span> settlements</p>
+          <div class="flex items-center gap-1.5">
+            <button class="w-9 h-9 flex items-center justify-center rounded-lg border border-gray-200 text-gray-400 hover:bg-gray-50 transition" disabled>
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M15.75 19.5L8.25 12l7.5-7.5"/></svg>
+            </button>
+            <button class="w-9 h-9 flex items-center justify-center rounded-lg bg-brand-500 text-white text-sm font-semibold">1</button>
+            <button class="w-9 h-9 flex items-center justify-center rounded-lg border border-gray-200 text-gray-600 text-sm font-medium hover:bg-gray-50 transition">2</button>
+            <button class="w-9 h-9 flex items-center justify-center rounded-lg border border-gray-200 text-gray-600 text-sm font-medium hover:bg-gray-50 transition">3</button>
+            <button class="w-9 h-9 flex items-center justify-center rounded-lg border border-gray-200 text-gray-600 text-sm font-medium hover:bg-gray-50 transition">4</button>
+            <button class="w-9 h-9 flex items-center justify-center rounded-lg border border-gray-200 text-gray-600 text-sm font-medium hover:bg-gray-50 transition">5</button>
+            <button class="w-9 h-9 flex items-center justify-center rounded-lg border border-gray-200 text-gray-600 text-sm font-medium hover:bg-gray-50 transition">6</button>
+            <button class="w-9 h-9 flex items-center justify-center rounded-lg border border-gray-200 text-gray-600 hover:bg-gray-50 transition">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M8.25 4.5l7.5 7.5-7.5 7.5"/></svg>
+            </button>
+          </div>
+        </div>
+      </div>
+
+    </main>
+  </div>
+
+  <script>
+    function toggleEarnings(trigger) {
+      var id = trigger.dataset.id;
+      var expandRow = document.getElementById('earnings-' + id);
+      if (!expandRow) return;
+      var isOpen = expandRow.classList.contains('open');
+      // Close all expand rows
+      document.querySelectorAll('.expand-row').forEach(function(r) { r.classList.remove('open'); });
+      document.querySelectorAll('.expand-trigger').forEach(function(t) { t.classList.remove('expanded'); });
+      // Toggle current
+      if (!isOpen) {
+        expandRow.classList.add('open');
+        trigger.classList.add('expanded');
+      }
+    }
+
+    function viewSettlement(btn) {
+      var tr = btn.closest('tr');
+      var id = tr.dataset.id;
+      var seller = tr.dataset.seller;
+      var status = tr.dataset.status;
+      alert('Settlement Details\n\nID: ' + id + '\nSeller: ' + seller + '\nStatus: ' + status);
+    }
+
+    function processSettlement(btn) {
+      var tr = btn.closest('tr');
+      var id = tr.dataset.id;
+      var seller = tr.dataset.seller;
+      if (confirm('Process settlement ' + id + ' for ' + seller + '?')) {
+        alert('Settlement ' + id + ' is now being processed. Payout will be completed within 24 hours.');
+      }
+    }
+
+    function retrySettlement(btn) {
+      var tr = btn.closest('tr');
+      var id = tr.dataset.id;
+      var seller = tr.dataset.seller;
+      if (confirm('Retry failed settlement ' + id + ' for ' + seller + '?')) {
+        alert('Retrying settlement ' + id + '. Check bank details and try again.');
+      }
+    }
+
+    function processBatch() {
+      if (confirm('Process batch settlement for all pending sellers?\n\nThis will initiate payouts for 12 pending settlements totaling approx. ₹45,80,000.')) {
+        alert('Batch processing initiated. 12 settlements queued for payout.');
+      }
+    }
+
+    function calculateBatch() {
+      alert('Batch Calculation Summary:\n\nDate Range: Mar 22 - Mar 28, 2026\nSellers: All (234)\n\nTotal Gross: ₹1,87,45,300\nPlatform Fee (5%): -₹9,37,265\nGST on Fee: -₹1,68,708\nNet Payout: ₹1,76,39,327\n\n12 settlements ready for processing.');
+    }
+
+    function resolveDispute(id) {
+      var action = prompt('Resolve dispute for ' + id + ':\n\n1. Accept seller claim (refund difference)\n2. Reject seller claim\n3. Partial settlement\n\nEnter choice (1-3):');
+      if (action === '1') {
+        alert('Dispute resolved. Difference amount will be added to next settlement cycle for ' + id + '.');
+      } else if (action === '2') {
+        alert('Seller claim rejected for ' + id + '. Notification sent to seller.');
+      } else if (action === '3') {
+        alert('Partial settlement initiated for ' + id + '. Amount details to be confirmed.');
+      }
+    }
+
+    function previewBatch() {
+      alert('Batch Preview — April 5, 2026\n\n42 sellers eligible for payout\nTotal Net Payout: ₹45,80,000\nPeriod: Mar 29 - Apr 4, 2026\n\n8 sellers on hold (excluded):\n- 3 KYC pending\n- 2 Dispute resolution\n- 1 Low balance\n- 2 Fraud investigation\n\nReview deductions and seller eligibility before processing.');
+    }
+
+    function processNow() {
+      if (confirm('Process settlement batch immediately?\n\n42 sellers | ₹45,80,000 net payout\n\nThis action cannot be undone. Proceed?')) {
+        alert('Batch processing initiated for 42 sellers.\nEstimated completion: 2 hours.\nPayouts via NEFT/IMPS to registered bank accounts.');
+      }
+    }
+
+    function releaseHold(seller, reason) {
+      if (confirm('Release hold on ' + seller + '?\n\nCurrent hold reason: ' + reason + '\n\nThis will make the seller eligible for the next settlement batch.')) {
+        alert('Hold released for ' + seller + '. Seller will be included in the next settlement cycle.');
+      }
+    }
+
+    function retryFailed(id, seller) {
+      if (confirm('Retry failed settlement ' + id + ' for ' + seller + '?\n\nPlease ensure bank details have been verified before retrying.')) {
+        alert('Settlement ' + id + ' queued for retry. Estimated processing: 30 minutes.');
+      }
+    }
+  </script>
+
+  <script>
+    /* ===== Filter Tabs ===== */
+    (function() {
+      var tabs = document.querySelectorAll('.filter-tab');
+      var tbody = document.querySelector('#settlements-table tbody');
+      if (!tabs.length || !tbody) return;
+      var allRows = Array.from(tbody.querySelectorAll('tr.table-row'));
+
+      tabs.forEach(function(tab) {
+        tab.addEventListener('click', function() {
+          tabs.forEach(function(t) {
+            t.classList.remove('active', 'text-brand-500');
+            t.classList.add('text-gray-500');
+            t.style.borderBottomColor = 'transparent';
+          });
+          this.classList.add('active');
+          this.classList.remove('text-gray-500');
+          this.classList.add('text-brand-500');
+          this.style.borderBottomColor = '#F97316';
+
+          var label = this.textContent.trim().split(/\s/)[0].toLowerCase();
+          // Close all expanded rows
+          document.querySelectorAll('.expand-row').forEach(function(r) { r.classList.remove('open'); });
+          document.querySelectorAll('.expand-trigger').forEach(function(t) { t.classList.remove('expanded'); });
+
+          allRows.forEach(function(row) {
+            var status = (row.getAttribute('data-status') || '').toLowerCase();
+            var earningsRow = document.getElementById('earnings-' + row.dataset.id);
+            if (label === 'all') {
+              row.style.display = '';
+            } else if (status.indexOf(label) !== -1) {
+              row.style.display = '';
+            } else {
+              row.style.display = 'none';
+              if (earningsRow) earningsRow.classList.remove('open');
+            }
+          });
+        });
+      });
+
+      /* Search */
+      var searchInput = document.querySelector('input[type="text"][placeholder*="Search"]');
+      var debounceTimer;
+      if (searchInput) {
+        searchInput.addEventListener('keyup', function() {
+          clearTimeout(debounceTimer);
+          var q = this.value.toLowerCase();
+          debounceTimer = setTimeout(function() {
+            allRows.forEach(function(row) {
+              var text = row.textContent.toLowerCase();
+              if (!q || text.indexOf(q) !== -1) {
+                row.style.display = '';
+              } else {
+                row.style.display = 'none';
+              }
+            });
+          }, 250);
+        });
+      }
+    })();
+  </script>
+
+  <script src="../shared-layout.js"></script>
+  <script>renderAdminLayout('settlements', '../');</script>
+</body>
+</html>

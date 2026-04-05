@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HomeBase — Design Prototype</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>body { font-family: 'Inter', sans-serif; } .app-card:hover { transform: translateY(-4px); }</style>
+</head>
+<body class="bg-gray-50 text-gray-900 min-h-screen flex items-center justify-center">
+
+  <div class="max-w-3xl mx-auto px-6 py-16 text-center">
+    <!-- Logo -->
+    <div class="flex items-center justify-center gap-3 mb-3">
+      <div class="w-14 h-14 rounded-2xl bg-[#F97316] flex items-center justify-center shadow-lg shadow-orange-200">
+        <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-4 0a1 1 0 01-1-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 01-1 1"/></svg>
+      </div>
+    </div>
+    <h1 class="text-4xl font-extrabold mb-2">Home<span class="text-[#F97316]">Base</span></h1>
+    <p class="text-gray-400 mb-12">Design Prototype — 62 Pages across 4 Apps</p>
+
+    <!-- 4 App Cards -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+      <!-- Customer Storefront -->
+      <a href="customer/storefront.html" class="app-card bg-white rounded-2xl border border-gray-100 p-8 shadow-sm hover:shadow-xl transition-all duration-200 text-left group">
+        <div class="w-12 h-12 rounded-xl bg-[#F97316] flex items-center justify-center mb-4">
+          <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25a3 3 0 00-3 3h15.75m-12.75-3h11.218c1.121-2.3 2.1-4.684 2.924-7.138a60.114 60.114 0 00-16.536-1.84M7.5 14.25L5.106 5.272M6 20.25a.75.75 0 11-1.5 0 .75.75 0 011.5 0zm12.75 0a.75.75 0 11-1.5 0 .75.75 0 011.5 0z"/></svg>
+        </div>
+        <h2 class="text-xl font-bold text-gray-900 group-hover:text-[#F97316] transition-colors">Customer Storefront</h2>
+        <p class="text-sm text-gray-500 mt-1 mb-3">Shopping experience — browse, search, buy, track orders</p>
+        <span class="text-xs font-medium text-[#F97316] bg-orange-50 px-2.5 py-1 rounded-full">13 pages</span>
+      </a>
+
+      <!-- Seller Hub -->
+      <a href="seller/seller-dashboard.html" class="app-card bg-white rounded-2xl border border-gray-100 p-8 shadow-sm hover:shadow-xl transition-all duration-200 text-left group">
+        <div class="w-12 h-12 rounded-xl bg-[#0F1B2D] flex items-center justify-center mb-4">
+          <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M13.5 21v-7.5a.75.75 0 01.75-.75h3a.75.75 0 01.75.75V21m-4.5 0H2.36m11.14 0H18m0 0h3.64m-1.39 0V9.349m-16.5 11.65V9.35m0 0a3.001 3.001 0 003.75-.615A2.993 2.993 0 009.75 9.75c.896 0 1.7-.393 2.25-1.016a2.993 2.993 0 002.25 1.016c.896 0 1.7-.393 2.25-1.016a3.001 3.001 0 003.75.614m-16.5 0a3.004 3.004 0 01-.621-4.72L4.318 3.44A1.5 1.5 0 015.378 3h13.243a1.5 1.5 0 011.06.44l1.19 1.189a3 3 0 01-.621 4.72m-13.5 8.65h3.75a.75.75 0 00.75-.75V13.5a.75.75 0 00-.75-.75H6.75a.75.75 0 00-.75.75v3.75c0 .415.336.75.75.75z"/></svg>
+        </div>
+        <h2 class="text-xl font-bold text-gray-900 group-hover:text-[#0F1B2D] transition-colors">Seller Hub</h2>
+        <p class="text-sm text-gray-500 mt-1 mb-3">Manage products, orders, inventory, settlements, reviews</p>
+        <span class="text-xs font-medium text-[#0F1B2D] bg-gray-100 px-2.5 py-1 rounded-full">20 pages</span>
+      </a>
+
+      <!-- Platform Admin -->
+      <a href="admin/dashboard.html" class="app-card bg-white rounded-2xl border border-gray-100 p-8 shadow-sm hover:shadow-xl transition-all duration-200 text-left group">
+        <div class="w-12 h-12 rounded-xl bg-[#0A1628] flex items-center justify-center mb-4">
+          <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z"/></svg>
+        </div>
+        <h2 class="text-xl font-bold text-gray-900 group-hover:text-[#0A1628] transition-colors">Platform Admin</h2>
+        <p class="text-sm text-gray-500 mt-1 mb-3">Moderate products, manage sellers, users, analytics, compliance</p>
+        <span class="text-xs font-medium text-[#0A1628] bg-gray-100 px-2.5 py-1 rounded-full">24 pages</span>
+      </a>
+
+      <!-- Warehouse -->
+      <a href="warehouse/warehouse-dashboard.html" class="app-card bg-white rounded-2xl border border-gray-100 p-8 shadow-sm hover:shadow-xl transition-all duration-200 text-left group">
+        <div class="w-12 h-12 rounded-xl bg-[#0F2027] flex items-center justify-center mb-4">
+          <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M8.25 18.75a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m3 0h6m-9 0H3.375a1.125 1.125 0 01-1.125-1.125V14.25m17.25 4.5a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m3 0H6.375m11.25 3V7.5a.375.375 0 00-.375-.375H14.25m0 0V3h4.5a.375.375 0 01.375.375v3.75m-4.875 0h4.875"/></svg>
+        </div>
+        <h2 class="text-xl font-bold text-gray-900 group-hover:text-[#0F2027] transition-colors">Warehouse</h2>
+        <p class="text-sm text-gray-500 mt-1 mb-3">Inbound, inventory, pick & pack, shipments</p>
+        <span class="text-xs font-medium text-[#0F2027] bg-gray-100 px-2.5 py-1 rounded-full">5 pages</span>
+      </a>
+
+    </div>
+
+    <p class="text-xs text-gray-400 mt-10">HomeBase Design Prototype — 62 pages — Built with Tailwind CSS</p>
+  </div>
+
+</body>
+</html>

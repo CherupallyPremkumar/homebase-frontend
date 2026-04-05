@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HomeBase — Catalog & Listing Rules</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brand: { 50:'#FFF7ED',100:'#FFEDD5',200:'#FED7AA',300:'#FDBA74',400:'#FB923C',500:'#F97316',600:'#EA580C',700:'#C2410C' },
+            navy: { 700:'#1E3A5F',800:'#0F1E30',900:'#0A1628' },
+            success: '#16A34A', warning: '#EAB308', danger: '#DC2626',
+          },
+          fontFamily: { sans: ['Inter','system-ui','sans-serif'] }
+        }
+      }
+    }
+  </script>
+  <style>
+    .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+    .scrollbar-hide::-webkit-scrollbar { display: none; }
+    .sidebar-link { transition: all 0.15s ease; }
+    .sidebar-link:hover { background: rgba(255,255,255,0.06); }
+    .sidebar-link.active { background: rgba(249,115,22,0.15); border-right: 3px solid #F97316; color: #F97316; }
+    .table-row { transition: background 0.15s ease; }
+    .table-row:hover { background: #FFF7ED; }
+    .toggle-track { transition: background 0.2s ease; }
+    .toggle-knob { transition: transform 0.2s ease; }
+    .dropdown-menu { display: none; }
+    .dropdown:hover .dropdown-menu { display: block; }
+  </style>
+</head>
+<body class="font-sans bg-gray-50 text-gray-900">
+
+  <!-- ===== TOP HEADER BAR ===== -->
+  <header id="admin-header" class="fixed top-0 left-0 right-0 z-50 bg-white border-b border-gray-200 h-16"></header>
+
+  <!-- ===== LAYOUT: SIDEBAR + MAIN ===== -->
+  <div class="flex pt-16 min-h-screen">
+    <aside id="admin-sidebar" class="fixed left-0 top-16 bottom-0 w-60 z-40 flex flex-col overflow-y-auto" style="background:#0A1628;"></aside>
+
+    <!-- ===== MAIN CONTENT ===== -->
+    <main class="flex-1 ml-60 p-6 lg:p-8 overflow-x-hidden">
+
+      <!-- Breadcrumb -->
+      <nav class="flex items-center gap-2 text-sm text-gray-500 mb-4">
+        <a href="../dashboard.html" class="hover:text-brand-500 transition">Dashboard</a>
+        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"/></svg>
+        <a href="index.html" class="hover:text-brand-500 transition">Settings</a>
+        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"/></svg>
+        <span class="text-gray-900 font-medium">Catalog & Listing Rules</span>
+      </nav>
+
+      <!-- Page Header -->
+      <div class="flex items-center justify-between mb-6">
+        <div class="min-w-0">
+          <h1 class="text-2xl font-bold text-gray-900">Catalog & Listing Rules</h1>
+          <p class="text-sm text-gray-500 mt-1">Product quality standards, image requirements, and listing validation rules for the marketplace</p>
+        </div>
+        <div class="flex items-center gap-3 shrink-0">
+          <button onclick="if(confirm('Discard all unsaved changes?'))location.reload()" class="px-4 py-2.5 text-sm font-medium text-gray-600 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 transition">Discard</button>
+          <button onclick="saveConfig()" class="px-5 py-2.5 bg-brand-500 text-white text-sm font-semibold rounded-lg hover:bg-brand-600 transition shadow-sm flex items-center gap-2">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4.5 12.75l6 6 9-13.5"/></svg>
+            Save Changes
+          </button>
+        </div>
+      </div>
+
+      <!-- ===== SECTION 1: IMAGE REQUIREMENTS ===== -->
+      <div class="bg-white rounded-xl border border-gray-200 shadow-sm mb-6">
+        <div class="px-6 py-4 border-b border-gray-100">
+          <h2 class="text-lg font-bold text-gray-900">Image Requirements</h2>
+          <p class="text-sm text-gray-500 mt-0.5">Quality standards for product images across all listings</p>
+        </div>
+        <div class="p-6 space-y-6">
+          <div class="grid grid-cols-2 gap-6">
+            <div>
+              <label class="text-sm font-medium text-gray-700 mb-1 block">Minimum Images per Listing</label>
+              <input type="number" value="3" min="1" max="20" class="w-full border border-gray-200 rounded-lg px-4 py-2.5 text-sm outline-none focus:border-brand-400 focus:ring-2 focus:ring-brand-100 transition">
+              <p class="text-xs text-gray-400 mt-1">Sellers must upload at least this many images</p>
+            </div>
+            <div>
+              <label class="text-sm font-medium text-gray-700 mb-1 block">Maximum Images per Listing</label>
+              <input type="number" value="10" min="1" max="30" class="w-full border border-gray-200 rounded-lg px-4 py-2.5 text-sm outline-none focus:border-brand-400 focus:ring-2 focus:ring-brand-100 transition">
+              <p class="text-xs text-gray-400 mt-1">Upper limit to keep listings consistent</p>
+            </div>
+          </div>
+          <div class="grid grid-cols-2 gap-6">
+            <div>
+              <label class="text-sm font-medium text-gray-700 mb-1 block">Minimum Resolution</label>
+              <div class="flex items-center gap-2">
+                <input type="number" value="800" class="w-full border border-gray-200 rounded-lg px-4 py-2.5 text-sm outline-none focus:border-brand-400 focus:ring-2 focus:ring-brand-100 transition">
+                <span class="text-sm text-gray-500">x</span>
+                <input type="number" value="800" class="w-full border border-gray-200 rounded-lg px-4 py-2.5 text-sm outline-none focus:border-brand-400 focus:ring-2 focus:ring-brand-100 transition">
+                <span class="text-sm text-gray-500 whitespace-nowrap">px</span>
+              </div>
+              <p class="text-xs text-gray-400 mt-1">Images below this resolution are rejected</p>
+            </div>
+            <div>
+              <label class="text-sm font-medium text-gray-700 mb-1 block">Max File Size per Image</label>
+              <div class="flex items-center gap-2">
+                <input type="number" value="5" class="w-full border border-gray-200 rounded-lg px-4 py-2.5 text-sm outline-none focus:border-brand-400 focus:ring-2 focus:ring-brand-100 transition">
+                <span class="text-sm text-gray-500 whitespace-nowrap">MB</span>
+              </div>
+              <p class="text-xs text-gray-400 mt-1">Compressed before storage regardless</p>
+            </div>
+          </div>
+          <div class="space-y-3">
+            <div class="flex items-center justify-between">
+              <div>
+                <span class="text-sm font-medium text-gray-700">White Background Required</span>
+                <p class="text-xs text-gray-400 mt-0.5">Primary image must have pure white (#FFFFFF) background</p>
+              </div>
+              <button onclick="toggleSwitch(this)" class="relative inline-flex h-6 w-11 items-center rounded-full toggle-track bg-green-500" data-on="true">
+                <span class="toggle-knob inline-block h-4 w-4 rounded-full bg-white shadow translate-x-6"></span>
+              </button>
+            </div>
+            <div class="flex items-center justify-between">
+              <div>
+                <span class="text-sm font-medium text-gray-700">Block Watermarked Images</span>
+                <p class="text-xs text-gray-400 mt-0.5">AI detection rejects images with text overlays or watermarks</p>
+              </div>
+              <button onclick="toggleSwitch(this)" class="relative inline-flex h-6 w-11 items-center rounded-full toggle-track bg-green-500" data-on="true">
+                <span class="toggle-knob inline-block h-4 w-4 rounded-full bg-white shadow translate-x-6"></span>
+              </button>
+            </div>
+            <div class="flex items-center justify-between">
+              <div>
+                <span class="text-sm font-medium text-gray-700">Allowed Formats</span>
+                <p class="text-xs text-gray-400 mt-0.5">Accepted image file types</p>
+              </div>
+              <div class="flex items-center gap-2">
+                <span class="px-2.5 py-1 text-xs font-medium bg-gray-100 text-gray-700 rounded-md">JPG</span>
+                <span class="px-2.5 py-1 text-xs font-medium bg-gray-100 text-gray-700 rounded-md">PNG</span>
+                <span class="px-2.5 py-1 text-xs font-medium bg-gray-100 text-gray-700 rounded-md">WEBP</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== SECTION 2: LISTING RULES ===== -->
+      <div class="bg-white rounded-xl border border-gray-200 shadow-sm mb-6">
+        <div class="px-6 py-4 border-b border-gray-100">
+          <h2 class="text-lg font-bold text-gray-900">Listing Validation Rules</h2>
+          <p class="text-sm text-gray-500 mt-0.5">Content quality and structure requirements for product listings</p>
+        </div>
+        <div class="p-6 space-y-6">
+          <div class="grid grid-cols-2 gap-6">
+            <div>
+              <label class="text-sm font-medium text-gray-700 mb-1 block">Title Min Length</label>
+              <div class="flex items-center gap-2">
+                <input type="number" value="10" class="w-full border border-gray-200 rounded-lg px-4 py-2.5 text-sm outline-none focus:border-brand-400 focus:ring-2 focus:ring-brand-100 transition">
+                <span class="text-sm text-gray-500 whitespace-nowrap">chars</span>
+              </div>
+              <p class="text-xs text-gray-400 mt-1">Titles shorter than this are rejected</p>
+            </div>
+            <div>
+              <label class="text-sm font-medium text-gray-700 mb-1 block">Title Max Length</label>
+              <div class="flex items-center gap-2">
+                <input type="number" value="200" class="w-full border border-gray-200 rounded-lg px-4 py-2.5 text-sm outline-none focus:border-brand-400 focus:ring-2 focus:ring-brand-100 transition">
+                <span class="text-sm text-gray-500 whitespace-nowrap">chars</span>
+              </div>
+              <p class="text-xs text-gray-400 mt-1">Truncated in search results beyond 80 chars</p>
+            </div>
+            <div>
+              <label class="text-sm font-medium text-gray-700 mb-1 block">Description Min Length</label>
+              <div class="flex items-center gap-2">
+                <input type="number" value="50" class="w-full border border-gray-200 rounded-lg px-4 py-2.5 text-sm outline-none focus:border-brand-400 focus:ring-2 focus:ring-brand-100 transition">
+                <span class="text-sm text-gray-500 whitespace-nowrap">chars</span>
+              </div>
+              <p class="text-xs text-gray-400 mt-1">Rich descriptions improve discoverability</p>
+            </div>
+            <div>
+              <label class="text-sm font-medium text-gray-700 mb-1 block">Max Variants per Product</label>
+              <input type="number" value="20" class="w-full border border-gray-200 rounded-lg px-4 py-2.5 text-sm outline-none focus:border-brand-400 focus:ring-2 focus:ring-brand-100 transition">
+              <p class="text-xs text-gray-400 mt-1">Color/size combinations per parent listing</p>
+            </div>
+            <div>
+              <label class="text-sm font-medium text-gray-700 mb-1 block">Price Change Limit</label>
+              <div class="flex items-center gap-2">
+                <input type="number" value="50" class="w-full border border-gray-200 rounded-lg px-4 py-2.5 text-sm outline-none focus:border-brand-400 focus:ring-2 focus:ring-brand-100 transition">
+                <span class="text-sm text-gray-500 whitespace-nowrap">%</span>
+              </div>
+              <p class="text-xs text-gray-400 mt-1">Max single-edit price change (prevents errors)</p>
+            </div>
+            <div>
+              <label class="text-sm font-medium text-gray-700 mb-1 block">Low Stock Threshold</label>
+              <div class="flex items-center gap-2">
+                <input type="number" value="5" class="w-full border border-gray-200 rounded-lg px-4 py-2.5 text-sm outline-none focus:border-brand-400 focus:ring-2 focus:ring-brand-100 transition">
+                <span class="text-sm text-gray-500 whitespace-nowrap">units</span>
+              </div>
+              <p class="text-xs text-gray-400 mt-1">Triggers low-stock badge on storefront</p>
+            </div>
+          </div>
+          <div class="border-t border-gray-100 pt-4">
+            <div class="flex items-center justify-between">
+              <div>
+                <span class="text-sm font-medium text-gray-700">Auto-Deactivate Out-of-Stock Listings</span>
+                <p class="text-xs text-gray-400 mt-0.5">Listings with 0 inventory are hidden from search and category pages</p>
+              </div>
+              <button onclick="toggleSwitch(this)" class="relative inline-flex h-6 w-11 items-center rounded-full toggle-track bg-green-500" data-on="true">
+                <span class="toggle-knob inline-block h-4 w-4 rounded-full bg-white shadow translate-x-6"></span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== SECTION 3: MANDATORY FIELDS ===== -->
+      <div class="bg-white rounded-xl border border-gray-200 shadow-sm mb-6">
+        <div class="px-6 py-4 border-b border-gray-100">
+          <h2 class="text-lg font-bold text-gray-900">Mandatory Fields for Listing</h2>
+          <p class="text-sm text-gray-500 mt-0.5">Fields that must be filled before a product listing can be published</p>
+        </div>
+        <div class="p-6">
+          <div class="grid grid-cols-3 gap-4">
+            <!-- Always required (disabled) -->
+            <label class="flex items-center gap-3 py-2.5 px-3 rounded-lg border border-gray-100 bg-gray-50">
+              <input type="checkbox" checked disabled class="w-4 h-4 rounded text-brand-500 cursor-not-allowed">
+              <div>
+                <span class="text-sm font-medium text-gray-700">Title</span>
+                <span class="ml-1 text-[10px] text-gray-400">(always)</span>
+              </div>
+            </label>
+            <label class="flex items-center gap-3 py-2.5 px-3 rounded-lg border border-gray-100 bg-gray-50">
+              <input type="checkbox" checked disabled class="w-4 h-4 rounded text-brand-500 cursor-not-allowed">
+              <div>
+                <span class="text-sm font-medium text-gray-700">Price</span>
+                <span class="ml-1 text-[10px] text-gray-400">(always)</span>
+              </div>
+            </label>
+            <label class="flex items-center gap-3 py-2.5 px-3 rounded-lg border border-gray-100 bg-gray-50">
+              <input type="checkbox" checked disabled class="w-4 h-4 rounded text-brand-500 cursor-not-allowed">
+              <div>
+                <span class="text-sm font-medium text-gray-700">Category</span>
+                <span class="ml-1 text-[10px] text-gray-400">(always)</span>
+              </div>
+            </label>
+            <label class="flex items-center gap-3 py-2.5 px-3 rounded-lg border border-gray-100 bg-gray-50">
+              <input type="checkbox" checked disabled class="w-4 h-4 rounded text-brand-500 cursor-not-allowed">
+              <div>
+                <span class="text-sm font-medium text-gray-700">At Least 1 Image</span>
+                <span class="ml-1 text-[10px] text-gray-400">(always)</span>
+              </div>
+            </label>
+            <!-- Toggleable -->
+            <label class="flex items-center gap-3 py-2.5 px-3 rounded-lg border border-gray-200 hover:border-brand-200 transition cursor-pointer">
+              <input type="checkbox" checked class="w-4 h-4 rounded text-brand-500">
+              <span class="text-sm font-medium text-gray-700">Description</span>
+            </label>
+            <label class="flex items-center gap-3 py-2.5 px-3 rounded-lg border border-gray-200 hover:border-brand-200 transition cursor-pointer">
+              <input type="checkbox" checked class="w-4 h-4 rounded text-brand-500">
+              <span class="text-sm font-medium text-gray-700">Brand</span>
+            </label>
+            <label class="flex items-center gap-3 py-2.5 px-3 rounded-lg border border-gray-200 hover:border-brand-200 transition cursor-pointer">
+              <input type="checkbox" checked class="w-4 h-4 rounded text-brand-500">
+              <span class="text-sm font-medium text-gray-700">Weight</span>
+            </label>
+            <label class="flex items-center gap-3 py-2.5 px-3 rounded-lg border border-gray-200 hover:border-brand-200 transition cursor-pointer">
+              <input type="checkbox" checked class="w-4 h-4 rounded text-brand-500">
+              <span class="text-sm font-medium text-gray-700">HSN Code</span>
+            </label>
+            <label class="flex items-center gap-3 py-2.5 px-3 rounded-lg border border-gray-200 hover:border-brand-200 transition cursor-pointer">
+              <input type="checkbox" class="w-4 h-4 rounded text-brand-500">
+              <span class="text-sm font-medium text-gray-700">SKU</span>
+            </label>
+            <label class="flex items-center gap-3 py-2.5 px-3 rounded-lg border border-gray-200 hover:border-brand-200 transition cursor-pointer">
+              <input type="checkbox" class="w-4 h-4 rounded text-brand-500">
+              <span class="text-sm font-medium text-gray-700">MPN</span>
+            </label>
+            <label class="flex items-center gap-3 py-2.5 px-3 rounded-lg border border-gray-200 hover:border-brand-200 transition cursor-pointer">
+              <input type="checkbox" class="w-4 h-4 rounded text-brand-500">
+              <span class="text-sm font-medium text-gray-700">Dimensions</span>
+            </label>
+            <label class="flex items-center gap-3 py-2.5 px-3 rounded-lg border border-gray-200 hover:border-brand-200 transition cursor-pointer">
+              <input type="checkbox" class="w-4 h-4 rounded text-brand-500">
+              <span class="text-sm font-medium text-gray-700">Country of Origin</span>
+            </label>
+          </div>
+          <p class="text-xs text-gray-400 mt-3">Grayed-out fields are always required and cannot be disabled.</p>
+        </div>
+      </div>
+
+      <!-- ===== SECTION 4: CATEGORY-SPECIFIC OVERRIDES ===== -->
+      <div class="bg-white rounded-xl border border-gray-200 shadow-sm mb-6">
+        <div class="px-6 py-4 border-b border-gray-100 flex items-center justify-between">
+          <div>
+            <h2 class="text-lg font-bold text-gray-900">Category-Specific Overrides</h2>
+            <p class="text-sm text-gray-500 mt-0.5">Additional requirements that override default rules for specific categories</p>
+          </div>
+          <button onclick="alert('Add new category override rule')" class="px-4 py-2 text-sm font-medium text-brand-600 bg-brand-50 rounded-lg hover:bg-brand-100 transition">+ Add Override</button>
+        </div>
+        <div class="overflow-x-auto">
+          <table class="w-full text-sm">
+            <thead>
+              <tr class="bg-gray-50 text-left">
+                <th class="px-6 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Category</th>
+                <th class="px-6 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Min Images</th>
+                <th class="px-6 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Extra Requirements</th>
+                <th class="px-6 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Status</th>
+                <th class="px-6 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Actions</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-100">
+              <tr class="table-row">
+                <td class="px-6 py-4 font-medium text-gray-900">Power Tools</td>
+                <td class="px-6 py-4">
+                  <input type="number" value="5" class="w-16 border border-gray-200 rounded px-2 py-1 text-sm text-center">
+                </td>
+                <td class="px-6 py-4">
+                  <div class="flex flex-wrap gap-1.5">
+                    <span class="px-2 py-0.5 text-[10px] font-medium rounded bg-blue-50 text-blue-700">Warranty Info</span>
+                    <span class="px-2 py-0.5 text-[10px] font-medium rounded bg-blue-50 text-blue-700">Safety Manual</span>
+                    <span class="px-2 py-0.5 text-[10px] font-medium rounded bg-blue-50 text-blue-700">Voltage Spec</span>
+                  </div>
+                </td>
+                <td class="px-6 py-4"><span class="px-2 py-0.5 text-[10px] font-bold rounded-full bg-green-100 text-green-700">ACTIVE</span></td>
+                <td class="px-6 py-4"><button onclick="alert('Edit Power Tools override')" class="text-brand-500 hover:text-brand-600 text-xs font-medium">Edit</button></td>
+              </tr>
+              <tr class="table-row">
+                <td class="px-6 py-4 font-medium text-gray-900">Electrical</td>
+                <td class="px-6 py-4">
+                  <input type="number" value="4" class="w-16 border border-gray-200 rounded px-2 py-1 text-sm text-center">
+                </td>
+                <td class="px-6 py-4">
+                  <div class="flex flex-wrap gap-1.5">
+                    <span class="px-2 py-0.5 text-[10px] font-medium rounded bg-red-50 text-red-700">ISI Certificate</span>
+                    <span class="px-2 py-0.5 text-[10px] font-medium rounded bg-blue-50 text-blue-700">Wattage Spec</span>
+                  </div>
+                </td>
+                <td class="px-6 py-4"><span class="px-2 py-0.5 text-[10px] font-bold rounded-full bg-green-100 text-green-700">ACTIVE</span></td>
+                <td class="px-6 py-4"><button onclick="alert('Edit Electrical override')" class="text-brand-500 hover:text-brand-600 text-xs font-medium">Edit</button></td>
+              </tr>
+              <tr class="table-row">
+                <td class="px-6 py-4 font-medium text-gray-900">Food & Beverage</td>
+                <td class="px-6 py-4">
+                  <input type="number" value="3" class="w-16 border border-gray-200 rounded px-2 py-1 text-sm text-center">
+                </td>
+                <td class="px-6 py-4">
+                  <div class="flex flex-wrap gap-1.5">
+                    <span class="px-2 py-0.5 text-[10px] font-medium rounded bg-red-50 text-red-700">FSSAI License</span>
+                    <span class="px-2 py-0.5 text-[10px] font-medium rounded bg-blue-50 text-blue-700">Expiry Date</span>
+                    <span class="px-2 py-0.5 text-[10px] font-medium rounded bg-blue-50 text-blue-700">Nutritional Info</span>
+                  </div>
+                </td>
+                <td class="px-6 py-4"><span class="px-2 py-0.5 text-[10px] font-bold rounded-full bg-green-100 text-green-700">ACTIVE</span></td>
+                <td class="px-6 py-4"><button onclick="alert('Edit Food & Beverage override')" class="text-brand-500 hover:text-brand-600 text-xs font-medium">Edit</button></td>
+              </tr>
+              <tr class="table-row">
+                <td class="px-6 py-4 font-medium text-gray-900">Jewelry & Watches</td>
+                <td class="px-6 py-4">
+                  <input type="number" value="6" class="w-16 border border-gray-200 rounded px-2 py-1 text-sm text-center">
+                </td>
+                <td class="px-6 py-4">
+                  <div class="flex flex-wrap gap-1.5">
+                    <span class="px-2 py-0.5 text-[10px] font-medium rounded bg-red-50 text-red-700">BIS Hallmark</span>
+                    <span class="px-2 py-0.5 text-[10px] font-medium rounded bg-blue-50 text-blue-700">Purity Certificate</span>
+                  </div>
+                </td>
+                <td class="px-6 py-4"><span class="px-2 py-0.5 text-[10px] font-bold rounded-full bg-yellow-100 text-yellow-700">GATED</span></td>
+                <td class="px-6 py-4"><button onclick="alert('Edit Jewelry override')" class="text-brand-500 hover:text-brand-600 text-xs font-medium">Edit</button></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- ===== SECTION 5: PROHIBITED CONTENT ===== -->
+      <div class="bg-white rounded-xl border border-gray-200 shadow-sm mb-6">
+        <div class="px-6 py-4 border-b border-gray-100">
+          <h2 class="text-lg font-bold text-gray-900">Prohibited Content</h2>
+          <p class="text-sm text-gray-500 mt-0.5">Blocked keywords and banned categories that are not allowed on the platform</p>
+        </div>
+        <div class="p-6 space-y-6">
+          <!-- Keyword Blacklist -->
+          <div>
+            <h3 class="text-sm font-semibold text-gray-900 mb-3 flex items-center gap-2">
+              <span class="w-6 h-6 rounded bg-red-50 flex items-center justify-center text-red-500 text-xs">&#9888;</span>
+              Keyword Blacklist
+            </h3>
+            <textarea rows="3" class="w-full border border-gray-200 rounded-lg px-4 py-3 text-sm outline-none focus:border-brand-400 focus:ring-2 focus:ring-brand-100 transition font-mono" placeholder="Enter blocked keywords, one per line">replica, counterfeit, knockoff, first copy, fake, dupe, AAA quality, 1:1 copy, master copy, OG quality</textarea>
+            <p class="text-xs text-gray-400 mt-1">Comma-separated. Listings containing these keywords in title or description are auto-rejected.</p>
+          </div>
+          <div class="border-t border-gray-100"></div>
+          <!-- Banned Categories -->
+          <div>
+            <h3 class="text-sm font-semibold text-gray-900 mb-3 flex items-center gap-2">
+              <span class="w-6 h-6 rounded bg-red-50 flex items-center justify-center text-red-500 text-xs">&#128683;</span>
+              Banned Categories
+            </h3>
+            <div class="flex flex-wrap gap-2">
+              <span class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-red-50 text-red-700 rounded-lg text-xs font-medium border border-red-100">
+                Weapons & Ammunition
+                <button onclick="this.parentElement.remove()" class="text-red-400 hover:text-red-600">&times;</button>
+              </span>
+              <span class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-red-50 text-red-700 rounded-lg text-xs font-medium border border-red-100">
+                Tobacco Products
+                <button onclick="this.parentElement.remove()" class="text-red-400 hover:text-red-600">&times;</button>
+              </span>
+              <span class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-red-50 text-red-700 rounded-lg text-xs font-medium border border-red-100">
+                Prescription Drugs
+                <button onclick="this.parentElement.remove()" class="text-red-400 hover:text-red-600">&times;</button>
+              </span>
+              <span class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-red-50 text-red-700 rounded-lg text-xs font-medium border border-red-100">
+                Hazardous Chemicals
+                <button onclick="this.parentElement.remove()" class="text-red-400 hover:text-red-600">&times;</button>
+              </span>
+              <span class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-red-50 text-red-700 rounded-lg text-xs font-medium border border-red-100">
+                Adult Content
+                <button onclick="this.parentElement.remove()" class="text-red-400 hover:text-red-600">&times;</button>
+              </span>
+              <button onclick="alert('Add banned category')" class="inline-flex items-center gap-1 px-3 py-1.5 bg-gray-100 text-gray-600 rounded-lg text-xs font-medium border border-gray-200 hover:bg-gray-200 transition">
+                + Add Category
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Bottom Save -->
+      <div class="flex justify-end gap-3 mt-2 mb-4">
+        <button onclick="if(confirm('Discard all unsaved changes?'))location.reload()" class="px-4 py-2.5 text-sm font-medium text-gray-600 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 transition">Discard</button>
+        <button onclick="saveConfig()" class="px-5 py-2.5 bg-brand-500 text-white text-sm font-semibold rounded-lg hover:bg-brand-600 transition shadow-sm flex items-center gap-2">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4.5 12.75l6 6 9-13.5"/></svg>
+          Save Changes
+        </button>
+      </div>
+
+    </main>
+  </div>
+
+<script>
+  function toggleSwitch(btn) {
+    var isOn = btn.dataset.on === 'true';
+    if (isOn) {
+      btn.dataset.on = 'false';
+      btn.classList.remove('bg-green-500');
+      btn.classList.add('bg-gray-200');
+      btn.querySelector('.toggle-knob').classList.remove('translate-x-6');
+      btn.querySelector('.toggle-knob').classList.add('translate-x-1');
+    } else {
+      btn.dataset.on = 'true';
+      btn.classList.remove('bg-gray-200');
+      btn.classList.add('bg-green-500');
+      btn.querySelector('.toggle-knob').classList.remove('translate-x-1');
+      btn.querySelector('.toggle-knob').classList.add('translate-x-6');
+    }
+  }
+
+  function saveConfig() {
+    alert('Catalog & listing rules saved successfully!');
+  }
+</script>
+
+<script src="../shared-layout.js"></script>
+<script>renderAdminLayout('settings', '../');</script>
+</body>
+</html>

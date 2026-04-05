@@ -1,3 +1,9 @@
 export { ProductCard } from './product-card';
+export { ProductFilters } from './product-filters';
 export { ProductListing } from './product-listing';
 export { ProductDetail } from './product-detail';
+export { ProductImageGallery } from './product-image-gallery';
+export { ColorSwatches } from './color-swatches';
+export { VariantSelector } from './variant-selector';
+export { ProductQuantitySelector } from './product-quantity-selector';
+export { ProductTabs } from './product-tabs';

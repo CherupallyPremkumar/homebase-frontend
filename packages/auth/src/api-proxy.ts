@@ -3,17 +3,37 @@ import { getToken } from 'next-auth/jwt';
 import { randomUUID } from 'crypto';
 
 /**
+ * Known query module path prefixes.
+ * POST requests to these prefixes are query calls → rewrite to /q/ with queryName in body.
+ * All other requests (GET/PUT/PATCH/DELETE) are mutation calls → forward as-is.
+ */
+const QUERY_PREFIXES = new Set([
+  'dashboard', 'storefront', 'oms', 'wms',
+  'user', 'product', 'order', 'cart', 'inventory', 'shipping', 'supplier',
+  'payment', 'settlement', 'returnrequest', 'return-processing', 'fulfillment',
+  'warehouse', 'promo', 'checkout', 'notification', 'support', 'review',
+  'offer', 'pricing', 'catalog', 'search', 'recommendation', 'disputes',
+  'cms', 'cconfig', 'compliance', 'tax', 'organisation', 'media',
+  'rules-engine', 'onboarding', 'seller', 'analytics', 'reconciliation',
+  'reporting', 'clickstream', 'wishlist', 'invoice',
+]);
+
+/**
  * Server-side API proxy.
  * Reads JWT from encrypted session cookie (httpOnly — browser never sees it).
  * Injects Chenile-required headers and forwards to backend.
  *
+ * Query routing:
+ * - POST /api/proxy/{module}/{queryName} → POST /q/ with {"queryName": "{queryName}", ...body}
+ * - All other requests forwarded as-is to BACKEND_URL
+ *
  * Security:
- * - Rejects unauthenticated mutation requests (POST/PUT/PATCH/DELETE)
+ * - Rejects unauthenticated mutation requests (PUT/PATCH/DELETE)
  * - Validates target URL stays on the configured backend origin (SSRF protection)
  * - Timeouts: 5s for GET, 30s for mutations
  */
 export function createApiProxy() {
-  const backendUrl = process.env.BACKEND_URL || 'http://localhost:8080';
+  const backendUrl = process.env.BACKEND_URL || 'http://localhost:8081';
   const tenantId = process.env.TENANT_ID || 'homebase';
   const backendOrigin = new URL(backendUrl).origin;
 
@@ -23,7 +43,16 @@ export function createApiProxy() {
   ) {
     const { path } = await context.params;
     const targetPath = '/' + path.join('/');
-    const targetUrl = new URL(targetPath, backendUrl);
+
+    // Check if this is a query call: POST to /{module}/{queryName}
+    const isPost = request.method === 'POST';
+    const pathPrefix = path[0];
+    const queryName = path[1];
+    const isQueryCall = isPost && pathPrefix && QUERY_PREFIXES.has(pathPrefix) && queryName;
+
+    const targetUrl = isQueryCall
+      ? new URL('/q/', backendUrl)
+      : new URL(targetPath, backendUrl);
 
     // SSRF protection — ensure target stays on configured backend
     if (targetUrl.origin !== backendOrigin) {
@@ -57,14 +86,36 @@ export function createApiProxy() {
       );
     }
 
-    // Build Chenile-required headers
+    // Build Chenile-required headers + standard API headers
     const correlationId = request.headers.get('x-correlation-id') || randomUUID();
+    const requestId = request.headers.get('x-request-id') || randomUUID();
     const headers: Record<string, string> = {
       'Content-Type': request.headers.get('content-type') || 'application/json',
       'Accept': 'application/json',
+      // Chenile identity & routing
       'x-chenile-tenant-id': tenantId,
+      // Tracing
       'X-Correlation-Id': correlationId,
+      'X-Request-Id': requestId,
+      // Geo & locale — forwarded from browser or defaults
+      'X-Country': request.headers.get('x-country') || 'IN',
+      'X-Currency': request.headers.get('x-currency') || 'INR',
+      'X-Timezone': request.headers.get('x-timezone') || 'Asia/Kolkata',
+      'Accept-Language': request.headers.get('accept-language') || 'en-IN',
+      // Client context
+      'X-Channel': request.headers.get('x-channel') || 'platform-web',
+      'X-Device-Type': request.headers.get('x-device-type') || 'desktop',
+      'X-App-Version': request.headers.get('x-app-version') || '1.0.0',
     };
+
+    // Forward session & client IP if present
+    const sessionId = request.headers.get('x-session-id');
+    if (sessionId) headers['X-Session-Id'] = sessionId;
+    const clientIp = request.headers.get('x-forwarded-for') || request.headers.get('x-client-ip');
+    if (clientIp) headers['X-Client-Ip'] = clientIp;
+    // Idempotency key for mutations
+    const idempotencyKey = request.headers.get('x-idempotency-key');
+    if (idempotencyKey) headers['X-Idempotency-Key'] = idempotencyKey;
 
     // Only send Bearer token if it exists, hasn't failed refresh, and isn't expired
     const isTokenValid = token?.accessToken
@@ -75,10 +126,22 @@ export function createApiProxy() {
       headers['Authorization'] = `Bearer ${token!.accessToken as string}`;
     }
 
-    // Forward request body for mutations
+    // Forward request body — inject queryName for query calls
     let body: string | undefined;
     if (isMutation) {
-      body = await request.text();
+      const rawBody = await request.text();
+      if (isQueryCall) {
+        // Rewrite: inject queryName into the JSON body for /q/ endpoint
+        try {
+          const parsed = rawBody ? JSON.parse(rawBody) : {};
+          parsed.queryName = queryName;
+          body = JSON.stringify(parsed);
+        } catch {
+          body = JSON.stringify({ queryName });
+        }
+      } else {
+        body = rawBody;
+      }
     }
 
     try {

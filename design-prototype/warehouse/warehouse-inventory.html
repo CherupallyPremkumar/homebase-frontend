@@ -1,0 +1,1052 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HomeBase -- Warehouse Inventory</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              50: '#FFF7ED',
+              100: '#FFEDD5',
+              200: '#FED7AA',
+              300: '#FDBA74',
+              400: '#FB923C',
+              500: '#F97316',
+              600: '#EA580C',
+              700: '#C2410C',
+            },
+            teal: {
+              800: '#0F2027',
+              900: '#0A1A20',
+            },
+            success: '#16A34A',
+            warning: '#EAB308',
+            danger: '#DC2626',
+          },
+          fontFamily: {
+            sans: ['Inter', 'system-ui', 'sans-serif'],
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+    .scrollbar-hide::-webkit-scrollbar { display: none; }
+    .sidebar-link { transition: all 0.15s ease; }
+    .sidebar-link:hover { background: rgba(255,255,255,0.06); }
+    .sidebar-link.active { background: rgba(249,115,22,0.15); border-right: 3px solid #F97316; }
+    .stat-card { transition: all 0.2s ease; }
+    .stat-card:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,0.1); }
+    .table-row { transition: background 0.15s ease; }
+    .table-row:hover { background: #FFF7ED; }
+    .dropdown-menu { display: none; }
+    .dropdown:hover .dropdown-menu { display: block; }
+    .health-pulse { animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite; }
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.5; }
+    }
+    .sidebar-scroll::-webkit-scrollbar { width: 4px; }
+    .sidebar-scroll::-webkit-scrollbar-track { background: transparent; }
+    .sidebar-scroll::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.12); border-radius: 2px; }
+    .zone-cell { transition: all 0.2s ease; }
+    .zone-cell:hover { transform: scale(1.03); }
+    .movement-item { transition: background 0.15s ease; }
+    .movement-item:hover { background: #F9FAFB; }
+  </style>
+</head>
+<body class="font-sans bg-gray-50 text-gray-900">
+
+  <!-- ===== TOP HEADER BAR ===== -->
+  <header id="warehouse-header" class="fixed top-0 left-0 right-0 z-50 bg-white border-b border-gray-200 h-16"></header>
+
+  <!-- ===== LAYOUT: SIDEBAR + MAIN ===== -->
+  <div class="flex pt-16 min-h-screen">
+
+    <!-- ===== LEFT SIDEBAR (Dark Teal #0F2027) ===== -->
+    <aside id="warehouse-sidebar" class="fixed left-0 top-16 bottom-0 w-60 z-40 flex flex-col overflow-y-auto" style="background:#0F2027;"></aside>
+
+    <!-- ===== MAIN CONTENT ===== -->
+    <main class="flex-1 ml-60 p-6 lg:p-8">
+
+      <!-- Page Title Row -->
+      <div class="mb-8">
+        <div class="flex items-center justify-between">
+          <div>
+            <h1 class="text-2xl font-bold text-gray-900">Warehouse Inventory</h1>
+            <p class="text-sm text-gray-500 mt-1">Track stock levels, locations, and movements across all warehouse zones.</p>
+          </div>
+          <div class="flex items-center gap-3">
+            <button class="flex items-center gap-2 bg-white border border-gray-200 rounded-lg px-4 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50 transition">
+              <svg class="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z"/></svg>
+              Stock Audit
+            </button>
+            <button class="flex items-center gap-2 bg-brand-500 text-white rounded-lg px-4 py-2.5 text-sm font-medium hover:bg-brand-600 transition shadow-sm">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3"/></svg>
+              Export
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== 4 STATS CARDS ===== -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 mb-8">
+        <!-- Total SKUs -->
+        <div class="stat-card bg-white rounded-xl border border-gray-100 p-5 shadow-sm">
+          <div class="flex items-center justify-between mb-3">
+            <div class="w-10 h-10 rounded-lg bg-blue-50 flex items-center justify-center">
+              <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M3.75 4.875c0-.621.504-1.125 1.125-1.125h4.5c.621 0 1.125.504 1.125 1.125v4.5c0 .621-.504 1.125-1.125 1.125h-4.5A1.125 1.125 0 013.75 9.375v-4.5zM3.75 14.625c0-.621.504-1.125 1.125-1.125h4.5c.621 0 1.125.504 1.125 1.125v4.5c0 .621-.504 1.125-1.125 1.125h-4.5a1.125 1.125 0 01-1.125-1.125v-4.5zM13.5 4.875c0-.621.504-1.125 1.125-1.125h4.5c.621 0 1.125.504 1.125 1.125v4.5c0 .621-.504 1.125-1.125 1.125h-4.5A1.125 1.125 0 0113.5 9.375v-4.5z"/><path d="M13.5 14.625c0-.621.504-1.125 1.125-1.125h4.5c.621 0 1.125.504 1.125 1.125v4.5c0 .621-.504 1.125-1.125 1.125h-4.5a1.125 1.125 0 01-1.125-1.125v-4.5z"/></svg>
+            </div>
+            <span class="text-xs font-medium text-success bg-green-50 px-2 py-1 rounded-full flex items-center gap-1">
+              <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4.5 19.5l15-15m0 0H8.25m11.25 0v11.25"/></svg>
+              +12
+            </span>
+          </div>
+          <p class="text-2xl font-bold text-gray-900">2,450</p>
+          <p class="text-xs text-gray-500 mt-1">Total SKUs</p>
+          <div class="mt-3 h-1 bg-gray-100 rounded-full overflow-hidden">
+            <div class="h-full bg-blue-500 rounded-full" style="width: 82%"></div>
+          </div>
+        </div>
+
+        <!-- Total Units -->
+        <div class="stat-card bg-white rounded-xl border border-gray-100 p-5 shadow-sm">
+          <div class="flex items-center justify-between mb-3">
+            <div class="w-10 h-10 rounded-lg bg-brand-50 flex items-center justify-center">
+              <svg class="w-5 h-5 text-brand-500" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M20.25 7.5l-.625 10.632a2.25 2.25 0 01-2.247 2.118H6.622a2.25 2.25 0 01-2.247-2.118L3.75 7.5M10 11.25h4M3.375 7.5h17.25c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125z"/></svg>
+            </div>
+            <span class="text-xs font-medium text-success bg-green-50 px-2 py-1 rounded-full flex items-center gap-1">
+              <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4.5 19.5l15-15m0 0H8.25m11.25 0v11.25"/></svg>
+              +340
+            </span>
+          </div>
+          <p class="text-2xl font-bold text-gray-900">24,560</p>
+          <p class="text-xs text-gray-500 mt-1">Total Units</p>
+          <div class="mt-3 h-1 bg-gray-100 rounded-full overflow-hidden">
+            <div class="h-full bg-brand-500 rounded-full" style="width: 68%"></div>
+          </div>
+        </div>
+
+        <!-- Low Stock -->
+        <div class="stat-card bg-white rounded-xl border border-gray-100 p-5 shadow-sm">
+          <div class="flex items-center justify-between mb-3">
+            <div class="w-10 h-10 rounded-lg bg-amber-50 flex items-center justify-center">
+              <svg class="w-5 h-5 text-amber-500" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z"/></svg>
+            </div>
+            <span class="text-xs font-medium text-amber-600 bg-amber-50 px-2 py-1 rounded-full flex items-center gap-1">
+              <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4.5 19.5l15-15m0 0H8.25m11.25 0v11.25"/></svg>
+              +5
+            </span>
+          </div>
+          <p class="text-2xl font-bold text-gray-900">34</p>
+          <p class="text-xs text-gray-500 mt-1">Low Stock</p>
+          <div class="mt-3 h-1 bg-gray-100 rounded-full overflow-hidden">
+            <div class="h-full bg-amber-400 rounded-full" style="width: 14%"></div>
+          </div>
+        </div>
+
+        <!-- Out of Stock -->
+        <div class="stat-card bg-white rounded-xl border border-gray-100 p-5 shadow-sm">
+          <div class="flex items-center justify-between mb-3">
+            <div class="w-10 h-10 rounded-lg bg-red-50 flex items-center justify-center">
+              <svg class="w-5 h-5 text-red-500" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"/></svg>
+            </div>
+            <span class="text-xs font-medium text-danger bg-red-50 px-2 py-1 rounded-full flex items-center gap-1">
+              <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4.5 19.5l15-15m0 0H8.25m11.25 0v11.25"/></svg>
+              +2
+            </span>
+          </div>
+          <p class="text-2xl font-bold text-gray-900">8</p>
+          <p class="text-xs text-gray-500 mt-1">Out of Stock</p>
+          <div class="mt-3 h-1 bg-gray-100 rounded-full overflow-hidden">
+            <div class="h-full bg-red-500 rounded-full" style="width: 3%"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== SEARCH + FILTER BAR ===== -->
+      <div class="bg-white rounded-xl border border-gray-100 shadow-sm p-4 mb-6">
+        <div class="flex flex-wrap items-center gap-3">
+          <!-- Search -->
+          <div class="relative flex-1 min-w-[240px]">
+            <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+            <input type="text" placeholder="Search by SKU, product name, or bin location..." class="w-full bg-gray-50 border border-gray-200 rounded-lg py-2.5 pl-10 pr-4 text-sm outline-none focus:border-brand-400 focus:ring-2 focus:ring-brand-100 transition">
+          </div>
+          <!-- Zone Dropdown -->
+          <select class="bg-gray-50 border border-gray-200 rounded-lg py-2.5 px-3 text-sm text-gray-700 outline-none focus:border-brand-400 focus:ring-2 focus:ring-brand-100 transition min-w-[130px]">
+            <option>All Zones</option>
+            <option>Zone A</option>
+            <option>Zone B</option>
+            <option>Zone C</option>
+            <option>Zone D</option>
+          </select>
+          <!-- Category Dropdown -->
+          <select class="bg-gray-50 border border-gray-200 rounded-lg py-2.5 px-3 text-sm text-gray-700 outline-none focus:border-brand-400 focus:ring-2 focus:ring-brand-100 transition min-w-[150px]">
+            <option>All Categories</option>
+            <option>Electronics</option>
+            <option>Home &amp; Kitchen</option>
+            <option>Clothing</option>
+            <option>Beauty</option>
+            <option>Sports</option>
+            <option>Books</option>
+          </select>
+          <!-- Stock Status Dropdown -->
+          <select class="bg-gray-50 border border-gray-200 rounded-lg py-2.5 px-3 text-sm text-gray-700 outline-none focus:border-brand-400 focus:ring-2 focus:ring-brand-100 transition min-w-[150px]">
+            <option>All Status</option>
+            <option>In Stock</option>
+            <option>Low Stock</option>
+            <option>Out of Stock</option>
+          </select>
+          <!-- Filter Button -->
+          <button class="flex items-center gap-2 bg-brand-500 text-white rounded-lg px-4 py-2.5 text-sm font-medium hover:bg-brand-600 transition">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M12 3c2.755 0 5.455.232 8.083.678.533.09.917.556.917 1.096v1.044a2.25 2.25 0 01-.659 1.591l-5.432 5.432a2.25 2.25 0 00-.659 1.591v2.927a2.25 2.25 0 01-1.244 2.013L9.75 21v-6.568a2.25 2.25 0 00-.659-1.591L3.659 7.409A2.25 2.25 0 013 5.818V4.774c0-.54.384-1.006.917-1.096A48.32 48.32 0 0112 3z"/></svg>
+            Filter
+          </button>
+        </div>
+      </div>
+
+      <!-- ===== INVENTORY TABLE ===== -->
+      <div class="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden mb-8">
+        <div class="overflow-x-auto">
+          <table class="w-full text-sm">
+            <thead>
+              <tr class="bg-gray-50 border-b border-gray-100">
+                <th class="text-left px-5 py-3.5 font-semibold text-gray-600 text-xs uppercase tracking-wider">SKU</th>
+                <th class="text-left px-5 py-3.5 font-semibold text-gray-600 text-xs uppercase tracking-wider">Product</th>
+                <th class="text-left px-5 py-3.5 font-semibold text-gray-600 text-xs uppercase tracking-wider">Seller</th>
+                <th class="text-left px-5 py-3.5 font-semibold text-gray-600 text-xs uppercase tracking-wider">Zone</th>
+                <th class="text-left px-5 py-3.5 font-semibold text-gray-600 text-xs uppercase tracking-wider">Bin Location</th>
+                <th class="text-right px-5 py-3.5 font-semibold text-gray-600 text-xs uppercase tracking-wider">Qty</th>
+                <th class="text-right px-5 py-3.5 font-semibold text-gray-600 text-xs uppercase tracking-wider">Reserved</th>
+                <th class="text-right px-5 py-3.5 font-semibold text-gray-600 text-xs uppercase tracking-wider">Available</th>
+                <th class="text-center px-5 py-3.5 font-semibold text-gray-600 text-xs uppercase tracking-wider">Status</th>
+                <th class="text-left px-5 py-3.5 font-semibold text-gray-600 text-xs uppercase tracking-wider">Last Movement</th>
+                <th class="text-center px-5 py-3.5 font-semibold text-gray-600 text-xs uppercase tracking-wider">Actions</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-50">
+              <!-- Row 1: In Stock -->
+              <tr class="table-row" data-sku="HB-EL-4521" data-product="Samsung Galaxy S24" data-category="Electronics" data-seller="TechWorld India" data-zone="A" data-bin="A3-R2-S5" data-qty="120" data-reserved="18" data-available="102" data-status="In Stock" data-lastmove="28 Mar, 10:24 AM">
+                <td class="px-5 py-4">
+                  <span class="font-mono text-xs font-semibold text-gray-700 bg-gray-100 px-2 py-1 rounded">HB-EL-4521</span>
+                </td>
+                <td class="px-5 py-4">
+                  <div class="flex items-center gap-2.5">
+                    <span class="text-xl">&#x1F4F1;</span>
+                    <div>
+                      <p class="font-medium text-gray-900">Samsung Galaxy S24</p>
+                      <p class="text-xs text-gray-400">Electronics</p>
+                    </div>
+                  </div>
+                </td>
+                <td class="px-5 py-4 text-gray-600">TechWorld India</td>
+                <td class="px-5 py-4"><span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-semibold bg-blue-100 text-blue-700">A</span></td>
+                <td class="px-5 py-4 font-mono text-xs text-gray-700">A3-R2-S5</td>
+                <td class="px-5 py-4 text-right font-semibold text-gray-900">120</td>
+                <td class="px-5 py-4 text-right text-gray-500">18</td>
+                <td class="px-5 py-4 text-right font-semibold text-gray-900">102</td>
+                <td class="px-5 py-4 text-center">
+                  <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-green-50 text-green-700">In Stock</span>
+                </td>
+                <td class="px-5 py-4 text-xs text-gray-500">28 Mar, 10:24 AM</td>
+                <td class="px-5 py-4 text-center">
+                  <div class="flex items-center justify-center gap-1">
+                    <button onclick="viewItem(this)" class="p-1.5 text-gray-400 hover:text-brand-500 hover:bg-brand-50 rounded-lg transition" title="View Details">
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z"/><path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                    </button>
+                    <button onclick="editItem(this)" class="p-1.5 text-gray-400 hover:text-blue-500 hover:bg-blue-50 rounded-lg transition" title="Edit">
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125"/></svg>
+                    </button>
+                    <button onclick="showMoreMenu(event, this)" class="p-1.5 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition" title="More">
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M12 6.75a.75.75 0 110-1.5.75.75 0 010 1.5zM12 12.75a.75.75 0 110-1.5.75.75 0 010 1.5zM12 18.75a.75.75 0 110-1.5.75.75 0 010 1.5z"/></svg>
+                    </button>
+                  </div>
+                </td>
+              </tr>
+
+              <!-- Row 2: In Stock -->
+              <tr class="table-row" data-sku="HB-HK-8823" data-product="Prestige Coffee Maker" data-category="Home &amp; Kitchen" data-seller="HomeGoods Ltd" data-zone="B" data-bin="B1-R4-S2" data-qty="85" data-reserved="12" data-available="73" data-status="In Stock" data-lastmove="28 Mar, 09:15 AM">
+                <td class="px-5 py-4">
+                  <span class="font-mono text-xs font-semibold text-gray-700 bg-gray-100 px-2 py-1 rounded">HB-HK-8823</span>
+                </td>
+                <td class="px-5 py-4">
+                  <div class="flex items-center gap-2.5">
+                    <span class="text-xl">&#x2615;</span>
+                    <div>
+                      <p class="font-medium text-gray-900">Prestige Coffee Maker</p>
+                      <p class="text-xs text-gray-400">Home &amp; Kitchen</p>
+                    </div>
+                  </div>
+                </td>
+                <td class="px-5 py-4 text-gray-600">HomeGoods Ltd</td>
+                <td class="px-5 py-4"><span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-semibold bg-emerald-100 text-emerald-700">B</span></td>
+                <td class="px-5 py-4 font-mono text-xs text-gray-700">B1-R4-S2</td>
+                <td class="px-5 py-4 text-right font-semibold text-gray-900">85</td>
+                <td class="px-5 py-4 text-right text-gray-500">12</td>
+                <td class="px-5 py-4 text-right font-semibold text-gray-900">73</td>
+                <td class="px-5 py-4 text-center">
+                  <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-green-50 text-green-700">In Stock</span>
+                </td>
+                <td class="px-5 py-4 text-xs text-gray-500">28 Mar, 09:15 AM</td>
+                <td class="px-5 py-4 text-center">
+                  <div class="flex items-center justify-center gap-1">
+                    <button onclick="viewItem(this)" class="p-1.5 text-gray-400 hover:text-brand-500 hover:bg-brand-50 rounded-lg transition" title="View Details">
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z"/><path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                    </button>
+                    <button onclick="editItem(this)" class="p-1.5 text-gray-400 hover:text-blue-500 hover:bg-blue-50 rounded-lg transition" title="Edit">
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125"/></svg>
+                    </button>
+                    <button onclick="showMoreMenu(event, this)" class="p-1.5 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition" title="More">
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M12 6.75a.75.75 0 110-1.5.75.75 0 010 1.5zM12 12.75a.75.75 0 110-1.5.75.75 0 010 1.5zM12 18.75a.75.75 0 110-1.5.75.75 0 010 1.5z"/></svg>
+                    </button>
+                  </div>
+                </td>
+              </tr>
+
+              <!-- Row 3: Low Stock -->
+              <tr class="table-row" data-sku="HB-CL-3347" data-product="Nike Dri-FIT T-Shirt" data-category="Clothing" data-seller="FashionHub" data-zone="C" data-bin="C2-R1-S8" data-qty="8" data-reserved="3" data-available="5" data-status="Low Stock" data-lastmove="27 Mar, 04:32 PM">
+                <td class="px-5 py-4">
+                  <span class="font-mono text-xs font-semibold text-gray-700 bg-gray-100 px-2 py-1 rounded">HB-CL-3347</span>
+                </td>
+                <td class="px-5 py-4">
+                  <div class="flex items-center gap-2.5">
+                    <span class="text-xl">&#x1F455;</span>
+                    <div>
+                      <p class="font-medium text-gray-900">Nike Dri-FIT T-Shirt</p>
+                      <p class="text-xs text-gray-400">Clothing</p>
+                    </div>
+                  </div>
+                </td>
+                <td class="px-5 py-4 text-gray-600">FashionHub</td>
+                <td class="px-5 py-4"><span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-semibold bg-purple-100 text-purple-700">C</span></td>
+                <td class="px-5 py-4 font-mono text-xs text-gray-700">C2-R1-S8</td>
+                <td class="px-5 py-4 text-right font-semibold text-amber-600">8</td>
+                <td class="px-5 py-4 text-right text-gray-500">3</td>
+                <td class="px-5 py-4 text-right font-semibold text-amber-600">5</td>
+                <td class="px-5 py-4 text-center">
+                  <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-amber-50 text-amber-700">Low Stock</span>
+                </td>
+                <td class="px-5 py-4 text-xs text-gray-500">27 Mar, 04:32 PM</td>
+                <td class="px-5 py-4 text-center">
+                  <div class="flex items-center justify-center gap-1">
+                    <button onclick="viewItem(this)" class="p-1.5 text-gray-400 hover:text-brand-500 hover:bg-brand-50 rounded-lg transition" title="View Details">
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z"/><path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                    </button>
+                    <button onclick="editItem(this)" class="p-1.5 text-gray-400 hover:text-blue-500 hover:bg-blue-50 rounded-lg transition" title="Edit">
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125"/></svg>
+                    </button>
+                    <button onclick="showMoreMenu(event, this)" class="p-1.5 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition" title="More">
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M12 6.75a.75.75 0 110-1.5.75.75 0 010 1.5zM12 12.75a.75.75 0 110-1.5.75.75 0 010 1.5zM12 18.75a.75.75 0 110-1.5.75.75 0 010 1.5z"/></svg>
+                    </button>
+                  </div>
+                </td>
+              </tr>
+
+              <!-- Row 4: Out of Stock -->
+              <tr class="table-row" data-sku="HB-EL-9912" data-product="Sony WH-1000XM5" data-category="Electronics" data-seller="AudioMax Pvt Ltd" data-zone="A" data-bin="A1-R5-S3" data-qty="0" data-reserved="0" data-available="0" data-status="Out of Stock" data-lastmove="26 Mar, 02:18 PM">
+                <td class="px-5 py-4">
+                  <span class="font-mono text-xs font-semibold text-gray-700 bg-gray-100 px-2 py-1 rounded">HB-EL-9912</span>
+                </td>
+                <td class="px-5 py-4">
+                  <div class="flex items-center gap-2.5">
+                    <span class="text-xl">&#x1F3A7;</span>
+                    <div>
+                      <p class="font-medium text-gray-900">Sony WH-1000XM5</p>
+                      <p class="text-xs text-gray-400">Electronics</p>
+                    </div>
+                  </div>
+                </td>
+                <td class="px-5 py-4 text-gray-600">AudioMax Pvt Ltd</td>
+                <td class="px-5 py-4"><span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-semibold bg-blue-100 text-blue-700">A</span></td>
+                <td class="px-5 py-4 font-mono text-xs text-gray-700">A1-R5-S3</td>
+                <td class="px-5 py-4 text-right font-semibold text-red-600">0</td>
+                <td class="px-5 py-4 text-right text-gray-500">0</td>
+                <td class="px-5 py-4 text-right font-semibold text-red-600">0</td>
+                <td class="px-5 py-4 text-center">
+                  <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-red-50 text-red-700">Out of Stock</span>
+                </td>
+                <td class="px-5 py-4 text-xs text-gray-500">26 Mar, 02:18 PM</td>
+                <td class="px-5 py-4 text-center">
+                  <div class="flex items-center justify-center gap-1">
+                    <button onclick="viewItem(this)" class="p-1.5 text-gray-400 hover:text-brand-500 hover:bg-brand-50 rounded-lg transition" title="View Details">
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z"/><path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                    </button>
+                    <button onclick="editItem(this)" class="p-1.5 text-gray-400 hover:text-blue-500 hover:bg-blue-50 rounded-lg transition" title="Edit">
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125"/></svg>
+                    </button>
+                    <button onclick="showMoreMenu(event, this)" class="p-1.5 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition" title="More">
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M12 6.75a.75.75 0 110-1.5.75.75 0 010 1.5zM12 12.75a.75.75 0 110-1.5.75.75 0 010 1.5zM12 18.75a.75.75 0 110-1.5.75.75 0 010 1.5z"/></svg>
+                    </button>
+                  </div>
+                </td>
+              </tr>
+
+              <!-- Row 5: In Stock -->
+              <tr class="table-row" data-sku="HB-BT-5567" data-product="Dove Body Wash 500ml" data-category="Beauty" data-seller="BeautyEssentials" data-zone="D" data-bin="D2-R3-S1" data-qty="340" data-reserved="45" data-available="295" data-status="In Stock" data-lastmove="28 Mar, 08:40 AM">
+                <td class="px-5 py-4">
+                  <span class="font-mono text-xs font-semibold text-gray-700 bg-gray-100 px-2 py-1 rounded">HB-BT-5567</span>
+                </td>
+                <td class="px-5 py-4">
+                  <div class="flex items-center gap-2.5">
+                    <span class="text-xl">&#x1F9F4;</span>
+                    <div>
+                      <p class="font-medium text-gray-900">Dove Body Wash 500ml</p>
+                      <p class="text-xs text-gray-400">Beauty</p>
+                    </div>
+                  </div>
+                </td>
+                <td class="px-5 py-4 text-gray-600">BeautyEssentials</td>
+                <td class="px-5 py-4"><span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-semibold bg-amber-100 text-amber-700">D</span></td>
+                <td class="px-5 py-4 font-mono text-xs text-gray-700">D2-R3-S1</td>
+                <td class="px-5 py-4 text-right font-semibold text-gray-900">340</td>
+                <td class="px-5 py-4 text-right text-gray-500">45</td>
+                <td class="px-5 py-4 text-right font-semibold text-gray-900">295</td>
+                <td class="px-5 py-4 text-center">
+                  <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-green-50 text-green-700">In Stock</span>
+                </td>
+                <td class="px-5 py-4 text-xs text-gray-500">28 Mar, 08:40 AM</td>
+                <td class="px-5 py-4 text-center">
+                  <div class="flex items-center justify-center gap-1">
+                    <button onclick="viewItem(this)" class="p-1.5 text-gray-400 hover:text-brand-500 hover:bg-brand-50 rounded-lg transition" title="View Details">
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z"/><path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                    </button>
+                    <button onclick="editItem(this)" class="p-1.5 text-gray-400 hover:text-blue-500 hover:bg-blue-50 rounded-lg transition" title="Edit">
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125"/></svg>
+                    </button>
+                    <button onclick="showMoreMenu(event, this)" class="p-1.5 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition" title="More">
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M12 6.75a.75.75 0 110-1.5.75.75 0 010 1.5zM12 12.75a.75.75 0 110-1.5.75.75 0 010 1.5zM12 18.75a.75.75 0 110-1.5.75.75 0 010 1.5z"/></svg>
+                    </button>
+                  </div>
+                </td>
+              </tr>
+
+              <!-- Row 6: Low Stock -->
+              <tr class="table-row" data-sku="HB-SP-7741" data-product="Yonex Badminton Racket" data-category="Sports" data-seller="SportsZone India" data-zone="B" data-bin="B4-R2-S6" data-qty="12" data-reserved="7" data-available="5" data-status="Low Stock" data-lastmove="27 Mar, 11:05 AM">
+                <td class="px-5 py-4">
+                  <span class="font-mono text-xs font-semibold text-gray-700 bg-gray-100 px-2 py-1 rounded">HB-SP-7741</span>
+                </td>
+                <td class="px-5 py-4">
+                  <div class="flex items-center gap-2.5">
+                    <span class="text-xl">&#x1F3BE;</span>
+                    <div>
+                      <p class="font-medium text-gray-900">Yonex Badminton Racket</p>
+                      <p class="text-xs text-gray-400">Sports</p>
+                    </div>
+                  </div>
+                </td>
+                <td class="px-5 py-4 text-gray-600">SportsZone India</td>
+                <td class="px-5 py-4"><span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-semibold bg-emerald-100 text-emerald-700">B</span></td>
+                <td class="px-5 py-4 font-mono text-xs text-gray-700">B4-R2-S6</td>
+                <td class="px-5 py-4 text-right font-semibold text-amber-600">12</td>
+                <td class="px-5 py-4 text-right text-gray-500">7</td>
+                <td class="px-5 py-4 text-right font-semibold text-amber-600">5</td>
+                <td class="px-5 py-4 text-center">
+                  <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-amber-50 text-amber-700">Low Stock</span>
+                </td>
+                <td class="px-5 py-4 text-xs text-gray-500">27 Mar, 11:05 AM</td>
+                <td class="px-5 py-4 text-center">
+                  <div class="flex items-center justify-center gap-1">
+                    <button onclick="viewItem(this)" class="p-1.5 text-gray-400 hover:text-brand-500 hover:bg-brand-50 rounded-lg transition" title="View Details">
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z"/><path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                    </button>
+                    <button onclick="editItem(this)" class="p-1.5 text-gray-400 hover:text-blue-500 hover:bg-blue-50 rounded-lg transition" title="Edit">
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125"/></svg>
+                    </button>
+                    <button onclick="showMoreMenu(event, this)" class="p-1.5 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition" title="More">
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M12 6.75a.75.75 0 110-1.5.75.75 0 010 1.5zM12 12.75a.75.75 0 110-1.5.75.75 0 010 1.5zM12 18.75a.75.75 0 110-1.5.75.75 0 010 1.5z"/></svg>
+                    </button>
+                  </div>
+                </td>
+              </tr>
+
+              <!-- Row 7: In Stock -->
+              <tr class="table-row" data-sku="HB-BK-2204" data-product="Atomic Habits - James Clear" data-category="Books" data-seller="BookWorm Dist." data-zone="C" data-bin="C1-R3-S2" data-qty="200" data-reserved="30" data-available="170" data-status="In Stock" data-lastmove="28 Mar, 07:50 AM">
+                <td class="px-5 py-4">
+                  <span class="font-mono text-xs font-semibold text-gray-700 bg-gray-100 px-2 py-1 rounded">HB-BK-2204</span>
+                </td>
+                <td class="px-5 py-4">
+                  <div class="flex items-center gap-2.5">
+                    <span class="text-xl">&#x1F4DA;</span>
+                    <div>
+                      <p class="font-medium text-gray-900">Atomic Habits - James Clear</p>
+                      <p class="text-xs text-gray-400">Books</p>
+                    </div>
+                  </div>
+                </td>
+                <td class="px-5 py-4 text-gray-600">BookWorm Dist.</td>
+                <td class="px-5 py-4"><span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-semibold bg-purple-100 text-purple-700">C</span></td>
+                <td class="px-5 py-4 font-mono text-xs text-gray-700">C1-R3-S2</td>
+                <td class="px-5 py-4 text-right font-semibold text-gray-900">200</td>
+                <td class="px-5 py-4 text-right text-gray-500">30</td>
+                <td class="px-5 py-4 text-right font-semibold text-gray-900">170</td>
+                <td class="px-5 py-4 text-center">
+                  <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-green-50 text-green-700">In Stock</span>
+                </td>
+                <td class="px-5 py-4 text-xs text-gray-500">28 Mar, 07:50 AM</td>
+                <td class="px-5 py-4 text-center">
+                  <div class="flex items-center justify-center gap-1">
+                    <button onclick="viewItem(this)" class="p-1.5 text-gray-400 hover:text-brand-500 hover:bg-brand-50 rounded-lg transition" title="View Details">
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z"/><path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                    </button>
+                    <button onclick="editItem(this)" class="p-1.5 text-gray-400 hover:text-blue-500 hover:bg-blue-50 rounded-lg transition" title="Edit">
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125"/></svg>
+                    </button>
+                    <button onclick="showMoreMenu(event, this)" class="p-1.5 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition" title="More">
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M12 6.75a.75.75 0 110-1.5.75.75 0 010 1.5zM12 12.75a.75.75 0 110-1.5.75.75 0 010 1.5zM12 18.75a.75.75 0 110-1.5.75.75 0 010 1.5z"/></svg>
+                    </button>
+                  </div>
+                </td>
+              </tr>
+
+              <!-- Row 8: Out of Stock -->
+              <tr class="table-row" data-sku="HB-HK-1190" data-product="Dyson V15 Vacuum" data-category="Home &amp; Kitchen" data-seller="CleanTech Co." data-zone="D" data-bin="D4-R1-S4" data-qty="0" data-reserved="0" data-available="0" data-status="Out of Stock" data-lastmove="25 Mar, 06:12 PM">
+                <td class="px-5 py-4">
+                  <span class="font-mono text-xs font-semibold text-gray-700 bg-gray-100 px-2 py-1 rounded">HB-HK-1190</span>
+                </td>
+                <td class="px-5 py-4">
+                  <div class="flex items-center gap-2.5">
+                    <span class="text-xl">&#x1F9F9;</span>
+                    <div>
+                      <p class="font-medium text-gray-900">Dyson V15 Vacuum</p>
+                      <p class="text-xs text-gray-400">Home &amp; Kitchen</p>
+                    </div>
+                  </div>
+                </td>
+                <td class="px-5 py-4 text-gray-600">CleanTech Co.</td>
+                <td class="px-5 py-4"><span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-semibold bg-amber-100 text-amber-700">D</span></td>
+                <td class="px-5 py-4 font-mono text-xs text-gray-700">D4-R1-S4</td>
+                <td class="px-5 py-4 text-right font-semibold text-red-600">0</td>
+                <td class="px-5 py-4 text-right text-gray-500">0</td>
+                <td class="px-5 py-4 text-right font-semibold text-red-600">0</td>
+                <td class="px-5 py-4 text-center">
+                  <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-red-50 text-red-700">Out of Stock</span>
+                </td>
+                <td class="px-5 py-4 text-xs text-gray-500">25 Mar, 06:12 PM</td>
+                <td class="px-5 py-4 text-center">
+                  <div class="flex items-center justify-center gap-1">
+                    <button onclick="viewItem(this)" class="p-1.5 text-gray-400 hover:text-brand-500 hover:bg-brand-50 rounded-lg transition" title="View Details">
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z"/><path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                    </button>
+                    <button onclick="editItem(this)" class="p-1.5 text-gray-400 hover:text-blue-500 hover:bg-blue-50 rounded-lg transition" title="Edit">
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125"/></svg>
+                    </button>
+                    <button onclick="showMoreMenu(event, this)" class="p-1.5 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition" title="More">
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M12 6.75a.75.75 0 110-1.5.75.75 0 010 1.5zM12 12.75a.75.75 0 110-1.5.75.75 0 010 1.5zM12 18.75a.75.75 0 110-1.5.75.75 0 010 1.5z"/></svg>
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- ===== WAREHOUSE MAP + RECENT MOVEMENTS (2 cols) ===== -->
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+
+        <!-- Warehouse Zone Map -->
+        <div class="bg-white rounded-xl border border-gray-100 shadow-sm p-6">
+          <div class="flex items-center justify-between mb-5">
+            <div>
+              <h2 class="text-base font-bold text-gray-900">Warehouse Zone Map</h2>
+              <p class="text-xs text-gray-500 mt-0.5">Storage utilization by zone</p>
+            </div>
+            <span class="text-xs font-medium text-gray-400 bg-gray-100 px-2.5 py-1 rounded-full">Live</span>
+          </div>
+
+          <!-- Zone Grid -->
+          <div class="grid grid-cols-2 gap-4">
+            <!-- Zone A -->
+            <div class="zone-cell relative bg-blue-50 border-2 border-blue-200 rounded-xl p-4 cursor-pointer hover:border-blue-400">
+              <div class="flex items-center justify-between mb-3">
+                <span class="text-lg font-bold text-blue-700">Zone A</span>
+                <span class="text-xs font-semibold text-blue-600 bg-blue-100 px-2 py-0.5 rounded-full">Electronics</span>
+              </div>
+              <div class="mb-2">
+                <div class="flex items-end justify-between mb-1">
+                  <span class="text-2xl font-bold text-blue-800">87%</span>
+                  <span class="text-xs text-blue-500">Full</span>
+                </div>
+                <div class="w-full h-3 bg-blue-100 rounded-full overflow-hidden">
+                  <div class="h-full bg-blue-500 rounded-full transition-all" style="width: 87%"></div>
+                </div>
+              </div>
+              <div class="flex items-center justify-between text-xs text-blue-600 mt-2">
+                <span>652 SKUs</span>
+                <span>48 bins</span>
+              </div>
+            </div>
+
+            <!-- Zone B -->
+            <div class="zone-cell relative bg-emerald-50 border-2 border-emerald-200 rounded-xl p-4 cursor-pointer hover:border-emerald-400">
+              <div class="flex items-center justify-between mb-3">
+                <span class="text-lg font-bold text-emerald-700">Zone B</span>
+                <span class="text-xs font-semibold text-emerald-600 bg-emerald-100 px-2 py-0.5 rounded-full">General</span>
+              </div>
+              <div class="mb-2">
+                <div class="flex items-end justify-between mb-1">
+                  <span class="text-2xl font-bold text-emerald-800">72%</span>
+                  <span class="text-xs text-emerald-500">Full</span>
+                </div>
+                <div class="w-full h-3 bg-emerald-100 rounded-full overflow-hidden">
+                  <div class="h-full bg-emerald-500 rounded-full transition-all" style="width: 72%"></div>
+                </div>
+              </div>
+              <div class="flex items-center justify-between text-xs text-emerald-600 mt-2">
+                <span>580 SKUs</span>
+                <span>52 bins</span>
+              </div>
+            </div>
+
+            <!-- Zone C -->
+            <div class="zone-cell relative bg-purple-50 border-2 border-purple-200 rounded-xl p-4 cursor-pointer hover:border-purple-400">
+              <div class="flex items-center justify-between mb-3">
+                <span class="text-lg font-bold text-purple-700">Zone C</span>
+                <span class="text-xs font-semibold text-purple-600 bg-purple-100 px-2 py-0.5 rounded-full">Apparel</span>
+              </div>
+              <div class="mb-2">
+                <div class="flex items-end justify-between mb-1">
+                  <span class="text-2xl font-bold text-purple-800">63%</span>
+                  <span class="text-xs text-purple-500">Full</span>
+                </div>
+                <div class="w-full h-3 bg-purple-100 rounded-full overflow-hidden">
+                  <div class="h-full bg-purple-500 rounded-full transition-all" style="width: 63%"></div>
+                </div>
+              </div>
+              <div class="flex items-center justify-between text-xs text-purple-600 mt-2">
+                <span>718 SKUs</span>
+                <span>60 bins</span>
+              </div>
+            </div>
+
+            <!-- Zone D -->
+            <div class="zone-cell relative bg-amber-50 border-2 border-amber-200 rounded-xl p-4 cursor-pointer hover:border-amber-400">
+              <div class="flex items-center justify-between mb-3">
+                <span class="text-lg font-bold text-amber-700">Zone D</span>
+                <span class="text-xs font-semibold text-amber-600 bg-amber-100 px-2 py-0.5 rounded-full">Beauty / FMCG</span>
+              </div>
+              <div class="mb-2">
+                <div class="flex items-end justify-between mb-1">
+                  <span class="text-2xl font-bold text-amber-800">91%</span>
+                  <span class="text-xs text-amber-500">Full</span>
+                </div>
+                <div class="w-full h-3 bg-amber-100 rounded-full overflow-hidden">
+                  <div class="h-full bg-amber-500 rounded-full transition-all" style="width: 91%"></div>
+                </div>
+              </div>
+              <div class="flex items-center justify-between text-xs text-amber-600 mt-2">
+                <span>500 SKUs</span>
+                <span>36 bins</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Map Legend -->
+          <div class="mt-4 pt-4 border-t border-gray-100 flex items-center justify-between text-xs text-gray-500">
+            <div class="flex items-center gap-4">
+              <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-green-400"></span> &lt;70% Optimal</span>
+              <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-amber-400"></span> 70-90% High</span>
+              <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-red-400"></span> &gt;90% Critical</span>
+            </div>
+            <span class="font-medium text-gray-600">Total: 196 bins</span>
+          </div>
+        </div>
+
+        <!-- Recent Stock Movements -->
+        <div class="bg-white rounded-xl border border-gray-100 shadow-sm p-6">
+          <div class="flex items-center justify-between mb-5">
+            <div>
+              <h2 class="text-base font-bold text-gray-900">Recent Stock Movements</h2>
+              <p class="text-xs text-gray-500 mt-0.5">Last 5 inventory transactions</p>
+            </div>
+            <a href="#" onclick="event.preventDefault();alert('View All Stock Movements - Coming Soon')" class="text-xs font-semibold text-brand-500 hover:text-brand-600 transition">View All</a>
+          </div>
+
+          <div class="space-y-0">
+            <!-- Movement 1: Received -->
+            <div class="movement-item flex items-center gap-4 py-3.5 px-3 -mx-3 rounded-lg border-b border-gray-50">
+              <div class="w-10 h-10 rounded-lg bg-green-50 flex items-center justify-center shrink-0">
+                <svg class="w-5 h-5 text-green-600" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5m-13.5-9L12 3m0 0l4.5 4.5M12 3v13.5"/></svg>
+              </div>
+              <div class="flex-1 min-w-0">
+                <div class="flex items-center justify-between">
+                  <p class="text-sm font-semibold text-gray-900">Received - Samsung Galaxy S24</p>
+                  <span class="text-sm font-bold text-green-600">+50 units</span>
+                </div>
+                <div class="flex items-center gap-2 mt-1">
+                  <span class="text-xs text-gray-400">HB-EL-4521</span>
+                  <span class="text-gray-300">|</span>
+                  <span class="text-xs text-gray-400">Zone A, A3-R2-S5</span>
+                  <span class="text-gray-300">|</span>
+                  <span class="text-xs text-gray-400">28 Mar, 10:24 AM</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Movement 2: Picked -->
+            <div class="movement-item flex items-center gap-4 py-3.5 px-3 -mx-3 rounded-lg border-b border-gray-50">
+              <div class="w-10 h-10 rounded-lg bg-blue-50 flex items-center justify-center shrink-0">
+                <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M15.75 17.25v3.375c0 .621-.504 1.125-1.125 1.125h-9.5a1.125 1.125 0 01-1.125-1.125V7.875c0-.621.504-1.125 1.125-1.125H6.75a9.06 9.06 0 011.5.124m7.5 10.376h3.375c.621 0 1.125-.504 1.125-1.125V11.25c0-4.46-3.243-8.161-7.5-8.876a9.06 9.06 0 00-1.5-.124H9.375c-.621 0-1.125.504-1.125 1.125v3.5m7.5 10.375H9.375a1.125 1.125 0 01-1.125-1.125v-9.25m12.75 6.625v-1.875a3.375 3.375 0 00-3.375-3.375h-1.5a1.125 1.125 0 01-1.125-1.125v-1.5a3.375 3.375 0 00-3.375-3.375H9.75"/></svg>
+              </div>
+              <div class="flex-1 min-w-0">
+                <div class="flex items-center justify-between">
+                  <p class="text-sm font-semibold text-gray-900">Picked - Prestige Coffee Maker</p>
+                  <span class="text-sm font-bold text-blue-600">-3 units</span>
+                </div>
+                <div class="flex items-center gap-2 mt-1">
+                  <span class="text-xs text-gray-400">HB-HK-8823</span>
+                  <span class="text-gray-300">|</span>
+                  <span class="text-xs text-gray-400">Zone B, B1-R4-S2</span>
+                  <span class="text-gray-300">|</span>
+                  <span class="text-xs text-gray-400">28 Mar, 09:45 AM</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Movement 3: Transferred -->
+            <div class="movement-item flex items-center gap-4 py-3.5 px-3 -mx-3 rounded-lg border-b border-gray-50">
+              <div class="w-10 h-10 rounded-lg bg-purple-50 flex items-center justify-center shrink-0">
+                <svg class="w-5 h-5 text-purple-600" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M7.5 21L3 16.5m0 0L7.5 12M3 16.5h13.5m0-13.5L21 7.5m0 0L16.5 12M21 7.5H7.5"/></svg>
+              </div>
+              <div class="flex-1 min-w-0">
+                <div class="flex items-center justify-between">
+                  <p class="text-sm font-semibold text-gray-900">Transferred - Nike Dri-FIT T-Shirt</p>
+                  <span class="text-sm font-bold text-purple-600">20 units</span>
+                </div>
+                <div class="flex items-center gap-2 mt-1">
+                  <span class="text-xs text-gray-400">HB-CL-3347</span>
+                  <span class="text-gray-300">|</span>
+                  <span class="text-xs text-gray-400">Zone A &#8594; Zone C</span>
+                  <span class="text-gray-300">|</span>
+                  <span class="text-xs text-gray-400">28 Mar, 08:30 AM</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Movement 4: Damaged -->
+            <div class="movement-item flex items-center gap-4 py-3.5 px-3 -mx-3 rounded-lg border-b border-gray-50">
+              <div class="w-10 h-10 rounded-lg bg-red-50 flex items-center justify-center shrink-0">
+                <svg class="w-5 h-5 text-red-600" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z"/></svg>
+              </div>
+              <div class="flex-1 min-w-0">
+                <div class="flex items-center justify-between">
+                  <p class="text-sm font-semibold text-gray-900">Damaged - Dove Body Wash 500ml</p>
+                  <span class="text-sm font-bold text-red-600">-1 unit</span>
+                </div>
+                <div class="flex items-center gap-2 mt-1">
+                  <span class="text-xs text-gray-400">HB-BT-5567</span>
+                  <span class="text-gray-300">|</span>
+                  <span class="text-xs text-gray-400">Zone D, D2-R3-S1</span>
+                  <span class="text-gray-300">|</span>
+                  <span class="text-xs text-gray-400">27 Mar, 05:10 PM</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Movement 5: Received -->
+            <div class="movement-item flex items-center gap-4 py-3.5 px-3 -mx-3 rounded-lg">
+              <div class="w-10 h-10 rounded-lg bg-green-50 flex items-center justify-center shrink-0">
+                <svg class="w-5 h-5 text-green-600" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5m-13.5-9L12 3m0 0l4.5 4.5M12 3v13.5"/></svg>
+              </div>
+              <div class="flex-1 min-w-0">
+                <div class="flex items-center justify-between">
+                  <p class="text-sm font-semibold text-gray-900">Received - Atomic Habits</p>
+                  <span class="text-sm font-bold text-green-600">+100 units</span>
+                </div>
+                <div class="flex items-center gap-2 mt-1">
+                  <span class="text-xs text-gray-400">HB-BK-2204</span>
+                  <span class="text-gray-300">|</span>
+                  <span class="text-xs text-gray-400">Zone C, C1-R3-S2</span>
+                  <span class="text-gray-300">|</span>
+                  <span class="text-xs text-gray-400">27 Mar, 02:45 PM</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== PAGINATION ===== -->
+      <div class="bg-white rounded-xl border border-gray-100 shadow-sm px-6 py-4">
+        <div class="flex items-center justify-between">
+          <p class="text-sm text-gray-500">Showing <span class="font-semibold text-gray-700">1-8</span> of <span class="font-semibold text-gray-700">2,450</span> SKUs</p>
+          <div class="flex items-center gap-1">
+            <button class="px-3 py-2 text-sm text-gray-400 bg-gray-50 rounded-lg cursor-not-allowed" disabled>
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M15.75 19.5L8.25 12l7.5-7.5"/></svg>
+            </button>
+            <button class="px-3.5 py-2 text-sm font-semibold text-white bg-brand-500 rounded-lg">1</button>
+            <button class="px-3.5 py-2 text-sm font-medium text-gray-600 hover:bg-gray-100 rounded-lg transition">2</button>
+            <button class="px-3.5 py-2 text-sm font-medium text-gray-600 hover:bg-gray-100 rounded-lg transition">3</button>
+            <button class="px-3.5 py-2 text-sm font-medium text-gray-600 hover:bg-gray-100 rounded-lg transition">4</button>
+            <span class="px-2 py-2 text-sm text-gray-400">...</span>
+            <button class="px-3.5 py-2 text-sm font-medium text-gray-600 hover:bg-gray-100 rounded-lg transition">307</button>
+            <button class="px-3 py-2 text-sm text-gray-600 hover:bg-gray-100 rounded-lg transition">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M8.25 4.5l7.5 7.5-7.5 7.5"/></svg>
+            </button>
+          </div>
+          <div class="flex items-center gap-2">
+            <span class="text-sm text-gray-500">Per page:</span>
+            <select class="bg-gray-50 border border-gray-200 rounded-lg py-1.5 px-2 text-sm text-gray-700 outline-none focus:border-brand-400">
+              <option selected>8</option>
+              <option>20</option>
+              <option>50</option>
+              <option>100</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <!-- Footer spacer -->
+      <div class="h-8"></div>
+
+    </main>
+  </div>
+
+  <!-- ===== VIEW DETAILS MODAL ===== -->
+  <div id="viewModal" class="fixed inset-0 z-[100] hidden items-center justify-center bg-black/40 backdrop-blur-sm">
+    <div class="relative w-full max-w-lg mx-4 bg-white rounded-2xl shadow-2xl overflow-hidden">
+      <!-- Modal Header -->
+      <div class="flex items-center justify-between px-6 py-4 border-b border-gray-100 bg-gray-50">
+        <h3 class="text-lg font-bold text-gray-900">Item Details</h3>
+        <button onclick="closeViewModal()" class="p-1.5 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M6 18L18 6M6 6l12 12"/></svg>
+        </button>
+      </div>
+      <!-- Modal Body -->
+      <div class="px-6 py-5 space-y-4" id="viewModalBody"></div>
+      <!-- Modal Footer -->
+      <div class="flex justify-end px-6 py-4 border-t border-gray-100 bg-gray-50">
+        <button onclick="closeViewModal()" class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 transition">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== MORE ACTIONS DROPDOWN ===== -->
+  <div id="moreMenu" class="fixed z-[110] hidden bg-white rounded-xl shadow-xl border border-gray-100 py-1.5 w-48">
+    <button onclick="moreAction('Transfer Stock')" class="flex items-center gap-2.5 w-full px-4 py-2.5 text-sm text-gray-700 hover:bg-brand-50 hover:text-brand-600 transition text-left">
+      <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M7.5 21L3 16.5m0 0L7.5 12M3 16.5h13.5m0-13.5L21 7.5m0 0L16.5 12M21 7.5H7.5"/></svg>
+      Transfer Stock
+    </button>
+    <button onclick="moreAction('Adjust Quantity')" class="flex items-center gap-2.5 w-full px-4 py-2.5 text-sm text-gray-700 hover:bg-brand-50 hover:text-brand-600 transition text-left">
+      <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M10.5 6h9.75M10.5 6a1.5 1.5 0 11-3 0m3 0a1.5 1.5 0 10-3 0M3.75 6H7.5m3 12h9.75m-9.75 0a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m-3.75 0H7.5m9-6h3.75m-3.75 0a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m-9.75 0h9.75"/></svg>
+      Adjust Quantity
+    </button>
+    <button onclick="moreAction('Mark Damaged')" class="flex items-center gap-2.5 w-full px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 transition text-left">
+      <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z"/></svg>
+      Mark Damaged
+    </button>
+    <div class="border-t border-gray-100 my-1"></div>
+    <button onclick="moreAction('View History')" class="flex items-center gap-2.5 w-full px-4 py-2.5 text-sm text-gray-700 hover:bg-brand-50 hover:text-brand-600 transition text-left">
+      <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+      View History
+    </button>
+  </div>
+
+  <!-- ===== ACTION BUTTONS JAVASCRIPT ===== -->
+  <script>
+    /* ------ helpers ------ */
+    function getRowData(btn) {
+      var tr = btn.closest('tr');
+      return {
+        sku: tr.dataset.sku,
+        product: tr.dataset.product,
+        category: tr.dataset.category,
+        seller: tr.dataset.seller,
+        zone: tr.dataset.zone,
+        bin: tr.dataset.bin,
+        qty: tr.dataset.qty,
+        reserved: tr.dataset.reserved,
+        available: tr.dataset.available,
+        status: tr.dataset.status,
+        lastmove: tr.dataset.lastmove,
+        tr: tr
+      };
+    }
+
+    /* ------ VIEW MODAL ------ */
+    function viewItem(btn) {
+      var d = getRowData(btn);
+      var statusColor = d.status === 'In Stock' ? 'bg-green-50 text-green-700' :
+                        d.status === 'Low Stock' ? 'bg-amber-50 text-amber-700' :
+                        'bg-red-50 text-red-700';
+      document.getElementById('viewModalBody').innerHTML =
+        '<div class="grid grid-cols-2 gap-4">' +
+          '<div class="space-y-1"><p class="text-xs font-semibold text-gray-400 uppercase tracking-wider">SKU</p><p class="font-mono text-sm font-semibold text-gray-800 bg-gray-100 inline-block px-2 py-0.5 rounded">' + d.sku + '</p></div>' +
+          '<div class="space-y-1"><p class="text-xs font-semibold text-gray-400 uppercase tracking-wider">Status</p><span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold ' + statusColor + '">' + d.status + '</span></div>' +
+          '<div class="space-y-1 col-span-2"><p class="text-xs font-semibold text-gray-400 uppercase tracking-wider">Product Name</p><p class="text-sm font-medium text-gray-900">' + d.product + '</p></div>' +
+          '<div class="space-y-1"><p class="text-xs font-semibold text-gray-400 uppercase tracking-wider">Category</p><p class="text-sm text-gray-700">' + d.category + '</p></div>' +
+          '<div class="space-y-1"><p class="text-xs font-semibold text-gray-400 uppercase tracking-wider">Seller</p><p class="text-sm text-gray-700">' + d.seller + '</p></div>' +
+          '<div class="space-y-1"><p class="text-xs font-semibold text-gray-400 uppercase tracking-wider">Zone</p><p class="text-sm font-semibold text-gray-800">Zone ' + d.zone + '</p></div>' +
+          '<div class="space-y-1"><p class="text-xs font-semibold text-gray-400 uppercase tracking-wider">Bin Location</p><p class="font-mono text-sm text-gray-700">' + d.bin + '</p></div>' +
+          '<div class="space-y-1"><p class="text-xs font-semibold text-gray-400 uppercase tracking-wider">Total Qty</p><p class="text-sm font-bold text-gray-900">' + d.qty + '</p></div>' +
+          '<div class="space-y-1"><p class="text-xs font-semibold text-gray-400 uppercase tracking-wider">Reserved</p><p class="text-sm text-gray-600">' + d.reserved + '</p></div>' +
+          '<div class="space-y-1"><p class="text-xs font-semibold text-gray-400 uppercase tracking-wider">Available</p><p class="text-sm font-bold text-gray-900">' + d.available + '</p></div>' +
+          '<div class="space-y-1"><p class="text-xs font-semibold text-gray-400 uppercase tracking-wider">Last Movement</p><p class="text-sm text-gray-600">' + d.lastmove + '</p></div>' +
+        '</div>';
+      var modal = document.getElementById('viewModal');
+      modal.classList.remove('hidden');
+      modal.classList.add('flex');
+    }
+
+    function closeViewModal() {
+      var modal = document.getElementById('viewModal');
+      modal.classList.add('hidden');
+      modal.classList.remove('flex');
+    }
+
+    // Close modal on backdrop click
+    document.getElementById('viewModal').addEventListener('click', function(e) {
+      if (e.target === this) closeViewModal();
+    });
+
+    // Close modal on Escape key
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape') {
+        closeViewModal();
+        hideMoreMenu();
+      }
+    });
+
+    /* ------ INLINE EDIT ------ */
+    var currentEditRow = null;
+    var originalRowHTML = null;
+
+    function editItem(btn) {
+      // Cancel any previous edit first
+      if (currentEditRow) cancelEdit();
+
+      var d = getRowData(btn);
+      var tr = d.tr;
+      currentEditRow = tr;
+      originalRowHTML = tr.innerHTML;
+
+      tr.innerHTML =
+        '<td class="px-5 py-4" colspan="5">' +
+          '<div class="flex items-center gap-3">' +
+            '<span class="font-mono text-xs font-semibold text-gray-700 bg-gray-100 px-2 py-1 rounded">' + d.sku + '</span>' +
+            '<span class="text-sm font-medium text-gray-900">' + d.product + '</span>' +
+            '<span class="text-xs text-gray-400">Zone ' + d.zone + ' / ' + d.bin + '</span>' +
+          '</div>' +
+        '</td>' +
+        '<td class="px-5 py-4" colspan="3">' +
+          '<div class="flex items-center gap-3">' +
+            '<div class="flex items-center gap-2">' +
+              '<label class="text-xs font-semibold text-gray-500">Qty:</label>' +
+              '<input id="editQty" type="number" value="' + d.qty + '" min="0" class="w-20 rounded-lg border border-gray-300 px-2.5 py-1.5 text-sm font-semibold text-gray-900 outline-none focus:border-brand-400 focus:ring-2 focus:ring-brand-100 transition">' +
+            '</div>' +
+            '<div class="flex items-center gap-2">' +
+              '<label class="text-xs font-semibold text-gray-500">Reserved:</label>' +
+              '<input id="editReserved" type="number" value="' + d.reserved + '" min="0" class="w-20 rounded-lg border border-gray-300 px-2.5 py-1.5 text-sm text-gray-600 outline-none focus:border-brand-400 focus:ring-2 focus:ring-brand-100 transition">' +
+            '</div>' +
+          '</div>' +
+        '</td>' +
+        '<td class="px-5 py-4" colspan="3">' +
+          '<div class="flex items-center justify-end gap-2">' +
+            '<button onclick="saveEdit()" class="inline-flex items-center gap-1.5 px-3.5 py-1.5 text-xs font-semibold text-white bg-green-600 rounded-lg hover:bg-green-700 transition shadow-sm">' +
+              '<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4.5 12.75l6 6 9-13.5"/></svg>' +
+              'Save' +
+            '</button>' +
+            '<button onclick="cancelEdit()" class="inline-flex items-center gap-1.5 px-3.5 py-1.5 text-xs font-semibold text-gray-600 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 transition">' +
+              '<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M6 18L18 6M6 6l12 12"/></svg>' +
+              'Cancel' +
+            '</button>' +
+          '</div>' +
+        '</td>';
+      tr.classList.add('bg-blue-50');
+
+      // Focus the quantity input
+      setTimeout(function() { document.getElementById('editQty').focus(); }, 50);
+    }
+
+    function saveEdit() {
+      if (!currentEditRow) return;
+      var newQty = parseInt(document.getElementById('editQty').value) || 0;
+      var newReserved = parseInt(document.getElementById('editReserved').value) || 0;
+      var newAvailable = Math.max(0, newQty - newReserved);
+
+      // Update data attributes
+      currentEditRow.dataset.qty = newQty;
+      currentEditRow.dataset.reserved = newReserved;
+      currentEditRow.dataset.available = newAvailable;
+
+      // Determine new status
+      var newStatus = newQty === 0 ? 'Out of Stock' : newQty <= 10 ? 'Low Stock' : 'In Stock';
+      currentEditRow.dataset.status = newStatus;
+
+      // Restore original HTML then update the displayed values
+      currentEditRow.innerHTML = originalRowHTML;
+      currentEditRow.classList.remove('bg-blue-50');
+
+      // Update quantity cells (td index 5=qty, 6=reserved, 7=available)
+      var tds = currentEditRow.querySelectorAll('td');
+      var qtyColor = newStatus === 'Out of Stock' ? 'text-red-600' : newStatus === 'Low Stock' ? 'text-amber-600' : 'text-gray-900';
+      tds[5].innerHTML = '<span class="font-semibold ' + qtyColor + '">' + newQty + '</span>';
+      tds[5].className = 'px-5 py-4 text-right';
+      tds[6].innerHTML = newReserved.toString();
+      tds[7].innerHTML = '<span class="font-semibold ' + qtyColor + '">' + newAvailable + '</span>';
+      tds[7].className = 'px-5 py-4 text-right';
+
+      // Update status badge
+      var statusColor = newStatus === 'In Stock' ? 'bg-green-50 text-green-700' :
+                        newStatus === 'Low Stock' ? 'bg-amber-50 text-amber-700' :
+                        'bg-red-50 text-red-700';
+      tds[8].innerHTML = '<span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold ' + statusColor + '">' + newStatus + '</span>';
+
+      currentEditRow = null;
+      originalRowHTML = null;
+    }
+
+    function cancelEdit() {
+      if (!currentEditRow) return;
+      currentEditRow.innerHTML = originalRowHTML;
+      currentEditRow.classList.remove('bg-blue-50');
+      currentEditRow = null;
+      originalRowHTML = null;
+    }
+
+    /* ------ MORE (THREE DOTS) DROPDOWN ------ */
+    var moreMenuSku = null;
+
+    function showMoreMenu(e, btn) {
+      e.stopPropagation();
+      var d = getRowData(btn);
+      moreMenuSku = d.sku;
+      var menu = document.getElementById('moreMenu');
+      var rect = btn.getBoundingClientRect();
+
+      // Position the menu below the button, aligned right
+      menu.style.top = (rect.bottom + 4) + 'px';
+      menu.style.left = Math.max(8, rect.right - 192) + 'px';
+      menu.classList.remove('hidden');
+    }
+
+    function hideMoreMenu() {
+      document.getElementById('moreMenu').classList.add('hidden');
+      moreMenuSku = null;
+    }
+
+    function moreAction(action) {
+      alert(action + ' for ' + moreMenuSku);
+      hideMoreMenu();
+    }
+
+    // Close dropdown when clicking anywhere else
+    document.addEventListener('click', function(e) {
+      var menu = document.getElementById('moreMenu');
+      if (!menu.classList.contains('hidden') && !menu.contains(e.target)) {
+        hideMoreMenu();
+      }
+    });
+  </script>
+
+  <script src="shared-layout.js"></script>
+  <script>renderWarehouseLayout('inventory');</script>
+</body>
+</html>

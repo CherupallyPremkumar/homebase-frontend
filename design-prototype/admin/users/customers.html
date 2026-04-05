@@ -1,0 +1,829 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HomeBase — Customer Management</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              50: '#FFF7ED',
+              100: '#FFEDD5',
+              200: '#FED7AA',
+              300: '#FDBA74',
+              400: '#FB923C',
+              500: '#F97316',
+              600: '#EA580C',
+              700: '#C2410C',
+            },
+            navy: {
+              700: '#1E3A5F',
+              800: '#152238',
+              900: '#0A1628',
+            },
+            success: '#16A34A',
+            warning: '#EAB308',
+            danger: '#DC2626',
+          },
+          fontFamily: {
+            sans: ['Inter', 'system-ui', 'sans-serif'],
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+    .scrollbar-hide::-webkit-scrollbar { display: none; }
+    .sidebar-link { transition: all 0.15s ease; }
+    .sidebar-link:hover { background: rgba(255,255,255,0.08); }
+    .sidebar-link.active { background: rgba(249,115,22,0.15); border-right: 3px solid #F97316; }
+    .stat-card { transition: all 0.2s ease; }
+    .stat-card:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,0.08); }
+    .table-row { transition: background 0.15s ease; }
+    .table-row:hover { background: #FFF7ED; }
+    .dropdown-menu { display: none; }
+    .dropdown:hover .dropdown-menu { display: block; }
+    .sidebar-scroll::-webkit-scrollbar { width: 4px; }
+    .sidebar-scroll::-webkit-scrollbar-track { background: transparent; }
+    .sidebar-scroll::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); border-radius: 2px; }
+    .tab-btn { transition: all 0.15s ease; }
+    .tab-btn.active { color: #F97316; border-color: #F97316; }
+  </style>
+</head>
+<body class="font-sans bg-gray-50 text-gray-900">
+
+  <!-- ===== TOP HEADER BAR ===== -->
+  <header id="admin-header" class="fixed top-0 left-0 right-0 z-50 bg-white border-b border-gray-200 h-16"></header>
+
+  <!-- ===== LAYOUT: SIDEBAR + MAIN ===== -->
+  <div class="flex pt-16 min-h-screen">
+
+    <!-- ===== LEFT SIDEBAR ===== -->
+    <aside id="admin-sidebar" class="fixed left-0 top-16 bottom-0 w-60 z-40 flex flex-col overflow-y-auto" style="background:#0A1628;"></aside>
+
+    <!-- ===== MAIN CONTENT ===== -->
+    <main class="ml-60 flex-1 min-h-screen">
+      <div class="p-8">
+
+        <!-- Page Header -->
+        <div class="flex items-center justify-between mb-8">
+          <div>
+            <h1 class="text-2xl font-bold text-gray-900">Customer Management</h1>
+            <p class="text-sm text-gray-500 mt-1">Monitor and manage all platform customers</p>
+          </div>
+          <div class="flex items-center gap-3">
+            <button class="flex items-center gap-2 px-4 py-2.5 bg-white border border-gray-200 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 transition">
+              <svg class="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3"/></svg>
+              Export
+            </button>
+            <button class="flex items-center gap-2 bg-brand-500 hover:bg-brand-600 text-white text-sm font-medium px-4 py-2.5 rounded-lg transition">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M19 7.5v3m0 0v3m0-3h3m-3 0h-3m-2.25-4.125a3.375 3.375 0 11-6.75 0 3.375 3.375 0 016.75 0zM4 19.235v-.11a6.375 6.375 0 0112.75 0v.109A12.318 12.318 0 0110.374 21c-2.331 0-4.512-.645-6.374-1.766z"/></svg>
+              Add Customer
+            </button>
+          </div>
+        </div>
+
+        <!-- Stats Cards -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 mb-8">
+          <!-- Total Customers -->
+          <div class="stat-card bg-white rounded-xl p-5 border border-gray-100 shadow-sm">
+            <div class="flex items-center justify-between mb-3">
+              <div class="w-10 h-10 rounded-lg bg-blue-50 flex items-center justify-center">
+                <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M15 19.128a9.38 9.38 0 002.625.372 9.337 9.337 0 004.121-.952 4.125 4.125 0 00-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 018.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0111.964-3.07M12 6.375a3.375 3.375 0 11-6.75 0 3.375 3.375 0 016.75 0zm8.25 2.25a2.625 2.625 0 11-5.25 0 2.625 2.625 0 015.25 0z"/></svg>
+              </div>
+              <span class="inline-flex items-center gap-1 text-xs font-medium text-green-600 bg-green-50 px-2 py-0.5 rounded-full">
+                <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4.5 19.5l15-15m0 0H8.25m11.25 0v11.25"/></svg>
+                +14.2%
+              </span>
+            </div>
+            <p class="text-2xl font-bold text-gray-900">1,24,567</p>
+            <p class="text-xs text-gray-500 mt-1">Total Customers</p>
+          </div>
+
+          <!-- Active (30d) -->
+          <div class="stat-card bg-white rounded-xl p-5 border border-gray-100 shadow-sm">
+            <div class="flex items-center justify-between mb-3">
+              <div class="w-10 h-10 rounded-lg bg-green-50 flex items-center justify-center">
+                <svg class="w-5 h-5 text-green-600" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+              </div>
+              <span class="inline-flex items-center gap-1 text-xs font-medium text-green-600 bg-green-50 px-2 py-0.5 rounded-full">
+                <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4.5 19.5l15-15m0 0H8.25m11.25 0v11.25"/></svg>
+                +8.7%
+              </span>
+            </div>
+            <p class="text-2xl font-bold text-gray-900">67,890</p>
+            <p class="text-xs text-gray-500 mt-1">Active (30d)</p>
+          </div>
+
+          <!-- New This Month -->
+          <div class="stat-card bg-white rounded-xl p-5 border border-gray-100 shadow-sm">
+            <div class="flex items-center justify-between mb-3">
+              <div class="w-10 h-10 rounded-lg bg-brand-50 flex items-center justify-center">
+                <svg class="w-5 h-5 text-brand-600" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M19 7.5v3m0 0v3m0-3h3m-3 0h-3m-2.25-4.125a3.375 3.375 0 11-6.75 0 3.375 3.375 0 016.75 0zM4 19.235v-.11a6.375 6.375 0 0112.75 0v.109A12.318 12.318 0 0110.374 21c-2.331 0-4.512-.645-6.374-1.766z"/></svg>
+              </div>
+              <span class="inline-flex items-center gap-1 text-xs font-medium text-green-600 bg-green-50 px-2 py-0.5 rounded-full">
+                <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4.5 19.5l15-15m0 0H8.25m11.25 0v11.25"/></svg>
+                +22.1%
+              </span>
+            </div>
+            <p class="text-2xl font-bold text-gray-900">3,456</p>
+            <p class="text-xs text-gray-500 mt-1">New This Month</p>
+          </div>
+
+          <!-- Blocked -->
+          <div class="stat-card bg-white rounded-xl p-5 border border-gray-100 shadow-sm">
+            <div class="flex items-center justify-between mb-3">
+              <div class="w-10 h-10 rounded-lg bg-red-50 flex items-center justify-center">
+                <svg class="w-5 h-5 text-red-600" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"/></svg>
+              </div>
+              <span class="inline-flex items-center gap-1 text-xs font-medium text-red-600 bg-red-50 px-2 py-0.5 rounded-full">
+                <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M19.5 4.5l-15 15m0 0h11.25m-11.25 0V8.25"/></svg>
+                -5.3%
+              </span>
+            </div>
+            <p class="text-2xl font-bold text-gray-900">234</p>
+            <p class="text-xs text-gray-500 mt-1">Blocked</p>
+          </div>
+        </div>
+
+        <!-- NEW: Customer Health Metrics -->
+        <div class="grid grid-cols-2 lg:grid-cols-5 gap-4 mb-6">
+          <div class="bg-white rounded-lg border border-gray-100 p-4">
+            <p class="text-xs font-medium text-gray-500 mb-1">Avg LTV</p>
+            <p class="text-xl font-bold text-gray-900">&#8377;12,400</p>
+            <span class="text-[10px] font-semibold text-green-600">+8% vs last quarter</span>
+          </div>
+          <div class="bg-white rounded-lg border border-gray-100 p-4">
+            <p class="text-xs font-medium text-gray-500 mb-1">Repeat Purchase Rate</p>
+            <p class="text-xl font-bold text-gray-900">34.2%</p>
+            <span class="text-[10px] font-semibold text-green-600">+2.1pp vs last month</span>
+          </div>
+          <div class="bg-white rounded-lg border border-gray-100 p-4">
+            <p class="text-xs font-medium text-gray-500 mb-1">Avg Order Value</p>
+            <p class="text-xl font-bold text-gray-900">&#8377;3,875</p>
+            <span class="text-[10px] font-semibold text-green-600">+5.4%</span>
+          </div>
+          <div class="bg-white rounded-lg border border-gray-100 p-4">
+            <p class="text-xs font-medium text-gray-500 mb-1">Churn Risk</p>
+            <p class="text-xl font-bold text-red-600">8,420</p>
+            <span class="text-[10px] font-semibold text-red-600">No purchase in 60+ days</span>
+          </div>
+          <div class="bg-white rounded-lg border border-gray-100 p-4">
+            <p class="text-xs font-medium text-gray-500 mb-1">NPS Score</p>
+            <p class="text-xl font-bold text-gray-900">72</p>
+            <span class="text-[10px] font-semibold text-green-600">Good (industry avg: 45)</span>
+          </div>
+        </div>
+
+        <!-- NEW: Segment Overview -->
+        <div class="bg-white rounded-xl border border-gray-100 shadow-sm p-5 mb-6">
+          <h3 class="text-sm font-semibold text-gray-900 mb-3">Customer Segments</h3>
+          <div class="flex rounded-lg overflow-hidden h-8 mb-3">
+            <div class="bg-violet-500 flex items-center justify-center" style="width:12%"><span class="text-[10px] font-bold text-white">VIP</span></div>
+            <div class="bg-blue-500 flex items-center justify-center" style="width:22%"><span class="text-[10px] font-bold text-white">High Value</span></div>
+            <div class="bg-green-500 flex items-center justify-center" style="width:28%"><span class="text-[10px] font-bold text-white">Regular</span></div>
+            <div class="bg-amber-400 flex items-center justify-center" style="width:18%"><span class="text-[10px] font-bold text-white">New</span></div>
+            <div class="bg-red-400 flex items-center justify-center" style="width:12%"><span class="text-[10px] font-bold text-white">At Risk</span></div>
+            <div class="bg-gray-400 flex items-center justify-center" style="width:8%"><span class="text-[10px] font-bold text-white">8%</span></div>
+          </div>
+          <div class="grid grid-cols-6 gap-2 text-center">
+            <div><p class="text-sm font-bold text-gray-900">14,948</p><p class="text-[10px] text-gray-400">VIP (12%)</p><p class="text-[10px] text-violet-600">&#8377;42K avg LTV</p></div>
+            <div><p class="text-sm font-bold text-gray-900">27,404</p><p class="text-[10px] text-gray-400">High Value (22%)</p><p class="text-[10px] text-blue-600">&#8377;18K avg LTV</p></div>
+            <div><p class="text-sm font-bold text-gray-900">34,878</p><p class="text-[10px] text-gray-400">Regular (28%)</p><p class="text-[10px] text-green-600">&#8377;8K avg LTV</p></div>
+            <div><p class="text-sm font-bold text-gray-900">22,422</p><p class="text-[10px] text-gray-400">New (18%)</p><p class="text-[10px] text-amber-600">&#8377;3K avg LTV</p></div>
+            <div><p class="text-sm font-bold text-gray-900">14,948</p><p class="text-[10px] text-gray-400">At Risk (12%)</p><p class="text-[10px] text-red-600">&#8377;6K avg LTV</p></div>
+            <div><p class="text-sm font-bold text-gray-900">9,967</p><p class="text-[10px] text-gray-400">Churned (8%)</p><p class="text-[10px] text-gray-500">&#8377;2K avg LTV</p></div>
+          </div>
+        </div>
+
+        <!-- Filter Tabs -->
+        <div class="flex items-center gap-1 mb-6 border-b border-gray-200">
+          <button onclick="filterByTab('all')" class="tab-btn active px-4 py-3 text-sm font-medium border-b-2 border-brand-500 text-brand-600" data-tab="all">
+            All <span class="ml-1 text-xs text-gray-400 font-normal">(1,24,567)</span>
+          </button>
+          <button onclick="filterByTab('Active')" class="tab-btn px-4 py-3 text-sm font-medium text-gray-500 border-b-2 border-transparent hover:text-gray-700" data-tab="Active">
+            Active <span class="ml-1 text-xs text-gray-400 font-normal">(67,890)</span>
+          </button>
+          <button onclick="filterByTab('Inactive')" class="tab-btn px-4 py-3 text-sm font-medium text-gray-500 border-b-2 border-transparent hover:text-gray-700" data-tab="Inactive">
+            Inactive <span class="ml-1 text-xs text-gray-400 font-normal">(56,443)</span>
+          </button>
+          <button onclick="filterByTab('Blocked')" class="tab-btn px-4 py-3 text-sm font-medium text-gray-500 border-b-2 border-transparent hover:text-gray-700" data-tab="Blocked">
+            Blocked <span class="ml-1 text-xs text-gray-400 font-normal">(234)</span>
+          </button>
+        </div>
+
+        <!-- Search + Filters -->
+        <div class="bg-white rounded-xl border border-gray-100 shadow-sm mb-6">
+          <div class="p-5 flex flex-col lg:flex-row items-start lg:items-center gap-4">
+            <!-- Search -->
+            <div class="relative flex-1 w-full lg:max-w-sm">
+              <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+              <input id="searchInput" type="text" placeholder="Search by name, email, or phone..." class="w-full bg-gray-50 border border-gray-200 rounded-lg py-2.5 pl-10 pr-4 text-sm outline-none focus:border-brand-400 focus:ring-2 focus:ring-brand-100 transition">
+            </div>
+
+            <!-- Segment Filter -->
+            <div class="flex items-center gap-3">
+              <select id="segmentFilter" class="bg-gray-50 border border-gray-200 rounded-lg py-2.5 px-4 text-sm text-gray-700 outline-none focus:border-brand-400 focus:ring-2 focus:ring-brand-100 transition appearance-none cursor-pointer pr-10" style="background-image: url('data:image/svg+xml;utf8,<svg fill=\'%236b7280\' viewBox=\'0 0 20 20\' xmlns=\'http://www.w3.org/2000/svg\'><path fill-rule=\'evenodd\' d=\'M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z\' clip-rule=\'evenodd\'/></svg>'); background-position: right 0.75rem center; background-repeat: no-repeat; background-size: 1rem;">
+                <option>All Segments</option>
+                <option>High Value</option>
+                <option>Repeat</option>
+                <option>New</option>
+                <option>At Risk</option>
+                <option>Regular</option>
+                <option>Churned</option>
+              </select>
+            </div>
+
+            <!-- Bulk Actions -->
+            <div class="flex items-center gap-2 lg:ml-auto">
+              <button class="flex items-center gap-1.5 px-3 py-2.5 bg-gray-50 border border-gray-200 rounded-lg text-sm text-gray-600 hover:bg-gray-100 transition">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M10.5 6h9.75M10.5 6a1.5 1.5 0 11-3 0m3 0a1.5 1.5 0 10-3 0M3.75 6H7.5m3 12h9.75m-9.75 0a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m-3.75 0H7.5m9-6h3.75m-3.75 0a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m-9.75 0h9.75"/></svg>
+                Filters
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- NEW: Bulk Actions Toolbar (shown when checkboxes selected) -->
+        <div id="bulkToolbar" class="hidden mb-4 bg-brand-50 border border-brand-200 rounded-xl p-4 flex items-center justify-between">
+          <div class="flex items-center gap-2">
+            <span class="text-sm font-semibold text-brand-700" id="selectedCount">0 selected</span>
+          </div>
+          <div class="flex items-center gap-2">
+            <button class="text-xs font-medium text-gray-700 bg-white border border-gray-200 px-3 py-2 rounded-lg hover:bg-gray-50 transition">Send Email Campaign</button>
+            <button class="text-xs font-medium text-gray-700 bg-white border border-gray-200 px-3 py-2 rounded-lg hover:bg-gray-50 transition">Assign Segment</button>
+            <button class="text-xs font-medium text-gray-700 bg-white border border-gray-200 px-3 py-2 rounded-lg hover:bg-gray-50 transition">Export Selected</button>
+            <button class="text-xs font-medium text-red-600 bg-white border border-red-200 px-3 py-2 rounded-lg hover:bg-red-50 transition">Block Selected</button>
+          </div>
+        </div>
+
+        <!-- Customers Table -->
+        <div class="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden">
+          <div class="overflow-x-auto">
+            <table class="w-full">
+              <thead>
+                <tr class="bg-gray-50 border-b border-gray-100">
+                  <th class="text-left py-3.5 px-5">
+                    <input type="checkbox" class="w-4 h-4 rounded border-gray-300 text-brand-500 focus:ring-brand-400 cursor-pointer">
+                  </th>
+                  <th class="text-left py-3.5 px-5 text-xs font-semibold text-gray-500 uppercase tracking-wider">Customer</th>
+                  <th class="text-left py-3.5 px-5 text-xs font-semibold text-gray-500 uppercase tracking-wider">Phone</th>
+                  <th class="text-left py-3.5 px-5 text-xs font-semibold text-gray-500 uppercase tracking-wider">Orders</th>
+                  <th class="text-left py-3.5 px-5 text-xs font-semibold text-gray-500 uppercase tracking-wider">Total Spent</th>
+                  <th class="text-left py-3.5 px-5 text-xs font-semibold text-gray-500 uppercase tracking-wider">Last Active</th>
+                  <th class="text-left py-3.5 px-5 text-xs font-semibold text-gray-500 uppercase tracking-wider">Segment</th>
+                  <th class="text-left py-3.5 px-5 text-xs font-semibold text-gray-500 uppercase tracking-wider">LTV</th>
+                  <th class="text-center py-3.5 px-5 text-xs font-semibold text-gray-500 uppercase tracking-wider">Risk</th>
+                  <th class="text-left py-3.5 px-5 text-xs font-semibold text-gray-500 uppercase tracking-wider">Status</th>
+                  <th class="text-left py-3.5 px-5 text-xs font-semibold text-gray-500 uppercase tracking-wider">Actions</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-gray-50">
+
+                <!-- Row 1: Priya Sharma -->
+                <tr class="table-row" data-status="Active" data-segment="High Value">
+                  <td class="py-4 px-5">
+                    <input type="checkbox" class="w-4 h-4 rounded border-gray-300 text-brand-500 focus:ring-brand-400 cursor-pointer">
+                  </td>
+                  <td class="py-4 px-5">
+                    <div class="flex items-center gap-3">
+                      <div class="w-9 h-9 rounded-full bg-gradient-to-br from-violet-400 to-violet-600 flex items-center justify-center text-white text-xs font-bold shrink-0">PS</div>
+                      <div>
+                        <a href="customer-detail.html" class="text-sm font-semibold text-brand-600 hover:text-brand-700 hover:underline">Priya Sharma</a>
+                        <p class="text-xs text-gray-500">priya.sharma@gmail.com</p>
+                      </div>
+                    </div>
+                  </td>
+                  <td class="py-4 px-5 text-sm text-gray-600">+91 98765 43210</td>
+                  <td class="py-4 px-5 text-sm font-medium text-gray-900">47</td>
+                  <td class="py-4 px-5 text-sm font-medium text-gray-900">&#8377;2,34,500</td>
+                  <td class="py-4 px-5 text-sm text-gray-500">2 hours ago</td>
+                  <td class="py-4 px-5">
+                    <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-purple-50 text-purple-700">High Value</span>
+                  </td>
+                  <td class="py-4 px-5">
+                    <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium bg-green-50 text-green-700">
+                      <span class="w-1.5 h-1.5 rounded-full bg-green-500"></span>
+                      Active
+                    </span>
+                  </td>
+                  <td class="py-4 px-5">
+                    <div class="flex items-center gap-1">
+                      <button onclick="window.location.href='customer-detail.html'" class="p-1.5 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition" title="View">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z"/><path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                      </button>
+                      <button onclick="customerAction('Block', 'Priya Sharma')" class="p-1.5 text-gray-400 hover:text-amber-600 hover:bg-amber-50 rounded-lg transition" title="Block">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z"/></svg>
+                      </button>
+                      <button onclick="customerAction('Delete', 'Priya Sharma')" class="p-1.5 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition" title="Delete">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0"/></svg>
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+
+                <!-- Row 2: Rajesh Patel -->
+                <tr class="table-row" data-status="Active" data-segment="Repeat">
+                  <td class="py-4 px-5">
+                    <input type="checkbox" class="w-4 h-4 rounded border-gray-300 text-brand-500 focus:ring-brand-400 cursor-pointer">
+                  </td>
+                  <td class="py-4 px-5">
+                    <div class="flex items-center gap-3">
+                      <div class="w-9 h-9 rounded-full bg-gradient-to-br from-blue-400 to-blue-600 flex items-center justify-center text-white text-xs font-bold shrink-0">RP</div>
+                      <div>
+                        <a href="customer-detail.html" class="text-sm font-semibold text-brand-600 hover:text-brand-700 hover:underline">Rajesh Patel</a>
+                        <p class="text-xs text-gray-500">rajesh.p@outlook.com</p>
+                      </div>
+                    </div>
+                  </td>
+                  <td class="py-4 px-5 text-sm text-gray-600">+91 87654 32109</td>
+                  <td class="py-4 px-5 text-sm font-medium text-gray-900">23</td>
+                  <td class="py-4 px-5 text-sm font-medium text-gray-900">&#8377;89,700</td>
+                  <td class="py-4 px-5 text-sm text-gray-500">1 day ago</td>
+                  <td class="py-4 px-5">
+                    <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-blue-50 text-blue-700">Repeat</span>
+                  </td>
+                  <td class="py-4 px-5">
+                    <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium bg-green-50 text-green-700">
+                      <span class="w-1.5 h-1.5 rounded-full bg-green-500"></span>
+                      Active
+                    </span>
+                  </td>
+                  <td class="py-4 px-5">
+                    <div class="flex items-center gap-1">
+                      <button onclick="window.location.href='customer-detail.html'" class="p-1.5 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition" title="View">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z"/><path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                      </button>
+                      <button onclick="customerAction('Block', 'Rajesh Patel')" class="p-1.5 text-gray-400 hover:text-amber-600 hover:bg-amber-50 rounded-lg transition" title="Block">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z"/></svg>
+                      </button>
+                      <button onclick="customerAction('Delete', 'Rajesh Patel')" class="p-1.5 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition" title="Delete">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0"/></svg>
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+
+                <!-- Row 3: Ananya Reddy -->
+                <tr class="table-row" data-status="Active" data-segment="Regular">
+                  <td class="py-4 px-5">
+                    <input type="checkbox" class="w-4 h-4 rounded border-gray-300 text-brand-500 focus:ring-brand-400 cursor-pointer">
+                  </td>
+                  <td class="py-4 px-5">
+                    <div class="flex items-center gap-3">
+                      <div class="w-9 h-9 rounded-full bg-gradient-to-br from-emerald-400 to-emerald-600 flex items-center justify-center text-white text-xs font-bold shrink-0">AR</div>
+                      <div>
+                        <a href="customer-detail.html" class="text-sm font-semibold text-brand-600 hover:text-brand-700 hover:underline">Ananya Reddy</a>
+                        <p class="text-xs text-gray-500">ananya.r@yahoo.com</p>
+                      </div>
+                    </div>
+                  </td>
+                  <td class="py-4 px-5 text-sm text-gray-600">+91 76543 21098</td>
+                  <td class="py-4 px-5 text-sm font-medium text-gray-900">12</td>
+                  <td class="py-4 px-5 text-sm font-medium text-gray-900">&#8377;45,200</td>
+                  <td class="py-4 px-5 text-sm text-gray-500">3 days ago</td>
+                  <td class="py-4 px-5">
+                    <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-600">Regular</span>
+                  </td>
+                  <td class="py-4 px-5">
+                    <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium bg-green-50 text-green-700">
+                      <span class="w-1.5 h-1.5 rounded-full bg-green-500"></span>
+                      Active
+                    </span>
+                  </td>
+                  <td class="py-4 px-5">
+                    <div class="flex items-center gap-1">
+                      <button onclick="window.location.href='customer-detail.html'" class="p-1.5 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition" title="View">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z"/><path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                      </button>
+                      <button onclick="customerAction('Block', 'Ananya Reddy')" class="p-1.5 text-gray-400 hover:text-amber-600 hover:bg-amber-50 rounded-lg transition" title="Block">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z"/></svg>
+                      </button>
+                      <button onclick="customerAction('Delete', 'Ananya Reddy')" class="p-1.5 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition" title="Delete">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0"/></svg>
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+
+                <!-- Row 4: Vikram Singh -->
+                <tr class="table-row" data-status="Active" data-segment="New">
+                  <td class="py-4 px-5">
+                    <input type="checkbox" class="w-4 h-4 rounded border-gray-300 text-brand-500 focus:ring-brand-400 cursor-pointer">
+                  </td>
+                  <td class="py-4 px-5">
+                    <div class="flex items-center gap-3">
+                      <div class="w-9 h-9 rounded-full bg-gradient-to-br from-cyan-400 to-cyan-600 flex items-center justify-center text-white text-xs font-bold shrink-0">VS</div>
+                      <div>
+                        <a href="customer-detail.html" class="text-sm font-semibold text-brand-600 hover:text-brand-700 hover:underline">Vikram Singh</a>
+                        <p class="text-xs text-gray-500">vikram.s@gmail.com</p>
+                      </div>
+                    </div>
+                  </td>
+                  <td class="py-4 px-5 text-sm text-gray-600">+91 65432 10987</td>
+                  <td class="py-4 px-5 text-sm font-medium text-gray-900">3</td>
+                  <td class="py-4 px-5 text-sm font-medium text-gray-900">&#8377;12,300</td>
+                  <td class="py-4 px-5 text-sm text-gray-500">1 week ago</td>
+                  <td class="py-4 px-5">
+                    <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-green-50 text-green-700">New</span>
+                  </td>
+                  <td class="py-4 px-5">
+                    <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium bg-green-50 text-green-700">
+                      <span class="w-1.5 h-1.5 rounded-full bg-green-500"></span>
+                      Active
+                    </span>
+                  </td>
+                  <td class="py-4 px-5">
+                    <div class="flex items-center gap-1">
+                      <button onclick="window.location.href='customer-detail.html'" class="p-1.5 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition" title="View">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z"/><path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                      </button>
+                      <button onclick="customerAction('Block', 'Vikram Singh')" class="p-1.5 text-gray-400 hover:text-amber-600 hover:bg-amber-50 rounded-lg transition" title="Block">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z"/></svg>
+                      </button>
+                      <button onclick="customerAction('Delete', 'Vikram Singh')" class="p-1.5 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition" title="Delete">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0"/></svg>
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+
+                <!-- Row 5: Deepa Nair -->
+                <tr class="table-row" data-status="Active" data-segment="High Value">
+                  <td class="py-4 px-5">
+                    <input type="checkbox" class="w-4 h-4 rounded border-gray-300 text-brand-500 focus:ring-brand-400 cursor-pointer">
+                  </td>
+                  <td class="py-4 px-5">
+                    <div class="flex items-center gap-3">
+                      <div class="w-9 h-9 rounded-full bg-gradient-to-br from-amber-400 to-amber-600 flex items-center justify-center text-white text-xs font-bold shrink-0">DN</div>
+                      <div>
+                        <a href="customer-detail.html" class="text-sm font-semibold text-brand-600 hover:text-brand-700 hover:underline">Deepa Nair</a>
+                        <p class="text-xs text-gray-500">deepa.n@hotmail.com</p>
+                      </div>
+                    </div>
+                  </td>
+                  <td class="py-4 px-5 text-sm text-gray-600">+91 54321 09876</td>
+                  <td class="py-4 px-5 text-sm font-medium text-gray-900">56</td>
+                  <td class="py-4 px-5 text-sm font-medium text-gray-900">&#8377;3,45,600</td>
+                  <td class="py-4 px-5 text-sm text-gray-500">5 hours ago</td>
+                  <td class="py-4 px-5">
+                    <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-purple-50 text-purple-700">High Value</span>
+                  </td>
+                  <td class="py-4 px-5">
+                    <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium bg-green-50 text-green-700">
+                      <span class="w-1.5 h-1.5 rounded-full bg-green-500"></span>
+                      Active
+                    </span>
+                  </td>
+                  <td class="py-4 px-5">
+                    <div class="flex items-center gap-1">
+                      <button onclick="window.location.href='customer-detail.html'" class="p-1.5 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition" title="View">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z"/><path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                      </button>
+                      <button onclick="customerAction('Block', 'Deepa Nair')" class="p-1.5 text-gray-400 hover:text-amber-600 hover:bg-amber-50 rounded-lg transition" title="Block">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z"/></svg>
+                      </button>
+                      <button onclick="customerAction('Delete', 'Deepa Nair')" class="p-1.5 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition" title="Delete">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0"/></svg>
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+
+                <!-- Row 6: Arjun Mehta -->
+                <tr class="table-row" data-status="Active" data-segment="At Risk">
+                  <td class="py-4 px-5">
+                    <input type="checkbox" class="w-4 h-4 rounded border-gray-300 text-brand-500 focus:ring-brand-400 cursor-pointer">
+                  </td>
+                  <td class="py-4 px-5">
+                    <div class="flex items-center gap-3">
+                      <div class="w-9 h-9 rounded-full bg-gradient-to-br from-rose-400 to-rose-600 flex items-center justify-center text-white text-xs font-bold shrink-0">AM</div>
+                      <div>
+                        <a href="customer-detail.html" class="text-sm font-semibold text-brand-600 hover:text-brand-700 hover:underline">Arjun Mehta</a>
+                        <p class="text-xs text-gray-500">arjun.m@gmail.com</p>
+                      </div>
+                    </div>
+                  </td>
+                  <td class="py-4 px-5 text-sm text-gray-600">+91 43210 98765</td>
+                  <td class="py-4 px-5 text-sm font-medium text-gray-900">8</td>
+                  <td class="py-4 px-5 text-sm font-medium text-gray-900">&#8377;23,400</td>
+                  <td class="py-4 px-5 text-sm text-gray-500">2 weeks ago</td>
+                  <td class="py-4 px-5">
+                    <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-orange-50 text-orange-700">At Risk</span>
+                  </td>
+                  <td class="py-4 px-5">
+                    <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium bg-green-50 text-green-700">
+                      <span class="w-1.5 h-1.5 rounded-full bg-green-500"></span>
+                      Active
+                    </span>
+                  </td>
+                  <td class="py-4 px-5">
+                    <div class="flex items-center gap-1">
+                      <button onclick="window.location.href='customer-detail.html'" class="p-1.5 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition" title="View">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z"/><path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                      </button>
+                      <button onclick="customerAction('Block', 'Arjun Mehta')" class="p-1.5 text-gray-400 hover:text-amber-600 hover:bg-amber-50 rounded-lg transition" title="Block">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z"/></svg>
+                      </button>
+                      <button onclick="customerAction('Delete', 'Arjun Mehta')" class="p-1.5 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition" title="Delete">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0"/></svg>
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+
+                <!-- Row 7: Kavitha Iyer -->
+                <tr class="table-row" data-status="Inactive" data-segment="Churned">
+                  <td class="py-4 px-5">
+                    <input type="checkbox" class="w-4 h-4 rounded border-gray-300 text-brand-500 focus:ring-brand-400 cursor-pointer">
+                  </td>
+                  <td class="py-4 px-5">
+                    <div class="flex items-center gap-3">
+                      <div class="w-9 h-9 rounded-full bg-gradient-to-br from-gray-400 to-gray-500 flex items-center justify-center text-white text-xs font-bold shrink-0">KI</div>
+                      <div>
+                        <a href="customer-detail.html" class="text-sm font-semibold text-brand-600 hover:text-brand-700 hover:underline">Kavitha Iyer</a>
+                        <p class="text-xs text-gray-500">kavitha.i@gmail.com</p>
+                      </div>
+                    </div>
+                  </td>
+                  <td class="py-4 px-5 text-sm text-gray-600">+91 32109 87654</td>
+                  <td class="py-4 px-5 text-sm font-medium text-gray-900">0</td>
+                  <td class="py-4 px-5 text-sm font-medium text-gray-900">&#8377;0</td>
+                  <td class="py-4 px-5 text-sm text-gray-500">30 days ago</td>
+                  <td class="py-4 px-5">
+                    <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-red-50 text-red-700">Churned</span>
+                  </td>
+                  <td class="py-4 px-5">
+                    <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-600">
+                      <span class="w-1.5 h-1.5 rounded-full bg-gray-400"></span>
+                      Inactive
+                    </span>
+                  </td>
+                  <td class="py-4 px-5">
+                    <div class="flex items-center gap-1">
+                      <button onclick="window.location.href='customer-detail.html'" class="p-1.5 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition" title="View">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z"/><path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                      </button>
+                      <button onclick="customerAction('Reactivate', 'Kavitha Iyer')" class="p-1.5 text-gray-400 hover:text-green-600 hover:bg-green-50 rounded-lg transition" title="Reactivate">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                      </button>
+                      <button onclick="customerAction('Delete', 'Kavitha Iyer')" class="p-1.5 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition" title="Delete">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0"/></svg>
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+
+                <!-- Row 8: Mohammed Khan -->
+                <tr class="table-row" data-status="Active" data-segment="Repeat">
+                  <td class="py-4 px-5">
+                    <input type="checkbox" class="w-4 h-4 rounded border-gray-300 text-brand-500 focus:ring-brand-400 cursor-pointer">
+                  </td>
+                  <td class="py-4 px-5">
+                    <div class="flex items-center gap-3">
+                      <div class="w-9 h-9 rounded-full bg-gradient-to-br from-indigo-400 to-indigo-600 flex items-center justify-center text-white text-xs font-bold shrink-0">MK</div>
+                      <div>
+                        <a href="customer-detail.html" class="text-sm font-semibold text-brand-600 hover:text-brand-700 hover:underline">Mohammed Khan</a>
+                        <p class="text-xs text-gray-500">mk.khan@gmail.com</p>
+                      </div>
+                    </div>
+                  </td>
+                  <td class="py-4 px-5 text-sm text-gray-600">+91 21098 76543</td>
+                  <td class="py-4 px-5 text-sm font-medium text-gray-900">15</td>
+                  <td class="py-4 px-5 text-sm font-medium text-gray-900">&#8377;67,800</td>
+                  <td class="py-4 px-5 text-sm text-gray-500">4 days ago</td>
+                  <td class="py-4 px-5">
+                    <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-blue-50 text-blue-700">Repeat</span>
+                  </td>
+                  <td class="py-4 px-5">
+                    <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium bg-green-50 text-green-700">
+                      <span class="w-1.5 h-1.5 rounded-full bg-green-500"></span>
+                      Active
+                    </span>
+                  </td>
+                  <td class="py-4 px-5">
+                    <div class="flex items-center gap-1">
+                      <button onclick="window.location.href='customer-detail.html'" class="p-1.5 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition" title="View">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z"/><path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                      </button>
+                      <button onclick="customerAction('Block', 'Mohammed Khan')" class="p-1.5 text-gray-400 hover:text-amber-600 hover:bg-amber-50 rounded-lg transition" title="Block">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z"/></svg>
+                      </button>
+                      <button onclick="customerAction('Delete', 'Mohammed Khan')" class="p-1.5 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition" title="Delete">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0"/></svg>
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+
+                <!-- Row 9: Sunita Gupta -->
+                <tr class="table-row" data-status="Active" data-segment="New">
+                  <td class="py-4 px-5">
+                    <input type="checkbox" class="w-4 h-4 rounded border-gray-300 text-brand-500 focus:ring-brand-400 cursor-pointer">
+                  </td>
+                  <td class="py-4 px-5">
+                    <div class="flex items-center gap-3">
+                      <div class="w-9 h-9 rounded-full bg-gradient-to-br from-pink-400 to-pink-600 flex items-center justify-center text-white text-xs font-bold shrink-0">SG</div>
+                      <div>
+                        <a href="customer-detail.html" class="text-sm font-semibold text-brand-600 hover:text-brand-700 hover:underline">Sunita Gupta</a>
+                        <p class="text-xs text-gray-500">sunita.g@gmail.com</p>
+                      </div>
+                    </div>
+                  </td>
+                  <td class="py-4 px-5 text-sm text-gray-600">+91 10987 65432</td>
+                  <td class="py-4 px-5 text-sm font-medium text-gray-900">2</td>
+                  <td class="py-4 px-5 text-sm font-medium text-gray-900">&#8377;5,600</td>
+                  <td class="py-4 px-5 text-sm text-gray-500">3 weeks ago</td>
+                  <td class="py-4 px-5">
+                    <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-green-50 text-green-700">New</span>
+                  </td>
+                  <td class="py-4 px-5">
+                    <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium bg-green-50 text-green-700">
+                      <span class="w-1.5 h-1.5 rounded-full bg-green-500"></span>
+                      Active
+                    </span>
+                  </td>
+                  <td class="py-4 px-5">
+                    <div class="flex items-center gap-1">
+                      <button onclick="window.location.href='customer-detail.html'" class="p-1.5 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition" title="View">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z"/><path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                      </button>
+                      <button onclick="customerAction('Block', 'Sunita Gupta')" class="p-1.5 text-gray-400 hover:text-amber-600 hover:bg-amber-50 rounded-lg transition" title="Block">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z"/></svg>
+                      </button>
+                      <button onclick="customerAction('Delete', 'Sunita Gupta')" class="p-1.5 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition" title="Delete">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0"/></svg>
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+
+                <!-- Row 10: Rohit Joshi -->
+                <tr class="table-row" data-status="Blocked" data-segment="">
+                  <td class="py-4 px-5">
+                    <input type="checkbox" class="w-4 h-4 rounded border-gray-300 text-brand-500 focus:ring-brand-400 cursor-pointer">
+                  </td>
+                  <td class="py-4 px-5">
+                    <div class="flex items-center gap-3">
+                      <div class="w-9 h-9 rounded-full bg-gradient-to-br from-red-400 to-red-600 flex items-center justify-center text-white text-xs font-bold shrink-0">RJ</div>
+                      <div>
+                        <a href="customer-detail.html" class="text-sm font-semibold text-brand-600 hover:text-brand-700 hover:underline">Rohit Joshi</a>
+                        <p class="text-xs text-gray-500">rohit.j@gmail.com</p>
+                      </div>
+                    </div>
+                  </td>
+                  <td class="py-4 px-5 text-sm text-gray-600">+91 99887 76655</td>
+                  <td class="py-4 px-5 text-sm font-medium text-gray-900">0</td>
+                  <td class="py-4 px-5 text-sm font-medium text-gray-900">&#8377;0</td>
+                  <td class="py-4 px-5 text-sm text-gray-400">&mdash;</td>
+                  <td class="py-4 px-5">
+                    <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-500">&mdash;</span>
+                  </td>
+                  <td class="py-4 px-5">
+                    <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium bg-red-50 text-red-700">
+                      <span class="w-1.5 h-1.5 rounded-full bg-red-500"></span>
+                      Blocked
+                    </span>
+                  </td>
+                  <td class="py-4 px-5">
+                    <div class="flex items-center gap-1">
+                      <button onclick="window.location.href='customer-detail.html'" class="p-1.5 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition" title="View">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z"/><path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                      </button>
+                      <button onclick="customerAction('Unblock', 'Rohit Joshi')" class="p-1.5 text-gray-400 hover:text-green-600 hover:bg-green-50 rounded-lg transition" title="Unblock">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                      </button>
+                      <button onclick="customerAction('Delete', 'Rohit Joshi')" class="p-1.5 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition" title="Delete">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0"/></svg>
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Pagination -->
+          <div class="flex items-center justify-between px-5 py-4 border-t border-gray-100">
+            <div class="flex items-center gap-2">
+              <p id="showingCount" class="text-sm text-gray-500">Showing <span class="font-medium text-gray-700">1-10</span> of <span class="font-medium text-gray-700">1,24,567</span> customers</p>
+              <select class="bg-gray-50 border border-gray-200 rounded-md py-1 px-2 text-xs text-gray-600 outline-none focus:border-brand-400 transition">
+                <option>10 per page</option>
+                <option>25 per page</option>
+                <option>50 per page</option>
+                <option>100 per page</option>
+              </select>
+            </div>
+            <div class="flex items-center gap-1">
+              <button class="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition disabled:opacity-40 disabled:cursor-not-allowed" disabled>
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M18.75 19.5l-7.5-7.5 7.5-7.5m-6 15L5.25 12l7.5-7.5"/></svg>
+              </button>
+              <button class="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition disabled:opacity-40 disabled:cursor-not-allowed" disabled>
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M15.75 19.5L8.25 12l7.5-7.5"/></svg>
+              </button>
+              <button class="w-9 h-9 rounded-lg bg-brand-500 text-white text-sm font-medium">1</button>
+              <button class="w-9 h-9 rounded-lg text-gray-600 hover:bg-gray-100 text-sm font-medium transition">2</button>
+              <button class="w-9 h-9 rounded-lg text-gray-600 hover:bg-gray-100 text-sm font-medium transition">3</button>
+              <button class="w-9 h-9 rounded-lg text-gray-600 hover:bg-gray-100 text-sm font-medium transition">4</button>
+              <span class="w-9 h-9 flex items-center justify-center text-gray-400 text-sm">...</span>
+              <button class="w-9 h-9 rounded-lg text-gray-600 hover:bg-gray-100 text-sm font-medium transition">12,457</button>
+              <button class="p-2 text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded-lg transition">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M8.25 4.5l7.5 7.5-7.5 7.5"/></svg>
+              </button>
+              <button class="p-2 text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded-lg transition">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M11.25 4.5l7.5 7.5-7.5 7.5m-6-15l7.5 7.5-7.5 7.5"/></svg>
+              </button>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </main>
+
+  </div>
+
+  <script>
+    function customerAction(action, name) {
+      if (confirm(action + ' customer "' + name + '"?')) {
+        alert(action + ' action confirmed for ' + name);
+      }
+    }
+
+    function filterByTab(status) {
+      var tabs = document.querySelectorAll('.tab-btn');
+      tabs.forEach(function(t) {
+        t.classList.remove('active', 'text-brand-600', 'border-brand-500');
+        t.classList.add('text-gray-500', 'border-transparent');
+      });
+      var clicked = document.querySelector('.tab-btn[data-tab="' + status + '"]');
+      if (clicked) {
+        clicked.classList.add('active', 'text-brand-600', 'border-brand-500');
+        clicked.classList.remove('text-gray-500', 'border-transparent');
+      }
+
+      var rows = document.querySelectorAll('tbody .table-row');
+      rows.forEach(function(row) {
+        var rowStatus = row.getAttribute('data-status');
+        if (status === 'all' || rowStatus === status) {
+          row.style.display = '';
+        } else {
+          row.style.display = 'none';
+        }
+      });
+    }
+
+    (function() {
+      var searchInput = document.getElementById('searchInput');
+      var segmentFilter = document.getElementById('segmentFilter');
+      var rows = document.querySelectorAll('tbody .table-row');
+      var debounceTimer;
+
+      if (searchInput) {
+        searchInput.addEventListener('keyup', function() {
+          clearTimeout(debounceTimer);
+          var q = this.value.toLowerCase();
+          debounceTimer = setTimeout(function() {
+            rows.forEach(function(row) {
+              var text = row.textContent.toLowerCase();
+              if (!q || text.indexOf(q) !== -1) {
+                row.classList.remove('search-hidden');
+                if (!row.classList.contains('filter-hidden')) row.style.display = '';
+              } else {
+                row.classList.add('search-hidden');
+                row.style.display = 'none';
+              }
+            });
+          }, 250);
+        });
+      }
+
+      if (segmentFilter) {
+        segmentFilter.addEventListener('change', function() {
+          var val = this.value;
+          rows.forEach(function(row) {
+            var segment = row.getAttribute('data-segment');
+            if (val === 'All Segments' || segment === val) {
+              row.classList.remove('filter-hidden');
+              if (!row.classList.contains('search-hidden')) row.style.display = '';
+            } else {
+              row.classList.add('filter-hidden');
+              row.style.display = 'none';
+            }
+          });
+        });
+      }
+    })();
+  </script>
+
+  <script src="../shared-layout.js"></script>
+  <script>renderAdminLayout('users', '../');</script>
+
+</body>
+</html>

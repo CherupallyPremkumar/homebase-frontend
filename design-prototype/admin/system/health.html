@@ -1,0 +1,504 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HomeBase — Platform Health</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              50: '#FFF7ED',
+              100: '#FFEDD5',
+              200: '#FED7AA',
+              300: '#FDBA74',
+              400: '#FB923C',
+              500: '#F97316',
+              600: '#EA580C',
+              700: '#C2410C',
+            },
+            navy: {
+              700: '#1E3A5F',
+              800: '#0F1E30',
+              900: '#0A1628',
+            },
+            success: '#16A34A',
+            warning: '#EAB308',
+            danger: '#DC2626',
+          },
+          fontFamily: {
+            sans: ['Inter', 'system-ui', 'sans-serif'],
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+    .scrollbar-hide::-webkit-scrollbar { display: none; }
+    .sidebar-link { transition: all 0.15s ease; }
+    .sidebar-link:hover { background: rgba(255,255,255,0.06); }
+    .sidebar-link.active { background: rgba(249,115,22,0.15); border-right: 3px solid #F97316; color: #F97316; }
+    .stat-card { transition: all 0.2s ease; }
+    .stat-card:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,0.08); }
+    .table-row { transition: background 0.15s ease; }
+    .table-row:hover { background: #FFF7ED; }
+    .health-pulse { animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite; }
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.5; }
+    }
+    .service-card { transition: all 0.2s ease; }
+    .service-card:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,0.08); }
+    .mini-bar { border-radius: 2px; min-width: 6px; }
+  </style>
+</head>
+<body class="font-sans bg-gray-50 text-gray-900">
+
+  <!-- ===== TOP HEADER BAR ===== -->
+  <header id="admin-header" class="fixed top-0 left-0 right-0 z-50 bg-white border-b border-gray-200 h-16"></header>
+
+  <!-- ===== LAYOUT: SIDEBAR + MAIN ===== -->
+  <div class="flex pt-16 min-h-screen">
+
+    <!-- ===== LEFT SIDEBAR ===== -->
+    <aside id="admin-sidebar" class="fixed left-0 top-16 bottom-0 w-60 z-40 flex flex-col overflow-y-auto" style="background:#0A1628;"></aside>
+
+    <!-- ===== MAIN CONTENT ===== -->
+    <main class="flex-1 ml-60 p-6 lg:p-8">
+
+      <!-- Page Header -->
+      <div class="flex items-center justify-between mb-6">
+        <div>
+          <h1 class="text-2xl font-bold text-gray-900">Platform Health</h1>
+          <p class="text-sm text-gray-500 mt-1">Real-time monitoring of system performance and services</p>
+        </div>
+        <div class="flex items-center gap-2">
+          <span class="health-pulse w-2.5 h-2.5 rounded-full bg-green-500 inline-block"></span>
+          <span class="text-sm font-medium text-green-600">All Systems Operational</span>
+        </div>
+      </div>
+
+      <!-- Stat Cards -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+        <div class="stat-card bg-white rounded-xl border border-gray-200 p-5 shadow-sm">
+          <div class="flex items-center justify-between">
+            <div>
+              <p class="text-xs font-semibold text-gray-500 uppercase tracking-wider">Uptime</p>
+              <p class="text-2xl font-bold text-green-600 mt-1">99.9%</p>
+            </div>
+            <div class="w-10 h-10 rounded-lg bg-green-100 flex items-center justify-center">
+              <svg class="w-5 h-5 text-green-600" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z"/></svg>
+            </div>
+          </div>
+          <p class="text-xs text-gray-400 mt-2">Last 30 days</p>
+        </div>
+        <div class="stat-card bg-white rounded-xl border border-gray-200 p-5 shadow-sm">
+          <div class="flex items-center justify-between">
+            <div>
+              <p class="text-xs font-semibold text-gray-500 uppercase tracking-wider">Response Time</p>
+              <p class="text-2xl font-bold text-blue-600 mt-1">142ms</p>
+            </div>
+            <div class="w-10 h-10 rounded-lg bg-blue-100 flex items-center justify-center">
+              <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+            </div>
+          </div>
+          <p class="text-xs text-gray-400 mt-2">Avg. P95 latency</p>
+        </div>
+        <div class="stat-card bg-white rounded-xl border border-gray-200 p-5 shadow-sm">
+          <div class="flex items-center justify-between">
+            <div>
+              <p class="text-xs font-semibold text-gray-500 uppercase tracking-wider">Active Sessions</p>
+              <p class="text-2xl font-bold text-gray-900 mt-1">1,247</p>
+            </div>
+            <div class="w-10 h-10 rounded-lg bg-brand-100 flex items-center justify-center">
+              <svg class="w-5 h-5 text-brand-600" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M15 19.128a9.38 9.38 0 002.625.372 9.337 9.337 0 004.121-.952 4.125 4.125 0 00-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 018.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0111.964-3.07M12 6.375a3.375 3.375 0 11-6.75 0 3.375 3.375 0 016.75 0zm8.25 2.25a2.625 2.625 0 11-5.25 0 2.625 2.625 0 015.25 0z"/></svg>
+            </div>
+          </div>
+          <p class="text-xs text-gray-400 mt-2">Current live users</p>
+        </div>
+        <div class="stat-card bg-white rounded-xl border border-gray-200 p-5 shadow-sm">
+          <div class="flex items-center justify-between">
+            <div>
+              <p class="text-xs font-semibold text-gray-500 uppercase tracking-wider">Error Rate</p>
+              <p class="text-2xl font-bold text-green-600 mt-1">0.02%</p>
+            </div>
+            <div class="w-10 h-10 rounded-lg bg-green-100 flex items-center justify-center">
+              <svg class="w-5 h-5 text-green-600" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M12 12.75c1.148 0 2.278.08 3.383.237 1.037.146 1.866.966 1.866 2.013 0 3.728-2.35 6.75-5.25 6.75S6.75 18.728 6.75 15c0-1.046.83-1.867 1.866-2.013A24.204 24.204 0 0112 12.75zm0 0c2.883 0 5.647.508 8.207 1.44a23.91 23.91 0 01-1.152 3.31M12 12.75c-2.883 0-5.647.508-8.208 1.44.125 1.17.417 2.282.856 3.31M12 12.75V6.75m0 0a2.25 2.25 0 10-4.5 0 2.25 2.25 0 004.5 0z"/></svg>
+            </div>
+          </div>
+          <p class="text-xs text-gray-400 mt-2">Last 24 hours</p>
+        </div>
+      </div>
+
+      <!-- Infrastructure Service Status Grid -->
+      <div class="bg-white rounded-xl border border-gray-200 shadow-sm mb-6">
+        <div class="px-6 py-4 border-b border-gray-100 flex items-center justify-between">
+          <h2 class="text-base font-semibold text-gray-900">Infrastructure Services</h2>
+          <span class="text-xs text-gray-400">Last checked: 12 seconds ago</span>
+        </div>
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 p-6">
+
+          <!-- API Server -->
+          <div class="service-card border border-gray-100 rounded-xl p-4">
+            <div class="flex items-center justify-between mb-3">
+              <div class="flex items-center gap-2.5">
+                <span class="w-2.5 h-2.5 rounded-full bg-green-500"></span>
+                <span class="text-sm font-semibold text-gray-900">API Server</span>
+              </div>
+              <span class="text-xs font-bold text-green-600">99.9%</span>
+            </div>
+            <div class="flex items-center justify-between mb-3">
+              <span class="text-xs text-gray-500">Latency</span>
+              <span class="text-xs font-semibold text-gray-700">142ms</span>
+            </div>
+            <div class="flex items-center gap-1">
+              <span class="text-[10px] text-gray-400 mr-1">7d</span>
+              <div class="mini-bar w-full h-4 bg-green-500" style="opacity:0.7"></div>
+              <div class="mini-bar w-full h-4 bg-green-500" style="opacity:0.75"></div>
+              <div class="mini-bar w-full h-4 bg-green-500" style="opacity:0.8"></div>
+              <div class="mini-bar w-full h-4 bg-green-500" style="opacity:0.85"></div>
+              <div class="mini-bar w-full h-4 bg-green-500" style="opacity:0.9"></div>
+              <div class="mini-bar w-full h-4 bg-green-500" style="opacity:0.95"></div>
+              <div class="mini-bar w-full h-4 bg-green-500"></div>
+            </div>
+            <div class="flex justify-between mt-1">
+              <span class="text-[10px] text-gray-300">Mar 27</span>
+              <span class="text-[10px] text-gray-300">Today</span>
+            </div>
+          </div>
+
+          <!-- PostgreSQL -->
+          <div class="service-card border border-gray-100 rounded-xl p-4">
+            <div class="flex items-center justify-between mb-3">
+              <div class="flex items-center gap-2.5">
+                <span class="w-2.5 h-2.5 rounded-full bg-green-500"></span>
+                <span class="text-sm font-semibold text-gray-900">PostgreSQL</span>
+              </div>
+              <span class="text-xs font-bold text-green-600">99.8%</span>
+            </div>
+            <div class="flex items-center justify-between mb-3">
+              <span class="text-xs text-gray-500">Latency</span>
+              <span class="text-xs font-semibold text-gray-700">23ms</span>
+            </div>
+            <div class="flex items-center gap-1">
+              <span class="text-[10px] text-gray-400 mr-1">7d</span>
+              <div class="mini-bar w-full h-4 bg-green-500" style="opacity:0.8"></div>
+              <div class="mini-bar w-full h-4 bg-green-500" style="opacity:0.85"></div>
+              <div class="mini-bar w-full h-4 bg-green-500" style="opacity:0.75"></div>
+              <div class="mini-bar w-full h-4 bg-green-500" style="opacity:0.9"></div>
+              <div class="mini-bar w-full h-4 bg-green-500" style="opacity:0.95"></div>
+              <div class="mini-bar w-full h-4 bg-green-500"></div>
+              <div class="mini-bar w-full h-4 bg-green-500" style="opacity:0.95"></div>
+            </div>
+            <div class="flex justify-between mt-1">
+              <span class="text-[10px] text-gray-300">Mar 27</span>
+              <span class="text-[10px] text-gray-300">Today</span>
+            </div>
+          </div>
+
+          <!-- Redis -->
+          <div class="service-card border border-gray-100 rounded-xl p-4">
+            <div class="flex items-center justify-between mb-3">
+              <div class="flex items-center gap-2.5">
+                <span class="w-2.5 h-2.5 rounded-full bg-green-500"></span>
+                <span class="text-sm font-semibold text-gray-900">Redis</span>
+              </div>
+              <span class="text-xs font-bold text-green-600">99.9%</span>
+            </div>
+            <div class="flex items-center justify-between mb-3">
+              <span class="text-xs text-gray-500">Latency</span>
+              <span class="text-xs font-semibold text-gray-700">2ms</span>
+            </div>
+            <div class="flex items-center gap-1">
+              <span class="text-[10px] text-gray-400 mr-1">7d</span>
+              <div class="mini-bar w-full h-4 bg-green-500" style="opacity:0.9"></div>
+              <div class="mini-bar w-full h-4 bg-green-500" style="opacity:0.95"></div>
+              <div class="mini-bar w-full h-4 bg-green-500"></div>
+              <div class="mini-bar w-full h-4 bg-green-500"></div>
+              <div class="mini-bar w-full h-4 bg-green-500" style="opacity:0.95"></div>
+              <div class="mini-bar w-full h-4 bg-green-500"></div>
+              <div class="mini-bar w-full h-4 bg-green-500"></div>
+            </div>
+            <div class="flex justify-between mt-1">
+              <span class="text-[10px] text-gray-300">Mar 27</span>
+              <span class="text-[10px] text-gray-300">Today</span>
+            </div>
+          </div>
+
+          <!-- Kafka -->
+          <div class="service-card border border-gray-100 rounded-xl p-4">
+            <div class="flex items-center justify-between mb-3">
+              <div class="flex items-center gap-2.5">
+                <span class="w-2.5 h-2.5 rounded-full bg-green-500"></span>
+                <span class="text-sm font-semibold text-gray-900">Kafka</span>
+              </div>
+              <span class="text-xs font-bold text-green-600">99.7%</span>
+            </div>
+            <div class="flex items-center justify-between mb-3">
+              <span class="text-xs text-gray-500">Latency</span>
+              <span class="text-xs font-semibold text-gray-700">45ms</span>
+            </div>
+            <div class="flex items-center gap-1">
+              <span class="text-[10px] text-gray-400 mr-1">7d</span>
+              <div class="mini-bar w-full h-4 bg-green-500" style="opacity:0.75"></div>
+              <div class="mini-bar w-full h-4 bg-green-500" style="opacity:0.8"></div>
+              <div class="mini-bar w-full h-4 bg-yellow-400" style="opacity:0.9"></div>
+              <div class="mini-bar w-full h-4 bg-green-500" style="opacity:0.9"></div>
+              <div class="mini-bar w-full h-4 bg-green-500" style="opacity:0.95"></div>
+              <div class="mini-bar w-full h-4 bg-green-500"></div>
+              <div class="mini-bar w-full h-4 bg-green-500" style="opacity:0.95"></div>
+            </div>
+            <div class="flex justify-between mt-1">
+              <span class="text-[10px] text-gray-300">Mar 27</span>
+              <span class="text-[10px] text-gray-300">Today</span>
+            </div>
+          </div>
+
+          <!-- Keycloak -->
+          <div class="service-card border border-gray-100 rounded-xl p-4">
+            <div class="flex items-center justify-between mb-3">
+              <div class="flex items-center gap-2.5">
+                <span class="w-2.5 h-2.5 rounded-full bg-green-500"></span>
+                <span class="text-sm font-semibold text-gray-900">Keycloak</span>
+              </div>
+              <span class="text-xs font-bold text-green-600">99.6%</span>
+            </div>
+            <div class="flex items-center justify-between mb-3">
+              <span class="text-xs text-gray-500">Latency</span>
+              <span class="text-xs font-semibold text-gray-700">68ms</span>
+            </div>
+            <div class="flex items-center gap-1">
+              <span class="text-[10px] text-gray-400 mr-1">7d</span>
+              <div class="mini-bar w-full h-4 bg-green-500" style="opacity:0.8"></div>
+              <div class="mini-bar w-full h-4 bg-yellow-400" style="opacity:0.85"></div>
+              <div class="mini-bar w-full h-4 bg-green-500" style="opacity:0.9"></div>
+              <div class="mini-bar w-full h-4 bg-green-500" style="opacity:0.85"></div>
+              <div class="mini-bar w-full h-4 bg-green-500" style="opacity:0.9"></div>
+              <div class="mini-bar w-full h-4 bg-green-500" style="opacity:0.95"></div>
+              <div class="mini-bar w-full h-4 bg-green-500"></div>
+            </div>
+            <div class="flex justify-between mt-1">
+              <span class="text-[10px] text-gray-300">Mar 27</span>
+              <span class="text-[10px] text-gray-300">Today</span>
+            </div>
+          </div>
+
+          <!-- Elasticsearch -->
+          <div class="service-card border border-yellow-200 rounded-xl p-4 bg-yellow-50/30">
+            <div class="flex items-center justify-between mb-3">
+              <div class="flex items-center gap-2.5">
+                <span class="w-2.5 h-2.5 rounded-full bg-yellow-500"></span>
+                <span class="text-sm font-semibold text-gray-900">Elasticsearch</span>
+              </div>
+              <span class="text-xs font-bold text-yellow-600">98.2%</span>
+            </div>
+            <div class="flex items-center justify-between mb-3">
+              <span class="text-xs text-gray-500">Latency</span>
+              <span class="text-xs font-semibold text-yellow-700">210ms</span>
+            </div>
+            <div class="flex items-center gap-1">
+              <span class="text-[10px] text-gray-400 mr-1">7d</span>
+              <div class="mini-bar w-full h-4 bg-green-500" style="opacity:0.8"></div>
+              <div class="mini-bar w-full h-4 bg-green-500" style="opacity:0.85"></div>
+              <div class="mini-bar w-full h-4 bg-yellow-400" style="opacity:0.9"></div>
+              <div class="mini-bar w-full h-4 bg-yellow-400" style="opacity:0.85"></div>
+              <div class="mini-bar w-full h-4 bg-yellow-400"></div>
+              <div class="mini-bar w-full h-4 bg-yellow-500"></div>
+              <div class="mini-bar w-full h-4 bg-yellow-500"></div>
+            </div>
+            <div class="flex justify-between mt-1">
+              <span class="text-[10px] text-gray-300">Mar 27</span>
+              <span class="text-[10px] text-gray-300">Today</span>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- Application Service Status -->
+      <div class="bg-white rounded-xl border border-gray-200 shadow-sm mb-6">
+        <div class="px-6 py-4 border-b border-gray-100">
+          <h2 class="text-base font-semibold text-gray-900">Application Services</h2>
+        </div>
+        <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 divide-x divide-gray-100">
+          <div class="px-6 py-5 text-center">
+            <div class="flex items-center justify-center gap-2 mb-1">
+              <span class="w-2.5 h-2.5 rounded-full bg-green-500"></span>
+              <span class="text-sm font-medium text-gray-900">Payment</span>
+            </div>
+            <p class="text-xs text-green-600">Operational</p>
+          </div>
+          <div class="px-6 py-5 text-center">
+            <div class="flex items-center justify-center gap-2 mb-1">
+              <span class="w-2.5 h-2.5 rounded-full bg-green-500"></span>
+              <span class="text-sm font-medium text-gray-900">Email</span>
+            </div>
+            <p class="text-xs text-green-600">Operational</p>
+          </div>
+          <div class="px-6 py-5 text-center">
+            <div class="flex items-center justify-center gap-2 mb-1">
+              <span class="w-2.5 h-2.5 rounded-full bg-green-500"></span>
+              <span class="text-sm font-medium text-gray-900">SMS</span>
+            </div>
+            <p class="text-xs text-green-600">Operational</p>
+          </div>
+          <div class="px-6 py-5 text-center">
+            <div class="flex items-center justify-center gap-2 mb-1">
+              <span class="w-2.5 h-2.5 rounded-full bg-green-500"></span>
+              <span class="text-sm font-medium text-gray-900">Search</span>
+            </div>
+            <p class="text-xs text-green-600">Operational</p>
+          </div>
+          <div class="px-6 py-5 text-center">
+            <div class="flex items-center justify-center gap-2 mb-1">
+              <span class="w-2.5 h-2.5 rounded-full bg-green-500"></span>
+              <span class="text-sm font-medium text-gray-900">CDN</span>
+            </div>
+            <p class="text-xs text-green-600">Operational</p>
+          </div>
+          <div class="px-6 py-5 text-center">
+            <div class="flex items-center justify-center gap-2 mb-1">
+              <span class="w-2.5 h-2.5 rounded-full bg-green-500"></span>
+              <span class="text-sm font-medium text-gray-900">Database</span>
+            </div>
+            <p class="text-xs text-green-600">Operational</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Active Alerts -->
+      <div class="bg-white rounded-xl border border-gray-200 shadow-sm mb-6">
+        <div class="px-6 py-4 border-b border-gray-100 flex items-center justify-between">
+          <h2 class="text-base font-semibold text-gray-900">Active Alerts</h2>
+          <span class="px-2.5 py-1 text-xs font-bold rounded-full bg-yellow-100 text-yellow-700">3 Active</span>
+        </div>
+        <div class="divide-y divide-gray-100">
+          <!-- Elasticsearch Alert -->
+          <div class="px-6 py-4">
+            <div class="flex items-start justify-between">
+              <div class="flex items-start gap-3">
+                <div class="w-8 h-8 rounded-lg bg-red-100 flex items-center justify-center shrink-0 mt-0.5">
+                  <svg class="w-4 h-4 text-red-600" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z"/></svg>
+                </div>
+                <div>
+                  <div class="flex items-center gap-2">
+                    <h3 class="text-sm font-semibold text-red-800">Elasticsearch Indexing Lag</h3>
+                    <span class="px-2 py-0.5 text-[10px] font-bold rounded-full bg-red-100 text-red-700 uppercase">Critical</span>
+                  </div>
+                  <p class="text-xs text-gray-600 mt-1">Indexing lag at <strong>12 seconds</strong> (threshold: 5s). Product search results may be stale. Affects catalog freshness for new listings.</p>
+                  <p class="text-xs text-gray-400 mt-1.5">Detected 6 minutes ago</p>
+                </div>
+              </div>
+              <button onclick="alert('Investigating Elasticsearch indexing lag...')" class="shrink-0 ml-4 px-3 py-1.5 text-xs font-semibold text-red-600 border border-red-200 rounded-lg hover:bg-red-50 transition">
+                Investigate
+              </button>
+            </div>
+          </div>
+          <!-- Memory Alert -->
+          <div class="px-6 py-4">
+            <div class="flex items-start justify-between">
+              <div class="flex items-start gap-3">
+                <div class="w-8 h-8 rounded-lg bg-yellow-100 flex items-center justify-center shrink-0 mt-0.5">
+                  <svg class="w-4 h-4 text-yellow-600" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z"/></svg>
+                </div>
+                <div>
+                  <div class="flex items-center gap-2">
+                    <h3 class="text-sm font-semibold text-yellow-800">High Memory Usage on Worker-3</h3>
+                    <span class="px-2 py-0.5 text-[10px] font-bold rounded-full bg-yellow-100 text-yellow-700 uppercase">Warning</span>
+                  </div>
+                  <p class="text-xs text-gray-600 mt-1">Memory utilization at 87%. Threshold is 85%. Auto-scaling triggered. Monitoring in progress.</p>
+                  <p class="text-xs text-gray-400 mt-1.5">Detected 14 minutes ago</p>
+                </div>
+              </div>
+              <button onclick="alert('Viewing Worker-3 metrics...')" class="shrink-0 ml-4 px-3 py-1.5 text-xs font-semibold text-yellow-600 border border-yellow-200 rounded-lg hover:bg-yellow-50 transition">
+                View Metrics
+              </button>
+            </div>
+          </div>
+          <!-- Latency Alert -->
+          <div class="px-6 py-4">
+            <div class="flex items-start justify-between">
+              <div class="flex items-start gap-3">
+                <div class="w-8 h-8 rounded-lg bg-yellow-100 flex items-center justify-center shrink-0 mt-0.5">
+                  <svg class="w-4 h-4 text-yellow-600" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z"/></svg>
+                </div>
+                <div>
+                  <div class="flex items-center gap-2">
+                    <h3 class="text-sm font-semibold text-yellow-800">Elevated Latency on /api/search</h3>
+                    <span class="px-2 py-0.5 text-[10px] font-bold rounded-full bg-yellow-100 text-yellow-700 uppercase">Warning</span>
+                  </div>
+                  <p class="text-xs text-gray-600 mt-1">P95 latency increased to 380ms (normal: 120ms). Likely due to cache rebuild after deployment. Expected to resolve within 30 minutes.</p>
+                  <p class="text-xs text-gray-400 mt-1.5">Detected 8 minutes ago</p>
+                </div>
+              </div>
+              <button onclick="alert('Acknowledging search latency alert...')" class="shrink-0 ml-4 px-3 py-1.5 text-xs font-semibold text-yellow-600 border border-yellow-200 rounded-lg hover:bg-yellow-50 transition">
+                Acknowledge
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Recent Errors Table -->
+      <div class="bg-white rounded-xl border border-gray-200 shadow-sm">
+        <div class="px-6 py-4 border-b border-gray-100">
+          <h2 class="text-base font-semibold text-gray-900">Recent Errors</h2>
+        </div>
+        <div class="overflow-x-auto">
+          <table class="w-full text-sm">
+            <thead>
+              <tr class="bg-gray-50 text-left">
+                <th class="px-6 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Timestamp</th>
+                <th class="px-6 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Endpoint</th>
+                <th class="px-6 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Error</th>
+                <th class="px-6 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider text-right">Count</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-100">
+              <tr class="table-row">
+                <td class="px-6 py-4 text-gray-500 whitespace-nowrap">2026-03-28 09:42:18</td>
+                <td class="px-6 py-4 font-medium text-gray-900 font-mono text-xs">/api/v1/checkout/payment</td>
+                <td class="px-6 py-4"><span class="px-2.5 py-1 text-xs font-medium rounded-full bg-red-100 text-red-700">502 Bad Gateway</span></td>
+                <td class="px-6 py-4 text-right font-medium text-gray-900">3</td>
+              </tr>
+              <tr class="table-row">
+                <td class="px-6 py-4 text-gray-500 whitespace-nowrap">2026-03-28 09:38:05</td>
+                <td class="px-6 py-4 font-medium text-gray-900 font-mono text-xs">/api/v1/products/search</td>
+                <td class="px-6 py-4"><span class="px-2.5 py-1 text-xs font-medium rounded-full bg-yellow-100 text-yellow-700">504 Timeout</span></td>
+                <td class="px-6 py-4 text-right font-medium text-gray-900">7</td>
+              </tr>
+              <tr class="table-row">
+                <td class="px-6 py-4 text-gray-500 whitespace-nowrap">2026-03-28 09:25:33</td>
+                <td class="px-6 py-4 font-medium text-gray-900 font-mono text-xs">/api/v1/users/profile</td>
+                <td class="px-6 py-4"><span class="px-2.5 py-1 text-xs font-medium rounded-full bg-red-100 text-red-700">500 Internal Error</span></td>
+                <td class="px-6 py-4 text-right font-medium text-gray-900">1</td>
+              </tr>
+              <tr class="table-row">
+                <td class="px-6 py-4 text-gray-500 whitespace-nowrap">2026-03-28 09:12:47</td>
+                <td class="px-6 py-4 font-medium text-gray-900 font-mono text-xs">/api/v1/orders/bulk</td>
+                <td class="px-6 py-4"><span class="px-2.5 py-1 text-xs font-medium rounded-full bg-yellow-100 text-yellow-700">429 Rate Limited</span></td>
+                <td class="px-6 py-4 text-right font-medium text-gray-900">12</td>
+              </tr>
+              <tr class="table-row">
+                <td class="px-6 py-4 text-gray-500 whitespace-nowrap">2026-03-28 08:58:22</td>
+                <td class="px-6 py-4 font-medium text-gray-900 font-mono text-xs">/api/v1/inventory/sync</td>
+                <td class="px-6 py-4"><span class="px-2.5 py-1 text-xs font-medium rounded-full bg-red-100 text-red-700">503 Unavailable</span></td>
+                <td class="px-6 py-4 text-right font-medium text-gray-900">2</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+    </main>
+  </div>
+
+<script src="../shared-layout.js"></script>
+<script>renderAdminLayout('health', '../');</script>
+</body>
+</html>

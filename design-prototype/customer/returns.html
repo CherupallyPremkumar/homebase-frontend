@@ -1,0 +1,667 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HomeBase — Returns & Refunds</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              50: '#FFF7ED',
+              100: '#FFEDD5',
+              200: '#FED7AA',
+              300: '#FDBA74',
+              400: '#FB923C',
+              500: '#F97316',
+              600: '#EA580C',
+              700: '#C2410C',
+            },
+            navy: {
+              700: '#1E3A5F',
+              800: '#1A2E4A',
+              900: '#0F1B2D',
+            },
+            success: '#16A34A',
+            warning: '#EAB308',
+            danger: '#DC2626',
+          },
+          fontFamily: {
+            sans: ['Inter', 'system-ui', 'sans-serif'],
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+    .scrollbar-hide::-webkit-scrollbar { display: none; }
+    .nav-link:hover { color: #F97316; }
+    .btn-brand { background: #F97316; transition: all 0.2s; }
+    .btn-brand:hover { background: #EA580C; }
+    .sidebar-link { transition: all 0.15s ease; }
+    .sidebar-link:hover { background: #FFF7ED; color: #EA580C; }
+    .sidebar-link.active { background: #FFF7ED; color: #EA580C; border-right: 3px solid #F97316; font-weight: 600; }
+    .return-card { transition: all 0.2s ease; }
+    .return-card:hover { box-shadow: 0 4px 12px rgba(0,0,0,0.06); }
+    .info-card { transition: all 0.2s ease; }
+    .info-card:hover { box-shadow: 0 4px 12px rgba(0,0,0,0.06); }
+    .faq-item { transition: all 0.2s ease; }
+    .faq-content { max-height: 0; overflow: hidden; transition: max-height 0.3s ease; }
+    .faq-content.open { max-height: 200px; }
+    .faq-chevron { transition: transform 0.3s ease; }
+    .faq-chevron.open { transform: rotate(180deg); }
+  </style>
+</head>
+<body class="font-sans bg-gray-50 text-gray-900">
+
+  <!-- ===== TOP BAR ===== -->
+  <div class="bg-navy-900 text-gray-300 text-xs">
+    <div class="max-w-7xl mx-auto px-4 flex items-center justify-between h-9">
+      <div class="flex items-center gap-5">
+        <span class="flex items-center gap-1.5">
+          <svg class="w-3.5 h-3.5 text-brand-400" fill="currentColor" viewBox="0 0 20 20"><path d="M2 3a1 1 0 011-1h2.153a1 1 0 01.986.836l.74 4.435a1 1 0 01-.54 1.06l-1.548.773a11.037 11.037 0 006.105 6.105l.774-1.548a1 1 0 011.059-.54l4.435.74a1 1 0 01.836.986V17a1 1 0 01-1 1h-2C7.82 18 2 12.18 2 5V3z"/></svg>
+          Hotline 24/7: <strong class="text-white ml-1">(025) 3886 2516</strong>
+        </span>
+        <a href="../seller/seller-register.html" class="hover:text-brand-400">Sell on HomeBase</a>
+        <a href="order-tracking.html" class="hover:text-brand-400">Order Tracking</a>
+      </div>
+      <div class="flex items-center gap-4">
+        <select class="bg-transparent text-gray-300 text-xs border-none outline-none cursor-pointer">
+          <option>INR &#8377;</option>
+          <option>USD $</option>
+        </select>
+        <select class="bg-transparent text-gray-300 text-xs border-none outline-none cursor-pointer">
+          <option>English</option>
+          <option>Hindi</option>
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== HEADER ===== -->
+  <header class="bg-white border-b border-gray-100 sticky top-0 z-50 shadow-sm">
+    <div class="max-w-7xl mx-auto px-4 flex items-center justify-between h-16">
+      <!-- Logo -->
+      <a href="storefront.html" class="flex items-center gap-2">
+        <div class="w-9 h-9 rounded-lg bg-brand-500 flex items-center justify-center">
+          <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-4 0a1 1 0 01-1-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 01-1 1"/></svg>
+        </div>
+        <span class="text-xl font-extrabold tracking-tight text-navy-900">Home<span class="text-brand-500">Base</span></span>
+      </a>
+
+      <!-- Search -->
+      <div class="hidden md:flex flex-1 max-w-xl mx-8">
+        <div class="flex w-full">
+          <select class="bg-gray-50 border border-r-0 border-gray-200 rounded-l-lg px-3 text-sm text-gray-600 outline-none">
+            <option>All Categories</option>
+            <option>Electronics</option>
+            <option>Fashion</option>
+            <option>Home & Garden</option>
+            <option>Sports</option>
+          </select>
+          <div class="relative flex-1">
+            <input type="text" placeholder="Search for products, brands and more..." class="w-full border border-gray-200 py-2.5 px-4 text-sm outline-none focus:border-brand-400 focus:ring-1 focus:ring-brand-200">
+            <button class="absolute right-0 top-0 h-full px-4 btn-brand text-white rounded-r-lg">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Actions -->
+      <div class="flex items-center gap-5">
+        <!-- Wishlist -->
+        <a href="wishlist.html" class="hidden md:flex flex-col items-center text-gray-500 hover:text-brand-500 transition">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12z"/></svg>
+          <span class="text-[10px] mt-0.5">Wishlist</span>
+        </a>
+        <!-- Cart -->
+        <a href="cart.html" class="flex flex-col items-center text-gray-500 hover:text-brand-500 transition relative">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25a3 3 0 00-3 3h15.75m-12.75-3h11.218c1.121-2.3 2.1-4.684 2.924-7.138a60.114 60.114 0 00-16.536-1.84M7.5 14.25L5.106 5.272M6 20.25a.75.75 0 11-1.5 0 .75.75 0 011.5 0zm12.75 0a.75.75 0 11-1.5 0 .75.75 0 011.5 0z"/></svg>
+          <span class="text-[10px] mt-0.5">Cart</span>
+          <span class="absolute -top-1.5 -right-2 bg-brand-500 text-white text-[9px] font-bold rounded-full w-4 h-4 flex items-center justify-center">3</span>
+        </a>
+        <!-- User -->
+        <a href="my-account.html" class="hidden md:flex flex-col items-center text-brand-500 transition">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z"/></svg>
+          <span class="text-[10px] mt-0.5 font-medium">Account</span>
+        </a>
+      </div>
+    </div>
+
+    <!-- Navigation -->
+    <nav class="bg-white border-t border-gray-50">
+      <div class="max-w-7xl mx-auto px-4 flex items-center gap-1 h-11 text-sm">
+        <!-- All Categories Dropdown -->
+        <button class="flex items-center gap-2 bg-navy-900 text-white px-4 py-1.5 rounded-md text-sm font-medium mr-4">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5"/></svg>
+          All Categories
+          <svg class="w-3 h-3 ml-1" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M19.5 8.25l-7.5 7.5-7.5-7.5"/></svg>
+        </button>
+        <a href="storefront.html" class="nav-link px-3 py-1.5 text-gray-600">Home</a>
+        <a href="product-listing.html" class="nav-link px-3 py-1.5 text-gray-600">Electronics</a>
+        <a href="product-listing.html" class="nav-link px-3 py-1.5 text-gray-600">Fashion</a>
+        <a href="product-listing.html" class="nav-link px-3 py-1.5 text-gray-600">Home & Living</a>
+        <a href="product-listing.html" class="nav-link px-3 py-1.5 text-gray-600">Sports</a>
+        <a href="product-listing.html" class="nav-link px-3 py-1.5 text-gray-600">Groceries</a>
+        <a href="product-listing.html" class="nav-link px-3 py-1.5 text-gray-600">Beauty</a>
+        <div class="ml-auto">
+          <a href="order-tracking.html" class="nav-link px-3 py-1.5 text-gray-600 flex items-center gap-1">
+            <svg class="w-4 h-4 text-brand-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z"/><path d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z"/></svg>
+            Track Order
+          </a>
+        </div>
+      </div>
+    </nav>
+  </header>
+
+  <!-- ===== BREADCRUMB ===== -->
+  <div class="bg-white border-b border-gray-100">
+    <div class="max-w-7xl mx-auto px-4 py-3">
+      <nav class="flex items-center gap-2 text-sm">
+        <a href="storefront.html" class="text-gray-400 hover:text-brand-500 transition">Home</a>
+        <svg class="w-3.5 h-3.5 text-gray-300" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M8.25 4.5l7.5 7.5-7.5 7.5"/></svg>
+        <a href="my-account.html" class="text-gray-400 hover:text-brand-500 transition">My Account</a>
+        <svg class="w-3.5 h-3.5 text-gray-300" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M8.25 4.5l7.5 7.5-7.5 7.5"/></svg>
+        <span class="text-navy-900 font-medium">Returns & Refunds</span>
+      </nav>
+    </div>
+  </div>
+
+  <!-- ===== MAIN CONTENT ===== -->
+  <div class="max-w-7xl mx-auto px-4 py-8">
+    <div class="flex gap-8">
+
+      <!-- ===== LEFT SIDEBAR ===== -->
+      <aside class="hidden lg:block w-64 shrink-0">
+        <div class="bg-white rounded-xl border border-gray-100 overflow-hidden">
+          <!-- User Summary -->
+          <div class="p-5 border-b border-gray-100 bg-gradient-to-r from-brand-50 to-orange-50">
+            <div class="flex items-center gap-3">
+              <div class="w-12 h-12 rounded-full bg-brand-500 flex items-center justify-center text-white text-lg font-bold">PK</div>
+              <div>
+                <p class="font-semibold text-navy-900 text-sm">Premkumar</p>
+                <p class="text-xs text-gray-500">premkumar@email.com</p>
+              </div>
+            </div>
+          </div>
+          <!-- Menu -->
+          <nav class="py-2">
+            <a href="my-account.html" class="sidebar-link flex items-center gap-3 px-5 py-2.5 text-sm text-gray-600">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z"/></svg>
+              Profile
+            </a>
+            <a href="my-orders.html" class="sidebar-link flex items-center gap-3 px-5 py-2.5 text-sm text-gray-600">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M15.75 10.5V6a3.75 3.75 0 10-7.5 0v4.5m11.356-1.993l1.263 12c.07.665-.45 1.243-1.119 1.243H4.25a1.125 1.125 0 01-1.12-1.243l1.264-12A1.125 1.125 0 015.513 7.5h12.974c.576 0 1.059.435 1.119 1.007zM8.625 10.5a.375.375 0 11-.75 0 .375.375 0 01.75 0zm7.5 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z"/></svg>
+              My Orders
+            </a>
+            <a href="wishlist.html" class="sidebar-link flex items-center gap-3 px-5 py-2.5 text-sm text-gray-600">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12z"/></svg>
+              Wishlist
+            </a>
+            <a href="my-account.html#addresses" class="sidebar-link flex items-center gap-3 px-5 py-2.5 text-sm text-gray-600">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z"/><path d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z"/></svg>
+              Addresses
+            </a>
+            <a href="my-account.html#payment-methods" class="sidebar-link flex items-center gap-3 px-5 py-2.5 text-sm text-gray-600">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M2.25 8.25h19.5M2.25 9h19.5m-16.5 5.25h6m-6 2.25h3m-3.75 3h15a2.25 2.25 0 002.25-2.25V6.75A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25v10.5A2.25 2.25 0 004.5 19.5z"/></svg>
+              Payment Methods
+            </a>
+            <a href="returns.html" class="sidebar-link active flex items-center gap-3 px-5 py-2.5 text-sm">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182"/></svg>
+              Returns
+            </a>
+            <a href="my-account.html#settings" class="sidebar-link flex items-center gap-3 px-5 py-2.5 text-sm text-gray-600">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M9.594 3.94c.09-.542.56-.94 1.11-.94h2.593c.55 0 1.02.398 1.11.94l.213 1.281c.063.374.313.686.645.87.074.04.147.083.22.127.324.196.72.257 1.075.124l1.217-.456a1.125 1.125 0 011.37.49l1.296 2.247a1.125 1.125 0 01-.26 1.431l-1.003.827c-.293.24-.438.613-.431.992a6.759 6.759 0 010 .255c-.007.378.138.75.43.99l1.005.828c.424.35.534.954.26 1.43l-1.298 2.247a1.125 1.125 0 01-1.369.491l-1.217-.456c-.355-.133-.75-.072-1.076.124a6.57 6.57 0 01-.22.128c-.331.183-.581.495-.644.869l-.213 1.28c-.09.543-.56.941-1.11.941h-2.594c-.55 0-1.02-.398-1.11-.94l-.213-1.281c-.062-.374-.312-.686-.644-.87a6.52 6.52 0 01-.22-.127c-.325-.196-.72-.257-1.076-.124l-1.217.456a1.125 1.125 0 01-1.369-.49l-1.297-2.247a1.125 1.125 0 01.26-1.431l1.004-.827c.292-.24.437-.613.43-.992a6.932 6.932 0 010-.255c.007-.378-.138-.75-.43-.99l-1.004-.828a1.125 1.125 0 01-.26-1.43l1.297-2.247a1.125 1.125 0 011.37-.491l1.216.456c.356.133.751.072 1.076-.124.072-.044.146-.087.22-.128.332-.183.582-.495.644-.869l.214-1.281z"/><path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+              Settings
+            </a>
+            <div class="border-t border-gray-100 mt-2 pt-2">
+              <a href="login.html" class="sidebar-link flex items-center gap-3 px-5 py-2.5 text-sm text-red-500 hover:bg-red-50 hover:text-red-600">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15m3 0l3-3m0 0l-3-3m3 3H9"/></svg>
+                Sign Out
+              </a>
+            </div>
+          </nav>
+        </div>
+      </aside>
+
+      <!-- ===== MAIN CONTENT AREA ===== -->
+      <main class="flex-1 min-w-0">
+
+        <!-- Page Header -->
+        <div class="flex items-center justify-between mb-6">
+          <div>
+            <h1 class="text-2xl font-extrabold text-navy-900">Returns & Refunds</h1>
+            <p class="text-sm text-gray-500 mt-1">Manage your return requests and track refund status</p>
+          </div>
+          <button class="btn-brand text-white font-semibold px-5 py-2.5 rounded-lg text-sm flex items-center gap-2">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 4.5v15m7.5-7.5h-15"/></svg>
+            Request New Return
+          </button>
+        </div>
+
+        <!-- Stats Summary -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+          <div class="bg-white rounded-xl border border-gray-100 p-4 flex items-center gap-4">
+            <div class="w-11 h-11 rounded-xl bg-blue-50 flex items-center justify-center shrink-0">
+              <svg class="w-5.5 h-5.5 text-blue-500" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182"/></svg>
+            </div>
+            <div>
+              <p class="text-xs text-gray-400 font-medium uppercase tracking-wider">Active Returns</p>
+              <p class="text-xl font-bold text-navy-900">1</p>
+            </div>
+          </div>
+          <div class="bg-white rounded-xl border border-gray-100 p-4 flex items-center gap-4">
+            <div class="w-11 h-11 rounded-xl bg-green-50 flex items-center justify-center shrink-0">
+              <svg class="w-5.5 h-5.5 text-green-500" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+            </div>
+            <div>
+              <p class="text-xs text-gray-400 font-medium uppercase tracking-wider">Completed Returns</p>
+              <p class="text-xl font-bold text-navy-900">1</p>
+            </div>
+          </div>
+          <div class="bg-white rounded-xl border border-gray-100 p-4 flex items-center gap-4">
+            <div class="w-11 h-11 rounded-xl bg-brand-50 flex items-center justify-center shrink-0">
+              <svg class="w-5.5 h-5.5 text-brand-500" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M2.25 18.75a60.07 60.07 0 0115.797 2.101c.727.198 1.453-.342 1.453-1.096V18.75M3.75 4.5v.75A.75.75 0 013 6h-.75m0 0v-.375c0-.621.504-1.125 1.125-1.125H20.25M2.25 6v9m18-10.5v.75c0 .414.336.75.75.75h.75m-1.5-1.5h.375c.621 0 1.125.504 1.125 1.125v9.75c0 .621-.504 1.125-1.125 1.125h-.375m1.5-1.5H21a.75.75 0 00-.75.75v.75m0 0H3.75m0 0h-.375a1.125 1.125 0 01-1.125-1.125V15m1.5 1.5v-.75A.75.75 0 003 15h-.75M15 10.5a3 3 0 11-6 0 3 3 0 016 0zm3 0h.008v.008H18V10.5zm-12 0h.008v.008H6V10.5z"/></svg>
+            </div>
+            <div>
+              <p class="text-xs text-gray-400 font-medium uppercase tracking-wider">Total Refunded</p>
+              <p class="text-xl font-bold text-navy-900">&#8377;3,698</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Active Returns Section -->
+        <div class="mb-6">
+          <h2 class="text-lg font-bold text-navy-900 mb-4">Your Returns</h2>
+
+          <!-- Return Card #RET-001 -->
+          <div class="return-card bg-white rounded-xl border border-gray-100 p-6 mb-4">
+            <!-- Header Row -->
+            <div class="flex items-start justify-between mb-4">
+              <div class="flex items-start gap-4">
+                <!-- Product Image Placeholder -->
+                <div class="w-20 h-20 rounded-lg bg-gray-100 flex items-center justify-center shrink-0 border border-gray-200">
+                  <svg class="w-8 h-8 text-gray-300" fill="none" stroke="currentColor" stroke-width="1" viewBox="0 0 24 24"><path d="M20.25 7.5l-.625 10.632a2.25 2.25 0 01-2.247 2.118H6.622a2.25 2.25 0 01-2.247-2.118L3.75 7.5M10 11.25h4M3.375 7.5h17.25c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125z"/></svg>
+                </div>
+                <div>
+                  <div class="flex items-center gap-2 mb-1">
+                    <span class="text-xs font-bold text-navy-900 bg-gray-100 px-2 py-0.5 rounded">RET-001</span>
+                    <span class="inline-flex items-center gap-1 bg-blue-50 text-blue-700 text-xs font-semibold px-2.5 py-0.5 rounded-full">
+                      <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm.75-13a.75.75 0 00-1.5 0v5c0 .414.336.75.75.75h4a.75.75 0 000-1.5h-3.25V5z" clip-rule="evenodd"/></svg>
+                      Pickup Scheduled
+                    </span>
+                  </div>
+                  <h3 class="text-sm font-semibold text-navy-900">boAt Rockerz 450 Bluetooth Headphones - Lush Red</h3>
+                  <div class="flex items-center gap-4 mt-1.5 text-xs text-gray-400">
+                    <span>Order: <span class="text-gray-600 font-medium">#ORD-2024-7845</span></span>
+                    <span>Requested: <span class="text-gray-600 font-medium">22 Mar 2026</span></span>
+                  </div>
+                  <div class="flex items-center gap-2 mt-2">
+                    <span class="text-xs text-gray-500">Reason:</span>
+                    <span class="text-xs font-medium text-red-600 bg-red-50 px-2 py-0.5 rounded">Defective</span>
+                  </div>
+                </div>
+              </div>
+              <div class="text-right shrink-0">
+                <p class="text-xs text-gray-400">Refund Amount</p>
+                <p class="text-lg font-bold text-navy-900">&#8377;1,299</p>
+              </div>
+            </div>
+
+            <!-- Timeline -->
+            <div class="bg-gray-50 rounded-lg p-4">
+              <div class="flex items-center justify-between relative">
+                <!-- Progress Line Background -->
+                <div class="absolute top-4 left-0 right-0 h-0.5 bg-gray-200"></div>
+                <!-- Progress Line Filled -->
+                <div class="absolute top-4 left-0 h-0.5 bg-blue-500" style="width: 50%"></div>
+
+                <!-- Step 1: Requested -->
+                <div class="relative flex flex-col items-center z-10">
+                  <div class="w-8 h-8 rounded-full bg-blue-500 flex items-center justify-center">
+                    <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M4.5 12.75l6 6 9-13.5"/></svg>
+                  </div>
+                  <span class="text-[10px] font-semibold text-blue-600 mt-1.5">Requested</span>
+                  <span class="text-[9px] text-gray-400">22 Mar</span>
+                </div>
+                <!-- Step 2: Approved -->
+                <div class="relative flex flex-col items-center z-10">
+                  <div class="w-8 h-8 rounded-full bg-blue-500 flex items-center justify-center">
+                    <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M4.5 12.75l6 6 9-13.5"/></svg>
+                  </div>
+                  <span class="text-[10px] font-semibold text-blue-600 mt-1.5">Approved</span>
+                  <span class="text-[9px] text-gray-400">23 Mar</span>
+                </div>
+                <!-- Step 3: Pickup Scheduled (Current) -->
+                <div class="relative flex flex-col items-center z-10">
+                  <div class="w-8 h-8 rounded-full bg-blue-500 flex items-center justify-center ring-4 ring-blue-100">
+                    <svg class="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm.75-13a.75.75 0 00-1.5 0v5c0 .414.336.75.75.75h4a.75.75 0 000-1.5h-3.25V5z" clip-rule="evenodd"/></svg>
+                  </div>
+                  <span class="text-[10px] font-semibold text-blue-600 mt-1.5">Pickup Scheduled</span>
+                  <span class="text-[9px] text-gray-400">25 Mar</span>
+                </div>
+                <!-- Step 4: Received -->
+                <div class="relative flex flex-col items-center z-10">
+                  <div class="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center">
+                    <span class="w-2.5 h-2.5 rounded-full bg-gray-400"></span>
+                  </div>
+                  <span class="text-[10px] font-medium text-gray-400 mt-1.5">Received</span>
+                  <span class="text-[9px] text-gray-300">Pending</span>
+                </div>
+                <!-- Step 5: Refunded -->
+                <div class="relative flex flex-col items-center z-10">
+                  <div class="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center">
+                    <span class="w-2.5 h-2.5 rounded-full bg-gray-400"></span>
+                  </div>
+                  <span class="text-[10px] font-medium text-gray-400 mt-1.5">Refunded</span>
+                  <span class="text-[9px] text-gray-300">Pending</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Footer -->
+            <div class="flex items-center justify-between mt-4 pt-4 border-t border-gray-100">
+              <p class="text-xs text-gray-400">Pickup scheduled for <span class="text-gray-600 font-medium">25 Mar 2026, 10:00 AM - 1:00 PM</span></p>
+              <div class="flex items-center gap-3">
+                <button class="text-xs text-gray-500 font-medium hover:text-red-500 transition">Cancel Return</button>
+                <button class="text-xs text-white bg-navy-900 hover:bg-navy-800 font-medium px-4 py-1.5 rounded-lg transition">Track Pickup</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Return Card #RET-002 -->
+          <div class="return-card bg-white rounded-xl border border-gray-100 p-6 mb-4">
+            <!-- Header Row -->
+            <div class="flex items-start justify-between mb-4">
+              <div class="flex items-start gap-4">
+                <!-- Product Image Placeholder -->
+                <div class="w-20 h-20 rounded-lg bg-gray-100 flex items-center justify-center shrink-0 border border-gray-200">
+                  <svg class="w-8 h-8 text-gray-300" fill="none" stroke="currentColor" stroke-width="1" viewBox="0 0 24 24"><path d="M15.75 10.5V6a3.75 3.75 0 10-7.5 0v4.5m11.356-1.993l1.263 12c.07.665-.45 1.243-1.119 1.243H4.25a1.125 1.125 0 01-1.12-1.243l1.264-12A1.125 1.125 0 015.513 7.5h12.974c.576 0 1.059.435 1.119 1.007zM8.625 10.5a.375.375 0 11-.75 0 .375.375 0 01.75 0zm7.5 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z"/></svg>
+                </div>
+                <div>
+                  <div class="flex items-center gap-2 mb-1">
+                    <span class="text-xs font-bold text-navy-900 bg-gray-100 px-2 py-0.5 rounded">RET-002</span>
+                    <span class="inline-flex items-center gap-1 bg-green-50 text-green-700 text-xs font-semibold px-2.5 py-0.5 rounded-full">
+                      <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                      Refund Processed
+                    </span>
+                  </div>
+                  <h3 class="text-sm font-semibold text-navy-900">Nike Air Max 270 Running Shoes - Black/White (Size 9)</h3>
+                  <div class="flex items-center gap-4 mt-1.5 text-xs text-gray-400">
+                    <span>Order: <span class="text-gray-600 font-medium">#ORD-2024-6532</span></span>
+                    <span>Requested: <span class="text-gray-600 font-medium">10 Mar 2026</span></span>
+                  </div>
+                  <div class="flex items-center gap-2 mt-2">
+                    <span class="text-xs text-gray-500">Reason:</span>
+                    <span class="text-xs font-medium text-amber-600 bg-amber-50 px-2 py-0.5 rounded">Wrong Size</span>
+                  </div>
+                </div>
+              </div>
+              <div class="text-right shrink-0">
+                <p class="text-xs text-gray-400">Refund Amount</p>
+                <p class="text-lg font-bold text-green-600">&#8377;2,399</p>
+                <span class="inline-flex items-center gap-1 text-[10px] text-green-600 font-medium mt-0.5">
+                  <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                  Refunded to UPI
+                </span>
+              </div>
+            </div>
+
+            <!-- Timeline -->
+            <div class="bg-gray-50 rounded-lg p-4">
+              <div class="flex items-center justify-between relative">
+                <!-- Progress Line Background -->
+                <div class="absolute top-4 left-0 right-0 h-0.5 bg-gray-200"></div>
+                <!-- Progress Line Filled -->
+                <div class="absolute top-4 left-0 right-0 h-0.5 bg-green-500"></div>
+
+                <!-- Step 1: Requested -->
+                <div class="relative flex flex-col items-center z-10">
+                  <div class="w-8 h-8 rounded-full bg-green-500 flex items-center justify-center">
+                    <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M4.5 12.75l6 6 9-13.5"/></svg>
+                  </div>
+                  <span class="text-[10px] font-semibold text-green-600 mt-1.5">Requested</span>
+                  <span class="text-[9px] text-gray-400">10 Mar</span>
+                </div>
+                <!-- Step 2: Approved -->
+                <div class="relative flex flex-col items-center z-10">
+                  <div class="w-8 h-8 rounded-full bg-green-500 flex items-center justify-center">
+                    <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M4.5 12.75l6 6 9-13.5"/></svg>
+                  </div>
+                  <span class="text-[10px] font-semibold text-green-600 mt-1.5">Approved</span>
+                  <span class="text-[9px] text-gray-400">11 Mar</span>
+                </div>
+                <!-- Step 3: Pickup Scheduled -->
+                <div class="relative flex flex-col items-center z-10">
+                  <div class="w-8 h-8 rounded-full bg-green-500 flex items-center justify-center">
+                    <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M4.5 12.75l6 6 9-13.5"/></svg>
+                  </div>
+                  <span class="text-[10px] font-semibold text-green-600 mt-1.5">Picked Up</span>
+                  <span class="text-[9px] text-gray-400">13 Mar</span>
+                </div>
+                <!-- Step 4: Received -->
+                <div class="relative flex flex-col items-center z-10">
+                  <div class="w-8 h-8 rounded-full bg-green-500 flex items-center justify-center">
+                    <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M4.5 12.75l6 6 9-13.5"/></svg>
+                  </div>
+                  <span class="text-[10px] font-semibold text-green-600 mt-1.5">Received</span>
+                  <span class="text-[9px] text-gray-400">15 Mar</span>
+                </div>
+                <!-- Step 5: Refunded -->
+                <div class="relative flex flex-col items-center z-10">
+                  <div class="w-8 h-8 rounded-full bg-green-500 flex items-center justify-center ring-4 ring-green-100">
+                    <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M4.5 12.75l6 6 9-13.5"/></svg>
+                  </div>
+                  <span class="text-[10px] font-semibold text-green-600 mt-1.5">Refunded</span>
+                  <span class="text-[9px] text-gray-400">17 Mar</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Footer -->
+            <div class="flex items-center justify-between mt-4 pt-4 border-t border-gray-100">
+              <p class="text-xs text-gray-400">Refund of <span class="text-green-600 font-semibold">&#8377;2,399</span> credited to UPI (premkumar@upi) on <span class="text-gray-600 font-medium">17 Mar 2026</span></p>
+              <button class="text-xs text-brand-500 font-medium hover:underline">Download Invoice</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Return Policy Info Card -->
+        <div class="info-card bg-white rounded-xl border border-gray-100 p-6 mb-6">
+          <div class="flex items-start gap-4">
+            <div class="w-11 h-11 rounded-xl bg-brand-50 flex items-center justify-center shrink-0">
+              <svg class="w-5.5 h-5.5 text-brand-500" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z"/></svg>
+            </div>
+            <div class="flex-1">
+              <h2 class="text-lg font-bold text-navy-900 mb-3">Return Policy</h2>
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-2.5">
+                <div class="flex items-start gap-2">
+                  <svg class="w-4 h-4 text-green-500 mt-0.5 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4.5 12.75l6 6 9-13.5"/></svg>
+                  <p class="text-sm text-gray-600"><span class="font-medium text-navy-900">30-day return window</span> from the date of delivery for most products</p>
+                </div>
+                <div class="flex items-start gap-2">
+                  <svg class="w-4 h-4 text-green-500 mt-0.5 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4.5 12.75l6 6 9-13.5"/></svg>
+                  <p class="text-sm text-gray-600"><span class="font-medium text-navy-900">Items must be unused</span> with original tags, packaging and accessories intact</p>
+                </div>
+                <div class="flex items-start gap-2">
+                  <svg class="w-4 h-4 text-green-500 mt-0.5 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4.5 12.75l6 6 9-13.5"/></svg>
+                  <p class="text-sm text-gray-600"><span class="font-medium text-navy-900">Free pickup</span> from your doorstep for eligible returns</p>
+                </div>
+                <div class="flex items-start gap-2">
+                  <svg class="w-4 h-4 text-green-500 mt-0.5 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4.5 12.75l6 6 9-13.5"/></svg>
+                  <p class="text-sm text-gray-600"><span class="font-medium text-navy-900">Refund within 5-7 business days</span> after the returned item is received and inspected</p>
+                </div>
+                <div class="flex items-start gap-2">
+                  <svg class="w-4 h-4 text-green-500 mt-0.5 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4.5 12.75l6 6 9-13.5"/></svg>
+                  <p class="text-sm text-gray-600"><span class="font-medium text-navy-900">Electronics have 10-day window</span> for return unless defective or damaged</p>
+                </div>
+                <div class="flex items-start gap-2">
+                  <svg class="w-4 h-4 text-green-500 mt-0.5 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4.5 12.75l6 6 9-13.5"/></svg>
+                  <p class="text-sm text-gray-600"><span class="font-medium text-navy-900">Refund to original payment method</span> or HomeBase wallet credits (instant)</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- FAQ Accordion -->
+        <div class="info-card bg-white rounded-xl border border-gray-100 p-6">
+          <h2 class="text-lg font-bold text-navy-900 mb-4">Frequently Asked Questions</h2>
+
+          <!-- FAQ 1 -->
+          <div class="border-b border-gray-100">
+            <button onclick="toggleFaq(this)" class="faq-item w-full flex items-center justify-between py-4 text-left">
+              <span class="text-sm font-medium text-navy-900">How do I initiate a return request?</span>
+              <svg class="faq-chevron w-4 h-4 text-gray-400 shrink-0 ml-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M19.5 8.25l-7.5 7.5-7.5-7.5"/></svg>
+            </button>
+            <div class="faq-content">
+              <p class="text-sm text-gray-600 pb-4 leading-relaxed">Go to "My Orders" and select the order containing the item you wish to return. Click the "Return" button next to the product, select a reason for return, and submit the request. You can also click "Request New Return" on this page. Once approved, a pickup will be scheduled at your convenience.</p>
+            </div>
+          </div>
+
+          <!-- FAQ 2 -->
+          <div class="border-b border-gray-100">
+            <button onclick="toggleFaq(this)" class="faq-item w-full flex items-center justify-between py-4 text-left">
+              <span class="text-sm font-medium text-navy-900">How long does it take to receive my refund?</span>
+              <svg class="faq-chevron w-4 h-4 text-gray-400 shrink-0 ml-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M19.5 8.25l-7.5 7.5-7.5-7.5"/></svg>
+            </button>
+            <div class="faq-content">
+              <p class="text-sm text-gray-600 pb-4 leading-relaxed">Once we receive and inspect the returned item, refunds are typically processed within 5-7 business days. UPI and wallet refunds are credited within 24 hours. Credit/debit card refunds may take 5-10 business days depending on your bank. You will receive an email and SMS notification once the refund is initiated.</p>
+            </div>
+          </div>
+
+          <!-- FAQ 3 -->
+          <div class="border-b border-gray-100">
+            <button onclick="toggleFaq(this)" class="faq-item w-full flex items-center justify-between py-4 text-left">
+              <span class="text-sm font-medium text-navy-900">Can I exchange an item instead of returning it?</span>
+              <svg class="faq-chevron w-4 h-4 text-gray-400 shrink-0 ml-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M19.5 8.25l-7.5 7.5-7.5-7.5"/></svg>
+            </button>
+            <div class="faq-content">
+              <p class="text-sm text-gray-600 pb-4 leading-relaxed">Yes, for eligible items you can request an exchange for a different size or color. During the return request process, select "Exchange" instead of "Refund" and choose the variant you want. The replacement will be shipped once the original item is picked up. Exchange is subject to stock availability.</p>
+            </div>
+          </div>
+
+          <!-- FAQ 4 -->
+          <div>
+            <button onclick="toggleFaq(this)" class="faq-item w-full flex items-center justify-between py-4 text-left">
+              <span class="text-sm font-medium text-navy-900">What items are not eligible for return?</span>
+              <svg class="faq-chevron w-4 h-4 text-gray-400 shrink-0 ml-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M19.5 8.25l-7.5 7.5-7.5-7.5"/></svg>
+            </button>
+            <div class="faq-content">
+              <p class="text-sm text-gray-600 pb-4 leading-relaxed">Certain products such as innerwear, swimwear, beauty products (if opened/used), customized/personalized items, and perishable goods like groceries are not eligible for return. Digital products, gift cards, and items marked as "non-returnable" on the product page also cannot be returned. Please check the product page for specific return eligibility.</p>
+            </div>
+          </div>
+        </div>
+
+      </main>
+    </div>
+  </div>
+
+  <!-- ===== FOOTER ===== -->
+  <footer class="bg-navy-900 text-gray-400 pt-12 pb-6">
+    <div class="max-w-7xl mx-auto px-4">
+      <div class="grid grid-cols-2 md:grid-cols-5 gap-8 pb-10 border-b border-white/10">
+        <!-- Brand -->
+        <div class="col-span-2 md:col-span-1">
+          <a href="storefront.html" class="flex items-center gap-2 mb-4">
+            <div class="w-8 h-8 rounded-lg bg-brand-500 flex items-center justify-center">
+              <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-4 0a1 1 0 01-1-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 01-1 1"/></svg>
+            </div>
+            <span class="text-lg font-extrabold text-white">Home<span class="text-brand-500">Base</span></span>
+          </a>
+          <p class="text-sm text-gray-500 leading-relaxed">India's #1 Online Marketplace. Shop from thousands of sellers with secure payments and easy returns.</p>
+          <div class="flex items-center gap-3 mt-4">
+            <a href="#" class="w-8 h-8 bg-white/10 rounded-full flex items-center justify-center hover:bg-brand-500 transition text-xs text-white">f</a>
+            <a href="#" class="w-8 h-8 bg-white/10 rounded-full flex items-center justify-center hover:bg-brand-500 transition text-xs text-white">t</a>
+            <a href="#" class="w-8 h-8 bg-white/10 rounded-full flex items-center justify-center hover:bg-brand-500 transition text-xs text-white">in</a>
+            <a href="#" class="w-8 h-8 bg-white/10 rounded-full flex items-center justify-center hover:bg-brand-500 transition text-xs text-white">yt</a>
+          </div>
+        </div>
+        <!-- Quick Links -->
+        <div>
+          <h4 class="text-white font-semibold text-sm mb-4">Quick Links</h4>
+          <ul class="space-y-2 text-sm">
+            <li><a href="#" class="hover:text-brand-400 transition">About Us</a></li>
+            <li><a href="#" class="hover:text-brand-400 transition">Contact</a></li>
+            <li><a href="#" class="hover:text-brand-400 transition">Careers</a></li>
+            <li><a href="#" class="hover:text-brand-400 transition">Blog</a></li>
+          </ul>
+        </div>
+        <!-- Customer -->
+        <div>
+          <h4 class="text-white font-semibold text-sm mb-4">Customer Service</h4>
+          <ul class="space-y-2 text-sm">
+            <li><a href="#" class="hover:text-brand-400 transition">Help Center</a></li>
+            <li><a href="order-tracking.html" class="hover:text-brand-400 transition">Track Order</a></li>
+            <li><a href="returns.html" class="hover:text-brand-400 transition">Returns & Refunds</a></li>
+            <li><a href="#" class="hover:text-brand-400 transition">Shipping Info</a></li>
+          </ul>
+        </div>
+        <!-- Seller -->
+        <div>
+          <h4 class="text-white font-semibold text-sm mb-4">Sell on HomeBase</h4>
+          <ul class="space-y-2 text-sm">
+            <li><a href="../seller/seller-register.html" class="hover:text-brand-400 transition">Become a Seller</a></li>
+            <li><a href="../seller/seller-dashboard.html" class="hover:text-brand-400 transition">Seller Dashboard</a></li>
+            <li><a href="#" class="hover:text-brand-400 transition">Seller Policies</a></li>
+            <li><a href="#" class="hover:text-brand-400 transition">Seller Support</a></li>
+          </ul>
+        </div>
+        <!-- Payment -->
+        <div>
+          <h4 class="text-white font-semibold text-sm mb-4">Payment Methods</h4>
+          <div class="flex flex-wrap gap-2">
+            <span class="bg-white/10 text-xs text-white px-3 py-1.5 rounded">VISA</span>
+            <span class="bg-white/10 text-xs text-white px-3 py-1.5 rounded">MasterCard</span>
+            <span class="bg-white/10 text-xs text-white px-3 py-1.5 rounded">UPI</span>
+            <span class="bg-white/10 text-xs text-white px-3 py-1.5 rounded">PayTM</span>
+            <span class="bg-white/10 text-xs text-white px-3 py-1.5 rounded">COD</span>
+            <span class="bg-white/10 text-xs text-white px-3 py-1.5 rounded">Net Banking</span>
+          </div>
+          <h4 class="text-white font-semibold text-sm mb-3 mt-5">Download App</h4>
+          <div class="flex flex-col gap-2">
+            <a href="#" class="bg-white/10 text-xs text-white px-3 py-2 rounded hover:bg-white/20 transition">App Store</a>
+            <a href="#" class="bg-white/10 text-xs text-white px-3 py-2 rounded hover:bg-white/20 transition">Google Play</a>
+          </div>
+        </div>
+      </div>
+      <!-- Bottom -->
+      <div class="pt-6 flex flex-col md:flex-row items-center justify-between text-xs text-gray-500">
+        <p>&copy; 2026 HomeBase. All rights reserved.</p>
+        <div class="flex items-center gap-4 mt-2 md:mt-0">
+          <a href="#" class="hover:text-brand-400">Privacy Policy</a>
+          <a href="#" class="hover:text-brand-400">Terms of Service</a>
+          <a href="#" class="hover:text-brand-400">Cookie Policy</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    function toggleFaq(button) {
+      const content = button.nextElementSibling;
+      const chevron = button.querySelector('.faq-chevron');
+      const isOpen = content.classList.contains('open');
+
+      // Close all other FAQs
+      document.querySelectorAll('.faq-content.open').forEach(el => {
+        el.classList.remove('open');
+        el.previousElementSibling.querySelector('.faq-chevron').classList.remove('open');
+      });
+
+      // Toggle current
+      if (!isOpen) {
+        content.classList.add('open');
+        chevron.classList.add('open');
+      }
+    }
+  </script>
+
+</body>
+</html>

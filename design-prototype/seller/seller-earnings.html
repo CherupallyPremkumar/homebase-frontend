@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HomeBase — Seller Earnings</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              50: '#FFF7ED',
+              100: '#FFEDD5',
+              200: '#FED7AA',
+              300: '#FDBA74',
+              400: '#FB923C',
+              500: '#F97316',
+              600: '#EA580C',
+              700: '#C2410C',
+            },
+            navy: {
+              700: '#1E3A5F',
+              800: '#1A2E4A',
+              900: '#0F1B2D',
+            },
+            success: '#16A34A',
+            warning: '#EAB308',
+            danger: '#DC2626',
+          },
+          fontFamily: {
+            sans: ['Inter', 'system-ui', 'sans-serif'],
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+    .scrollbar-hide::-webkit-scrollbar { display: none; }
+    .sidebar-link { transition: all 0.15s ease; }
+    .sidebar-link:hover { background: rgba(255,255,255,0.08); }
+    .sidebar-link.active { background: rgba(249,115,22,0.15); border-right: 3px solid #F97316; }
+    .stat-card { transition: all 0.2s ease; }
+    .stat-card:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,0.08); }
+    .table-row { transition: background 0.15s ease; }
+    .table-row:hover { background: #FFF7ED; }
+    .dropdown-menu { display: none; }
+    .dropdown:hover .dropdown-menu { display: block; }
+    .sidebar-scroll::-webkit-scrollbar { width: 4px; }
+    .sidebar-scroll::-webkit-scrollbar-track { background: transparent; }
+    .sidebar-scroll::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); border-radius: 2px; }
+    .bar-chart-bar { transition: height 0.4s ease; }
+  </style>
+</head>
+<body class="font-sans bg-gray-50 text-gray-900">
+
+  <header id="seller-header" class="fixed top-0 left-0 right-0 z-50 bg-white border-b border-gray-200 h-16"></header>
+  <aside id="seller-sidebar" class="fixed left-0 top-16 bottom-0 w-60 z-40 flex flex-col overflow-y-auto" style="background:#0F1B2D;"></aside>
+
+  <main class="ml-60 pt-16 p-6 min-h-screen">
+
+    <!-- Page Header -->
+    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
+      <div>
+        <h1 class="text-2xl font-bold text-gray-900">Earnings</h1>
+        <p class="text-sm text-gray-500 mt-1">Detailed breakdown of your revenue and deductions</p>
+      </div>
+      <div class="flex items-center gap-2">
+        <div class="flex bg-white border border-gray-200 rounded-lg overflow-hidden">
+          <button onclick="setRange(this,'today')" class="range-btn px-3 py-2 text-xs font-medium text-gray-600 hover:bg-gray-50 transition">Today</button>
+          <button onclick="setRange(this,'7d')" class="range-btn px-3 py-2 text-xs font-medium bg-brand-500 text-white">7D</button>
+          <button onclick="setRange(this,'30d')" class="range-btn px-3 py-2 text-xs font-medium text-gray-600 hover:bg-gray-50 transition">30D</button>
+          <button onclick="setRange(this,'1m')" class="range-btn px-3 py-2 text-xs font-medium text-gray-600 hover:bg-gray-50 transition">1M</button>
+        </div>
+        <button onclick="alert('Export earnings report')" class="flex items-center gap-1.5 bg-white border border-gray-200 text-gray-700 text-sm font-medium px-4 py-2 rounded-lg hover:bg-gray-50 transition">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3"/></svg>
+          Export
+        </button>
+      </div>
+    </div>
+
+    <!-- Stats Cards -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+      <div class="stat-card bg-white rounded-xl border border-gray-100 p-5">
+        <div class="flex items-center justify-between mb-3">
+          <span class="text-xs font-semibold text-gray-500 uppercase tracking-wide">Today's Earnings</span>
+          <div class="w-9 h-9 rounded-lg bg-green-50 flex items-center justify-center">
+            <svg class="w-5 h-5 text-green-600" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M12 6v12m-3-2.818l.879.659c1.171.879 3.07.879 4.242 0 1.172-.879 1.172-2.303 0-3.182C13.536 12.219 12.768 12 12 12c-.725 0-1.45-.22-2.003-.659-1.106-.879-1.106-2.303 0-3.182s2.9-.879 4.006 0l.415.33M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+          </div>
+        </div>
+        <p class="text-2xl font-bold text-gray-900">&#8377;12,450</p>
+        <p class="text-xs text-green-600 font-medium mt-1.5 flex items-center gap-1">
+          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4.5 19.5l15-15m0 0H8.25m11.25 0v11.25"/></svg>
+          +18.2% vs yesterday
+        </p>
+      </div>
+      <div class="stat-card bg-white rounded-xl border border-gray-100 p-5">
+        <div class="flex items-center justify-between mb-3">
+          <span class="text-xs font-semibold text-gray-500 uppercase tracking-wide">This Week</span>
+          <div class="w-9 h-9 rounded-lg bg-blue-50 flex items-center justify-center">
+            <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5"/></svg>
+          </div>
+        </div>
+        <p class="text-2xl font-bold text-gray-900">&#8377;89,200</p>
+        <p class="text-xs text-green-600 font-medium mt-1.5 flex items-center gap-1">
+          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4.5 19.5l15-15m0 0H8.25m11.25 0v11.25"/></svg>
+          +12.5% vs last week
+        </p>
+      </div>
+      <div class="stat-card bg-white rounded-xl border border-gray-100 p-5">
+        <div class="flex items-center justify-between mb-3">
+          <span class="text-xs font-semibold text-gray-500 uppercase tracking-wide">This Month</span>
+          <div class="w-9 h-9 rounded-lg bg-purple-50 flex items-center justify-center">
+            <svg class="w-5 h-5 text-purple-600" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 013 19.875v-6.75z"/><path d="M9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v11.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V8.625z"/><path d="M16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v15.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V4.125z"/></svg>
+          </div>
+        </div>
+        <p class="text-2xl font-bold text-gray-900">&#8377;4,52,890</p>
+        <p class="text-xs text-green-600 font-medium mt-1.5 flex items-center gap-1">
+          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4.5 19.5l15-15m0 0H8.25m11.25 0v11.25"/></svg>
+          +8.7% vs last month
+        </p>
+      </div>
+      <div class="stat-card bg-white rounded-xl border border-gray-100 p-5">
+        <div class="flex items-center justify-between mb-3">
+          <span class="text-xs font-semibold text-gray-500 uppercase tracking-wide">Pending Payout</span>
+          <div class="w-9 h-9 rounded-lg bg-orange-50 flex items-center justify-center">
+            <svg class="w-5 h-5 text-orange-600" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+          </div>
+        </div>
+        <p class="text-2xl font-bold text-gray-900">&#8377;1,52,340</p>
+        <p class="text-xs text-gray-500 font-medium mt-1.5">Next payout: Mar 30</p>
+      </div>
+    </div>
+
+    <!-- Revenue Chart -->
+    <div class="bg-white rounded-xl border border-gray-100 p-6 mb-6">
+      <div class="flex items-center justify-between mb-5">
+        <h2 class="text-base font-semibold text-gray-900">Daily Revenue (Last 7 Days)</h2>
+        <span class="text-xs text-gray-400">Gross earnings per day</span>
+      </div>
+      <div class="flex items-end justify-between gap-3 h-48 px-2">
+        <div class="flex-1 flex flex-col items-center gap-1">
+          <div class="w-full bg-brand-100 rounded-t-md bar-chart-bar" style="height:55%"></div>
+          <span class="text-[10px] text-gray-500 font-medium">22 Mar</span>
+          <span class="text-[10px] text-gray-700 font-semibold">&#8377;10.2K</span>
+        </div>
+        <div class="flex-1 flex flex-col items-center gap-1">
+          <div class="w-full bg-brand-200 rounded-t-md bar-chart-bar" style="height:72%"></div>
+          <span class="text-[10px] text-gray-500 font-medium">23 Mar</span>
+          <span class="text-[10px] text-gray-700 font-semibold">&#8377;13.4K</span>
+        </div>
+        <div class="flex-1 flex flex-col items-center gap-1">
+          <div class="w-full bg-brand-300 rounded-t-md bar-chart-bar" style="height:48%"></div>
+          <span class="text-[10px] text-gray-500 font-medium">24 Mar</span>
+          <span class="text-[10px] text-gray-700 font-semibold">&#8377;8.9K</span>
+        </div>
+        <div class="flex-1 flex flex-col items-center gap-1">
+          <div class="w-full bg-brand-300 rounded-t-md bar-chart-bar" style="height:85%"></div>
+          <span class="text-[10px] text-gray-500 font-medium">25 Mar</span>
+          <span class="text-[10px] text-gray-700 font-semibold">&#8377;15.8K</span>
+        </div>
+        <div class="flex-1 flex flex-col items-center gap-1">
+          <div class="w-full bg-brand-400 rounded-t-md bar-chart-bar" style="height:65%"></div>
+          <span class="text-[10px] text-gray-500 font-medium">26 Mar</span>
+          <span class="text-[10px] text-gray-700 font-semibold">&#8377;12.1K</span>
+        </div>
+        <div class="flex-1 flex flex-col items-center gap-1">
+          <div class="w-full bg-brand-400 rounded-t-md bar-chart-bar" style="height:92%"></div>
+          <span class="text-[10px] text-gray-500 font-medium">27 Mar</span>
+          <span class="text-[10px] text-gray-700 font-semibold">&#8377;16.8K</span>
+        </div>
+        <div class="flex-1 flex flex-col items-center gap-1">
+          <div class="w-full bg-brand-500 rounded-t-md bar-chart-bar" style="height:68%"></div>
+          <span class="text-[10px] text-gray-500 font-medium">28 Mar</span>
+          <span class="text-[10px] text-gray-700 font-semibold">&#8377;12.5K</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Daily Earnings Breakdown Table -->
+    <div class="bg-white rounded-xl border border-gray-100 mb-6">
+      <div class="px-6 py-4 border-b border-gray-100 flex items-center justify-between">
+        <h2 class="text-base font-semibold text-gray-900">Daily Earnings Breakdown</h2>
+        <button onclick="alert('Download CSV')" class="text-xs text-brand-500 hover:text-brand-600 font-medium">Download CSV</button>
+      </div>
+      <div class="overflow-x-auto">
+        <table class="w-full text-sm">
+          <thead>
+            <tr class="bg-gray-50 text-left">
+              <th class="px-6 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Date</th>
+              <th class="px-6 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Orders</th>
+              <th class="px-6 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Gross Sales</th>
+              <th class="px-6 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Commission (5%)</th>
+              <th class="px-6 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Gateway Fee (2%)</th>
+              <th class="px-6 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">GST</th>
+              <th class="px-6 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Net Earnings</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-gray-50">
+            <tr class="table-row">
+              <td class="px-6 py-3.5 font-medium text-gray-900">28 Mar 2026</td>
+              <td class="px-6 py-3.5 text-gray-700">18</td>
+              <td class="px-6 py-3.5 font-semibold text-gray-900">&#8377;14,200</td>
+              <td class="px-6 py-3.5 text-red-500">-&#8377;710</td>
+              <td class="px-6 py-3.5 text-red-500">-&#8377;284</td>
+              <td class="px-6 py-3.5 text-red-500">-&#8377;756</td>
+              <td class="px-6 py-3.5 font-bold text-green-600">&#8377;12,450</td>
+            </tr>
+            <tr class="table-row">
+              <td class="px-6 py-3.5 font-medium text-gray-900">27 Mar 2026</td>
+              <td class="px-6 py-3.5 text-gray-700">24</td>
+              <td class="px-6 py-3.5 font-semibold text-gray-900">&#8377;19,100</td>
+              <td class="px-6 py-3.5 text-red-500">-&#8377;955</td>
+              <td class="px-6 py-3.5 text-red-500">-&#8377;382</td>
+              <td class="px-6 py-3.5 text-red-500">-&#8377;963</td>
+              <td class="px-6 py-3.5 font-bold text-green-600">&#8377;16,800</td>
+            </tr>
+            <tr class="table-row">
+              <td class="px-6 py-3.5 font-medium text-gray-900">26 Mar 2026</td>
+              <td class="px-6 py-3.5 text-gray-700">16</td>
+              <td class="px-6 py-3.5 font-semibold text-gray-900">&#8377;13,800</td>
+              <td class="px-6 py-3.5 text-red-500">-&#8377;690</td>
+              <td class="px-6 py-3.5 text-red-500">-&#8377;276</td>
+              <td class="px-6 py-3.5 text-red-500">-&#8377;733</td>
+              <td class="px-6 py-3.5 font-bold text-green-600">&#8377;12,101</td>
+            </tr>
+            <tr class="table-row">
+              <td class="px-6 py-3.5 font-medium text-gray-900">25 Mar 2026</td>
+              <td class="px-6 py-3.5 text-gray-700">22</td>
+              <td class="px-6 py-3.5 font-semibold text-gray-900">&#8377;18,000</td>
+              <td class="px-6 py-3.5 text-red-500">-&#8377;900</td>
+              <td class="px-6 py-3.5 text-red-500">-&#8377;360</td>
+              <td class="px-6 py-3.5 text-red-500">-&#8377;942</td>
+              <td class="px-6 py-3.5 font-bold text-green-600">&#8377;15,798</td>
+            </tr>
+            <tr class="table-row">
+              <td class="px-6 py-3.5 font-medium text-gray-900">24 Mar 2026</td>
+              <td class="px-6 py-3.5 text-gray-700">12</td>
+              <td class="px-6 py-3.5 font-semibold text-gray-900">&#8377;10,200</td>
+              <td class="px-6 py-3.5 text-red-500">-&#8377;510</td>
+              <td class="px-6 py-3.5 text-red-500">-&#8377;204</td>
+              <td class="px-6 py-3.5 text-red-500">-&#8377;586</td>
+              <td class="px-6 py-3.5 font-bold text-green-600">&#8377;8,900</td>
+            </tr>
+            <tr class="table-row">
+              <td class="px-6 py-3.5 font-medium text-gray-900">23 Mar 2026</td>
+              <td class="px-6 py-3.5 text-gray-700">19</td>
+              <td class="px-6 py-3.5 font-semibold text-gray-900">&#8377;15,300</td>
+              <td class="px-6 py-3.5 text-red-500">-&#8377;765</td>
+              <td class="px-6 py-3.5 text-red-500">-&#8377;306</td>
+              <td class="px-6 py-3.5 text-red-500">-&#8377;829</td>
+              <td class="px-6 py-3.5 font-bold text-green-600">&#8377;13,400</td>
+            </tr>
+            <tr class="table-row">
+              <td class="px-6 py-3.5 font-medium text-gray-900">22 Mar 2026</td>
+              <td class="px-6 py-3.5 text-gray-700">14</td>
+              <td class="px-6 py-3.5 font-semibold text-gray-900">&#8377;11,600</td>
+              <td class="px-6 py-3.5 text-red-500">-&#8377;580</td>
+              <td class="px-6 py-3.5 text-red-500">-&#8377;232</td>
+              <td class="px-6 py-3.5 text-red-500">-&#8377;588</td>
+              <td class="px-6 py-3.5 font-bold text-green-600">&#8377;10,200</td>
+            </tr>
+          </tbody>
+          <tfoot>
+            <tr class="bg-gray-50 font-semibold">
+              <td class="px-6 py-3.5 text-gray-900">Total (7 Days)</td>
+              <td class="px-6 py-3.5 text-gray-900">125</td>
+              <td class="px-6 py-3.5 text-gray-900">&#8377;1,02,200</td>
+              <td class="px-6 py-3.5 text-red-500">-&#8377;5,110</td>
+              <td class="px-6 py-3.5 text-red-500">-&#8377;2,044</td>
+              <td class="px-6 py-3.5 text-red-500">-&#8377;5,397</td>
+              <td class="px-6 py-3.5 text-green-600 font-bold">&#8377;89,649</td>
+            </tr>
+          </tfoot>
+        </table>
+      </div>
+    </div>
+
+    <!-- Bottom Grid: Top Earning Products + Earnings by Category -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+
+      <!-- Top Earning Products -->
+      <div class="bg-white rounded-xl border border-gray-100">
+        <div class="px-6 py-4 border-b border-gray-100">
+          <h2 class="text-base font-semibold text-gray-900">Top Earning Products</h2>
+        </div>
+        <div class="divide-y divide-gray-50">
+          <div class="flex items-center gap-4 px-6 py-3.5 table-row">
+            <div class="w-10 h-10 bg-gray-100 rounded-lg flex items-center justify-center text-lg">&#128722;</div>
+            <div class="flex-1 min-w-0">
+              <p class="text-sm font-medium text-gray-900 truncate">Premium Wireless Earbuds</p>
+              <p class="text-xs text-gray-500">148 units sold</p>
+            </div>
+            <span class="text-sm font-bold text-gray-900">&#8377;1,18,400</span>
+          </div>
+          <div class="flex items-center gap-4 px-6 py-3.5 table-row">
+            <div class="w-10 h-10 bg-gray-100 rounded-lg flex items-center justify-center text-lg">&#128187;</div>
+            <div class="flex-1 min-w-0">
+              <p class="text-sm font-medium text-gray-900 truncate">Smart LED Desk Lamp</p>
+              <p class="text-xs text-gray-500">92 units sold</p>
+            </div>
+            <span class="text-sm font-bold text-gray-900">&#8377;82,800</span>
+          </div>
+          <div class="flex items-center gap-4 px-6 py-3.5 table-row">
+            <div class="w-10 h-10 bg-gray-100 rounded-lg flex items-center justify-center text-lg">&#9000;</div>
+            <div class="flex-1 min-w-0">
+              <p class="text-sm font-medium text-gray-900 truncate">Bluetooth Keyboard Combo</p>
+              <p class="text-xs text-gray-500">76 units sold</p>
+            </div>
+            <span class="text-sm font-bold text-gray-900">&#8377;68,400</span>
+          </div>
+          <div class="flex items-center gap-4 px-6 py-3.5 table-row">
+            <div class="w-10 h-10 bg-gray-100 rounded-lg flex items-center justify-center text-lg">&#128247;</div>
+            <div class="flex-1 min-w-0">
+              <p class="text-sm font-medium text-gray-900 truncate">USB-C Hub Adapter 7-in-1</p>
+              <p class="text-xs text-gray-500">63 units sold</p>
+            </div>
+            <span class="text-sm font-bold text-gray-900">&#8377;56,700</span>
+          </div>
+          <div class="flex items-center gap-4 px-6 py-3.5 table-row">
+            <div class="w-10 h-10 bg-gray-100 rounded-lg flex items-center justify-center text-lg">&#127911;</div>
+            <div class="flex-1 min-w-0">
+              <p class="text-sm font-medium text-gray-900 truncate">Noise Cancelling Headphones</p>
+              <p class="text-xs text-gray-500">51 units sold</p>
+            </div>
+            <span class="text-sm font-bold text-gray-900">&#8377;45,900</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Earnings by Category -->
+      <div class="bg-white rounded-xl border border-gray-100">
+        <div class="px-6 py-4 border-b border-gray-100">
+          <h2 class="text-base font-semibold text-gray-900">Earnings by Category</h2>
+        </div>
+        <div class="p-6 space-y-4">
+          <div>
+            <div class="flex items-center justify-between mb-1.5">
+              <span class="text-sm font-medium text-gray-700">Electronics</span>
+              <span class="text-sm font-bold text-gray-900">&#8377;1,89,400 (42%)</span>
+            </div>
+            <div class="w-full bg-gray-100 rounded-full h-3">
+              <div class="bg-brand-500 h-3 rounded-full" style="width:42%"></div>
+            </div>
+          </div>
+          <div>
+            <div class="flex items-center justify-between mb-1.5">
+              <span class="text-sm font-medium text-gray-700">Accessories</span>
+              <span class="text-sm font-bold text-gray-900">&#8377;1,13,200 (25%)</span>
+            </div>
+            <div class="w-full bg-gray-100 rounded-full h-3">
+              <div class="bg-blue-500 h-3 rounded-full" style="width:25%"></div>
+            </div>
+          </div>
+          <div>
+            <div class="flex items-center justify-between mb-1.5">
+              <span class="text-sm font-medium text-gray-700">Home &amp; Living</span>
+              <span class="text-sm font-bold text-gray-900">&#8377;81,500 (18%)</span>
+            </div>
+            <div class="w-full bg-gray-100 rounded-full h-3">
+              <div class="bg-green-500 h-3 rounded-full" style="width:18%"></div>
+            </div>
+          </div>
+          <div>
+            <div class="flex items-center justify-between mb-1.5">
+              <span class="text-sm font-medium text-gray-700">Kitchen</span>
+              <span class="text-sm font-bold text-gray-900">&#8377;45,200 (10%)</span>
+            </div>
+            <div class="w-full bg-gray-100 rounded-full h-3">
+              <div class="bg-purple-500 h-3 rounded-full" style="width:10%"></div>
+            </div>
+          </div>
+          <div>
+            <div class="flex items-center justify-between mb-1.5">
+              <span class="text-sm font-medium text-gray-700">Others</span>
+              <span class="text-sm font-bold text-gray-900">&#8377;23,590 (5%)</span>
+            </div>
+            <div class="w-full bg-gray-100 rounded-full h-3">
+              <div class="bg-gray-400 h-3 rounded-full" style="width:5%"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <script src="shared-layout.js"></script>
+  <script>
+    renderSellerLayout('earnings');
+
+    function setRange(btn, range) {
+      document.querySelectorAll('.range-btn').forEach(function(b) {
+        b.className = 'range-btn px-3 py-2 text-xs font-medium text-gray-600 hover:bg-gray-50 transition';
+      });
+      btn.className = 'range-btn px-3 py-2 text-xs font-medium bg-brand-500 text-white';
+      // Update stats display based on selected period
+      var labels = { today: 'Today', '7d': 'Last 7 Days', '30d': 'Last 30 Days', '1m': 'This Month' };
+      var headerEl = document.querySelector('main h1');
+      if (headerEl) {
+        var subEl = headerEl.nextElementSibling;
+        if (subEl) subEl.textContent = 'Showing earnings for: ' + (labels[range] || range);
+      }
+    }
+  </script>
+
+</body>
+</html>

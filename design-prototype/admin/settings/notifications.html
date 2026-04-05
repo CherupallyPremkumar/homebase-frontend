@@ -1,0 +1,792 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HomeBase — Notification Infrastructure</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              50: '#FFF7ED',
+              100: '#FFEDD5',
+              200: '#FED7AA',
+              300: '#FDBA74',
+              400: '#FB923C',
+              500: '#F97316',
+              600: '#EA580C',
+              700: '#C2410C',
+            },
+            navy: {
+              700: '#1E3A5F',
+              800: '#0F1E30',
+              900: '#0A1628',
+            },
+            success: '#16A34A',
+            warning: '#EAB308',
+            danger: '#DC2626',
+          },
+          fontFamily: {
+            sans: ['Inter', 'system-ui', 'sans-serif'],
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+    .scrollbar-hide::-webkit-scrollbar { display: none; }
+    .sidebar-link { transition: all 0.15s ease; }
+    .sidebar-link:hover { background: rgba(255,255,255,0.06); }
+    .sidebar-link.active { background: rgba(249,115,22,0.15); border-right: 3px solid #F97316; color: #F97316; }
+    .table-row { transition: background 0.15s ease; }
+    .table-row:hover { background: #FFF7ED; }
+    .toggle-track { transition: background 0.2s ease; }
+    .toggle-knob { transition: transform 0.2s ease; }
+    .section-card { transition: all 0.15s ease; }
+    .section-card:hover { box-shadow: 0 4px 16px rgba(0,0,0,0.06); }
+    .template-card { transition: all 0.2s ease; }
+    .template-card:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,0.08); }
+    .matrix-toggle { width: 36px; height: 20px; border-radius: 10px; position: relative; cursor: pointer; transition: background 0.2s ease; }
+    .matrix-toggle .matrix-knob { width: 16px; height: 16px; border-radius: 50%; background: white; position: absolute; top: 2px; transition: left 0.2s ease; box-shadow: 0 1px 2px rgba(0,0,0,0.15); }
+    .matrix-toggle[data-on="true"] { background: #16A34A; }
+    .matrix-toggle[data-on="true"] .matrix-knob { left: 18px; }
+    .matrix-toggle[data-on="false"] { background: #D1D5DB; }
+    .matrix-toggle[data-on="false"] .matrix-knob { left: 2px; }
+  </style>
+</head>
+<body class="font-sans bg-gray-50 text-gray-900">
+
+  <!-- ===== TOP HEADER BAR ===== -->
+  <header id="admin-header" class="fixed top-0 left-0 right-0 z-50 bg-white border-b border-gray-200 h-16"></header>
+
+  <!-- ===== LAYOUT: SIDEBAR + MAIN ===== -->
+  <div class="flex pt-16 min-h-screen">
+
+    <!-- ===== LEFT SIDEBAR ===== -->
+    <aside id="admin-sidebar" class="fixed left-0 top-16 bottom-0 w-60 z-40 flex flex-col overflow-y-auto" style="background:#0A1628;"></aside>
+
+    <!-- ===== MAIN CONTENT ===== -->
+    <main class="flex-1 ml-60 p-6 lg:p-8 overflow-x-hidden">
+
+      <!-- Breadcrumb -->
+      <nav class="flex items-center gap-2 text-sm text-gray-500 mb-4">
+        <a href="../dashboard.html" class="hover:text-brand-500 transition">Dashboard</a>
+        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M8.25 4.5l7.5 7.5-7.5 7.5"/></svg>
+        <a href="index.html" class="hover:text-brand-500 transition">Settings</a>
+        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M8.25 4.5l7.5 7.5-7.5 7.5"/></svg>
+        <span class="text-gray-900 font-medium">Notification Infrastructure</span>
+      </nav>
+
+      <!-- Page Header -->
+      <div class="flex items-center justify-between mb-6">
+        <div class="min-w-0">
+          <h1 class="text-2xl font-bold text-gray-900">Notification Infrastructure</h1>
+          <p class="text-sm text-gray-500 mt-1">Email, SMS, push, and WhatsApp provider configuration and delivery rules</p>
+        </div>
+        <div class="flex items-center gap-3 shrink-0">
+          <button onclick="discardChanges()" class="px-4 py-2.5 text-sm font-medium text-gray-600 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 transition">Discard</button>
+          <button onclick="saveConfig()" class="px-5 py-2.5 bg-brand-500 text-white text-sm font-semibold rounded-lg hover:bg-brand-600 transition shadow-sm">
+            <span class="flex items-center gap-2">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4.5 12.75l6 6 9-13.5"/></svg>
+              Save Changes
+            </span>
+          </button>
+        </div>
+      </div>
+
+      <!-- ===== EMAIL PROVIDER SECTION ===== -->
+      <div class="bg-white rounded-xl border border-gray-200 shadow-sm section-card mb-6">
+        <div class="px-6 py-4 border-b border-gray-100 flex items-center gap-3">
+          <div class="w-9 h-9 rounded-lg bg-blue-100 flex items-center justify-center">
+            <svg class="w-4.5 h-4.5 text-blue-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0L3.32 8.91a2.25 2.25 0 01-1.07-1.916V6.75"/></svg>
+          </div>
+          <div>
+            <h2 class="text-lg font-bold text-gray-900">Email Provider</h2>
+            <p class="text-sm text-gray-500 mt-0.5">Transactional and marketing email delivery configuration</p>
+          </div>
+        </div>
+        <div class="p-6 space-y-5">
+          <div class="grid grid-cols-3 gap-4 items-start">
+            <label class="text-sm font-medium text-gray-700 pt-2">Provider</label>
+            <div class="col-span-2">
+              <select id="email-provider-select" onchange="switchEmailProvider(this.value)" class="w-full max-w-md border border-gray-200 rounded-lg px-4 py-2.5 text-sm outline-none focus:border-brand-400 focus:ring-2 focus:ring-brand-100 transition bg-white">
+                <option value="smtp" selected>SMTP</option>
+                <option value="sendgrid">SendGrid</option>
+                <option value="ses">AWS SES</option>
+              </select>
+            </div>
+          </div>
+          <!-- SMTP Fields -->
+          <div id="email-provider-smtp" class="space-y-4">
+            <div class="grid grid-cols-2 gap-4">
+              <div>
+                <label class="text-sm text-gray-600 mb-1 block">SMTP Host</label>
+                <input type="text" value="smtp.homebase.in" class="w-full border border-gray-200 rounded-lg px-4 py-2.5 text-sm outline-none focus:border-brand-400 focus:ring-2 focus:ring-brand-100 transition">
+              </div>
+              <div>
+                <label class="text-sm text-gray-600 mb-1 block">SMTP Port</label>
+                <input type="number" value="587" class="w-full border border-gray-200 rounded-lg px-4 py-2.5 text-sm outline-none focus:border-brand-400 focus:ring-2 focus:ring-brand-100 transition">
+              </div>
+              <div>
+                <label class="text-sm text-gray-600 mb-1 block">Username</label>
+                <input type="text" value="notifications@homebase.in" class="w-full border border-gray-200 rounded-lg px-4 py-2.5 text-sm outline-none focus:border-brand-400 focus:ring-2 focus:ring-brand-100 transition">
+              </div>
+              <div>
+                <label class="text-sm text-gray-600 mb-1 block">Password</label>
+                <input type="password" value="smtp-secret-key" class="w-full border border-gray-200 rounded-lg px-4 py-2.5 text-sm bg-gray-50 outline-none">
+              </div>
+              <div>
+                <label class="text-sm text-gray-600 mb-1 block">From Email</label>
+                <input type="email" value="noreply@homebase.in" class="w-full border border-gray-200 rounded-lg px-4 py-2.5 text-sm outline-none focus:border-brand-400 focus:ring-2 focus:ring-brand-100 transition">
+              </div>
+              <div>
+                <label class="text-sm text-gray-600 mb-1 block">From Name</label>
+                <input type="text" value="HomeBase" class="w-full border border-gray-200 rounded-lg px-4 py-2.5 text-sm outline-none focus:border-brand-400 focus:ring-2 focus:ring-brand-100 transition">
+              </div>
+            </div>
+          </div>
+          <!-- SendGrid Fields -->
+          <div id="email-provider-sendgrid" class="space-y-4 hidden">
+            <div class="grid grid-cols-2 gap-4">
+              <div>
+                <label class="text-sm text-gray-600 mb-1 block">API Key</label>
+                <input type="text" value="SG.****...****xQ3m" class="w-full border border-gray-200 rounded-lg px-4 py-2.5 text-sm bg-gray-50 outline-none" readonly>
+              </div>
+              <div>
+                <label class="text-sm text-gray-600 mb-1 block">From Email</label>
+                <input type="email" value="noreply@homebase.in" class="w-full border border-gray-200 rounded-lg px-4 py-2.5 text-sm outline-none focus:border-brand-400 focus:ring-2 focus:ring-brand-100 transition">
+              </div>
+              <div>
+                <label class="text-sm text-gray-600 mb-1 block">From Name</label>
+                <input type="text" value="HomeBase" class="w-full border border-gray-200 rounded-lg px-4 py-2.5 text-sm outline-none focus:border-brand-400 focus:ring-2 focus:ring-brand-100 transition">
+              </div>
+            </div>
+          </div>
+          <!-- AWS SES Fields -->
+          <div id="email-provider-ses" class="space-y-4 hidden">
+            <div class="grid grid-cols-2 gap-4">
+              <div>
+                <label class="text-sm text-gray-600 mb-1 block">Access Key ID</label>
+                <input type="text" value="AKIA****...****7nWp" class="w-full border border-gray-200 rounded-lg px-4 py-2.5 text-sm bg-gray-50 outline-none" readonly>
+              </div>
+              <div>
+                <label class="text-sm text-gray-600 mb-1 block">Region</label>
+                <select class="w-full border border-gray-200 rounded-lg px-4 py-2.5 text-sm outline-none focus:border-brand-400 focus:ring-2 focus:ring-brand-100 transition bg-white">
+                  <option selected>ap-south-1 (Mumbai)</option>
+                  <option>us-east-1 (N. Virginia)</option>
+                  <option>eu-west-1 (Ireland)</option>
+                </select>
+              </div>
+              <div>
+                <label class="text-sm text-gray-600 mb-1 block">From Email</label>
+                <input type="email" value="noreply@homebase.in" class="w-full border border-gray-200 rounded-lg px-4 py-2.5 text-sm outline-none focus:border-brand-400 focus:ring-2 focus:ring-brand-100 transition">
+              </div>
+              <div>
+                <label class="text-sm text-gray-600 mb-1 block">From Name</label>
+                <input type="text" value="HomeBase" class="w-full border border-gray-200 rounded-lg px-4 py-2.5 text-sm outline-none focus:border-brand-400 focus:ring-2 focus:ring-brand-100 transition">
+              </div>
+            </div>
+          </div>
+          <!-- Send Test Email -->
+          <div class="flex items-center gap-4 pt-2 border-t border-gray-100">
+            <button onclick="sendTestEmail()" id="test-email-btn" class="px-4 py-2 text-sm font-medium text-blue-600 bg-blue-50 border border-blue-200 rounded-lg hover:bg-blue-100 transition">
+              <span class="flex items-center gap-2">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M6 12L3.269 3.126A59.768 59.768 0 0121.485 12 59.77 59.77 0 013.27 20.876L5.999 12zm0 0h7.5"/></svg>
+                Send Test Email
+              </span>
+            </button>
+            <span id="test-email-result" class="hidden items-center gap-1.5 text-xs font-medium text-green-600">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+              Test email sent successfully to admin@homebase.in
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== SMS PROVIDER SECTION ===== -->
+      <div class="bg-white rounded-xl border border-gray-200 shadow-sm section-card mb-6">
+        <div class="px-6 py-4 border-b border-gray-100 flex items-center gap-3">
+          <div class="w-9 h-9 rounded-lg bg-green-100 flex items-center justify-center">
+            <svg class="w-4.5 h-4.5 text-green-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M10.5 1.5H8.25A2.25 2.25 0 006 3.75v16.5a2.25 2.25 0 002.25 2.25h7.5A2.25 2.25 0 0018 20.25V3.75a2.25 2.25 0 00-2.25-2.25H13.5m-3 0V3h3V1.5m-3 0h3m-3 18.75h3"/></svg>
+          </div>
+          <div>
+            <h2 class="text-lg font-bold text-gray-900">SMS Provider</h2>
+            <p class="text-sm text-gray-500 mt-0.5">Transactional and OTP SMS delivery (DLT compliant)</p>
+          </div>
+        </div>
+        <div class="p-6 space-y-5">
+          <div class="grid grid-cols-2 gap-4">
+            <div>
+              <label class="text-sm text-gray-600 mb-1 block">Provider</label>
+              <select class="w-full border border-gray-200 rounded-lg px-4 py-2.5 text-sm outline-none focus:border-brand-400 focus:ring-2 focus:ring-brand-100 transition bg-white">
+                <option selected>MSG91</option>
+                <option>Twilio</option>
+                <option>Kaleyra</option>
+              </select>
+            </div>
+            <div>
+              <label class="text-sm text-gray-600 mb-1 block">API Key</label>
+              <input type="text" value="msg91_****...****kR2p" class="w-full border border-gray-200 rounded-lg px-4 py-2.5 text-sm bg-gray-50 outline-none" readonly>
+            </div>
+            <div>
+              <label class="text-sm text-gray-600 mb-1 block">Sender ID</label>
+              <input type="text" value="HMBSE" class="w-full border border-gray-200 rounded-lg px-4 py-2.5 text-sm outline-none focus:border-brand-400 focus:ring-2 focus:ring-brand-100 transition" maxlength="6">
+              <p class="text-xs text-gray-400 mt-1">6-character alphanumeric sender ID (DLT registered)</p>
+            </div>
+            <div>
+              <label class="text-sm text-gray-600 mb-1 block">DLT Entity ID</label>
+              <input type="text" value="1201159078752XXXXXX" class="w-full border border-gray-200 rounded-lg px-4 py-2.5 text-sm outline-none focus:border-brand-400 focus:ring-2 focus:ring-brand-100 transition">
+              <p class="text-xs text-gray-400 mt-1">TRAI DLT registration entity ID</p>
+            </div>
+          </div>
+          <!-- Send Test SMS -->
+          <div class="flex items-center gap-4 pt-2 border-t border-gray-100">
+            <button onclick="sendTestSms()" id="test-sms-btn" class="px-4 py-2 text-sm font-medium text-green-600 bg-green-50 border border-green-200 rounded-lg hover:bg-green-100 transition">
+              <span class="flex items-center gap-2">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M6 12L3.269 3.126A59.768 59.768 0 0121.485 12 59.77 59.77 0 013.27 20.876L5.999 12zm0 0h7.5"/></svg>
+                Send Test SMS
+              </span>
+            </button>
+            <span id="test-sms-result" class="hidden items-center gap-1.5 text-xs font-medium text-green-600">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+              Test SMS sent successfully to +91-XXXXX-XX890
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== PUSH NOTIFICATIONS SECTION ===== -->
+      <div class="bg-white rounded-xl border border-gray-200 shadow-sm section-card mb-6">
+        <div class="px-6 py-4 border-b border-gray-100 flex items-center gap-3">
+          <div class="w-9 h-9 rounded-lg bg-yellow-100 flex items-center justify-center">
+            <svg class="w-4.5 h-4.5 text-yellow-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M14.857 17.082a23.848 23.848 0 005.454-1.31A8.967 8.967 0 0118 9.75V9A6 6 0 006 9v.75a8.967 8.967 0 01-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 01-5.714 0m5.714 0a3 3 0 11-5.714 0"/></svg>
+          </div>
+          <div>
+            <h2 class="text-lg font-bold text-gray-900">Push Notifications</h2>
+            <p class="text-sm text-gray-500 mt-0.5">Firebase Cloud Messaging for mobile and web push</p>
+          </div>
+        </div>
+        <div class="p-6 space-y-4">
+          <div class="grid grid-cols-2 gap-4">
+            <div>
+              <label class="text-sm text-gray-600 mb-1 block">Firebase Project ID</label>
+              <input type="text" value="homebase-prod-a1b2c" class="w-full border border-gray-200 rounded-lg px-4 py-2.5 text-sm outline-none focus:border-brand-400 focus:ring-2 focus:ring-brand-100 transition">
+            </div>
+            <div>
+              <label class="text-sm text-gray-600 mb-1 block">Server Key</label>
+              <input type="text" value="AAAA****...****bN5x" class="w-full border border-gray-200 rounded-lg px-4 py-2.5 text-sm bg-gray-50 outline-none" readonly>
+            </div>
+          </div>
+          <!-- Send Test Push -->
+          <div class="flex items-center gap-4 pt-2 border-t border-gray-100">
+            <button onclick="sendTestPush()" id="test-push-btn" class="px-4 py-2 text-sm font-medium text-yellow-600 bg-yellow-50 border border-yellow-200 rounded-lg hover:bg-yellow-100 transition">
+              <span class="flex items-center gap-2">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M6 12L3.269 3.126A59.768 59.768 0 0121.485 12 59.77 59.77 0 013.27 20.876L5.999 12zm0 0h7.5"/></svg>
+                Send Test Push
+              </span>
+            </button>
+            <span id="test-push-result" class="hidden items-center gap-1.5 text-xs font-medium text-green-600">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+              Test push sent to admin device
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== WHATSAPP BUSINESS SECTION ===== -->
+      <div class="bg-white rounded-xl border border-gray-200 shadow-sm section-card mb-6">
+        <div class="px-6 py-4 border-b border-gray-100 flex items-center gap-3">
+          <div class="w-9 h-9 rounded-lg bg-emerald-100 flex items-center justify-center">
+            <svg class="w-4.5 h-4.5 text-emerald-600" fill="currentColor" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.625.846 5.059 2.284 7.03L.789 23.653l4.768-1.473A11.932 11.932 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.75c-2.14 0-4.122-.67-5.753-1.81l-.413-.246-2.828.874.893-2.74-.27-.428A9.717 9.717 0 012.25 12c0-5.385 4.365-9.75 9.75-9.75s9.75 4.365 9.75 9.75-4.365 9.75-9.75 9.75z"/></svg>
+          </div>
+          <div>
+            <h2 class="text-lg font-bold text-gray-900">WhatsApp Business</h2>
+            <p class="text-sm text-gray-500 mt-0.5">WhatsApp Business API for order updates and support</p>
+          </div>
+        </div>
+        <div class="p-6 space-y-4">
+          <div class="grid grid-cols-2 gap-4">
+            <div>
+              <label class="text-sm text-gray-600 mb-1 block">Business Phone Number</label>
+              <input type="text" value="+91 98765 43210" class="w-full border border-gray-200 rounded-lg px-4 py-2.5 text-sm outline-none focus:border-brand-400 focus:ring-2 focus:ring-brand-100 transition">
+            </div>
+            <div>
+              <label class="text-sm text-gray-600 mb-1 block">Business API Key</label>
+              <input type="text" value="whapi_****...****mK7q" class="w-full border border-gray-200 rounded-lg px-4 py-2.5 text-sm bg-gray-50 outline-none" readonly>
+            </div>
+          </div>
+          <div class="grid grid-cols-3 gap-4 items-start">
+            <label class="text-sm font-medium text-gray-700 pt-2">Template Approval Status</label>
+            <div class="col-span-2">
+              <div class="flex flex-wrap gap-2">
+                <span class="px-3 py-1.5 text-xs font-semibold rounded-full bg-green-50 text-green-700 border border-green-200">Order Placed - Approved</span>
+                <span class="px-3 py-1.5 text-xs font-semibold rounded-full bg-green-50 text-green-700 border border-green-200">Shipping Update - Approved</span>
+                <span class="px-3 py-1.5 text-xs font-semibold rounded-full bg-green-50 text-green-700 border border-green-200">OTP Verification - Approved</span>
+                <span class="px-3 py-1.5 text-xs font-semibold rounded-full bg-yellow-50 text-yellow-700 border border-yellow-200">Return Update - Pending</span>
+                <span class="px-3 py-1.5 text-xs font-semibold rounded-full bg-green-50 text-green-700 border border-green-200">Delivery Confirm - Approved</span>
+              </div>
+              <p class="text-xs text-gray-400 mt-2">Templates must be approved by Meta before use. Pending templates cannot be sent.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== NOTIFICATION EVENTS MATRIX ===== -->
+      <div class="bg-white rounded-xl border border-gray-200 shadow-sm section-card mb-6">
+        <div class="px-6 py-4 border-b border-gray-100 flex items-center gap-3">
+          <div class="w-9 h-9 rounded-lg bg-purple-100 flex items-center justify-center">
+            <svg class="w-4.5 h-4.5 text-purple-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3.75 12h16.5m-16.5 3.75h16.5M3.75 19.5h16.5M5.625 4.5h12.75a1.875 1.875 0 010 3.75H5.625a1.875 1.875 0 010-3.75z"/></svg>
+          </div>
+          <div>
+            <h2 class="text-lg font-bold text-gray-900">Notification Events Matrix</h2>
+            <p class="text-sm text-gray-500 mt-0.5">Configure which channels are active for each notification event</p>
+          </div>
+        </div>
+        <div class="overflow-x-auto">
+          <table class="w-full text-sm">
+            <thead>
+              <tr class="bg-gray-50 text-left">
+                <th class="px-6 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider min-w-[200px]">Event</th>
+                <th class="px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider text-center">Email</th>
+                <th class="px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider text-center">SMS</th>
+                <th class="px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider text-center">Push</th>
+                <th class="px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider text-center">In-App</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-100">
+              <!-- Order Placed -->
+              <tr class="table-row">
+                <td class="px-6 py-3.5">
+                  <div class="flex items-center gap-2">
+                    <span class="w-2 h-2 rounded-full bg-green-500"></span>
+                    <span class="font-medium text-gray-900">Order Placed</span>
+                  </div>
+                </td>
+                <td class="px-4 py-3.5 text-center"><div class="flex justify-center"><div onclick="toggleMatrix(this)" class="matrix-toggle" data-on="true"><div class="matrix-knob"></div></div></div></td>
+                <td class="px-4 py-3.5 text-center"><div class="flex justify-center"><div onclick="toggleMatrix(this)" class="matrix-toggle" data-on="true"><div class="matrix-knob"></div></div></div></td>
+                <td class="px-4 py-3.5 text-center"><div class="flex justify-center"><div onclick="toggleMatrix(this)" class="matrix-toggle" data-on="true"><div class="matrix-knob"></div></div></div></td>
+                <td class="px-4 py-3.5 text-center"><div class="flex justify-center"><div onclick="toggleMatrix(this)" class="matrix-toggle" data-on="true"><div class="matrix-knob"></div></div></div></td>
+              </tr>
+              <!-- Order Shipped -->
+              <tr class="table-row">
+                <td class="px-6 py-3.5">
+                  <div class="flex items-center gap-2">
+                    <span class="w-2 h-2 rounded-full bg-blue-500"></span>
+                    <span class="font-medium text-gray-900">Order Shipped</span>
+                  </div>
+                </td>
+                <td class="px-4 py-3.5 text-center"><div class="flex justify-center"><div onclick="toggleMatrix(this)" class="matrix-toggle" data-on="true"><div class="matrix-knob"></div></div></div></td>
+                <td class="px-4 py-3.5 text-center"><div class="flex justify-center"><div onclick="toggleMatrix(this)" class="matrix-toggle" data-on="true"><div class="matrix-knob"></div></div></div></td>
+                <td class="px-4 py-3.5 text-center"><div class="flex justify-center"><div onclick="toggleMatrix(this)" class="matrix-toggle" data-on="true"><div class="matrix-knob"></div></div></div></td>
+                <td class="px-4 py-3.5 text-center"><div class="flex justify-center"><div onclick="toggleMatrix(this)" class="matrix-toggle" data-on="true"><div class="matrix-knob"></div></div></div></td>
+              </tr>
+              <!-- Order Delivered -->
+              <tr class="table-row">
+                <td class="px-6 py-3.5">
+                  <div class="flex items-center gap-2">
+                    <span class="w-2 h-2 rounded-full bg-green-500"></span>
+                    <span class="font-medium text-gray-900">Order Delivered</span>
+                  </div>
+                </td>
+                <td class="px-4 py-3.5 text-center"><div class="flex justify-center"><div onclick="toggleMatrix(this)" class="matrix-toggle" data-on="true"><div class="matrix-knob"></div></div></div></td>
+                <td class="px-4 py-3.5 text-center"><div class="flex justify-center"><div onclick="toggleMatrix(this)" class="matrix-toggle" data-on="true"><div class="matrix-knob"></div></div></div></td>
+                <td class="px-4 py-3.5 text-center"><div class="flex justify-center"><div onclick="toggleMatrix(this)" class="matrix-toggle" data-on="true"><div class="matrix-knob"></div></div></div></td>
+                <td class="px-4 py-3.5 text-center"><div class="flex justify-center"><div onclick="toggleMatrix(this)" class="matrix-toggle" data-on="true"><div class="matrix-knob"></div></div></div></td>
+              </tr>
+              <!-- Return Approved -->
+              <tr class="table-row">
+                <td class="px-6 py-3.5">
+                  <div class="flex items-center gap-2">
+                    <span class="w-2 h-2 rounded-full bg-yellow-500"></span>
+                    <span class="font-medium text-gray-900">Return Approved</span>
+                  </div>
+                </td>
+                <td class="px-4 py-3.5 text-center"><div class="flex justify-center"><div onclick="toggleMatrix(this)" class="matrix-toggle" data-on="true"><div class="matrix-knob"></div></div></div></td>
+                <td class="px-4 py-3.5 text-center"><div class="flex justify-center"><div onclick="toggleMatrix(this)" class="matrix-toggle" data-on="true"><div class="matrix-knob"></div></div></div></td>
+                <td class="px-4 py-3.5 text-center"><div class="flex justify-center"><div onclick="toggleMatrix(this)" class="matrix-toggle" data-on="false"><div class="matrix-knob"></div></div></div></td>
+                <td class="px-4 py-3.5 text-center"><div class="flex justify-center"><div onclick="toggleMatrix(this)" class="matrix-toggle" data-on="true"><div class="matrix-knob"></div></div></div></td>
+              </tr>
+              <!-- Refund Processed -->
+              <tr class="table-row">
+                <td class="px-6 py-3.5">
+                  <div class="flex items-center gap-2">
+                    <span class="w-2 h-2 rounded-full bg-green-500"></span>
+                    <span class="font-medium text-gray-900">Refund Processed</span>
+                  </div>
+                </td>
+                <td class="px-4 py-3.5 text-center"><div class="flex justify-center"><div onclick="toggleMatrix(this)" class="matrix-toggle" data-on="true"><div class="matrix-knob"></div></div></div></td>
+                <td class="px-4 py-3.5 text-center"><div class="flex justify-center"><div onclick="toggleMatrix(this)" class="matrix-toggle" data-on="true"><div class="matrix-knob"></div></div></div></td>
+                <td class="px-4 py-3.5 text-center"><div class="flex justify-center"><div onclick="toggleMatrix(this)" class="matrix-toggle" data-on="false"><div class="matrix-knob"></div></div></div></td>
+                <td class="px-4 py-3.5 text-center"><div class="flex justify-center"><div onclick="toggleMatrix(this)" class="matrix-toggle" data-on="true"><div class="matrix-knob"></div></div></div></td>
+              </tr>
+              <!-- Payment Failed -->
+              <tr class="table-row">
+                <td class="px-6 py-3.5">
+                  <div class="flex items-center gap-2">
+                    <span class="w-2 h-2 rounded-full bg-red-500"></span>
+                    <span class="font-medium text-gray-900">Payment Failed</span>
+                  </div>
+                </td>
+                <td class="px-4 py-3.5 text-center"><div class="flex justify-center"><div onclick="toggleMatrix(this)" class="matrix-toggle" data-on="true"><div class="matrix-knob"></div></div></div></td>
+                <td class="px-4 py-3.5 text-center"><div class="flex justify-center"><div onclick="toggleMatrix(this)" class="matrix-toggle" data-on="true"><div class="matrix-knob"></div></div></div></td>
+                <td class="px-4 py-3.5 text-center"><div class="flex justify-center"><div onclick="toggleMatrix(this)" class="matrix-toggle" data-on="true"><div class="matrix-knob"></div></div></div></td>
+                <td class="px-4 py-3.5 text-center"><div class="flex justify-center"><div onclick="toggleMatrix(this)" class="matrix-toggle" data-on="true"><div class="matrix-knob"></div></div></div></td>
+              </tr>
+              <!-- Seller Payout -->
+              <tr class="table-row">
+                <td class="px-6 py-3.5">
+                  <div class="flex items-center gap-2">
+                    <span class="w-2 h-2 rounded-full bg-brand-500"></span>
+                    <span class="font-medium text-gray-900">Seller Payout</span>
+                  </div>
+                </td>
+                <td class="px-4 py-3.5 text-center"><div class="flex justify-center"><div onclick="toggleMatrix(this)" class="matrix-toggle" data-on="true"><div class="matrix-knob"></div></div></div></td>
+                <td class="px-4 py-3.5 text-center"><div class="flex justify-center"><div onclick="toggleMatrix(this)" class="matrix-toggle" data-on="false"><div class="matrix-knob"></div></div></div></td>
+                <td class="px-4 py-3.5 text-center"><div class="flex justify-center"><div onclick="toggleMatrix(this)" class="matrix-toggle" data-on="false"><div class="matrix-knob"></div></div></div></td>
+                <td class="px-4 py-3.5 text-center"><div class="flex justify-center"><div onclick="toggleMatrix(this)" class="matrix-toggle" data-on="true"><div class="matrix-knob"></div></div></div></td>
+              </tr>
+              <!-- Low Stock Alert -->
+              <tr class="table-row">
+                <td class="px-6 py-3.5">
+                  <div class="flex items-center gap-2">
+                    <span class="w-2 h-2 rounded-full bg-yellow-500"></span>
+                    <span class="font-medium text-gray-900">Low Stock Alert</span>
+                  </div>
+                </td>
+                <td class="px-4 py-3.5 text-center"><div class="flex justify-center"><div onclick="toggleMatrix(this)" class="matrix-toggle" data-on="true"><div class="matrix-knob"></div></div></div></td>
+                <td class="px-4 py-3.5 text-center"><div class="flex justify-center"><div onclick="toggleMatrix(this)" class="matrix-toggle" data-on="false"><div class="matrix-knob"></div></div></div></td>
+                <td class="px-4 py-3.5 text-center"><div class="flex justify-center"><div onclick="toggleMatrix(this)" class="matrix-toggle" data-on="true"><div class="matrix-knob"></div></div></div></td>
+                <td class="px-4 py-3.5 text-center"><div class="flex justify-center"><div onclick="toggleMatrix(this)" class="matrix-toggle" data-on="true"><div class="matrix-knob"></div></div></div></td>
+              </tr>
+              <!-- New Seller Application -->
+              <tr class="table-row">
+                <td class="px-6 py-3.5">
+                  <div class="flex items-center gap-2">
+                    <span class="w-2 h-2 rounded-full bg-purple-500"></span>
+                    <span class="font-medium text-gray-900">New Seller Application</span>
+                  </div>
+                </td>
+                <td class="px-4 py-3.5 text-center"><div class="flex justify-center"><div onclick="toggleMatrix(this)" class="matrix-toggle" data-on="true"><div class="matrix-knob"></div></div></div></td>
+                <td class="px-4 py-3.5 text-center"><div class="flex justify-center"><div onclick="toggleMatrix(this)" class="matrix-toggle" data-on="false"><div class="matrix-knob"></div></div></div></td>
+                <td class="px-4 py-3.5 text-center"><div class="flex justify-center"><div onclick="toggleMatrix(this)" class="matrix-toggle" data-on="false"><div class="matrix-knob"></div></div></div></td>
+                <td class="px-4 py-3.5 text-center"><div class="flex justify-center"><div onclick="toggleMatrix(this)" class="matrix-toggle" data-on="true"><div class="matrix-knob"></div></div></div></td>
+              </tr>
+              <!-- Support Ticket Update -->
+              <tr class="table-row">
+                <td class="px-6 py-3.5">
+                  <div class="flex items-center gap-2">
+                    <span class="w-2 h-2 rounded-full bg-blue-500"></span>
+                    <span class="font-medium text-gray-900">Support Ticket Update</span>
+                  </div>
+                </td>
+                <td class="px-4 py-3.5 text-center"><div class="flex justify-center"><div onclick="toggleMatrix(this)" class="matrix-toggle" data-on="true"><div class="matrix-knob"></div></div></div></td>
+                <td class="px-4 py-3.5 text-center"><div class="flex justify-center"><div onclick="toggleMatrix(this)" class="matrix-toggle" data-on="false"><div class="matrix-knob"></div></div></div></td>
+                <td class="px-4 py-3.5 text-center"><div class="flex justify-center"><div onclick="toggleMatrix(this)" class="matrix-toggle" data-on="true"><div class="matrix-knob"></div></div></div></td>
+                <td class="px-4 py-3.5 text-center"><div class="flex justify-center"><div onclick="toggleMatrix(this)" class="matrix-toggle" data-on="true"><div class="matrix-knob"></div></div></div></td>
+              </tr>
+              <!-- Account Locked -->
+              <tr class="table-row">
+                <td class="px-6 py-3.5">
+                  <div class="flex items-center gap-2">
+                    <span class="w-2 h-2 rounded-full bg-red-500"></span>
+                    <span class="font-medium text-gray-900">Account Locked</span>
+                  </div>
+                </td>
+                <td class="px-4 py-3.5 text-center"><div class="flex justify-center"><div onclick="toggleMatrix(this)" class="matrix-toggle" data-on="true"><div class="matrix-knob"></div></div></div></td>
+                <td class="px-4 py-3.5 text-center"><div class="flex justify-center"><div onclick="toggleMatrix(this)" class="matrix-toggle" data-on="true"><div class="matrix-knob"></div></div></div></td>
+                <td class="px-4 py-3.5 text-center"><div class="flex justify-center"><div onclick="toggleMatrix(this)" class="matrix-toggle" data-on="true"><div class="matrix-knob"></div></div></div></td>
+                <td class="px-4 py-3.5 text-center"><div class="flex justify-center"><div onclick="toggleMatrix(this)" class="matrix-toggle" data-on="true"><div class="matrix-knob"></div></div></div></td>
+              </tr>
+              <!-- Promotional -->
+              <tr class="table-row">
+                <td class="px-6 py-3.5">
+                  <div class="flex items-center gap-2">
+                    <span class="w-2 h-2 rounded-full bg-brand-500"></span>
+                    <span class="font-medium text-gray-900">Promotional</span>
+                  </div>
+                </td>
+                <td class="px-4 py-3.5 text-center"><div class="flex justify-center"><div onclick="toggleMatrix(this)" class="matrix-toggle" data-on="true"><div class="matrix-knob"></div></div></div></td>
+                <td class="px-4 py-3.5 text-center"><div class="flex justify-center"><div onclick="toggleMatrix(this)" class="matrix-toggle" data-on="false"><div class="matrix-knob"></div></div></div></td>
+                <td class="px-4 py-3.5 text-center"><div class="flex justify-center"><div onclick="toggleMatrix(this)" class="matrix-toggle" data-on="true"><div class="matrix-knob"></div></div></div></td>
+                <td class="px-4 py-3.5 text-center"><div class="flex justify-center"><div onclick="toggleMatrix(this)" class="matrix-toggle" data-on="true"><div class="matrix-knob"></div></div></div></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="px-6 py-3 border-t border-gray-100 bg-gray-50 rounded-b-xl">
+          <p class="text-[11px] text-gray-500"><span class="font-semibold text-gray-600">Note:</span> Users can override promotional notifications in their preferences. Transactional notifications (Order, Payment, Security) cannot be disabled by users.</p>
+        </div>
+      </div>
+
+      <!-- ===== EMAIL TEMPLATES SECTION ===== -->
+      <div class="bg-white rounded-xl border border-gray-200 shadow-sm section-card mb-6">
+        <div class="px-6 py-4 border-b border-gray-100 flex items-center justify-between">
+          <div class="flex items-center gap-3">
+            <div class="w-9 h-9 rounded-lg bg-indigo-100 flex items-center justify-center">
+              <svg class="w-4.5 h-4.5 text-indigo-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z"/></svg>
+            </div>
+            <div>
+              <h2 class="text-lg font-bold text-gray-900">Email Templates</h2>
+              <p class="text-sm text-gray-500 mt-0.5">Manage transactional email templates and designs</p>
+            </div>
+          </div>
+          <button onclick="alert('Create new email template')" class="px-4 py-2 text-sm font-medium text-brand-600 bg-brand-50 rounded-lg hover:bg-brand-100 transition">+ New Template</button>
+        </div>
+        <div class="p-6">
+          <div class="grid grid-cols-3 gap-4">
+            <!-- Order Confirmation -->
+            <div class="template-card border border-gray-200 rounded-xl overflow-hidden">
+              <div class="h-28 bg-gradient-to-br from-green-50 to-green-100 flex items-center justify-center">
+                <div class="w-12 h-12 rounded-xl bg-white shadow-sm flex items-center justify-center">
+                  <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                </div>
+              </div>
+              <div class="p-4">
+                <h3 class="text-sm font-bold text-gray-900">Order Confirmation</h3>
+                <p class="text-[11px] text-gray-400 mt-1">Last edited: 28 Mar 2026</p>
+                <div class="flex items-center gap-2 mt-3">
+                  <button onclick="alert('Preview Order Confirmation template')" class="flex-1 px-3 py-1.5 text-xs font-medium text-gray-600 bg-gray-100 rounded-lg hover:bg-gray-200 transition text-center">Preview</button>
+                  <button onclick="alert('Edit Order Confirmation template')" class="flex-1 px-3 py-1.5 text-xs font-medium text-brand-600 bg-brand-50 rounded-lg hover:bg-brand-100 transition text-center">Edit Template</button>
+                </div>
+              </div>
+            </div>
+            <!-- Shipping Update -->
+            <div class="template-card border border-gray-200 rounded-xl overflow-hidden">
+              <div class="h-28 bg-gradient-to-br from-blue-50 to-blue-100 flex items-center justify-center">
+                <div class="w-12 h-12 rounded-xl bg-white shadow-sm flex items-center justify-center">
+                  <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M8.25 18.75a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m3 0h6m-9 0H3.375a1.125 1.125 0 01-1.125-1.125V14.25m17.25 4.5a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m3 0H6.375m11.25 3V7.5"/></svg>
+                </div>
+              </div>
+              <div class="p-4">
+                <h3 class="text-sm font-bold text-gray-900">Shipping Update</h3>
+                <p class="text-[11px] text-gray-400 mt-1">Last edited: 25 Mar 2026</p>
+                <div class="flex items-center gap-2 mt-3">
+                  <button onclick="alert('Preview Shipping Update template')" class="flex-1 px-3 py-1.5 text-xs font-medium text-gray-600 bg-gray-100 rounded-lg hover:bg-gray-200 transition text-center">Preview</button>
+                  <button onclick="alert('Edit Shipping Update template')" class="flex-1 px-3 py-1.5 text-xs font-medium text-brand-600 bg-brand-50 rounded-lg hover:bg-brand-100 transition text-center">Edit Template</button>
+                </div>
+              </div>
+            </div>
+            <!-- Delivery Confirmation -->
+            <div class="template-card border border-gray-200 rounded-xl overflow-hidden">
+              <div class="h-28 bg-gradient-to-br from-emerald-50 to-emerald-100 flex items-center justify-center">
+                <div class="w-12 h-12 rounded-xl bg-white shadow-sm flex items-center justify-center">
+                  <svg class="w-6 h-6 text-emerald-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M15.75 10.5V6a3.75 3.75 0 10-7.5 0v4.5m11.356-1.993l1.263 12c.07.665-.45 1.243-1.119 1.243H4.25a1.125 1.125 0 01-1.12-1.243l1.264-12A1.125 1.125 0 015.513 7.5h12.974c.576 0 1.059.435 1.119 1.007z"/></svg>
+                </div>
+              </div>
+              <div class="p-4">
+                <h3 class="text-sm font-bold text-gray-900">Delivery Confirmation</h3>
+                <p class="text-[11px] text-gray-400 mt-1">Last edited: 22 Mar 2026</p>
+                <div class="flex items-center gap-2 mt-3">
+                  <button onclick="alert('Preview Delivery Confirmation template')" class="flex-1 px-3 py-1.5 text-xs font-medium text-gray-600 bg-gray-100 rounded-lg hover:bg-gray-200 transition text-center">Preview</button>
+                  <button onclick="alert('Edit Delivery Confirmation template')" class="flex-1 px-3 py-1.5 text-xs font-medium text-brand-600 bg-brand-50 rounded-lg hover:bg-brand-100 transition text-center">Edit Template</button>
+                </div>
+              </div>
+            </div>
+            <!-- Return Approved -->
+            <div class="template-card border border-gray-200 rounded-xl overflow-hidden">
+              <div class="h-28 bg-gradient-to-br from-yellow-50 to-yellow-100 flex items-center justify-center">
+                <div class="w-12 h-12 rounded-xl bg-white shadow-sm flex items-center justify-center">
+                  <svg class="w-6 h-6 text-yellow-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 15L3 9m0 0l6-6M3 9h12a6 6 0 010 12h-3"/></svg>
+                </div>
+              </div>
+              <div class="p-4">
+                <h3 class="text-sm font-bold text-gray-900">Return Approved</h3>
+                <p class="text-[11px] text-gray-400 mt-1">Last edited: 20 Mar 2026</p>
+                <div class="flex items-center gap-2 mt-3">
+                  <button onclick="alert('Preview Return Approved template')" class="flex-1 px-3 py-1.5 text-xs font-medium text-gray-600 bg-gray-100 rounded-lg hover:bg-gray-200 transition text-center">Preview</button>
+                  <button onclick="alert('Edit Return Approved template')" class="flex-1 px-3 py-1.5 text-xs font-medium text-brand-600 bg-brand-50 rounded-lg hover:bg-brand-100 transition text-center">Edit Template</button>
+                </div>
+              </div>
+            </div>
+            <!-- Welcome Email -->
+            <div class="template-card border border-gray-200 rounded-xl overflow-hidden">
+              <div class="h-28 bg-gradient-to-br from-purple-50 to-purple-100 flex items-center justify-center">
+                <div class="w-12 h-12 rounded-xl bg-white shadow-sm flex items-center justify-center">
+                  <svg class="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0"/></svg>
+                </div>
+              </div>
+              <div class="p-4">
+                <h3 class="text-sm font-bold text-gray-900">Welcome Email</h3>
+                <p class="text-[11px] text-gray-400 mt-1">Last edited: 15 Mar 2026</p>
+                <div class="flex items-center gap-2 mt-3">
+                  <button onclick="alert('Preview Welcome Email template')" class="flex-1 px-3 py-1.5 text-xs font-medium text-gray-600 bg-gray-100 rounded-lg hover:bg-gray-200 transition text-center">Preview</button>
+                  <button onclick="alert('Edit Welcome Email template')" class="flex-1 px-3 py-1.5 text-xs font-medium text-brand-600 bg-brand-50 rounded-lg hover:bg-brand-100 transition text-center">Edit Template</button>
+                </div>
+              </div>
+            </div>
+            <!-- Password Reset -->
+            <div class="template-card border border-gray-200 rounded-xl overflow-hidden">
+              <div class="h-28 bg-gradient-to-br from-red-50 to-red-100 flex items-center justify-center">
+                <div class="w-12 h-12 rounded-xl bg-white shadow-sm flex items-center justify-center">
+                  <svg class="w-6 h-6 text-red-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z"/></svg>
+                </div>
+              </div>
+              <div class="p-4">
+                <h3 class="text-sm font-bold text-gray-900">Password Reset</h3>
+                <p class="text-[11px] text-gray-400 mt-1">Last edited: 10 Mar 2026</p>
+                <div class="flex items-center gap-2 mt-3">
+                  <button onclick="alert('Preview Password Reset template')" class="flex-1 px-3 py-1.5 text-xs font-medium text-gray-600 bg-gray-100 rounded-lg hover:bg-gray-200 transition text-center">Preview</button>
+                  <button onclick="alert('Edit Password Reset template')" class="flex-1 px-3 py-1.5 text-xs font-medium text-brand-600 bg-brand-50 rounded-lg hover:bg-brand-100 transition text-center">Edit Template</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== DELIVERY RULES SECTION ===== -->
+      <div class="bg-white rounded-xl border border-gray-200 shadow-sm section-card mb-6">
+        <div class="px-6 py-4 border-b border-gray-100 flex items-center gap-3">
+          <div class="w-9 h-9 rounded-lg bg-teal-100 flex items-center justify-center">
+            <svg class="w-4.5 h-4.5 text-teal-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M10.5 6h9.75M10.5 6a1.5 1.5 0 11-3 0m3 0a1.5 1.5 0 10-3 0M3.75 6H7.5m3 12h9.75m-9.75 0a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m-3.75 0H7.5m9-6h3.75m-3.75 0a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m-9.75 0h9.75"/></svg>
+          </div>
+          <div>
+            <h2 class="text-lg font-bold text-gray-900">Delivery Rules</h2>
+            <p class="text-sm text-gray-500 mt-0.5">Quiet hours, retry policies, throughput limits, and priority queues</p>
+          </div>
+        </div>
+        <div class="p-6 space-y-6">
+          <!-- Quiet Hours -->
+          <div class="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
+            <div>
+              <div class="flex items-center gap-3">
+                <span class="text-sm font-medium text-gray-700">Quiet Hours</span>
+                <span class="px-2 py-0.5 text-[10px] font-bold rounded-full bg-blue-100 text-blue-700">10:00 PM - 8:00 AM</span>
+              </div>
+              <p class="text-xs text-gray-400 mt-1">Non-critical notifications are held and delivered after quiet hours end. OTP and payment alerts bypass this rule.</p>
+            </div>
+            <button onclick="toggleSwitch(this)" class="relative inline-flex h-6 w-11 items-center rounded-full toggle-track bg-green-500 shrink-0 ml-4" data-on="true">
+              <span class="toggle-knob inline-block h-4 w-4 rounded-full bg-white shadow translate-x-6"></span>
+            </button>
+          </div>
+          <!-- Grid settings -->
+          <div class="grid grid-cols-3 gap-6">
+            <div>
+              <label class="text-sm font-medium text-gray-700 mb-1 block">Retry Failed Sends</label>
+              <div class="flex items-center gap-2">
+                <input type="number" value="3" class="w-full border border-gray-200 rounded-lg px-4 py-2.5 text-sm outline-none focus:border-brand-400 focus:ring-2 focus:ring-brand-100 transition">
+                <span class="text-sm text-gray-500 whitespace-nowrap">times</span>
+              </div>
+              <p class="text-xs text-gray-400 mt-1">Exponential backoff: 1min, 5min, 15min</p>
+            </div>
+            <div>
+              <label class="text-sm font-medium text-gray-700 mb-1 block">Batch Send Rate</label>
+              <div class="flex items-center gap-2">
+                <input type="number" value="1000" class="w-full border border-gray-200 rounded-lg px-4 py-2.5 text-sm outline-none focus:border-brand-400 focus:ring-2 focus:ring-brand-100 transition">
+                <span class="text-sm text-gray-500 whitespace-nowrap">/min</span>
+              </div>
+              <p class="text-xs text-gray-400 mt-1">Maximum notifications sent per minute for batch campaigns</p>
+            </div>
+            <div>
+              <label class="text-sm font-medium text-gray-700 mb-1 block">Priority Queue</label>
+              <select class="w-full border border-gray-200 rounded-lg px-4 py-2.5 text-sm outline-none focus:border-brand-400 focus:ring-2 focus:ring-brand-100 transition bg-white">
+                <option selected>OTP, Payment Alerts</option>
+              </select>
+              <p class="text-xs text-gray-400 mt-1">These events bypass rate limits and quiet hours</p>
+            </div>
+          </div>
+          <!-- Info banner -->
+          <div class="flex items-center gap-2 px-4 py-3 bg-blue-50 border border-blue-200 rounded-lg">
+            <svg class="w-4 h-4 text-blue-600 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M11.25 11.25l.041-.02a.75.75 0 011.063.852l-.708 2.836a.75.75 0 001.063.853l.041-.021M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9-3.75h.008v.008H12V8.25z"/></svg>
+            <p class="text-xs text-gray-600">Failed notifications after all retries are moved to the Dead Letter Queue (DLQ) for manual review. DLQ is monitored via CloudWatch alarms with 5-minute evaluation intervals.</p>
+          </div>
+        </div>
+      </div>
+
+    </main>
+  </div>
+
+<script>
+  /* ===== Toggle Switch ===== */
+  function toggleSwitch(btn) {
+    var isOn = btn.dataset.on === 'true';
+    if (isOn) {
+      btn.dataset.on = 'false';
+      btn.classList.remove('bg-green-500');
+      btn.classList.add('bg-gray-200');
+      btn.querySelector('.toggle-knob').classList.remove('translate-x-6');
+      btn.querySelector('.toggle-knob').classList.add('translate-x-1');
+    } else {
+      btn.dataset.on = 'true';
+      btn.classList.remove('bg-gray-200');
+      btn.classList.add('bg-green-500');
+      btn.querySelector('.toggle-knob').classList.remove('translate-x-1');
+      btn.querySelector('.toggle-knob').classList.add('translate-x-6');
+    }
+  }
+
+  /* ===== Matrix Toggle ===== */
+  function toggleMatrix(el) {
+    var isOn = el.dataset.on === 'true';
+    el.dataset.on = isOn ? 'false' : 'true';
+  }
+
+  /* ===== Email Provider Switcher ===== */
+  function switchEmailProvider(provider) {
+    document.getElementById('email-provider-smtp').classList.add('hidden');
+    document.getElementById('email-provider-sendgrid').classList.add('hidden');
+    document.getElementById('email-provider-ses').classList.add('hidden');
+    document.getElementById('email-provider-' + provider).classList.remove('hidden');
+  }
+
+  /* ===== Test Actions ===== */
+  function sendTestEmail() {
+    var btn = document.getElementById('test-email-btn');
+    var result = document.getElementById('test-email-result');
+    btn.disabled = true;
+    btn.innerHTML = '<span class="flex items-center gap-2"><svg class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>Sending...</span>';
+    setTimeout(function() {
+      btn.innerHTML = '<span class="flex items-center gap-2"><svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M6 12L3.269 3.126A59.768 59.768 0 0121.485 12 59.77 59.77 0 013.27 20.876L5.999 12zm0 0h7.5"/></svg>Send Test Email</span>';
+      btn.disabled = false;
+      result.classList.remove('hidden');
+      result.classList.add('flex');
+      setTimeout(function() { result.classList.add('hidden'); result.classList.remove('flex'); }, 5000);
+    }, 1500);
+  }
+
+  function sendTestSms() {
+    var btn = document.getElementById('test-sms-btn');
+    var result = document.getElementById('test-sms-result');
+    btn.disabled = true;
+    btn.innerHTML = '<span class="flex items-center gap-2"><svg class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>Sending...</span>';
+    setTimeout(function() {
+      btn.innerHTML = '<span class="flex items-center gap-2"><svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M6 12L3.269 3.126A59.768 59.768 0 0121.485 12 59.77 59.77 0 013.27 20.876L5.999 12zm0 0h7.5"/></svg>Send Test SMS</span>';
+      btn.disabled = false;
+      result.classList.remove('hidden');
+      result.classList.add('flex');
+      setTimeout(function() { result.classList.add('hidden'); result.classList.remove('flex'); }, 5000);
+    }, 1500);
+  }
+
+  function sendTestPush() {
+    var btn = document.getElementById('test-push-btn');
+    var result = document.getElementById('test-push-result');
+    btn.disabled = true;
+    btn.innerHTML = '<span class="flex items-center gap-2"><svg class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>Sending...</span>';
+    setTimeout(function() {
+      btn.innerHTML = '<span class="flex items-center gap-2"><svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M6 12L3.269 3.126A59.768 59.768 0 0121.485 12 59.77 59.77 0 013.27 20.876L5.999 12zm0 0h7.5"/></svg>Send Test Push</span>';
+      btn.disabled = false;
+      result.classList.remove('hidden');
+      result.classList.add('flex');
+      setTimeout(function() { result.classList.add('hidden'); result.classList.remove('flex'); }, 5000);
+    }, 1500);
+  }
+
+  /* ===== Save / Discard ===== */
+  function saveConfig() {
+    alert('Notification configuration saved successfully!');
+  }
+  function discardChanges() {
+    if (confirm('Discard all unsaved changes?')) location.reload();
+  }
+</script>
+
+<script src="../shared-layout.js"></script>
+<script>renderAdminLayout('settings', '../');</script>
+</body>
+</html>

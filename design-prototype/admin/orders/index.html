@@ -1,0 +1,1622 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HomeBase — Admin Orders</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              50: '#FFF7ED',
+              100: '#FFEDD5',
+              200: '#FED7AA',
+              300: '#FDBA74',
+              400: '#FB923C',
+              500: '#F97316',
+              600: '#EA580C',
+              700: '#C2410C',
+            },
+            navy: {
+              700: '#1E3A5F',
+              800: '#0F1F3D',
+              900: '#0A1628',
+            },
+            success: '#16A34A',
+            warning: '#EAB308',
+            danger: '#DC2626',
+          },
+          fontFamily: {
+            sans: ['Inter', 'system-ui', 'sans-serif'],
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+    .scrollbar-hide::-webkit-scrollbar { display: none; }
+    .sidebar-link { transition: all 0.15s ease; }
+    .sidebar-link:hover { background: rgba(255,255,255,0.08); }
+    .sidebar-link.active { background: rgba(249,115,22,0.15); border-right: 3px solid #F97316; }
+    .stat-card { transition: all 0.2s ease; }
+    .stat-card:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,0.08); }
+    .table-row { transition: background 0.15s ease; }
+    .table-row:hover { background: #FFF7ED; }
+    .dropdown-menu { display: none; }
+    .dropdown:hover .dropdown-menu { display: block; }
+    .filter-tab { transition: all 0.15s ease; }
+    .filter-tab:hover { color: #F97316; }
+    .filter-tab.active { color: #F97316; border-bottom-color: #F97316; }
+    .sidebar-scroll::-webkit-scrollbar { width: 4px; }
+    .sidebar-scroll::-webkit-scrollbar-track { background: transparent; }
+    .sidebar-scroll::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); border-radius: 2px; }
+    .bulk-toolbar { transform: translateY(8px); opacity: 0; transition: all 0.2s ease; }
+    .bulk-toolbar.visible { transform: translateY(0); opacity: 1; }
+    .filter-sidebar { transition: width 0.25s ease, opacity 0.2s ease; }
+    .sla-pulse { animation: slaPulse 2s ease-in-out infinite; }
+    @keyframes slaPulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.6; } }
+    .filter-section-toggle { cursor: pointer; user-select: none; }
+    .filter-section-body { max-height: 0; overflow: hidden; transition: max-height 0.25s ease; }
+    .filter-section-body.open { max-height: 400px; }
+    .table-row.selected { background: #FFF7ED; }
+  </style>
+</head>
+<body class="font-sans bg-gray-50 text-gray-900">
+
+  <!-- ===== TOP HEADER BAR ===== -->
+  <header id="admin-header" class="fixed top-0 left-0 right-0 z-50 bg-white border-b border-gray-200 h-16"></header>
+
+  <!-- ===== LAYOUT: SIDEBAR + MAIN ===== -->
+  <div class="flex pt-16 min-h-screen">
+
+    <!-- ===== LEFT SIDEBAR ===== -->
+    <aside id="admin-sidebar" class="fixed left-0 top-16 bottom-0 w-60 z-40 flex flex-col overflow-y-auto" style="background:#0A1628;"></aside>
+
+    <!-- ===== MAIN CONTENT ===== -->
+    <main class="flex-1 ml-60 p-8">
+
+      <!-- Page Title -->
+      <div class="flex items-center justify-between mb-8">
+        <div>
+          <h1 class="text-2xl font-bold text-navy-900">Order Management</h1>
+          <p class="text-sm text-gray-500 mt-1">Monitor and manage all platform orders across sellers</p>
+        </div>
+        <div class="flex items-center gap-3">
+          <button onclick="toggleFilterSidebar()" class="flex items-center gap-2 bg-white border border-gray-200 text-gray-700 text-sm font-medium px-4 py-2.5 rounded-lg hover:bg-gray-50 transition" id="filterSidebarToggle">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M12 3c2.755 0 5.455.232 8.083.678.533.09.917.556.917 1.096v1.044a2.25 2.25 0 01-.659 1.591l-5.432 5.432a2.25 2.25 0 00-.659 1.591v2.927a2.25 2.25 0 01-1.244 2.013L9.75 21v-6.568a2.25 2.25 0 00-.659-1.591L3.659 7.409A2.25 2.25 0 013 5.818V4.774c0-.54.384-1.006.917-1.096A48.32 48.32 0 0112 3z"/></svg>
+            Advanced Filters
+          </button>
+          <button class="flex items-center gap-2 bg-white border border-gray-200 text-gray-700 text-sm font-medium px-4 py-2.5 rounded-lg hover:bg-gray-50 transition">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3"/></svg>
+            Export CSV
+          </button>
+          <button class="flex items-center gap-2 bg-brand-500 hover:bg-brand-600 text-white text-sm font-medium px-4 py-2.5 rounded-lg transition">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M12 4.5v15m7.5-7.5h-15"/></svg>
+            Create Order
+          </button>
+        </div>
+      </div>
+
+      <!-- Sub-page Navigation -->
+      <div class="flex items-center gap-2 mb-6">
+        <span class="text-xs text-gray-400">Related:</span>
+        <a href="disputes.html" class="text-xs text-brand-500 bg-brand-50 px-3 py-1 rounded-full hover:bg-brand-100 transition">Disputes</a>
+      </div>
+
+      <!-- ===== STATS CARDS (now 8 cards) ===== -->
+      <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-8 gap-4 mb-6">
+        <!-- Total Orders -->
+        <div class="stat-card bg-white rounded-xl p-4 border border-gray-100 shadow-sm">
+          <div class="flex items-center justify-between mb-3">
+            <div class="w-10 h-10 rounded-lg bg-brand-50 flex items-center justify-center">
+              <svg class="w-5 h-5 text-brand-500" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M15.75 10.5V6a3.75 3.75 0 10-7.5 0v4.5m11.356-1.993l1.263 12c.07.665-.45 1.243-1.119 1.243H4.25a1.125 1.125 0 01-1.12-1.243l1.264-12A1.125 1.125 0 015.513 7.5h12.974c.576 0 1.059.435 1.119 1.007zM8.625 10.5a.375.375 0 11-.75 0 .375.375 0 01.75 0zm7.5 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z"/></svg>
+            </div>
+            <span class="text-[10px] font-semibold text-green-600 bg-green-50 px-1.5 py-0.5 rounded-full">+12.5%</span>
+          </div>
+          <p class="text-2xl font-bold text-navy-900">12,450</p>
+          <p class="text-xs text-gray-500 mt-0.5">Total Orders</p>
+        </div>
+        <!-- Pending -->
+        <div class="stat-card bg-white rounded-xl p-4 border border-gray-100 shadow-sm">
+          <div class="flex items-center justify-between mb-3">
+            <div class="w-10 h-10 rounded-lg bg-yellow-50 flex items-center justify-center">
+              <svg class="w-5 h-5 text-yellow-500" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+            </div>
+            <span class="text-[10px] font-semibold text-red-600 bg-red-50 px-1.5 py-0.5 rounded-full">+8.2%</span>
+          </div>
+          <p class="text-2xl font-bold text-navy-900">234</p>
+          <p class="text-xs text-gray-500 mt-0.5">Pending</p>
+        </div>
+        <!-- Processing -->
+        <div class="stat-card bg-white rounded-xl p-4 border border-gray-100 shadow-sm">
+          <div class="flex items-center justify-between mb-3">
+            <div class="w-10 h-10 rounded-lg bg-blue-50 flex items-center justify-center">
+              <svg class="w-5 h-5 text-blue-500" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182"/></svg>
+            </div>
+            <span class="text-[10px] font-semibold text-green-600 bg-green-50 px-1.5 py-0.5 rounded-full">-3.1%</span>
+          </div>
+          <p class="text-2xl font-bold text-navy-900">567</p>
+          <p class="text-xs text-gray-500 mt-0.5">Processing</p>
+        </div>
+        <!-- Shipped -->
+        <div class="stat-card bg-white rounded-xl p-4 border border-gray-100 shadow-sm">
+          <div class="flex items-center justify-between mb-3">
+            <div class="w-10 h-10 rounded-lg bg-purple-50 flex items-center justify-center">
+              <svg class="w-5 h-5 text-purple-500" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M8.25 18.75a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m3 0h6m-9 0H3.375a1.125 1.125 0 01-1.125-1.125V14.25m17.25 4.5a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m3 0h1.125c.621 0 1.129-.504 1.09-1.124a17.902 17.902 0 00-3.213-9.193 2.056 2.056 0 00-1.58-.86H14.25M16.5 18.75h-2.25m0-11.177v-.958c0-.568-.422-1.048-.987-1.106a48.554 48.554 0 00-10.026 0 1.106 1.106 0 00-.987 1.106v7.635m12-6.677v6.677m0 4.5v-4.5m0 0h-12"/></svg>
+            </div>
+            <span class="text-[10px] font-semibold text-green-600 bg-green-50 px-1.5 py-0.5 rounded-full">+5.7%</span>
+          </div>
+          <p class="text-2xl font-bold text-navy-900">1,890</p>
+          <p class="text-xs text-gray-500 mt-0.5">Shipped</p>
+        </div>
+        <!-- Delivered -->
+        <div class="stat-card bg-white rounded-xl p-4 border border-gray-100 shadow-sm">
+          <div class="flex items-center justify-between mb-3">
+            <div class="w-10 h-10 rounded-lg bg-green-50 flex items-center justify-center">
+              <svg class="w-5 h-5 text-green-500" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+            </div>
+            <span class="text-[10px] font-semibold text-green-600 bg-green-50 px-1.5 py-0.5 rounded-full">+15.3%</span>
+          </div>
+          <p class="text-2xl font-bold text-navy-900">9,200</p>
+          <p class="text-xs text-gray-500 mt-0.5">Delivered</p>
+        </div>
+        <!-- Cancelled -->
+        <div class="stat-card bg-white rounded-xl p-4 border border-gray-100 shadow-sm">
+          <div class="flex items-center justify-between mb-3">
+            <div class="w-10 h-10 rounded-lg bg-red-50 flex items-center justify-center">
+              <svg class="w-5 h-5 text-red-500" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M9.75 9.75l4.5 4.5m0-4.5l-4.5 4.5M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+            </div>
+            <span class="text-[10px] font-semibold text-red-600 bg-red-50 px-1.5 py-0.5 rounded-full">+2.1%</span>
+          </div>
+          <p class="text-2xl font-bold text-navy-900">559</p>
+          <p class="text-xs text-gray-500 mt-0.5">Cancelled</p>
+        </div>
+        <!-- SLA Breaches (NEW) -->
+        <div class="stat-card bg-white rounded-xl p-4 border border-red-200 shadow-sm">
+          <div class="flex items-center justify-between mb-3">
+            <div class="w-10 h-10 rounded-lg bg-red-50 flex items-center justify-center">
+              <svg class="w-5 h-5 text-red-600 sla-pulse" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z"/></svg>
+            </div>
+            <span class="text-[10px] font-semibold text-red-600 bg-red-50 px-1.5 py-0.5 rounded-full">Critical</span>
+          </div>
+          <p class="text-2xl font-bold text-red-600">12</p>
+          <p class="text-xs text-gray-500 mt-0.5">SLA Breaches</p>
+        </div>
+        <!-- High Value Orders (NEW) -->
+        <div class="stat-card bg-white rounded-xl p-4 border border-amber-200 shadow-sm">
+          <div class="flex items-center justify-between mb-3">
+            <div class="w-10 h-10 rounded-lg bg-amber-50 flex items-center justify-center">
+              <svg class="w-5 h-5 text-amber-500" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M11.48 3.499a.562.562 0 011.04 0l2.125 5.111a.563.563 0 00.475.345l5.518.442c.499.04.701.663.321.988l-4.204 3.602a.563.563 0 00-.182.557l1.285 5.385a.562.562 0 01-.84.61l-4.725-2.885a.563.563 0 00-.586 0L6.982 20.54a.562.562 0 01-.84-.61l1.285-5.386a.562.562 0 00-.182-.557l-4.204-3.602a.563.563 0 01.321-.988l5.518-.442a.563.563 0 00.475-.345L11.48 3.5z"/></svg>
+            </div>
+            <span class="text-[10px] font-semibold text-amber-600 bg-amber-50 px-1.5 py-0.5 rounded-full">&#8377;10K+</span>
+          </div>
+          <p class="text-2xl font-bold text-amber-600">34</p>
+          <p class="text-xs text-gray-500 mt-0.5">High Value Orders</p>
+        </div>
+      </div>
+
+      <!-- ===== SMART RECOMMENDATIONS WIDGET (NEW) ===== -->
+      <div id="smartRecommendation" class="mb-6 bg-gradient-to-r from-amber-50 to-orange-50 rounded-xl border border-amber-200 px-5 py-3.5 flex items-center justify-between">
+        <div class="flex items-center gap-3">
+          <div class="w-9 h-9 rounded-lg bg-amber-100 flex items-center justify-center shrink-0">
+            <svg class="w-5 h-5 text-amber-600" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M12 18v-5.25m0 0a6.01 6.01 0 001.5-.189m-1.5.189a6.01 6.01 0 01-1.5-.189m3.75 7.478a12.06 12.06 0 01-4.5 0m3.75 2.383a14.406 14.406 0 01-3 0M14.25 18v-.192c0-.983.658-1.823 1.508-2.316a7.5 7.5 0 10-7.517 0c.85.493 1.509 1.333 1.509 2.316V18"/></svg>
+          </div>
+          <div>
+            <p class="text-sm font-semibold text-amber-800">14 orders pending >4hrs -- take action</p>
+            <p class="text-xs text-amber-600 mt-0.5">These orders risk breaching SLA. Auto-assign to available fulfillment centers to maintain delivery promise.</p>
+          </div>
+        </div>
+        <div class="flex items-center gap-2 shrink-0">
+          <a href="#" onclick="alert('Navigating to pending orders >4hrs...');return false;" class="text-sm font-semibold text-amber-700 hover:text-amber-900 bg-amber-100 hover:bg-amber-200 px-4 py-2 rounded-lg transition">Review Now</a>
+          <button onclick="document.getElementById('smartRecommendation').style.display='none'" class="p-1.5 text-amber-400 hover:text-amber-600 rounded-lg transition" title="Dismiss">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M6 18L18 6M6 6l12 12"/></svg>
+          </button>
+        </div>
+      </div>
+
+      <!-- ===== CONTENT AREA WITH OPTIONAL FILTER SIDEBAR ===== -->
+      <div class="flex gap-6">
+
+        <!-- ===== ADVANCED FILTERS SIDEBAR (NEW) ===== -->
+        <div id="filterSidebar" class="filter-sidebar hidden w-0 opacity-0 shrink-0">
+          <div class="bg-white rounded-xl border border-gray-100 shadow-sm w-64 sticky top-24">
+            <div class="px-4 py-3.5 border-b border-gray-100 flex items-center justify-between">
+              <h3 class="text-sm font-bold text-gray-800">Advanced Filters</h3>
+              <button onclick="toggleFilterSidebar()" class="p-1 text-gray-400 hover:text-gray-600 rounded transition">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M6 18L18 6M6 6l12 12"/></svg>
+              </button>
+            </div>
+            <div class="p-4 space-y-1 max-h-[calc(100vh-200px)] overflow-y-auto">
+
+              <!-- Payment Method -->
+              <div class="border-b border-gray-50 pb-3">
+                <div class="filter-section-toggle flex items-center justify-between py-2" onclick="toggleFilterSection(this)">
+                  <span class="text-xs font-semibold text-gray-600 uppercase tracking-wider">Payment Method</span>
+                  <svg class="w-3.5 h-3.5 text-gray-400 transition-transform filter-chevron" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M19.5 8.25l-7.5 7.5-7.5-7.5"/></svg>
+                </div>
+                <div class="filter-section-body open space-y-2 mt-1">
+                  <label class="flex items-center gap-2.5 cursor-pointer group">
+                    <input type="checkbox" class="w-3.5 h-3.5 rounded border-gray-300 text-brand-500 focus:ring-brand-400" data-filter="payment" value="UPI">
+                    <svg class="w-4 h-4 text-green-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M10.5 1.5H8.25A2.25 2.25 0 006 3.75v16.5a2.25 2.25 0 002.25 2.25h7.5A2.25 2.25 0 0018 20.25V3.75a2.25 2.25 0 00-2.25-2.25H13.5m-3 0V3h3V1.5m-3 0h3m-3 18.75h3"/></svg>
+                    <span class="text-sm text-gray-700 group-hover:text-gray-900">UPI</span>
+                    <span class="ml-auto text-[10px] text-gray-400">4,230</span>
+                  </label>
+                  <label class="flex items-center gap-2.5 cursor-pointer group">
+                    <input type="checkbox" class="w-3.5 h-3.5 rounded border-gray-300 text-brand-500 focus:ring-brand-400" data-filter="payment" value="Card">
+                    <svg class="w-4 h-4 text-blue-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M2.25 8.25h19.5M2.25 9h19.5m-16.5 5.25h6m-6 2.25h3m-3.75 3h15a2.25 2.25 0 002.25-2.25V6.75A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25v10.5A2.25 2.25 0 004.5 19.5z"/></svg>
+                    <span class="text-sm text-gray-700 group-hover:text-gray-900">Card</span>
+                    <span class="ml-auto text-[10px] text-gray-400">5,120</span>
+                  </label>
+                  <label class="flex items-center gap-2.5 cursor-pointer group">
+                    <input type="checkbox" class="w-3.5 h-3.5 rounded border-gray-300 text-brand-500 focus:ring-brand-400" data-filter="payment" value="COD">
+                    <svg class="w-4 h-4 text-amber-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M2.25 18.75a60.07 60.07 0 0115.797 2.101c.727.198 1.453-.342 1.453-1.096V18.75M3.75 4.5v.75A.75.75 0 013 6h-.75m0 0v-.375c0-.621.504-1.125 1.125-1.125H20.25M2.25 6v9m18-10.5v.75c0 .414.336.75.75.75h.75m-1.5-1.5h.375c.621 0 1.125.504 1.125 1.125v9.75c0 .621-.504 1.125-1.125 1.125h-.375m1.5-1.5H21a.75.75 0 00-.75.75v.75m0 0H3.75m0 0h-.375a1.125 1.125 0 01-1.125-1.125V15m1.5 1.5v-.75A.75.75 0 003 15h-.75M15 10.5a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                    <span class="text-sm text-gray-700 group-hover:text-gray-900">COD</span>
+                    <span class="ml-auto text-[10px] text-gray-400">2,340</span>
+                  </label>
+                  <label class="flex items-center gap-2.5 cursor-pointer group">
+                    <input type="checkbox" class="w-3.5 h-3.5 rounded border-gray-300 text-brand-500 focus:ring-brand-400" data-filter="payment" value="Wallet">
+                    <svg class="w-4 h-4 text-purple-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 12a2.25 2.25 0 00-2.25-2.25H15a3 3 0 110-6h.75A2.25 2.25 0 0118 6v.75m-3 0a3 3 0 110-6M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5"/></svg>
+                    <span class="text-sm text-gray-700 group-hover:text-gray-900">Wallet</span>
+                    <span class="ml-auto text-[10px] text-gray-400">760</span>
+                  </label>
+                </div>
+              </div>
+
+              <!-- Region -->
+              <div class="border-b border-gray-50 pb-3">
+                <div class="filter-section-toggle flex items-center justify-between py-2" onclick="toggleFilterSection(this)">
+                  <span class="text-xs font-semibold text-gray-600 uppercase tracking-wider">Region</span>
+                  <svg class="w-3.5 h-3.5 text-gray-400 transition-transform filter-chevron" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M19.5 8.25l-7.5 7.5-7.5-7.5"/></svg>
+                </div>
+                <div class="filter-section-body open space-y-2 mt-1">
+                  <label class="flex items-center gap-2.5 cursor-pointer group">
+                    <input type="checkbox" class="w-3.5 h-3.5 rounded border-gray-300 text-brand-500 focus:ring-brand-400" data-filter="region" value="Maharashtra">
+                    <span class="text-sm text-gray-700 group-hover:text-gray-900">Maharashtra</span>
+                    <span class="ml-auto text-[10px] text-gray-400">3,450</span>
+                  </label>
+                  <label class="flex items-center gap-2.5 cursor-pointer group">
+                    <input type="checkbox" class="w-3.5 h-3.5 rounded border-gray-300 text-brand-500 focus:ring-brand-400" data-filter="region" value="Karnataka">
+                    <span class="text-sm text-gray-700 group-hover:text-gray-900">Karnataka</span>
+                    <span class="ml-auto text-[10px] text-gray-400">2,890</span>
+                  </label>
+                  <label class="flex items-center gap-2.5 cursor-pointer group">
+                    <input type="checkbox" class="w-3.5 h-3.5 rounded border-gray-300 text-brand-500 focus:ring-brand-400" data-filter="region" value="Delhi NCR">
+                    <span class="text-sm text-gray-700 group-hover:text-gray-900">Delhi NCR</span>
+                    <span class="ml-auto text-[10px] text-gray-400">2,130</span>
+                  </label>
+                  <label class="flex items-center gap-2.5 cursor-pointer group">
+                    <input type="checkbox" class="w-3.5 h-3.5 rounded border-gray-300 text-brand-500 focus:ring-brand-400" data-filter="region" value="Tamil Nadu">
+                    <span class="text-sm text-gray-700 group-hover:text-gray-900">Tamil Nadu</span>
+                    <span class="ml-auto text-[10px] text-gray-400">1,980</span>
+                  </label>
+                  <label class="flex items-center gap-2.5 cursor-pointer group">
+                    <input type="checkbox" class="w-3.5 h-3.5 rounded border-gray-300 text-brand-500 focus:ring-brand-400" data-filter="region" value="Gujarat">
+                    <span class="text-sm text-gray-700 group-hover:text-gray-900">Gujarat</span>
+                    <span class="ml-auto text-[10px] text-gray-400">1,200</span>
+                  </label>
+                  <label class="flex items-center gap-2.5 cursor-pointer group">
+                    <input type="checkbox" class="w-3.5 h-3.5 rounded border-gray-300 text-brand-500 focus:ring-brand-400" data-filter="region" value="West Bengal">
+                    <span class="text-sm text-gray-700 group-hover:text-gray-900">West Bengal</span>
+                    <span class="ml-auto text-[10px] text-gray-400">800</span>
+                  </label>
+                </div>
+              </div>
+
+              <!-- Order Value Range -->
+              <div class="border-b border-gray-50 pb-3">
+                <div class="filter-section-toggle flex items-center justify-between py-2" onclick="toggleFilterSection(this)">
+                  <span class="text-xs font-semibold text-gray-600 uppercase tracking-wider">Order Value</span>
+                  <svg class="w-3.5 h-3.5 text-gray-400 transition-transform filter-chevron" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M19.5 8.25l-7.5 7.5-7.5-7.5"/></svg>
+                </div>
+                <div class="filter-section-body open space-y-2 mt-1">
+                  <label class="flex items-center gap-2.5 cursor-pointer group">
+                    <input type="radio" name="orderValue" class="w-3.5 h-3.5 border-gray-300 text-brand-500 focus:ring-brand-400" data-filter="value" value="0-500">
+                    <span class="text-sm text-gray-700 group-hover:text-gray-900">&#8377;0 - &#8377;500</span>
+                    <span class="ml-auto text-[10px] text-gray-400">1,230</span>
+                  </label>
+                  <label class="flex items-center gap-2.5 cursor-pointer group">
+                    <input type="radio" name="orderValue" class="w-3.5 h-3.5 border-gray-300 text-brand-500 focus:ring-brand-400" data-filter="value" value="500-2000">
+                    <span class="text-sm text-gray-700 group-hover:text-gray-900">&#8377;500 - &#8377;2,000</span>
+                    <span class="ml-auto text-[10px] text-gray-400">3,450</span>
+                  </label>
+                  <label class="flex items-center gap-2.5 cursor-pointer group">
+                    <input type="radio" name="orderValue" class="w-3.5 h-3.5 border-gray-300 text-brand-500 focus:ring-brand-400" data-filter="value" value="2000-5000">
+                    <span class="text-sm text-gray-700 group-hover:text-gray-900">&#8377;2,000 - &#8377;5,000</span>
+                    <span class="ml-auto text-[10px] text-gray-400">4,120</span>
+                  </label>
+                  <label class="flex items-center gap-2.5 cursor-pointer group">
+                    <input type="radio" name="orderValue" class="w-3.5 h-3.5 border-gray-300 text-brand-500 focus:ring-brand-400" data-filter="value" value="5000+">
+                    <span class="text-sm text-gray-700 group-hover:text-gray-900">&#8377;5,000+</span>
+                    <span class="ml-auto text-[10px] text-gray-400">3,650</span>
+                  </label>
+                </div>
+              </div>
+
+              <!-- Carrier -->
+              <div class="border-b border-gray-50 pb-3">
+                <div class="filter-section-toggle flex items-center justify-between py-2" onclick="toggleFilterSection(this)">
+                  <span class="text-xs font-semibold text-gray-600 uppercase tracking-wider">Carrier</span>
+                  <svg class="w-3.5 h-3.5 text-gray-400 transition-transform filter-chevron" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M19.5 8.25l-7.5 7.5-7.5-7.5"/></svg>
+                </div>
+                <div class="filter-section-body open space-y-2 mt-1">
+                  <label class="flex items-center gap-2.5 cursor-pointer group">
+                    <input type="checkbox" class="w-3.5 h-3.5 rounded border-gray-300 text-brand-500 focus:ring-brand-400" data-filter="carrier" value="Delhivery">
+                    <span class="text-sm text-gray-700 group-hover:text-gray-900">Delhivery</span>
+                    <span class="ml-auto text-[10px] text-gray-400">4,800</span>
+                  </label>
+                  <label class="flex items-center gap-2.5 cursor-pointer group">
+                    <input type="checkbox" class="w-3.5 h-3.5 rounded border-gray-300 text-brand-500 focus:ring-brand-400" data-filter="carrier" value="BlueDart">
+                    <span class="text-sm text-gray-700 group-hover:text-gray-900">BlueDart</span>
+                    <span class="ml-auto text-[10px] text-gray-400">3,200</span>
+                  </label>
+                  <label class="flex items-center gap-2.5 cursor-pointer group">
+                    <input type="checkbox" class="w-3.5 h-3.5 rounded border-gray-300 text-brand-500 focus:ring-brand-400" data-filter="carrier" value="DTDC">
+                    <span class="text-sm text-gray-700 group-hover:text-gray-900">DTDC</span>
+                    <span class="ml-auto text-[10px] text-gray-400">2,100</span>
+                  </label>
+                  <label class="flex items-center gap-2.5 cursor-pointer group">
+                    <input type="checkbox" class="w-3.5 h-3.5 rounded border-gray-300 text-brand-500 focus:ring-brand-400" data-filter="carrier" value="Ecom Express">
+                    <span class="text-sm text-gray-700 group-hover:text-gray-900">Ecom Express</span>
+                    <span class="ml-auto text-[10px] text-gray-400">1,550</span>
+                  </label>
+                  <label class="flex items-center gap-2.5 cursor-pointer group">
+                    <input type="checkbox" class="w-3.5 h-3.5 rounded border-gray-300 text-brand-500 focus:ring-brand-400" data-filter="carrier" value="India Post">
+                    <span class="text-sm text-gray-700 group-hover:text-gray-900">India Post</span>
+                    <span class="ml-auto text-[10px] text-gray-400">800</span>
+                  </label>
+                </div>
+              </div>
+
+              <!-- Delivery SLA Status -->
+              <div class="pb-2">
+                <div class="filter-section-toggle flex items-center justify-between py-2" onclick="toggleFilterSection(this)">
+                  <span class="text-xs font-semibold text-gray-600 uppercase tracking-wider">Delivery SLA</span>
+                  <svg class="w-3.5 h-3.5 text-gray-400 transition-transform filter-chevron" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M19.5 8.25l-7.5 7.5-7.5-7.5"/></svg>
+                </div>
+                <div class="filter-section-body open space-y-2 mt-1">
+                  <label class="flex items-center gap-2.5 cursor-pointer group">
+                    <input type="checkbox" class="w-3.5 h-3.5 rounded border-gray-300 text-brand-500 focus:ring-brand-400" data-filter="sla" value="On Track">
+                    <span class="w-2 h-2 rounded-full bg-green-500"></span>
+                    <span class="text-sm text-gray-700 group-hover:text-gray-900">On Track</span>
+                    <span class="ml-auto text-[10px] text-gray-400">8,920</span>
+                  </label>
+                  <label class="flex items-center gap-2.5 cursor-pointer group">
+                    <input type="checkbox" class="w-3.5 h-3.5 rounded border-gray-300 text-brand-500 focus:ring-brand-400" data-filter="sla" value="At Risk">
+                    <span class="w-2 h-2 rounded-full bg-yellow-500"></span>
+                    <span class="text-sm text-gray-700 group-hover:text-gray-900">At Risk</span>
+                    <span class="ml-auto text-[10px] text-gray-400">2,340</span>
+                  </label>
+                  <label class="flex items-center gap-2.5 cursor-pointer group">
+                    <input type="checkbox" class="w-3.5 h-3.5 rounded border-gray-300 text-brand-500 focus:ring-brand-400" data-filter="sla" value="Breached">
+                    <span class="w-2 h-2 rounded-full bg-red-500"></span>
+                    <span class="text-sm text-gray-700 group-hover:text-gray-900">Breached</span>
+                    <span class="ml-auto text-[10px] text-gray-400">1,190</span>
+                  </label>
+                </div>
+              </div>
+
+              <!-- Apply / Reset -->
+              <div class="pt-3 flex items-center gap-2">
+                <button onclick="applyAdvancedFilters()" class="flex-1 bg-brand-500 hover:bg-brand-600 text-white text-sm font-medium py-2 rounded-lg transition">Apply</button>
+                <button onclick="resetAdvancedFilters()" class="flex-1 bg-white border border-gray-200 text-gray-600 hover:bg-gray-50 text-sm font-medium py-2 rounded-lg transition">Reset</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ===== TABLE + FILTERS COLUMN ===== -->
+        <div class="flex-1 min-w-0">
+
+      <!-- ===== FILTERS & SEARCH ===== -->
+      <div class="bg-white rounded-xl border border-gray-100 shadow-sm mb-6">
+        <!-- Filter Tabs -->
+        <div class="border-b border-gray-100 px-6">
+          <div class="flex items-center gap-0 overflow-x-auto scrollbar-hide">
+            <button class="filter-tab active px-4 py-3.5 text-sm font-medium border-b-2 border-brand-500 text-brand-500 whitespace-nowrap">All Orders <span class="text-gray-400 font-normal">(12,450)</span></button>
+            <button class="filter-tab px-4 py-3.5 text-sm font-medium border-b-2 border-transparent text-gray-500 whitespace-nowrap">Pending <span class="text-gray-400 font-normal">(234)</span></button>
+            <button class="filter-tab px-4 py-3.5 text-sm font-medium border-b-2 border-transparent text-gray-500 whitespace-nowrap">Processing <span class="text-gray-400 font-normal">(567)</span></button>
+            <button class="filter-tab px-4 py-3.5 text-sm font-medium border-b-2 border-transparent text-gray-500 whitespace-nowrap">Shipped <span class="text-gray-400 font-normal">(1,890)</span></button>
+            <button class="filter-tab px-4 py-3.5 text-sm font-medium border-b-2 border-transparent text-gray-500 whitespace-nowrap">Delivered <span class="text-gray-400 font-normal">(9,200)</span></button>
+            <button class="filter-tab px-4 py-3.5 text-sm font-medium border-b-2 border-transparent text-gray-500 whitespace-nowrap">Cancelled <span class="text-gray-400 font-normal">(559)</span></button>
+            <button class="filter-tab px-4 py-3.5 text-sm font-medium border-b-2 border-transparent text-gray-500 whitespace-nowrap">Disputes <span class="bg-red-100 text-red-600 text-[10px] font-bold px-1.5 py-0.5 rounded-full ml-1">8</span></button>
+          </div>
+        </div>
+
+        <!-- Search & Filters Row -->
+        <div class="px-6 py-4 flex flex-wrap items-center gap-3">
+          <!-- Search -->
+          <div class="relative flex-1 min-w-[220px]">
+            <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+            <input type="text" placeholder="Search by Order ID, customer name, or product..." class="w-full bg-gray-50 border border-gray-200 rounded-lg py-2.5 pl-10 pr-4 text-sm outline-none focus:border-brand-400 focus:ring-2 focus:ring-brand-100 transition">
+          </div>
+          <!-- Date From -->
+          <div class="relative">
+            <input type="date" value="2026-03-01" class="bg-gray-50 border border-gray-200 rounded-lg py-2.5 px-3 text-sm text-gray-600 outline-none focus:border-brand-400 focus:ring-2 focus:ring-brand-100 transition cursor-pointer">
+          </div>
+          <span class="text-gray-400 text-sm">to</span>
+          <!-- Date To -->
+          <div class="relative">
+            <input type="date" value="2026-03-28" class="bg-gray-50 border border-gray-200 rounded-lg py-2.5 px-3 text-sm text-gray-600 outline-none focus:border-brand-400 focus:ring-2 focus:ring-brand-100 transition cursor-pointer">
+          </div>
+          <!-- Seller Filter -->
+          <select class="bg-gray-50 border border-gray-200 rounded-lg py-2.5 px-3 pr-8 text-sm text-gray-600 outline-none focus:border-brand-400 focus:ring-2 focus:ring-brand-100 transition cursor-pointer appearance-none" style="background-image: url('data:image/svg+xml;charset=UTF-8,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%2212%22 height=%2212%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22%239CA3AF%22 stroke-width=%222%22%3E%3Cpath d=%22M19.5 8.25l-7.5 7.5-7.5-7.5%22/%3E%3C/svg%3E'); background-repeat: no-repeat; background-position: right 10px center;">
+            <option value="">All Sellers</option>
+            <option value="rajesh">Rajesh Store</option>
+            <option value="priya">Priya Electronics</option>
+            <option value="kumar">Kumar Fashions</option>
+            <option value="anita">Anita Home Decor</option>
+            <option value="vikram">Vikram Sports</option>
+            <option value="meera">Meera Beauty</option>
+          </select>
+          <!-- Clear Filters -->
+          <button class="text-sm text-gray-500 hover:text-brand-500 font-medium transition whitespace-nowrap">Clear Filters</button>
+        </div>
+      </div>
+
+      <!-- ===== BULK ACTIONS TOOLBAR (NEW) ===== -->
+      <div id="bulkToolbar" class="bulk-toolbar mb-4 hidden">
+        <div class="bg-brand-50 border border-brand-200 rounded-xl px-5 py-3 flex items-center justify-between">
+          <div class="flex items-center gap-3">
+            <div class="flex items-center gap-2">
+              <div class="w-6 h-6 rounded-full bg-brand-500 flex items-center justify-center">
+                <span id="bulkCount" class="text-xs font-bold text-white">0</span>
+              </div>
+              <span class="text-sm font-medium text-brand-700"><span id="bulkCountText">0</span> orders selected</span>
+            </div>
+            <span class="text-gray-300">|</span>
+            <button onclick="bulkAction('ship')" class="flex items-center gap-1.5 text-sm font-medium text-gray-700 hover:text-brand-600 bg-white border border-gray-200 px-3 py-1.5 rounded-lg hover:border-brand-300 transition">
+              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M8.25 18.75a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m3 0h6m-9 0H3.375a1.125 1.125 0 01-1.125-1.125V14.25m17.25 4.5a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m3 0h1.125c.621 0 1.129-.504 1.09-1.124a17.902 17.902 0 00-3.213-9.193 2.056 2.056 0 00-1.58-.86H14.25M16.5 18.75h-2.25m0-11.177v-.958c0-.568-.422-1.048-.987-1.106a48.554 48.554 0 00-10.026 0 1.106 1.106 0 00-.987 1.106v7.635m12-6.677v6.677m0 4.5v-4.5m0 0h-12"/></svg>
+              Mark Shipped (<span class="bulk-action-count">0</span>)
+            </button>
+            <button onclick="bulkAction('labels')" class="flex items-center gap-1.5 text-sm font-medium text-gray-700 hover:text-brand-600 bg-white border border-gray-200 px-3 py-1.5 rounded-lg hover:border-brand-300 transition">
+              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M6.72 13.829c-.24.03-.48.062-.72.096m.72-.096a42.415 42.415 0 0110.56 0m-10.56 0L6.34 18m10.94-4.171c.24.03.48.062.72.096m-.72-.096L17.66 18m0 0l.229 2.523a1.125 1.125 0 01-1.12 1.227H7.231c-.662 0-1.18-.568-1.12-1.227L6.34 18m11.318 0h1.091A2.25 2.25 0 0021 15.75V9.456c0-1.081-.768-2.015-1.837-2.175a48.055 48.055 0 00-1.913-.247M6.34 18H5.25A2.25 2.25 0 013 15.75V9.456c0-1.081.768-2.015 1.837-2.175a48.041 48.041 0 011.913-.247m10.5 0a48.536 48.536 0 00-10.5 0m10.5 0V3.375c0-.621-.504-1.125-1.125-1.125h-8.25c-.621 0-1.125.504-1.125 1.125v3.659M18 10.5h.008v.008H18V10.5zm-3 0h.008v.008H15V10.5z"/></svg>
+              Generate Labels
+            </button>
+            <button onclick="bulkAction('export')" class="flex items-center gap-1.5 text-sm font-medium text-gray-700 hover:text-brand-600 bg-white border border-gray-200 px-3 py-1.5 rounded-lg hover:border-brand-300 transition">
+              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3"/></svg>
+              Export Selected
+            </button>
+            <button onclick="bulkAction('cancel')" class="flex items-center gap-1.5 text-sm font-medium text-red-600 hover:text-red-700 bg-white border border-red-200 px-3 py-1.5 rounded-lg hover:border-red-300 hover:bg-red-50 transition">
+              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"/></svg>
+              Cancel Selected
+            </button>
+          </div>
+          <button onclick="clearAllSelections()" class="text-sm text-gray-500 hover:text-gray-700 font-medium transition">Clear Selection</button>
+        </div>
+      </div>
+
+      <!-- ===== ORDERS TABLE ===== -->
+      <div class="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden">
+        <!-- Table Header Actions -->
+        <div class="px-6 py-3.5 border-b border-gray-100 flex items-center justify-between">
+          <div class="flex items-center gap-3">
+            <input type="checkbox" id="selectAllHeader" class="w-4 h-4 rounded border-gray-300 text-brand-500 focus:ring-brand-400 cursor-pointer" onchange="toggleSelectAll(this)">
+            <span class="text-sm text-gray-500">Select All</span>
+            <span class="text-xs text-gray-400 bg-gray-100 px-2 py-0.5 rounded-full">8 orders shown</span>
+          </div>
+          <div class="flex items-center gap-2">
+            <button class="text-sm text-gray-500 hover:text-gray-700 flex items-center gap-1.5 px-3 py-1.5 rounded-lg hover:bg-gray-50 transition">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M3 7.5L7.5 3m0 0L12 7.5M7.5 3v13.5m13.5 0L16.5 21m0 0L12 16.5m4.5 4.5V7.5"/></svg>
+              Sort
+            </button>
+            <button class="text-sm text-gray-500 hover:text-gray-700 flex items-center gap-1.5 px-3 py-1.5 rounded-lg hover:bg-gray-50 transition">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M10.5 6h9.75M10.5 6a1.5 1.5 0 11-3 0m3 0a1.5 1.5 0 10-3 0M3.75 6H7.5m3 12h9.75m-9.75 0a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m-3.75 0H7.5m9-6h3.75m-3.75 0a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m-9.75 0h9.75"/></svg>
+              Columns
+            </button>
+          </div>
+        </div>
+
+        <!-- Table -->
+        <div class="overflow-x-auto">
+          <table class="w-full">
+            <thead>
+              <tr class="bg-gray-50/80">
+                <th class="text-left py-3 px-6 text-[11px] font-semibold text-gray-500 uppercase tracking-wider w-10">
+                  <input type="checkbox" id="selectAllTable" class="w-3.5 h-3.5 rounded border-gray-300 text-brand-500 focus:ring-brand-400 cursor-pointer" onchange="toggleSelectAll(this)">
+                </th>
+                <th class="text-left py-3 px-4 text-[11px] font-semibold text-gray-500 uppercase tracking-wider">Order ID</th>
+                <th class="text-left py-3 px-4 text-[11px] font-semibold text-gray-500 uppercase tracking-wider">Customer</th>
+                <th class="text-left py-3 px-4 text-[11px] font-semibold text-gray-500 uppercase tracking-wider">Seller</th>
+                <th class="text-left py-3 px-4 text-[11px] font-semibold text-gray-500 uppercase tracking-wider">Products</th>
+                <th class="text-right py-3 px-4 text-[11px] font-semibold text-gray-500 uppercase tracking-wider">Amount</th>
+                <th class="text-left py-3 px-4 text-[11px] font-semibold text-gray-500 uppercase tracking-wider">Payment</th>
+                <th class="text-left py-3 px-4 text-[11px] font-semibold text-gray-500 uppercase tracking-wider">Region</th>
+                <th class="text-left py-3 px-4 text-[11px] font-semibold text-gray-500 uppercase tracking-wider">Status</th>
+                <th class="text-left py-3 px-4 text-[11px] font-semibold text-gray-500 uppercase tracking-wider">SLA</th>
+                <th class="text-left py-3 px-4 text-[11px] font-semibold text-gray-500 uppercase tracking-wider">Date</th>
+                <th class="text-center py-3 px-4 text-[11px] font-semibold text-gray-500 uppercase tracking-wider">Actions</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-50">
+
+              <!-- Row 1 — Delivered -->
+              <tr class="table-row" data-orderid="#HB-10234" data-customer="Arun Mehta" data-email="arun.mehta@email.com" data-seller="Rajesh Store" data-products="iPhone 15 Pro Max" data-items="1 item" data-amount="&#8377;1,34,999" data-payment="Card" data-status="Delivered" data-date="Mar 27, 2026" data-time="10:45 AM" data-region="Maharashtra" data-sla="On Track" data-carrier="Delhivery">
+                <td class="py-3.5 px-6"><input type="checkbox" class="row-checkbox w-3.5 h-3.5 rounded border-gray-300 text-brand-500 focus:ring-brand-400 cursor-pointer" onchange="updateBulkToolbar()"></td>
+                <td class="py-3.5 px-4">
+                  <a href="detail.html" class="text-sm font-semibold text-brand-500 hover:text-brand-600 hover:underline">#HB-10234</a>
+                </td>
+                <td class="py-3.5 px-4">
+                  <div class="flex items-center gap-2.5">
+                    <div class="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center text-blue-700 text-xs font-bold shrink-0">AM</div>
+                    <div>
+                      <p class="text-sm font-medium text-gray-800">Arun Mehta</p>
+                      <p class="text-[11px] text-gray-400">arun.mehta@email.com</p>
+                    </div>
+                  </div>
+                </td>
+                <td class="py-3.5 px-4">
+                  <p class="text-sm text-gray-700">Rajesh Store</p>
+                </td>
+                <td class="py-3.5 px-4">
+                  <p class="text-sm text-gray-700">iPhone 15 Pro Max</p>
+                  <p class="text-[11px] text-gray-400">1 item</p>
+                </td>
+                <td class="py-3.5 px-4 text-right">
+                  <p class="text-sm font-semibold text-gray-800">&#8377;1,34,999</p>
+                </td>
+                <td class="py-3.5 px-4">
+                  <span class="inline-flex items-center gap-1.5 text-xs font-medium text-gray-600">
+                    <svg class="w-3.5 h-3.5 text-blue-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M2.25 8.25h19.5M2.25 9h19.5m-16.5 5.25h6m-6 2.25h3m-3.75 3h15a2.25 2.25 0 002.25-2.25V6.75A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25v10.5A2.25 2.25 0 004.5 19.5z"/></svg>
+                    Card
+                  </span>
+                </td>
+                <td class="py-3.5 px-4">
+                  <span class="text-xs text-gray-600">Maharashtra</span>
+                </td>
+                <td class="py-3.5 px-4">
+                  <span class="inline-flex items-center px-2.5 py-1 rounded-full text-[11px] font-semibold bg-green-50 text-green-700 border border-green-200">
+                    <span class="w-1.5 h-1.5 rounded-full bg-green-500 mr-1.5"></span>
+                    Delivered
+                  </span>
+                </td>
+                <td class="py-3.5 px-4">
+                  <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold bg-green-50 text-green-700 border border-green-200">On Track</span>
+                </td>
+                <td class="py-3.5 px-4">
+                  <p class="text-sm text-gray-600">Mar 27, 2026</p>
+                  <p class="text-[11px] text-gray-400">10:45 AM</p>
+                </td>
+                <td class="py-3.5 px-4 text-center">
+                  <div class="flex items-center justify-center gap-1">
+                    <button onclick="viewOrder(this)" class="p-1.5 text-gray-400 hover:text-brand-500 hover:bg-brand-50 rounded-lg transition" title="View Details">
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z"/><path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                    </button>
+                    <button onclick="showOrderMenu(event, this)" class="p-1.5 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition" title="More Actions">
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 6.75a.75.75 0 110-1.5.75.75 0 010 1.5zM12 12.75a.75.75 0 110-1.5.75.75 0 010 1.5zM12 18.75a.75.75 0 110-1.5.75.75 0 010 1.5z"/></svg>
+                    </button>
+                  </div>
+                </td>
+              </tr>
+
+              <!-- Row 2 — Processing -->
+              <tr class="table-row" data-orderid="#HB-10233" data-customer="Sneha Patel" data-email="sneha.p@email.com" data-seller="Priya Electronics" data-products="Samsung 65&quot; QLED TV" data-items="1 item" data-amount="&#8377;89,990" data-payment="UPI" data-status="Processing" data-date="Mar 27, 2026" data-time="09:12 AM" data-region="Karnataka" data-sla="On Track" data-carrier="BlueDart">
+                <td class="py-3.5 px-6"><input type="checkbox" class="row-checkbox w-3.5 h-3.5 rounded border-gray-300 text-brand-500 focus:ring-brand-400 cursor-pointer" onchange="updateBulkToolbar()"></td>
+                <td class="py-3.5 px-4">
+                  <a href="detail.html" class="text-sm font-semibold text-brand-500 hover:text-brand-600 hover:underline">#HB-10233</a>
+                </td>
+                <td class="py-3.5 px-4">
+                  <div class="flex items-center gap-2.5">
+                    <div class="w-8 h-8 rounded-full bg-pink-100 flex items-center justify-center text-pink-700 text-xs font-bold shrink-0">SP</div>
+                    <div>
+                      <p class="text-sm font-medium text-gray-800">Sneha Patel</p>
+                      <p class="text-[11px] text-gray-400">sneha.p@email.com</p>
+                    </div>
+                  </div>
+                </td>
+                <td class="py-3.5 px-4">
+                  <p class="text-sm text-gray-700">Priya Electronics</p>
+                </td>
+                <td class="py-3.5 px-4">
+                  <p class="text-sm text-gray-700">Samsung 65" QLED TV</p>
+                  <p class="text-[11px] text-gray-400">1 item</p>
+                </td>
+                <td class="py-3.5 px-4 text-right">
+                  <p class="text-sm font-semibold text-gray-800">&#8377;89,990</p>
+                </td>
+                <td class="py-3.5 px-4">
+                  <span class="inline-flex items-center gap-1.5 text-xs font-medium text-gray-600">
+                    <svg class="w-3.5 h-3.5 text-green-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M10.5 1.5H8.25A2.25 2.25 0 006 3.75v16.5a2.25 2.25 0 002.25 2.25h7.5A2.25 2.25 0 0018 20.25V3.75a2.25 2.25 0 00-2.25-2.25H13.5m-3 0V3h3V1.5m-3 0h3m-3 18.75h3"/></svg>
+                    UPI
+                  </span>
+                </td>
+                <td class="py-3.5 px-4">
+                  <span class="text-xs text-gray-600">Karnataka</span>
+                </td>
+                <td class="py-3.5 px-4">
+                  <span class="inline-flex items-center px-2.5 py-1 rounded-full text-[11px] font-semibold bg-blue-50 text-blue-700 border border-blue-200">
+                    <span class="w-1.5 h-1.5 rounded-full bg-blue-500 mr-1.5"></span>
+                    Processing
+                  </span>
+                </td>
+                <td class="py-3.5 px-4">
+                  <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold bg-green-50 text-green-700 border border-green-200">On Track</span>
+                </td>
+                <td class="py-3.5 px-4">
+                  <p class="text-sm text-gray-600">Mar 27, 2026</p>
+                  <p class="text-[11px] text-gray-400">09:12 AM</p>
+                </td>
+                <td class="py-3.5 px-4 text-center">
+                  <div class="flex items-center justify-center gap-1">
+                    <button onclick="viewOrder(this)" class="p-1.5 text-gray-400 hover:text-brand-500 hover:bg-brand-50 rounded-lg transition" title="View Details">
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z"/><path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                    </button>
+                    <button onclick="showOrderMenu(event, this)" class="p-1.5 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition" title="More Actions">
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 6.75a.75.75 0 110-1.5.75.75 0 010 1.5zM12 12.75a.75.75 0 110-1.5.75.75 0 010 1.5zM12 18.75a.75.75 0 110-1.5.75.75 0 010 1.5z"/></svg>
+                    </button>
+                  </div>
+                </td>
+              </tr>
+
+              <!-- Row 3 — Pending -->
+              <tr class="table-row" data-orderid="#HB-10232" data-customer="Vikram Kumar" data-email="vikram.k@email.com" data-seller="Kumar Fashions" data-products="Levi's Denim Jacket, Nike Shoes" data-items="2 items" data-amount="&#8377;8,450" data-payment="COD" data-status="Pending" data-date="Mar 26, 2026" data-time="11:30 PM" data-region="Delhi NCR" data-sla="At Risk" data-carrier="DTDC">
+                <td class="py-3.5 px-6"><input type="checkbox" class="row-checkbox w-3.5 h-3.5 rounded border-gray-300 text-brand-500 focus:ring-brand-400 cursor-pointer" onchange="updateBulkToolbar()"></td>
+                <td class="py-3.5 px-4">
+                  <a href="detail.html" class="text-sm font-semibold text-brand-500 hover:text-brand-600 hover:underline">#HB-10232</a>
+                </td>
+                <td class="py-3.5 px-4">
+                  <div class="flex items-center gap-2.5">
+                    <div class="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center text-green-700 text-xs font-bold shrink-0">VK</div>
+                    <div>
+                      <p class="text-sm font-medium text-gray-800">Vikram Kumar</p>
+                      <p class="text-[11px] text-gray-400">vikram.k@email.com</p>
+                    </div>
+                  </div>
+                </td>
+                <td class="py-3.5 px-4">
+                  <p class="text-sm text-gray-700">Kumar Fashions</p>
+                </td>
+                <td class="py-3.5 px-4">
+                  <p class="text-sm text-gray-700">Levi's Denim Jacket, Nike Shoes</p>
+                  <p class="text-[11px] text-gray-400">2 items</p>
+                </td>
+                <td class="py-3.5 px-4 text-right">
+                  <p class="text-sm font-semibold text-gray-800">&#8377;8,450</p>
+                </td>
+                <td class="py-3.5 px-4">
+                  <span class="inline-flex items-center gap-1.5 text-xs font-medium text-gray-600">
+                    <svg class="w-3.5 h-3.5 text-amber-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M2.25 18.75a60.07 60.07 0 0115.797 2.101c.727.198 1.453-.342 1.453-1.096V18.75M3.75 4.5v.75A.75.75 0 013 6h-.75m0 0v-.375c0-.621.504-1.125 1.125-1.125H20.25M2.25 6v9m18-10.5v.75c0 .414.336.75.75.75h.75m-1.5-1.5h.375c.621 0 1.125.504 1.125 1.125v9.75c0 .621-.504 1.125-1.125 1.125h-.375m1.5-1.5H21a.75.75 0 00-.75.75v.75m0 0H3.75m0 0h-.375a1.125 1.125 0 01-1.125-1.125V15m1.5 1.5v-.75A.75.75 0 003 15h-.75M15 10.5a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                    COD
+                  </span>
+                </td>
+                <td class="py-3.5 px-4">
+                  <span class="text-xs text-gray-600">Delhi NCR</span>
+                </td>
+                <td class="py-3.5 px-4">
+                  <span class="inline-flex items-center px-2.5 py-1 rounded-full text-[11px] font-semibold bg-yellow-50 text-yellow-700 border border-yellow-200">
+                    <span class="w-1.5 h-1.5 rounded-full bg-yellow-500 mr-1.5"></span>
+                    Pending
+                  </span>
+                </td>
+                <td class="py-3.5 px-4">
+                  <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold bg-yellow-50 text-yellow-700 border border-yellow-200">At Risk</span>
+                </td>
+                <td class="py-3.5 px-4">
+                  <p class="text-sm text-gray-600">Mar 26, 2026</p>
+                  <p class="text-[11px] text-gray-400">11:30 PM</p>
+                </td>
+                <td class="py-3.5 px-4 text-center">
+                  <div class="flex items-center justify-center gap-1">
+                    <button onclick="viewOrder(this)" class="p-1.5 text-gray-400 hover:text-brand-500 hover:bg-brand-50 rounded-lg transition" title="View Details">
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z"/><path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                    </button>
+                    <button onclick="showOrderMenu(event, this)" class="p-1.5 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition" title="More Actions">
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 6.75a.75.75 0 110-1.5.75.75 0 010 1.5zM12 12.75a.75.75 0 110-1.5.75.75 0 010 1.5zM12 18.75a.75.75 0 110-1.5.75.75 0 010 1.5z"/></svg>
+                    </button>
+                  </div>
+                </td>
+              </tr>
+
+              <!-- Row 4 — Shipped -->
+              <tr class="table-row" data-orderid="#HB-10231" data-customer="Deepa Gupta" data-email="deepa.g@email.com" data-seller="Anita Home Decor" data-products="Ceramic Vase Set, Wall Art" data-items="3 items" data-amount="&#8377;4,275" data-payment="Card" data-status="Shipped" data-date="Mar 26, 2026" data-time="04:18 PM" data-region="Tamil Nadu" data-sla="On Track" data-carrier="Delhivery">
+                <td class="py-3.5 px-6"><input type="checkbox" class="row-checkbox w-3.5 h-3.5 rounded border-gray-300 text-brand-500 focus:ring-brand-400 cursor-pointer" onchange="updateBulkToolbar()"></td>
+                <td class="py-3.5 px-4">
+                  <a href="detail.html" class="text-sm font-semibold text-brand-500 hover:text-brand-600 hover:underline">#HB-10231</a>
+                </td>
+                <td class="py-3.5 px-4">
+                  <div class="flex items-center gap-2.5">
+                    <div class="w-8 h-8 rounded-full bg-purple-100 flex items-center justify-center text-purple-700 text-xs font-bold shrink-0">DG</div>
+                    <div>
+                      <p class="text-sm font-medium text-gray-800">Deepa Gupta</p>
+                      <p class="text-[11px] text-gray-400">deepa.g@email.com</p>
+                    </div>
+                  </div>
+                </td>
+                <td class="py-3.5 px-4">
+                  <p class="text-sm text-gray-700">Anita Home Decor</p>
+                </td>
+                <td class="py-3.5 px-4">
+                  <p class="text-sm text-gray-700">Ceramic Vase Set, Wall Art</p>
+                  <p class="text-[11px] text-gray-400">3 items</p>
+                </td>
+                <td class="py-3.5 px-4 text-right">
+                  <p class="text-sm font-semibold text-gray-800">&#8377;4,275</p>
+                </td>
+                <td class="py-3.5 px-4">
+                  <span class="inline-flex items-center gap-1.5 text-xs font-medium text-gray-600">
+                    <svg class="w-3.5 h-3.5 text-blue-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M2.25 8.25h19.5M2.25 9h19.5m-16.5 5.25h6m-6 2.25h3m-3.75 3h15a2.25 2.25 0 002.25-2.25V6.75A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25v10.5A2.25 2.25 0 004.5 19.5z"/></svg>
+                    Card
+                  </span>
+                </td>
+                <td class="py-3.5 px-4">
+                  <span class="text-xs text-gray-600">Tamil Nadu</span>
+                </td>
+                <td class="py-3.5 px-4">
+                  <span class="inline-flex items-center px-2.5 py-1 rounded-full text-[11px] font-semibold bg-purple-50 text-purple-700 border border-purple-200">
+                    <span class="w-1.5 h-1.5 rounded-full bg-purple-500 mr-1.5"></span>
+                    Shipped
+                  </span>
+                </td>
+                <td class="py-3.5 px-4">
+                  <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold bg-green-50 text-green-700 border border-green-200">On Track</span>
+                </td>
+                <td class="py-3.5 px-4">
+                  <p class="text-sm text-gray-600">Mar 26, 2026</p>
+                  <p class="text-[11px] text-gray-400">04:18 PM</p>
+                </td>
+                <td class="py-3.5 px-4 text-center">
+                  <div class="flex items-center justify-center gap-1">
+                    <button onclick="viewOrder(this)" class="p-1.5 text-gray-400 hover:text-brand-500 hover:bg-brand-50 rounded-lg transition" title="View Details">
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z"/><path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                    </button>
+                    <button onclick="showOrderMenu(event, this)" class="p-1.5 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition" title="More Actions">
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 6.75a.75.75 0 110-1.5.75.75 0 010 1.5zM12 12.75a.75.75 0 110-1.5.75.75 0 010 1.5zM12 18.75a.75.75 0 110-1.5.75.75 0 010 1.5z"/></svg>
+                    </button>
+                  </div>
+                </td>
+              </tr>
+
+              <!-- Row 5 — Cancelled -->
+              <tr class="table-row" data-orderid="#HB-10230" data-customer="Rahul Sharma" data-email="rahul.s@email.com" data-seller="Vikram Sports" data-products="Cricket Bat (MRF Genius)" data-items="1 item" data-amount="&#8377;12,500" data-payment="UPI" data-status="Cancelled" data-date="Mar 25, 2026" data-time="02:05 PM" data-region="Gujarat" data-sla="Breached" data-carrier="DTDC">
+                <td class="py-3.5 px-6"><input type="checkbox" class="row-checkbox w-3.5 h-3.5 rounded border-gray-300 text-brand-500 focus:ring-brand-400 cursor-pointer" onchange="updateBulkToolbar()"></td>
+                <td class="py-3.5 px-4">
+                  <a href="detail.html" class="text-sm font-semibold text-brand-500 hover:text-brand-600 hover:underline">#HB-10230</a>
+                </td>
+                <td class="py-3.5 px-4">
+                  <div class="flex items-center gap-2.5">
+                    <div class="w-8 h-8 rounded-full bg-orange-100 flex items-center justify-center text-orange-700 text-xs font-bold shrink-0">RS</div>
+                    <div>
+                      <p class="text-sm font-medium text-gray-800">Rahul Sharma</p>
+                      <p class="text-[11px] text-gray-400">rahul.s@email.com</p>
+                    </div>
+                  </div>
+                </td>
+                <td class="py-3.5 px-4">
+                  <p class="text-sm text-gray-700">Vikram Sports</p>
+                </td>
+                <td class="py-3.5 px-4">
+                  <p class="text-sm text-gray-700">Cricket Bat (MRF Genius)</p>
+                  <p class="text-[11px] text-gray-400">1 item</p>
+                </td>
+                <td class="py-3.5 px-4 text-right">
+                  <p class="text-sm font-semibold text-gray-800 line-through text-gray-400">&#8377;12,500</p>
+                </td>
+                <td class="py-3.5 px-4">
+                  <span class="inline-flex items-center gap-1.5 text-xs font-medium text-gray-600">
+                    <svg class="w-3.5 h-3.5 text-green-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M10.5 1.5H8.25A2.25 2.25 0 006 3.75v16.5a2.25 2.25 0 002.25 2.25h7.5A2.25 2.25 0 0018 20.25V3.75a2.25 2.25 0 00-2.25-2.25H13.5m-3 0V3h3V1.5m-3 0h3m-3 18.75h3"/></svg>
+                    UPI
+                  </span>
+                </td>
+                <td class="py-3.5 px-4">
+                  <span class="text-xs text-gray-600">Gujarat</span>
+                </td>
+                <td class="py-3.5 px-4">
+                  <span class="inline-flex items-center px-2.5 py-1 rounded-full text-[11px] font-semibold bg-red-50 text-red-700 border border-red-200">
+                    <span class="w-1.5 h-1.5 rounded-full bg-red-500 mr-1.5"></span>
+                    Cancelled
+                  </span>
+                </td>
+                <td class="py-3.5 px-4">
+                  <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold bg-red-50 text-red-700 border border-red-200">Breached</span>
+                </td>
+                <td class="py-3.5 px-4">
+                  <p class="text-sm text-gray-600">Mar 25, 2026</p>
+                  <p class="text-[11px] text-gray-400">02:05 PM</p>
+                </td>
+                <td class="py-3.5 px-4 text-center">
+                  <div class="flex items-center justify-center gap-1">
+                    <button onclick="viewOrder(this)" class="p-1.5 text-gray-400 hover:text-brand-500 hover:bg-brand-50 rounded-lg transition" title="View Details">
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z"/><path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                    </button>
+                    <button onclick="showOrderMenu(event, this)" class="p-1.5 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition" title="More Actions">
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 6.75a.75.75 0 110-1.5.75.75 0 010 1.5zM12 12.75a.75.75 0 110-1.5.75.75 0 010 1.5zM12 18.75a.75.75 0 110-1.5.75.75 0 010 1.5z"/></svg>
+                    </button>
+                  </div>
+                </td>
+              </tr>
+
+              <!-- Row 6 — Delivered -->
+              <tr class="table-row" data-orderid="#HB-10229" data-customer="Neha Reddy" data-email="neha.r@email.com" data-seller="Meera Beauty" data-products="Lakme Combo, Maybelline Set" data-items="4 items" data-amount="&#8377;3,890" data-payment="Card" data-status="Delivered" data-date="Mar 25, 2026" data-time="01:20 PM" data-region="Karnataka" data-sla="On Track" data-carrier="BlueDart">
+                <td class="py-3.5 px-6"><input type="checkbox" class="row-checkbox w-3.5 h-3.5 rounded border-gray-300 text-brand-500 focus:ring-brand-400 cursor-pointer" onchange="updateBulkToolbar()"></td>
+                <td class="py-3.5 px-4">
+                  <a href="detail.html" class="text-sm font-semibold text-brand-500 hover:text-brand-600 hover:underline">#HB-10229</a>
+                </td>
+                <td class="py-3.5 px-4">
+                  <div class="flex items-center gap-2.5">
+                    <div class="w-8 h-8 rounded-full bg-teal-100 flex items-center justify-center text-teal-700 text-xs font-bold shrink-0">NR</div>
+                    <div>
+                      <p class="text-sm font-medium text-gray-800">Neha Reddy</p>
+                      <p class="text-[11px] text-gray-400">neha.r@email.com</p>
+                    </div>
+                  </div>
+                </td>
+                <td class="py-3.5 px-4">
+                  <p class="text-sm text-gray-700">Meera Beauty</p>
+                </td>
+                <td class="py-3.5 px-4">
+                  <p class="text-sm text-gray-700">Lakme Combo, Maybelline Set</p>
+                  <p class="text-[11px] text-gray-400">4 items</p>
+                </td>
+                <td class="py-3.5 px-4 text-right">
+                  <p class="text-sm font-semibold text-gray-800">&#8377;3,890</p>
+                </td>
+                <td class="py-3.5 px-4">
+                  <span class="inline-flex items-center gap-1.5 text-xs font-medium text-gray-600">
+                    <svg class="w-3.5 h-3.5 text-blue-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M2.25 8.25h19.5M2.25 9h19.5m-16.5 5.25h6m-6 2.25h3m-3.75 3h15a2.25 2.25 0 002.25-2.25V6.75A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25v10.5A2.25 2.25 0 004.5 19.5z"/></svg>
+                    Card
+                  </span>
+                </td>
+                <td class="py-3.5 px-4">
+                  <span class="text-xs text-gray-600">Karnataka</span>
+                </td>
+                <td class="py-3.5 px-4">
+                  <span class="inline-flex items-center px-2.5 py-1 rounded-full text-[11px] font-semibold bg-green-50 text-green-700 border border-green-200">
+                    <span class="w-1.5 h-1.5 rounded-full bg-green-500 mr-1.5"></span>
+                    Delivered
+                  </span>
+                </td>
+                <td class="py-3.5 px-4">
+                  <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold bg-green-50 text-green-700 border border-green-200">On Track</span>
+                </td>
+                <td class="py-3.5 px-4">
+                  <p class="text-sm text-gray-600">Mar 25, 2026</p>
+                  <p class="text-[11px] text-gray-400">01:20 PM</p>
+                </td>
+                <td class="py-3.5 px-4 text-center">
+                  <div class="flex items-center justify-center gap-1">
+                    <button onclick="viewOrder(this)" class="p-1.5 text-gray-400 hover:text-brand-500 hover:bg-brand-50 rounded-lg transition" title="View Details">
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z"/><path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                    </button>
+                    <button onclick="showOrderMenu(event, this)" class="p-1.5 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition" title="More Actions">
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 6.75a.75.75 0 110-1.5.75.75 0 010 1.5zM12 12.75a.75.75 0 110-1.5.75.75 0 010 1.5zM12 18.75a.75.75 0 110-1.5.75.75 0 010 1.5z"/></svg>
+                    </button>
+                  </div>
+                </td>
+              </tr>
+
+              <!-- Row 7 — Shipped -->
+              <tr class="table-row" data-orderid="#HB-10228" data-customer="Karthik Jain" data-email="karthik.j@email.com" data-seller="Rajesh Store" data-products="MacBook Air M3, Magic Mouse" data-items="2 items" data-amount="&#8377;1,24,900" data-payment="Card" data-status="Shipped" data-date="Mar 24, 2026" data-time="06:55 PM" data-region="Maharashtra" data-sla="At Risk" data-carrier="Ecom Express">
+                <td class="py-3.5 px-6"><input type="checkbox" class="row-checkbox w-3.5 h-3.5 rounded border-gray-300 text-brand-500 focus:ring-brand-400 cursor-pointer" onchange="updateBulkToolbar()"></td>
+                <td class="py-3.5 px-4">
+                  <a href="detail.html" class="text-sm font-semibold text-brand-500 hover:text-brand-600 hover:underline">#HB-10228</a>
+                </td>
+                <td class="py-3.5 px-4">
+                  <div class="flex items-center gap-2.5">
+                    <div class="w-8 h-8 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-700 text-xs font-bold shrink-0">KJ</div>
+                    <div>
+                      <p class="text-sm font-medium text-gray-800">Karthik Jain</p>
+                      <p class="text-[11px] text-gray-400">karthik.j@email.com</p>
+                    </div>
+                  </div>
+                </td>
+                <td class="py-3.5 px-4">
+                  <p class="text-sm text-gray-700">Rajesh Store</p>
+                </td>
+                <td class="py-3.5 px-4">
+                  <p class="text-sm text-gray-700">MacBook Air M3, Magic Mouse</p>
+                  <p class="text-[11px] text-gray-400">2 items</p>
+                </td>
+                <td class="py-3.5 px-4 text-right">
+                  <p class="text-sm font-semibold text-gray-800">&#8377;1,24,900</p>
+                </td>
+                <td class="py-3.5 px-4">
+                  <span class="inline-flex items-center gap-1.5 text-xs font-medium text-gray-600">
+                    <svg class="w-3.5 h-3.5 text-blue-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M2.25 8.25h19.5M2.25 9h19.5m-16.5 5.25h6m-6 2.25h3m-3.75 3h15a2.25 2.25 0 002.25-2.25V6.75A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25v10.5A2.25 2.25 0 004.5 19.5z"/></svg>
+                    Card
+                  </span>
+                </td>
+                <td class="py-3.5 px-4">
+                  <span class="text-xs text-gray-600">Maharashtra</span>
+                </td>
+                <td class="py-3.5 px-4">
+                  <span class="inline-flex items-center px-2.5 py-1 rounded-full text-[11px] font-semibold bg-purple-50 text-purple-700 border border-purple-200">
+                    <span class="w-1.5 h-1.5 rounded-full bg-purple-500 mr-1.5"></span>
+                    Shipped
+                  </span>
+                </td>
+                <td class="py-3.5 px-4">
+                  <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold bg-yellow-50 text-yellow-700 border border-yellow-200">At Risk</span>
+                </td>
+                <td class="py-3.5 px-4">
+                  <p class="text-sm text-gray-600">Mar 24, 2026</p>
+                  <p class="text-[11px] text-gray-400">06:55 PM</p>
+                </td>
+                <td class="py-3.5 px-4 text-center">
+                  <div class="flex items-center justify-center gap-1">
+                    <button onclick="viewOrder(this)" class="p-1.5 text-gray-400 hover:text-brand-500 hover:bg-brand-50 rounded-lg transition" title="View Details">
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z"/><path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                    </button>
+                    <button onclick="showOrderMenu(event, this)" class="p-1.5 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition" title="More Actions">
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 6.75a.75.75 0 110-1.5.75.75 0 010 1.5zM12 12.75a.75.75 0 110-1.5.75.75 0 010 1.5zM12 18.75a.75.75 0 110-1.5.75.75 0 010 1.5z"/></svg>
+                    </button>
+                  </div>
+                </td>
+              </tr>
+
+              <!-- Row 8 — Pending -->
+              <tr class="table-row" data-orderid="#HB-10227" data-customer="Pooja Singh" data-email="pooja.s@email.com" data-seller="Priya Electronics" data-products="Sony WH-1000XM5, Case" data-items="2 items" data-amount="&#8377;28,990" data-payment="COD" data-status="Pending" data-date="Mar 24, 2026" data-time="03:40 PM" data-region="West Bengal" data-sla="Breached" data-carrier="India Post">
+                <td class="py-3.5 px-6"><input type="checkbox" class="row-checkbox w-3.5 h-3.5 rounded border-gray-300 text-brand-500 focus:ring-brand-400 cursor-pointer" onchange="updateBulkToolbar()"></td>
+                <td class="py-3.5 px-4">
+                  <a href="detail.html" class="text-sm font-semibold text-brand-500 hover:text-brand-600 hover:underline">#HB-10227</a>
+                </td>
+                <td class="py-3.5 px-4">
+                  <div class="flex items-center gap-2.5">
+                    <div class="w-8 h-8 rounded-full bg-rose-100 flex items-center justify-center text-rose-700 text-xs font-bold shrink-0">PS</div>
+                    <div>
+                      <p class="text-sm font-medium text-gray-800">Pooja Singh</p>
+                      <p class="text-[11px] text-gray-400">pooja.s@email.com</p>
+                    </div>
+                  </div>
+                </td>
+                <td class="py-3.5 px-4">
+                  <p class="text-sm text-gray-700">Priya Electronics</p>
+                </td>
+                <td class="py-3.5 px-4">
+                  <p class="text-sm text-gray-700">Sony WH-1000XM5, Case</p>
+                  <p class="text-[11px] text-gray-400">2 items</p>
+                </td>
+                <td class="py-3.5 px-4 text-right">
+                  <p class="text-sm font-semibold text-gray-800">&#8377;28,990</p>
+                </td>
+                <td class="py-3.5 px-4">
+                  <span class="inline-flex items-center gap-1.5 text-xs font-medium text-gray-600">
+                    <svg class="w-3.5 h-3.5 text-amber-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M2.25 18.75a60.07 60.07 0 0115.797 2.101c.727.198 1.453-.342 1.453-1.096V18.75M3.75 4.5v.75A.75.75 0 013 6h-.75m0 0v-.375c0-.621.504-1.125 1.125-1.125H20.25M2.25 6v9m18-10.5v.75c0 .414.336.75.75.75h.75m-1.5-1.5h.375c.621 0 1.125.504 1.125 1.125v9.75c0 .621-.504 1.125-1.125 1.125h-.375m1.5-1.5H21a.75.75 0 00-.75.75v.75m0 0H3.75m0 0h-.375a1.125 1.125 0 01-1.125-1.125V15m1.5 1.5v-.75A.75.75 0 003 15h-.75M15 10.5a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                    COD
+                  </span>
+                </td>
+                <td class="py-3.5 px-4">
+                  <span class="text-xs text-gray-600">West Bengal</span>
+                </td>
+                <td class="py-3.5 px-4">
+                  <span class="inline-flex items-center px-2.5 py-1 rounded-full text-[11px] font-semibold bg-yellow-50 text-yellow-700 border border-yellow-200">
+                    <span class="w-1.5 h-1.5 rounded-full bg-yellow-500 mr-1.5"></span>
+                    Pending
+                  </span>
+                </td>
+                <td class="py-3.5 px-4">
+                  <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold bg-red-50 text-red-700 border border-red-200">Breached</span>
+                </td>
+                <td class="py-3.5 px-4">
+                  <p class="text-sm text-gray-600">Mar 24, 2026</p>
+                  <p class="text-[11px] text-gray-400">03:40 PM</p>
+                </td>
+                <td class="py-3.5 px-4 text-center">
+                  <div class="flex items-center justify-center gap-1">
+                    <button onclick="viewOrder(this)" class="p-1.5 text-gray-400 hover:text-brand-500 hover:bg-brand-50 rounded-lg transition" title="View Details">
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z"/><path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                    </button>
+                    <button onclick="showOrderMenu(event, this)" class="p-1.5 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition" title="More Actions">
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 6.75a.75.75 0 110-1.5.75.75 0 010 1.5zM12 12.75a.75.75 0 110-1.5.75.75 0 010 1.5zM12 18.75a.75.75 0 110-1.5.75.75 0 010 1.5z"/></svg>
+                    </button>
+                  </div>
+                </td>
+              </tr>
+
+            </tbody>
+          </table>
+        </div>
+
+        <!-- ===== PAGINATION ===== -->
+        <div class="px-6 py-4 border-t border-gray-100 flex items-center justify-between">
+          <div class="flex items-center gap-2">
+            <p id="showingCount" class="text-sm text-gray-500">Showing <span class="font-medium text-gray-700">1-8</span> of <span class="font-medium text-gray-700">12,450</span> orders</p>
+            <select class="bg-gray-50 border border-gray-200 rounded-lg py-1.5 px-2 text-xs text-gray-600 outline-none focus:border-brand-400 transition cursor-pointer">
+              <option>8 per page</option>
+              <option>20 per page</option>
+              <option>50 per page</option>
+              <option>100 per page</option>
+            </select>
+          </div>
+          <div class="flex items-center gap-1">
+            <!-- Previous -->
+            <button class="p-2 rounded-lg text-gray-400 cursor-not-allowed" disabled>
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M15.75 19.5L8.25 12l7.5-7.5"/></svg>
+            </button>
+            <!-- Page Numbers -->
+            <button class="w-8 h-8 rounded-lg text-sm font-medium bg-brand-500 text-white">1</button>
+            <button class="w-8 h-8 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-100 transition">2</button>
+            <button class="w-8 h-8 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-100 transition">3</button>
+            <span class="w-8 h-8 flex items-center justify-center text-gray-400 text-sm">...</span>
+            <button class="w-8 h-8 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-100 transition">1,556</button>
+            <!-- Next -->
+            <button class="p-2 rounded-lg text-gray-600 hover:bg-gray-100 transition">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M8.25 4.5l7.5 7.5-7.5 7.5"/></svg>
+            </button>
+          </div>
+        </div>
+      </div>
+
+        </div><!-- end table column -->
+      </div><!-- end flex with sidebar -->
+
+    </main>
+  </div>
+
+  <!-- ===== VIEW DETAILS MODAL ===== -->
+  <div id="viewModal" class="fixed inset-0 z-[100] hidden items-center justify-center bg-black/40 backdrop-blur-sm">
+    <div class="relative w-full max-w-lg mx-4 bg-white rounded-2xl shadow-2xl overflow-hidden">
+      <div class="flex items-center justify-between px-6 py-4 border-b border-gray-100 bg-gray-50">
+        <h3 class="text-lg font-bold text-gray-900">Order Details</h3>
+        <button onclick="closeViewModal()" class="p-1.5 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M6 18L18 6M6 6l12 12"/></svg>
+        </button>
+      </div>
+      <div class="px-6 py-5 space-y-4" id="viewModalBody"><div class="mt-4 pt-4 border-t border-gray-100 text-center"><a href="detail.html" class="inline-flex items-center gap-2 bg-brand-500 text-white px-5 py-2 rounded-lg text-sm font-semibold hover:bg-brand-600 transition">View Full Order &rarr;</a></div></div>
+      <div class="flex justify-end px-6 py-4 border-t border-gray-100 bg-gray-50">
+        <button onclick="closeViewModal()" class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 transition">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== MORE ACTIONS DROPDOWN ===== -->
+  <div id="moreMenu" class="fixed z-[110] hidden bg-white rounded-xl shadow-xl border border-gray-100 py-1.5 w-48">
+    <button onclick="orderMenuAction('View Details')" class="flex items-center gap-2.5 w-full px-4 py-2.5 text-sm text-gray-700 hover:bg-brand-50 hover:text-brand-600 transition text-left">
+      <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z"/><path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+      View Details
+    </button>
+    <button onclick="orderMenuAction('Track Order')" class="flex items-center gap-2.5 w-full px-4 py-2.5 text-sm text-gray-700 hover:bg-brand-50 hover:text-brand-600 transition text-left">
+      <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z"/><path d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z"/></svg>
+      Track Order
+    </button>
+    <button onclick="orderMenuAction('Print Invoice')" class="flex items-center gap-2.5 w-full px-4 py-2.5 text-sm text-gray-700 hover:bg-brand-50 hover:text-brand-600 transition text-left">
+      <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M6.72 13.829c-.24.03-.48.062-.72.096m.72-.096a42.415 42.415 0 0110.56 0m-10.56 0L6.34 18m10.94-4.171c.24.03.48.062.72.096m-.72-.096L17.66 18m0 0l.229 2.523a1.125 1.125 0 01-1.12 1.227H7.231c-.662 0-1.18-.568-1.12-1.227L6.34 18m11.318 0h1.091A2.25 2.25 0 0021 15.75V9.456c0-1.081-.768-2.015-1.837-2.175a48.055 48.055 0 00-1.913-.247M6.34 18H5.25A2.25 2.25 0 013 15.75V9.456c0-1.081.768-2.015 1.837-2.175a48.041 48.041 0 011.913-.247m10.5 0a48.536 48.536 0 00-10.5 0m10.5 0V3.375c0-.621-.504-1.125-1.125-1.125h-8.25c-.621 0-1.125.504-1.125 1.125v3.659M18 10.5h.008v.008H18V10.5zm-3 0h.008v.008H15V10.5z"/></svg>
+      Print Invoice
+    </button>
+    <div class="border-t border-gray-100 my-1"></div>
+    <button onclick="orderMenuAction('Cancel / Refund')" class="flex items-center gap-2.5 w-full px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 transition text-left">
+      <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"/></svg>
+      Cancel / Refund
+    </button>
+  </div>
+
+  <!-- ===== ACTION BUTTONS JAVASCRIPT ===== -->
+  <script>
+    function getRowData(el) {
+      var tr = el.closest('tr');
+      return {
+        orderid: tr.dataset.orderid,
+        customer: tr.dataset.customer,
+        email: tr.dataset.email,
+        seller: tr.dataset.seller,
+        products: tr.dataset.products,
+        items: tr.dataset.items,
+        amount: tr.dataset.amount,
+        payment: tr.dataset.payment,
+        status: tr.dataset.status,
+        date: tr.dataset.date,
+        time: tr.dataset.time,
+        region: tr.dataset.region,
+        sla: tr.dataset.sla,
+        carrier: tr.dataset.carrier
+      };
+    }
+
+    function viewOrder(btn) {
+      var d = getRowData(btn);
+      var statusColor = d.status === 'Delivered' ? 'bg-green-50 text-green-700' :
+                        d.status === 'Processing' ? 'bg-blue-50 text-blue-700' :
+                        d.status === 'Pending' ? 'bg-yellow-50 text-yellow-700' :
+                        d.status === 'Shipped' ? 'bg-purple-50 text-purple-700' :
+                        'bg-red-50 text-red-700';
+      var slaColor = d.sla === 'On Track' ? 'bg-green-50 text-green-700 border border-green-200' :
+                     d.sla === 'At Risk' ? 'bg-yellow-50 text-yellow-700 border border-yellow-200' :
+                     'bg-red-50 text-red-700 border border-red-200';
+      document.getElementById('viewModalBody').innerHTML =
+        '<div class="grid grid-cols-2 gap-4">' +
+          '<div class="space-y-1"><p class="text-xs font-semibold text-gray-400 uppercase tracking-wider">Order ID</p><p class="font-mono text-sm font-semibold text-brand-600 bg-brand-50 inline-block px-2 py-0.5 rounded">' + d.orderid + '</p></div>' +
+          '<div class="space-y-1"><p class="text-xs font-semibold text-gray-400 uppercase tracking-wider">Status</p><span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold ' + statusColor + '">' + d.status + '</span></div>' +
+          '<div class="space-y-1"><p class="text-xs font-semibold text-gray-400 uppercase tracking-wider">Customer</p><p class="text-sm font-medium text-gray-900">' + d.customer + '</p><p class="text-xs text-gray-500">' + d.email + '</p></div>' +
+          '<div class="space-y-1"><p class="text-xs font-semibold text-gray-400 uppercase tracking-wider">Seller</p><p class="text-sm text-gray-700">' + d.seller + '</p></div>' +
+          '<div class="space-y-1 col-span-2"><p class="text-xs font-semibold text-gray-400 uppercase tracking-wider">Products</p><p class="text-sm text-gray-700">' + d.products + ' (' + d.items + ')</p></div>' +
+          '<div class="space-y-1"><p class="text-xs font-semibold text-gray-400 uppercase tracking-wider">Amount</p><p class="text-sm font-bold text-gray-900">' + d.amount + '</p></div>' +
+          '<div class="space-y-1"><p class="text-xs font-semibold text-gray-400 uppercase tracking-wider">Payment</p><p class="text-sm text-gray-700">' + d.payment + '</p></div>' +
+          '<div class="space-y-1"><p class="text-xs font-semibold text-gray-400 uppercase tracking-wider">Region</p><p class="text-sm text-gray-700">' + (d.region || 'N/A') + '</p></div>' +
+          '<div class="space-y-1"><p class="text-xs font-semibold text-gray-400 uppercase tracking-wider">Carrier</p><p class="text-sm text-gray-700">' + (d.carrier || 'N/A') + '</p></div>' +
+          '<div class="space-y-1"><p class="text-xs font-semibold text-gray-400 uppercase tracking-wider">SLA Status</p><span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold ' + slaColor + '">' + (d.sla || 'N/A') + '</span></div>' +
+          '<div class="space-y-1"><p class="text-xs font-semibold text-gray-400 uppercase tracking-wider">Date</p><p class="text-sm text-gray-600">' + d.date + ', ' + d.time + '</p></div>' +
+        '</div>';
+      var modal = document.getElementById('viewModal');
+      modal.classList.remove('hidden');
+      modal.classList.add('flex');
+    }
+
+    function viewOrderFromLink(e, link) {
+      e.preventDefault();
+      viewOrder(link);
+    }
+
+    function closeViewModal() {
+      var modal = document.getElementById('viewModal');
+      modal.classList.add('hidden');
+      modal.classList.remove('flex');
+    }
+
+    document.getElementById('viewModal').addEventListener('click', function(e) {
+      if (e.target === this) closeViewModal();
+    });
+
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape') { closeViewModal(); hideMoreMenu(); }
+    });
+
+    var moreMenuOrderId = null;
+    function showOrderMenu(e, btn) {
+      e.stopPropagation();
+      var d = getRowData(btn);
+      moreMenuOrderId = d.orderid;
+      var menu = document.getElementById('moreMenu');
+      var rect = btn.getBoundingClientRect();
+      menu.style.top = (rect.bottom + 4) + 'px';
+      menu.style.left = Math.max(8, rect.right - 192) + 'px';
+      menu.classList.remove('hidden');
+    }
+
+    function hideMoreMenu() {
+      document.getElementById('moreMenu').classList.add('hidden');
+      moreMenuOrderId = null;
+    }
+
+    function orderMenuAction(action) {
+      if (action === 'View Details') {
+        var rows = document.querySelectorAll('tr[data-orderid="' + moreMenuOrderId + '"]');
+        if (rows.length) viewOrder(rows[0].querySelector('button'));
+      } else {
+        alert(action + ' for order ' + moreMenuOrderId);
+      }
+      hideMoreMenu();
+    }
+
+    document.addEventListener('click', function(e) {
+      var menu = document.getElementById('moreMenu');
+      if (!menu.classList.contains('hidden') && !menu.contains(e.target)) {
+        hideMoreMenu();
+      }
+    });
+
+    /* ===== Select All / Bulk Actions ===== */
+    function toggleSelectAll(masterCheckbox) {
+      var checked = masterCheckbox.checked;
+      var allRowCheckboxes = document.querySelectorAll('.row-checkbox');
+      allRowCheckboxes.forEach(function(cb) {
+        var row = cb.closest('tr');
+        if (row && row.style.display !== 'none') {
+          cb.checked = checked;
+          if (checked) {
+            row.classList.add('selected');
+          } else {
+            row.classList.remove('selected');
+          }
+        }
+      });
+      // Sync both select-all checkboxes
+      var headerCb = document.getElementById('selectAllHeader');
+      var tableCb = document.getElementById('selectAllTable');
+      if (headerCb) headerCb.checked = checked;
+      if (tableCb) tableCb.checked = checked;
+      updateBulkToolbar();
+    }
+
+    function updateBulkToolbar() {
+      var checked = document.querySelectorAll('.row-checkbox:checked');
+      var toolbar = document.getElementById('bulkToolbar');
+      var count = checked.length;
+
+      // Update row highlighting
+      document.querySelectorAll('.row-checkbox').forEach(function(cb) {
+        var row = cb.closest('tr');
+        if (row) {
+          if (cb.checked) {
+            row.classList.add('selected');
+          } else {
+            row.classList.remove('selected');
+          }
+        }
+      });
+
+      if (count > 0) {
+        toolbar.classList.remove('hidden');
+        toolbar.classList.add('visible');
+        document.getElementById('bulkCount').textContent = count;
+        document.getElementById('bulkCountText').textContent = count;
+        document.querySelectorAll('.bulk-action-count').forEach(function(el) {
+          el.textContent = count;
+        });
+      } else {
+        toolbar.classList.add('hidden');
+        toolbar.classList.remove('visible');
+      }
+
+      // Update master checkboxes
+      var allVisible = document.querySelectorAll('.row-checkbox');
+      var visibleCount = 0;
+      allVisible.forEach(function(cb) {
+        var row = cb.closest('tr');
+        if (row && row.style.display !== 'none') visibleCount++;
+      });
+      var allChecked = count > 0 && count === visibleCount;
+      var headerCb = document.getElementById('selectAllHeader');
+      var tableCb = document.getElementById('selectAllTable');
+      if (headerCb) headerCb.checked = allChecked;
+      if (tableCb) tableCb.checked = allChecked;
+    }
+
+    function clearAllSelections() {
+      document.querySelectorAll('.row-checkbox').forEach(function(cb) {
+        cb.checked = false;
+        var row = cb.closest('tr');
+        if (row) row.classList.remove('selected');
+      });
+      var headerCb = document.getElementById('selectAllHeader');
+      var tableCb = document.getElementById('selectAllTable');
+      if (headerCb) headerCb.checked = false;
+      if (tableCb) tableCb.checked = false;
+      updateBulkToolbar();
+    }
+
+    function bulkAction(action) {
+      var checked = document.querySelectorAll('.row-checkbox:checked');
+      var orderIds = [];
+      checked.forEach(function(cb) {
+        var tr = cb.closest('tr');
+        if (tr) orderIds.push(tr.dataset.orderid);
+      });
+      var count = orderIds.length;
+      if (count === 0) return;
+
+      var actionLabels = {
+        'ship': 'Mark as Shipped',
+        'labels': 'Generate Labels',
+        'export': 'Export Selected',
+        'cancel': 'Cancel Orders'
+      };
+      var label = actionLabels[action] || action;
+      alert(label + ' for ' + count + ' order(s):\n' + orderIds.join(', '));
+    }
+
+    /* ===== Advanced Filter Sidebar Toggle ===== */
+    function toggleFilterSidebar() {
+      var sidebar = document.getElementById('filterSidebar');
+      var btn = document.getElementById('filterSidebarToggle');
+      if (sidebar.classList.contains('hidden')) {
+        sidebar.classList.remove('hidden');
+        sidebar.style.width = '264px';
+        sidebar.style.opacity = '1';
+        btn.classList.add('bg-brand-50', 'border-brand-300', 'text-brand-600');
+        btn.classList.remove('bg-white', 'border-gray-200', 'text-gray-700');
+      } else {
+        sidebar.classList.add('hidden');
+        sidebar.style.width = '0';
+        sidebar.style.opacity = '0';
+        btn.classList.remove('bg-brand-50', 'border-brand-300', 'text-brand-600');
+        btn.classList.add('bg-white', 'border-gray-200', 'text-gray-700');
+      }
+    }
+
+    function toggleFilterSection(toggle) {
+      var body = toggle.nextElementSibling;
+      var chevron = toggle.querySelector('.filter-chevron');
+      if (body.classList.contains('open')) {
+        body.classList.remove('open');
+        if (chevron) chevron.style.transform = 'rotate(-90deg)';
+      } else {
+        body.classList.add('open');
+        if (chevron) chevron.style.transform = 'rotate(0deg)';
+      }
+    }
+
+    function applyAdvancedFilters() {
+      var filters = {};
+      document.querySelectorAll('#filterSidebar input[data-filter]:checked').forEach(function(cb) {
+        var key = cb.dataset.filter;
+        if (!filters[key]) filters[key] = [];
+        filters[key].push(cb.value);
+      });
+
+      var tbody = document.querySelector('table tbody');
+      if (!tbody) return;
+      var rows = tbody.querySelectorAll('tr.table-row');
+
+      rows.forEach(function(row) {
+        var show = true;
+
+        // Payment filter
+        if (filters.payment && filters.payment.length > 0) {
+          var rowPayment = row.dataset.payment || '';
+          if (filters.payment.indexOf(rowPayment) === -1) show = false;
+        }
+
+        // Region filter
+        if (filters.region && filters.region.length > 0) {
+          var rowRegion = row.dataset.region || '';
+          if (filters.region.indexOf(rowRegion) === -1) show = false;
+        }
+
+        // SLA filter
+        if (filters.sla && filters.sla.length > 0) {
+          var rowSla = row.dataset.sla || '';
+          if (filters.sla.indexOf(rowSla) === -1) show = false;
+        }
+
+        // Carrier filter
+        if (filters.carrier && filters.carrier.length > 0) {
+          var rowCarrier = row.dataset.carrier || '';
+          if (filters.carrier.indexOf(rowCarrier) === -1) show = false;
+        }
+
+        // Value filter
+        if (filters.value && filters.value.length > 0) {
+          var amountStr = (row.dataset.amount || '').replace(/[^\d]/g, '');
+          var amount = parseInt(amountStr) || 0;
+          var valueMatch = false;
+          filters.value.forEach(function(range) {
+            if (range === '0-500' && amount >= 0 && amount <= 500) valueMatch = true;
+            if (range === '500-2000' && amount > 500 && amount <= 2000) valueMatch = true;
+            if (range === '2000-5000' && amount > 2000 && amount <= 5000) valueMatch = true;
+            if (range === '5000+' && amount > 5000) valueMatch = true;
+          });
+          if (!valueMatch) show = false;
+        }
+
+        if (!show) {
+          row.classList.add('advanced-hidden');
+          row.style.display = 'none';
+        } else {
+          row.classList.remove('advanced-hidden');
+          if (!row.classList.contains('filter-hidden') && !row.classList.contains('search-hidden') && !row.classList.contains('date-hidden')) {
+            row.style.display = '';
+          }
+        }
+      });
+    }
+
+    function resetAdvancedFilters() {
+      document.querySelectorAll('#filterSidebar input[data-filter]').forEach(function(cb) {
+        cb.checked = false;
+      });
+      var tbody = document.querySelector('table tbody');
+      if (!tbody) return;
+      var rows = tbody.querySelectorAll('tr.table-row');
+      rows.forEach(function(row) {
+        row.classList.remove('advanced-hidden');
+        if (!row.classList.contains('filter-hidden') && !row.classList.contains('search-hidden') && !row.classList.contains('date-hidden')) {
+          row.style.display = '';
+        }
+      });
+    }
+  </script>
+
+
+<script>
+  /* ===== Notification Bell Toggle ===== */
+  (function() {
+    var bellBtn = document.querySelector('button.relative.p-2');
+    if (!bellBtn) return;
+    var notifDrop = document.getElementById('notifDropdown');
+    if (!notifDrop) return;
+    bellBtn.addEventListener('click', function(e) {
+      e.stopPropagation();
+      notifDrop.classList.toggle('hidden');
+    });
+    document.addEventListener('click', function(e) {
+      if (!notifDrop.contains(e.target) && e.target !== bellBtn) {
+        notifDrop.classList.add('hidden');
+      }
+    });
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape') notifDrop.classList.add('hidden');
+    });
+  })();
+</script>
+
+<script>
+  /* ===== Filter Tabs ===== */
+  (function() {
+    var tabs = document.querySelectorAll('.filter-tab');
+    var tbody = document.querySelector('table tbody');
+    if (!tabs.length || !tbody) return;
+    var allRows = Array.from(tbody.querySelectorAll('tr.table-row'));
+    var countEl = document.getElementById('showingCount');
+
+    function getVisibleRows() {
+      return allRows.filter(function(r) { return r.style.display !== 'none' && !r.classList.contains('filter-hidden'); });
+    }
+
+    tabs.forEach(function(tab) {
+      tab.addEventListener('click', function() {
+        tabs.forEach(function(t) {
+          t.classList.remove('active');
+          t.classList.remove('text-brand-500');
+          t.classList.add('text-gray-500');
+          t.style.borderBottomColor = 'transparent';
+        });
+        this.classList.add('active');
+        this.classList.remove('text-gray-500');
+        this.classList.add('text-brand-500');
+        this.style.borderBottomColor = '#F97316';
+
+        var label = this.textContent.trim().split(/\s/)[0].toLowerCase();
+        allRows.forEach(function(row) {
+          var status = (row.getAttribute('data-status') || '').toLowerCase();
+          if (label === 'all') {
+            row.classList.remove('filter-hidden');
+            row.style.display = '';
+          } else if (status.indexOf(label) !== -1) {
+            row.classList.remove('filter-hidden');
+            row.style.display = '';
+          } else {
+            row.classList.add('filter-hidden');
+            row.style.display = 'none';
+          }
+        });
+        currentPage = 1;
+        paginate();
+      });
+    });
+
+    /* ===== Search (debounced) ===== */
+    var searchInputs = document.querySelectorAll('input[type="text"][placeholder*="Search"], input[type="text"][placeholder*="search"]');
+    var searchInput = null;
+    searchInputs.forEach(function(inp) {
+      if (inp.closest('main')) searchInput = inp;
+    });
+    if (!searchInput) {
+      // fallback: pick the input inside the table card
+      var card = tbody.closest('.bg-white');
+      if (card) searchInput = card.querySelector('input[type="text"]');
+    }
+    var debounceTimer;
+    if (searchInput) {
+      searchInput.addEventListener('keyup', function() {
+        clearTimeout(debounceTimer);
+        var q = this.value.toLowerCase();
+        debounceTimer = setTimeout(function() {
+          allRows.forEach(function(row) {
+            if (row.classList.contains('filter-hidden')) return;
+            var text = row.textContent.toLowerCase();
+            if (!q || text.indexOf(q) !== -1) {
+              row.classList.remove('search-hidden');
+              row.style.display = '';
+            } else {
+              row.classList.add('search-hidden');
+              row.style.display = 'none';
+            }
+          });
+          currentPage = 1;
+          paginate();
+        }, 250);
+      });
+    }
+
+    /* ===== Pagination ===== */
+    var ROWS_PER_PAGE = 8;
+    var currentPage = 1;
+    var paginationContainer = document.querySelector('nav[aria-label*="aginat"], nav[aria-label*="paginat"], .pagination-nav');
+    if (!paginationContainer) {
+      // find the nav with Previous/Next buttons
+      var allNavs = document.querySelectorAll('nav');
+      allNavs.forEach(function(n) {
+        if (n.textContent.indexOf('Previous') !== -1 && n.textContent.indexOf('Next') !== -1) {
+          paginationContainer = n;
+        }
+      });
+    }
+
+    function paginate() {
+      var visible = allRows.filter(function(r) {
+        return !r.classList.contains('filter-hidden') && !r.classList.contains('search-hidden');
+      });
+      var totalPages = Math.max(1, Math.ceil(visible.length / ROWS_PER_PAGE));
+      if (currentPage > totalPages) currentPage = totalPages;
+      var start = (currentPage - 1) * ROWS_PER_PAGE;
+      var end = start + ROWS_PER_PAGE;
+
+      visible.forEach(function(row, i) {
+        row.style.display = (i >= start && i < end) ? '' : 'none';
+      });
+
+      // Update count text
+      if (countEl) {
+        var showStart = visible.length > 0 ? start + 1 : 0;
+        var showEnd = Math.min(end, visible.length);
+        countEl.textContent = 'Showing ' + showStart + '-' + showEnd + ' of ' + visible.length;
+      }
+
+      // Update pagination buttons
+      if (paginationContainer) {
+        var btns = paginationContainer.querySelectorAll('button, a');
+        btns.forEach(function(btn) {
+          var txt = btn.textContent.trim();
+          if (txt === 'Previous') {
+            btn.onclick = function(e) { e.preventDefault(); if (currentPage > 1) { currentPage--; paginate(); } };
+            btn.style.opacity = currentPage <= 1 ? '0.5' : '1';
+            btn.style.pointerEvents = currentPage <= 1 ? 'none' : 'auto';
+          } else if (txt === 'Next') {
+            btn.onclick = function(e) { e.preventDefault(); if (currentPage < totalPages) { currentPage++; paginate(); } };
+            btn.style.opacity = currentPage >= totalPages ? '0.5' : '1';
+            btn.style.pointerEvents = currentPage >= totalPages ? 'none' : 'auto';
+          } else if (!isNaN(parseInt(txt))) {
+            var pg = parseInt(txt);
+            btn.onclick = function(e) { e.preventDefault(); currentPage = pg; paginate(); };
+            if (pg === currentPage) {
+              btn.className = btn.className.replace(/bg-white/g, 'bg-brand-500').replace(/text-gray-\d+/g, 'text-white');
+            } else {
+              btn.className = btn.className.replace(/bg-brand-500/g, 'bg-white').replace(/text-white/g, 'text-gray-700');
+            }
+          }
+        });
+      }
+    }
+    paginate();
+  })();
+
+  /* ===== Export Button ===== */
+  document.querySelectorAll('button').forEach(function(btn) {
+    var t = btn.textContent.trim().toLowerCase();
+    if ((t.indexOf('export') !== -1 || t.indexOf('csv') !== -1) && !btn.onclick) {
+      btn.onclick = function() { alert('Exporting data to CSV...'); };
+    }
+  });
+</script>
+
+<script>
+  /* ===== Orders: Date Range Filter ===== */
+  (function() {
+    var dateInputs = document.querySelectorAll('input[type="date"]');
+    if (dateInputs.length < 2) return;
+    var fromDate = dateInputs[0];
+    var toDate = dateInputs[1];
+    function filterByDate() {
+      var from = fromDate.value ? new Date(fromDate.value) : null;
+      var to = toDate.value ? new Date(toDate.value) : null;
+      var tbody = document.querySelector('table tbody');
+      if (!tbody) return;
+      var rows = tbody.querySelectorAll('tr.table-row');
+      rows.forEach(function(row) {
+        var dateStr = row.getAttribute('data-date');
+        if (!dateStr) return;
+        var rowDate = new Date(dateStr);
+        var show = true;
+        if (from && rowDate < from) show = false;
+        if (to && rowDate > to) show = false;
+        if (!show) {
+          row.classList.add('date-hidden');
+          row.style.display = 'none';
+        } else {
+          row.classList.remove('date-hidden');
+          if (!row.classList.contains('filter-hidden') && !row.classList.contains('search-hidden') && !row.classList.contains('advanced-hidden')) {
+            row.style.display = '';
+          }
+        }
+      });
+    }
+    fromDate.addEventListener('change', filterByDate);
+    toDate.addEventListener('change', filterByDate);
+  })();
+
+  /* ===== Orders: Export CSV ===== */
+  document.querySelectorAll('button').forEach(function(btn) {
+    var t = btn.textContent.trim().toLowerCase();
+    if ((t.indexOf('export') !== -1 || t.indexOf('csv') !== -1) && !btn.onclick) {
+      btn.onclick = function() { alert('Exporting orders to CSV...'); };
+    }
+  });
+</script>
+
+<script src="../shared-layout.js"></script>
+<script>renderAdminLayout('orders', '../');</script>
+</body>
+</html>

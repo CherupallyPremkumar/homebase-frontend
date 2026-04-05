@@ -1,0 +1,582 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HomeBase — Support Center</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              50: '#FFF7ED',
+              100: '#FFEDD5',
+              200: '#FED7AA',
+              300: '#FDBA74',
+              400: '#FB923C',
+              500: '#F97316',
+              600: '#EA580C',
+              700: '#C2410C',
+            },
+            navy: {
+              700: '#1E3A5F',
+              800: '#1A2E4A',
+              900: '#0F1B2D',
+            },
+            success: '#16A34A',
+            warning: '#EAB308',
+            danger: '#DC2626',
+          },
+          fontFamily: {
+            sans: ['Inter', 'system-ui', 'sans-serif'],
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+    .scrollbar-hide::-webkit-scrollbar { display: none; }
+    .sidebar-link { transition: all 0.15s ease; }
+    .sidebar-link:hover { background: rgba(255,255,255,0.08); }
+    .sidebar-link.active { background: rgba(249,115,22,0.15); border-right: 3px solid #F97316; }
+    .stat-card { transition: all 0.2s ease; }
+    .stat-card:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,0.08); }
+    .ticket-card { transition: all 0.2s ease; }
+    .ticket-card:hover { transform: translateY(-1px); box-shadow: 0 4px 16px rgba(0,0,0,0.08); }
+    .kb-card { transition: all 0.2s ease; }
+    .kb-card:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(0,0,0,0.08); }
+    .filter-tab { transition: all 0.15s ease; }
+    .filter-tab.active { color: #F97316; border-color: #F97316; background: #FFF7ED; }
+    .dropdown-menu { display: none; }
+    .dropdown:hover .dropdown-menu { display: block; }
+
+    /* Custom scrollbar for sidebar */
+    .sidebar-scroll::-webkit-scrollbar { width: 4px; }
+    .sidebar-scroll::-webkit-scrollbar-track { background: transparent; }
+    .sidebar-scroll::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); border-radius: 2px; }
+  </style>
+</head>
+<body class="font-sans bg-gray-50 text-gray-900">
+
+  <!-- ===== TOP HEADER BAR ===== -->
+  <header id="seller-header" class="fixed top-0 left-0 right-0 z-50 bg-white border-b border-gray-200 h-16"></header>
+
+  <!-- ===== LAYOUT: SIDEBAR + MAIN ===== -->
+  <div class="flex pt-16 min-h-screen">
+
+    <!-- ===== LEFT SIDEBAR ===== -->
+    <aside id="seller-sidebar" class="fixed left-0 top-16 bottom-0 w-60 z-40 flex flex-col overflow-y-auto" style="background:#0F1B2D;"></aside>
+
+    <!-- ===== MAIN CONTENT ===== -->
+    <main class="flex-1 ml-60 p-6">
+
+      <!-- Page Header -->
+      <div class="flex items-center justify-between mb-6">
+        <div>
+          <h1 class="text-2xl font-bold text-navy-900">Support Center</h1>
+          <p class="text-sm text-gray-400 mt-1">Manage your tickets and find help resources</p>
+        </div>
+        <button class="flex items-center gap-2 bg-brand-500 hover:bg-brand-600 text-white text-sm font-semibold px-5 py-2.5 rounded-lg transition shadow-sm">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 4.5v15m7.5-7.5h-15"/></svg>
+          Create New Ticket
+        </button>
+      </div>
+
+      <!-- Stats Cards Row -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 mb-6">
+        <!-- Open Tickets -->
+        <div class="stat-card bg-white rounded-xl p-5 border border-gray-100 shadow-sm">
+          <div class="flex items-center justify-between mb-3">
+            <div class="w-10 h-10 rounded-lg bg-red-50 flex items-center justify-center">
+              <svg class="w-5 h-5 text-danger" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z"/></svg>
+            </div>
+            <span class="flex items-center gap-1 text-xs font-semibold text-danger bg-red-50 px-2 py-1 rounded-full">Urgent</span>
+          </div>
+          <p class="text-2xl font-bold text-navy-900">2</p>
+          <p class="text-xs text-gray-400 mt-1">Open Tickets</p>
+          <div class="mt-3 h-1 bg-gray-100 rounded-full overflow-hidden">
+            <div class="h-full bg-danger rounded-full" style="width: 20%"></div>
+          </div>
+        </div>
+
+        <!-- In Progress -->
+        <div class="stat-card bg-white rounded-xl p-5 border border-gray-100 shadow-sm">
+          <div class="flex items-center justify-between mb-3">
+            <div class="w-10 h-10 rounded-lg bg-brand-50 flex items-center justify-center">
+              <svg class="w-5 h-5 text-brand-500" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182"/></svg>
+            </div>
+            <span class="flex items-center gap-1 text-xs font-semibold text-brand-600 bg-brand-50 px-2 py-1 rounded-full">Active</span>
+          </div>
+          <p class="text-2xl font-bold text-navy-900">3</p>
+          <p class="text-xs text-gray-400 mt-1">In Progress</p>
+          <div class="mt-3 h-1 bg-gray-100 rounded-full overflow-hidden">
+            <div class="h-full bg-brand-500 rounded-full" style="width: 35%"></div>
+          </div>
+        </div>
+
+        <!-- Resolved -->
+        <div class="stat-card bg-white rounded-xl p-5 border border-gray-100 shadow-sm">
+          <div class="flex items-center justify-between mb-3">
+            <div class="w-10 h-10 rounded-lg bg-green-50 flex items-center justify-center">
+              <svg class="w-5 h-5 text-success" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+            </div>
+            <span class="flex items-center gap-1 text-xs font-semibold text-success bg-green-50 px-2 py-1 rounded-full">
+              <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M4.5 19.5l15-15m0 0H8.25m11.25 0v11.25"/></svg>
+              +6
+            </span>
+          </div>
+          <p class="text-2xl font-bold text-navy-900">45</p>
+          <p class="text-xs text-gray-400 mt-1">Resolved</p>
+          <div class="mt-3 h-1 bg-gray-100 rounded-full overflow-hidden">
+            <div class="h-full bg-success rounded-full" style="width: 90%"></div>
+          </div>
+        </div>
+
+        <!-- Avg Response Time -->
+        <div class="stat-card bg-white rounded-xl p-5 border border-gray-100 shadow-sm">
+          <div class="flex items-center justify-between mb-3">
+            <div class="w-10 h-10 rounded-lg bg-blue-50 flex items-center justify-center">
+              <svg class="w-5 h-5 text-blue-500" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+            </div>
+            <span class="flex items-center gap-1 text-xs font-semibold text-success bg-green-50 px-2 py-1 rounded-full">
+              <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M19.5 4.5l-15 15m0 0h11.25m-11.25 0V8.25"/></svg>
+              -18%
+            </span>
+          </div>
+          <p class="text-2xl font-bold text-navy-900">2.4 <span class="text-base font-normal text-gray-400">hrs</span></p>
+          <p class="text-xs text-gray-400 mt-1">Avg Response Time</p>
+          <div class="mt-3 h-1 bg-gray-100 rounded-full overflow-hidden">
+            <div class="h-full bg-blue-500 rounded-full" style="width: 76%"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Filter Tabs + Search -->
+      <div class="bg-white rounded-xl border border-gray-100 shadow-sm mb-6">
+        <div class="flex items-center justify-between p-5 border-b border-gray-100">
+          <div class="flex items-center gap-1">
+            <button class="filter-tab active text-sm font-medium px-4 py-2 rounded-lg border border-transparent">All (50)</button>
+            <button class="filter-tab text-sm font-medium px-4 py-2 rounded-lg border border-transparent text-gray-500 hover:text-gray-700 hover:bg-gray-50">Open (2)</button>
+            <button class="filter-tab text-sm font-medium px-4 py-2 rounded-lg border border-transparent text-gray-500 hover:text-gray-700 hover:bg-gray-50">In Progress (3)</button>
+            <button class="filter-tab text-sm font-medium px-4 py-2 rounded-lg border border-transparent text-gray-500 hover:text-gray-700 hover:bg-gray-50">Resolved (45)</button>
+            <button class="filter-tab text-sm font-medium px-4 py-2 rounded-lg border border-transparent text-gray-500 hover:text-gray-700 hover:bg-gray-50">Closed (0)</button>
+          </div>
+          <div class="relative">
+            <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+            <input type="text" placeholder="Search tickets..." class="bg-gray-50 border border-gray-200 rounded-lg py-2 pl-10 pr-4 text-sm outline-none focus:border-brand-400 focus:ring-2 focus:ring-brand-100 transition w-56">
+          </div>
+        </div>
+
+        <!-- Tickets List -->
+        <div class="divide-y divide-gray-100">
+
+          <!-- Ticket 1: High Priority, Open -->
+          <div class="ticket-card p-5 cursor-pointer hover:bg-gray-50/50" data-ticketid="#TKT-1042" data-priority="High" data-status="Open" data-category="Order Issue" data-title="Order #ORD-8834 not delivered but marked as completed" data-replies="4" data-attachments="2" data-assigned="Support Team A" data-updated="2 hours ago" onclick="viewTicket(this)">
+            <div class="flex items-start justify-between gap-4">
+              <div class="flex-1 min-w-0">
+                <div class="flex items-center gap-3 mb-2">
+                  <span class="text-xs font-mono text-gray-400">#TKT-1042</span>
+                  <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-red-100 text-danger">
+                    <span class="w-1.5 h-1.5 rounded-full bg-danger"></span>
+                    High
+                  </span>
+                  <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-blue-100 text-blue-700">Open</span>
+                  <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-medium bg-gray-100 text-gray-600">Order Issue</span>
+                </div>
+                <h4 class="text-sm font-semibold text-navy-900 mb-1">Order #ORD-8834 not delivered but marked as completed</h4>
+                <p class="text-xs text-gray-400 line-clamp-2">Customer is claiming the order was never received despite the tracking showing delivered. Need urgent investigation on the delivery partner's proof of delivery...</p>
+              </div>
+              <div class="text-right shrink-0">
+                <p class="text-[10px] text-gray-400">Updated</p>
+                <p class="text-xs font-medium text-gray-600">2 hours ago</p>
+              </div>
+            </div>
+            <div class="flex items-center gap-4 mt-3">
+              <div class="flex items-center gap-1.5 text-xs text-gray-400">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M8.625 12a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0H8.25m4.125 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0H12m4.125 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0h-.375M21 12c0 4.556-4.03 8.25-9 8.25a9.764 9.764 0 01-2.555-.337A5.972 5.972 0 015.41 20.97a5.969 5.969 0 01-.474-.065 4.48 4.48 0 00.978-2.025c.09-.457-.133-.901-.467-1.226C3.93 16.178 3 14.189 3 12c0-4.556 4.03-8.25 9-8.25s9 3.694 9 8.25z"/></svg>
+                4 replies
+              </div>
+              <div class="flex items-center gap-1.5 text-xs text-gray-400">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M18.375 12.739l-7.693 7.693a4.5 4.5 0 01-6.364-6.364l10.94-10.94A3 3 0 1119.5 7.372L8.552 18.32m.009-.01l-.01.01m5.699-9.941l-7.81 7.81a1.5 1.5 0 002.112 2.13"/></svg>
+                2 attachments
+              </div>
+              <span class="text-[10px] text-gray-300">|</span>
+              <span class="text-xs text-gray-400">Assigned to: <span class="font-medium text-gray-600">Support Team A</span></span>
+            </div>
+          </div>
+
+          <!-- Ticket 2: High Priority, In Progress -->
+          <div class="ticket-card p-5 cursor-pointer hover:bg-gray-50/50" data-ticketid="#TKT-1039" data-priority="High" data-status="In Progress" data-category="Payment" data-title="Settlement payment delayed for March cycle" data-replies="6" data-attachments="1" data-assigned="Finance Team" data-updated="5 hours ago" onclick="viewTicket(this)">
+            <div class="flex items-start justify-between gap-4">
+              <div class="flex-1 min-w-0">
+                <div class="flex items-center gap-3 mb-2">
+                  <span class="text-xs font-mono text-gray-400">#TKT-1039</span>
+                  <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-red-100 text-danger">
+                    <span class="w-1.5 h-1.5 rounded-full bg-danger"></span>
+                    High
+                  </span>
+                  <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-brand-100 text-brand-700">In Progress</span>
+                  <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-medium bg-gray-100 text-gray-600">Payment</span>
+                </div>
+                <h4 class="text-sm font-semibold text-navy-900 mb-1">Settlement payment delayed for March cycle</h4>
+                <p class="text-xs text-gray-400 line-clamp-2">The settlement amount of Rs. 1,24,500 for the March 15-22 cycle has not been credited to the registered bank account. Expected date was March 25...</p>
+              </div>
+              <div class="text-right shrink-0">
+                <p class="text-[10px] text-gray-400">Updated</p>
+                <p class="text-xs font-medium text-gray-600">5 hours ago</p>
+              </div>
+            </div>
+            <div class="flex items-center gap-4 mt-3">
+              <div class="flex items-center gap-1.5 text-xs text-gray-400">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M8.625 12a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0H8.25m4.125 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0H12m4.125 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0h-.375M21 12c0 4.556-4.03 8.25-9 8.25a9.764 9.764 0 01-2.555-.337A5.972 5.972 0 015.41 20.97a5.969 5.969 0 01-.474-.065 4.48 4.48 0 00.978-2.025c.09-.457-.133-.901-.467-1.226C3.93 16.178 3 14.189 3 12c0-4.556 4.03-8.25 9-8.25s9 3.694 9 8.25z"/></svg>
+                6 replies
+              </div>
+              <div class="flex items-center gap-1.5 text-xs text-gray-400">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M18.375 12.739l-7.693 7.693a4.5 4.5 0 01-6.364-6.364l10.94-10.94A3 3 0 1119.5 7.372L8.552 18.32m.009-.01l-.01.01m5.699-9.941l-7.81 7.81a1.5 1.5 0 002.112 2.13"/></svg>
+                1 attachment
+              </div>
+              <span class="text-[10px] text-gray-300">|</span>
+              <span class="text-xs text-gray-400">Assigned to: <span class="font-medium text-gray-600">Finance Team</span></span>
+            </div>
+          </div>
+
+          <!-- Ticket 3: Medium Priority, In Progress -->
+          <div class="ticket-card p-5 cursor-pointer hover:bg-gray-50/50" data-ticketid="#TKT-1036" data-priority="Medium" data-status="In Progress" data-category="Product" data-title="Product listing rejected - incorrect category mapping" data-replies="3" data-attachments="5" data-assigned="Catalog Team" data-updated="1 day ago" onclick="viewTicket(this)">
+            <div class="flex items-start justify-between gap-4">
+              <div class="flex-1 min-w-0">
+                <div class="flex items-center gap-3 mb-2">
+                  <span class="text-xs font-mono text-gray-400">#TKT-1036</span>
+                  <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-orange-100 text-orange-700">
+                    <span class="w-1.5 h-1.5 rounded-full bg-orange-500"></span>
+                    Medium
+                  </span>
+                  <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-brand-100 text-brand-700">In Progress</span>
+                  <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-medium bg-gray-100 text-gray-600">Product</span>
+                </div>
+                <h4 class="text-sm font-semibold text-navy-900 mb-1">Product listing rejected - incorrect category mapping</h4>
+                <p class="text-xs text-gray-400 line-clamp-2">Submitted 5 new product listings under "Home Appliances" but they were rejected with error "Category mismatch". The products are kitchen appliances and should qualify...</p>
+              </div>
+              <div class="text-right shrink-0">
+                <p class="text-[10px] text-gray-400">Updated</p>
+                <p class="text-xs font-medium text-gray-600">1 day ago</p>
+              </div>
+            </div>
+            <div class="flex items-center gap-4 mt-3">
+              <div class="flex items-center gap-1.5 text-xs text-gray-400">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M8.625 12a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0H8.25m4.125 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0H12m4.125 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0h-.375M21 12c0 4.556-4.03 8.25-9 8.25a9.764 9.764 0 01-2.555-.337A5.972 5.972 0 015.41 20.97a5.969 5.969 0 01-.474-.065 4.48 4.48 0 00.978-2.025c.09-.457-.133-.901-.467-1.226C3.93 16.178 3 14.189 3 12c0-4.556 4.03-8.25 9-8.25s9 3.694 9 8.25z"/></svg>
+                3 replies
+              </div>
+              <div class="flex items-center gap-1.5 text-xs text-gray-400">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M18.375 12.739l-7.693 7.693a4.5 4.5 0 01-6.364-6.364l10.94-10.94A3 3 0 1119.5 7.372L8.552 18.32m.009-.01l-.01.01m5.699-9.941l-7.81 7.81a1.5 1.5 0 002.112 2.13"/></svg>
+                5 attachments
+              </div>
+              <span class="text-[10px] text-gray-300">|</span>
+              <span class="text-xs text-gray-400">Assigned to: <span class="font-medium text-gray-600">Catalog Team</span></span>
+            </div>
+          </div>
+
+          <!-- Ticket 4: Low Priority, Open -->
+          <div class="ticket-card p-5 cursor-pointer hover:bg-gray-50/50" data-ticketid="#TKT-1031" data-priority="Low" data-status="Open" data-category="Account" data-title="Request to update registered business address" data-replies="1" data-attachments="3" data-assigned="Account Team" data-updated="2 days ago" onclick="viewTicket(this)">
+            <div class="flex items-start justify-between gap-4">
+              <div class="flex-1 min-w-0">
+                <div class="flex items-center gap-3 mb-2">
+                  <span class="text-xs font-mono text-gray-400">#TKT-1031</span>
+                  <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-green-100 text-green-700">
+                    <span class="w-1.5 h-1.5 rounded-full bg-green-500"></span>
+                    Low
+                  </span>
+                  <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-blue-100 text-blue-700">Open</span>
+                  <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-medium bg-gray-100 text-gray-600">Account</span>
+                </div>
+                <h4 class="text-sm font-semibold text-navy-900 mb-1">Request to update registered business address</h4>
+                <p class="text-xs text-gray-400 line-clamp-2">We have relocated our warehouse to a new address in Bengaluru. Need to update the registered business address and GST details in the seller profile...</p>
+              </div>
+              <div class="text-right shrink-0">
+                <p class="text-[10px] text-gray-400">Updated</p>
+                <p class="text-xs font-medium text-gray-600">2 days ago</p>
+              </div>
+            </div>
+            <div class="flex items-center gap-4 mt-3">
+              <div class="flex items-center gap-1.5 text-xs text-gray-400">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M8.625 12a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0H8.25m4.125 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0H12m4.125 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0h-.375M21 12c0 4.556-4.03 8.25-9 8.25a9.764 9.764 0 01-2.555-.337A5.972 5.972 0 015.41 20.97a5.969 5.969 0 01-.474-.065 4.48 4.48 0 00.978-2.025c.09-.457-.133-.901-.467-1.226C3.93 16.178 3 14.189 3 12c0-4.556 4.03-8.25 9-8.25s9 3.694 9 8.25z"/></svg>
+                1 reply
+              </div>
+              <div class="flex items-center gap-1.5 text-xs text-gray-400">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M18.375 12.739l-7.693 7.693a4.5 4.5 0 01-6.364-6.364l10.94-10.94A3 3 0 1119.5 7.372L8.552 18.32m.009-.01l-.01.01m5.699-9.941l-7.81 7.81a1.5 1.5 0 002.112 2.13"/></svg>
+                3 attachments
+              </div>
+              <span class="text-[10px] text-gray-300">|</span>
+              <span class="text-xs text-gray-400">Assigned to: <span class="font-medium text-gray-600">Account Team</span></span>
+            </div>
+          </div>
+
+          <!-- Ticket 5: Medium Priority, Resolved -->
+          <div class="ticket-card p-5 cursor-pointer hover:bg-gray-50/50" data-ticketid="#TKT-1028" data-priority="Medium" data-status="Resolved" data-category="Order Issue" data-title="Bulk order cancellation request - incorrect pricing uploaded" data-replies="8" data-attachments="1" data-assigned="Support Team B" data-updated="4 days ago" onclick="viewTicket(this)">
+            <div class="flex items-start justify-between gap-4">
+              <div class="flex-1 min-w-0">
+                <div class="flex items-center gap-3 mb-2">
+                  <span class="text-xs font-mono text-gray-400">#TKT-1028</span>
+                  <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-orange-100 text-orange-700">
+                    <span class="w-1.5 h-1.5 rounded-full bg-orange-500"></span>
+                    Medium
+                  </span>
+                  <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-green-100 text-green-700">Resolved</span>
+                  <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-medium bg-gray-100 text-gray-600">Order Issue</span>
+                </div>
+                <h4 class="text-sm font-semibold text-navy-900 mb-1">Bulk order cancellation request - incorrect pricing uploaded</h4>
+                <p class="text-xs text-gray-400 line-clamp-2">Due to a pricing error in the bulk upload, 23 orders were placed at incorrect prices. Requested cancellation of all affected orders and price correction...</p>
+              </div>
+              <div class="text-right shrink-0">
+                <p class="text-[10px] text-gray-400">Updated</p>
+                <p class="text-xs font-medium text-gray-600">4 days ago</p>
+              </div>
+            </div>
+            <div class="flex items-center gap-4 mt-3">
+              <div class="flex items-center gap-1.5 text-xs text-gray-400">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M8.625 12a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0H8.25m4.125 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0H12m4.125 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0h-.375M21 12c0 4.556-4.03 8.25-9 8.25a9.764 9.764 0 01-2.555-.337A5.972 5.972 0 015.41 20.97a5.969 5.969 0 01-.474-.065 4.48 4.48 0 00.978-2.025c.09-.457-.133-.901-.467-1.226C3.93 16.178 3 14.189 3 12c0-4.556 4.03-8.25 9-8.25s9 3.694 9 8.25z"/></svg>
+                8 replies
+              </div>
+              <div class="flex items-center gap-1.5 text-xs text-gray-400">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M18.375 12.739l-7.693 7.693a4.5 4.5 0 01-6.364-6.364l10.94-10.94A3 3 0 1119.5 7.372L8.552 18.32m.009-.01l-.01.01m5.699-9.941l-7.81 7.81a1.5 1.5 0 002.112 2.13"/></svg>
+                1 attachment
+              </div>
+              <span class="text-[10px] text-gray-300">|</span>
+              <span class="text-xs text-gray-400">Resolved by: <span class="font-medium text-gray-600">Support Team B</span></span>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Pagination -->
+        <div class="flex items-center justify-between p-5 border-t border-gray-100">
+          <p class="text-sm text-gray-400">Showing <span class="font-medium text-gray-600">1-5</span> of <span class="font-medium text-gray-600">50</span> tickets</p>
+          <div class="flex items-center gap-1">
+            <button class="w-9 h-9 flex items-center justify-center rounded-lg border border-gray-200 text-gray-400 hover:bg-gray-50 transition disabled:opacity-40" disabled>
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M15.75 19.5L8.25 12l7.5-7.5"/></svg>
+            </button>
+            <button class="w-9 h-9 flex items-center justify-center rounded-lg bg-brand-500 text-white text-sm font-medium">1</button>
+            <button class="w-9 h-9 flex items-center justify-center rounded-lg border border-gray-200 text-gray-600 text-sm font-medium hover:bg-gray-50 transition">2</button>
+            <button class="w-9 h-9 flex items-center justify-center rounded-lg border border-gray-200 text-gray-600 text-sm font-medium hover:bg-gray-50 transition">3</button>
+            <span class="w-9 h-9 flex items-center justify-center text-gray-400 text-sm">...</span>
+            <button class="w-9 h-9 flex items-center justify-center rounded-lg border border-gray-200 text-gray-600 text-sm font-medium hover:bg-gray-50 transition">10</button>
+            <button class="w-9 h-9 flex items-center justify-center rounded-lg border border-gray-200 text-gray-600 hover:bg-gray-50 transition">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M8.25 4.5l7.5 7.5-7.5 7.5"/></svg>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Knowledge Base + Contact Support -->
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
+
+        <!-- Knowledge Base Section -->
+        <div class="lg:col-span-2">
+          <div class="flex items-center justify-between mb-4">
+            <div>
+              <h3 class="text-base font-semibold text-navy-900">Knowledge Base</h3>
+              <p class="text-xs text-gray-400 mt-0.5">Find answers to common questions</p>
+            </div>
+            <a href="#" onclick="event.preventDefault();alert('View All Articles - Coming Soon')" class="text-sm font-medium text-brand-500 hover:text-brand-600 transition">View All Articles</a>
+          </div>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+
+            <!-- Article 1 -->
+            <div class="kb-card bg-white rounded-xl p-5 border border-gray-100 shadow-sm cursor-pointer">
+              <div class="w-10 h-10 rounded-lg bg-brand-50 flex items-center justify-center mb-3">
+                <svg class="w-5 h-5 text-brand-500" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M20.25 7.5l-.625 10.632a2.25 2.25 0 01-2.247 2.118H6.622a2.25 2.25 0 01-2.247-2.118L3.75 7.5M10 11.25h4M3.375 7.5h17.25c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125z"/></svg>
+              </div>
+              <h4 class="text-sm font-semibold text-navy-900 mb-1">How to Add Products</h4>
+              <p class="text-xs text-gray-400 leading-relaxed">Step-by-step guide to listing your products, setting prices, adding images, and managing variants on HomeBase.</p>
+              <div class="flex items-center gap-2 mt-3 pt-3 border-t border-gray-100">
+                <svg class="w-3.5 h-3.5 text-gray-300" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                <span class="text-[10px] text-gray-400">5 min read</span>
+                <span class="text-[10px] text-gray-300 mx-1">|</span>
+                <span class="text-[10px] text-gray-400">Updated Mar 20</span>
+              </div>
+            </div>
+
+            <!-- Article 2 -->
+            <div class="kb-card bg-white rounded-xl p-5 border border-gray-100 shadow-sm cursor-pointer">
+              <div class="w-10 h-10 rounded-lg bg-blue-50 flex items-center justify-center mb-3">
+                <svg class="w-5 h-5 text-blue-500" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M8.25 18.75a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m3 0h6m-9 0H3.375a1.125 1.125 0 01-1.125-1.125V14.25m17.25 4.5a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m3 0h1.125c.621 0 1.129-.504 1.09-1.124a17.902 17.902 0 00-3.213-9.193 2.056 2.056 0 00-1.58-.86H14.25M16.5 18.75h-2.25m0-11.177v-.958c0-.568-.422-1.048-.987-1.106a48.554 48.554 0 00-10.026 0 1.106 1.106 0 00-.987 1.106v7.635m12-6.677v6.677m0 4.5v-4.5m0 0h-12"/></svg>
+              </div>
+              <h4 class="text-sm font-semibold text-navy-900 mb-1">Shipping Guidelines</h4>
+              <p class="text-xs text-gray-400 leading-relaxed">Packaging standards, shipping partner integration, delivery SLAs, and how to handle shipping exceptions effectively.</p>
+              <div class="flex items-center gap-2 mt-3 pt-3 border-t border-gray-100">
+                <svg class="w-3.5 h-3.5 text-gray-300" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                <span class="text-[10px] text-gray-400">8 min read</span>
+                <span class="text-[10px] text-gray-300 mx-1">|</span>
+                <span class="text-[10px] text-gray-400">Updated Mar 18</span>
+              </div>
+            </div>
+
+            <!-- Article 3 -->
+            <div class="kb-card bg-white rounded-xl p-5 border border-gray-100 shadow-sm cursor-pointer">
+              <div class="w-10 h-10 rounded-lg bg-purple-50 flex items-center justify-center mb-3">
+                <svg class="w-5 h-5 text-purple-500" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182"/></svg>
+              </div>
+              <h4 class="text-sm font-semibold text-navy-900 mb-1">Return Policies</h4>
+              <p class="text-xs text-gray-400 leading-relaxed">Understanding return windows, refund processing, quality check procedures, and managing customer return requests.</p>
+              <div class="flex items-center gap-2 mt-3 pt-3 border-t border-gray-100">
+                <svg class="w-3.5 h-3.5 text-gray-300" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                <span class="text-[10px] text-gray-400">6 min read</span>
+                <span class="text-[10px] text-gray-300 mx-1">|</span>
+                <span class="text-[10px] text-gray-400">Updated Mar 15</span>
+              </div>
+            </div>
+
+            <!-- Article 4 -->
+            <div class="kb-card bg-white rounded-xl p-5 border border-gray-100 shadow-sm cursor-pointer">
+              <div class="w-10 h-10 rounded-lg bg-green-50 flex items-center justify-center mb-3">
+                <svg class="w-5 h-5 text-green-500" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M2.25 18.75a60.07 60.07 0 0115.797 2.101c.727.198 1.453-.342 1.453-1.096V18.75M3.75 4.5v.75A.75.75 0 013 6h-.75m0 0v-.375c0-.621.504-1.125 1.125-1.125H20.25M2.25 6v9m18-10.5v.75c0 .414.336.75.75.75h.75m-1.5-1.5h.375c.621 0 1.125.504 1.125 1.125v9.75c0 .621-.504 1.125-1.125 1.125h-.375m1.5-1.5H21a.75.75 0 00-.75.75v.75m0 0H3.75m0 0h-.375a1.125 1.125 0 01-1.125-1.125V15m1.5 1.5v-.75A.75.75 0 003 15h-.75M15 10.5a3 3 0 11-6 0 3 3 0 016 0zm3 0h.008v.008H18V10.5zm-12 0h.008v.008H6V10.5z"/></svg>
+              </div>
+              <h4 class="text-sm font-semibold text-navy-900 mb-1">Payment FAQs</h4>
+              <p class="text-xs text-gray-400 leading-relaxed">Settlement cycles, commission structure, tax deductions, payment methods, and resolving payment discrepancies.</p>
+              <div class="flex items-center gap-2 mt-3 pt-3 border-t border-gray-100">
+                <svg class="w-3.5 h-3.5 text-gray-300" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                <span class="text-[10px] text-gray-400">4 min read</span>
+                <span class="text-[10px] text-gray-300 mx-1">|</span>
+                <span class="text-[10px] text-gray-400">Updated Mar 12</span>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- Contact Support Card -->
+        <div class="lg:col-span-1">
+          <div class="mb-4">
+            <h3 class="text-base font-semibold text-navy-900">Contact Support</h3>
+            <p class="text-xs text-gray-400 mt-0.5">Get in touch with our team</p>
+          </div>
+          <div class="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden">
+            <!-- Header Gradient -->
+            <div class="bg-gradient-to-br from-navy-900 to-navy-800 p-5">
+              <div class="w-12 h-12 rounded-xl bg-white/10 flex items-center justify-center mb-3">
+                <svg class="w-6 h-6 text-brand-400" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M20.25 8.511c.884.284 1.5 1.128 1.5 2.097v4.286c0 1.136-.847 2.1-1.98 2.193-.34.027-.68.052-1.02.072v3.091l-3-3c-1.354 0-2.694-.055-4.02-.163a2.115 2.115 0 01-.825-.242m9.345-8.334a2.126 2.126 0 00-.476-.095 48.64 48.64 0 00-8.048 0c-1.131.094-1.976 1.057-1.976 2.192v4.286c0 .837.46 1.58 1.155 1.951m9.345-8.334V6.637c0-1.621-1.152-3.026-2.76-3.235A48.455 48.455 0 0011.25 3c-2.115 0-4.198.137-6.24.402-1.608.209-2.76 1.614-2.76 3.235v6.226c0 1.621 1.152 3.026 2.76 3.235.577.075 1.157.14 1.74.194V21l4.155-4.155"/></svg>
+              </div>
+              <h4 class="text-white font-semibold text-sm">Need Help?</h4>
+              <p class="text-gray-400 text-xs mt-1">Our support team is available 24/7 to assist you with any queries.</p>
+            </div>
+
+            <!-- Contact Methods -->
+            <div class="p-5 space-y-4">
+              <!-- Email -->
+              <div class="flex items-center gap-3">
+                <div class="w-9 h-9 rounded-lg bg-brand-50 flex items-center justify-center shrink-0">
+                  <svg class="w-4 h-4 text-brand-500" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0L3.32 8.91a2.25 2.25 0 01-1.07-1.916V6.75"/></svg>
+                </div>
+                <div>
+                  <p class="text-xs text-gray-400">Email</p>
+                  <p class="text-sm font-medium text-navy-900">seller-support@homebase.in</p>
+                </div>
+              </div>
+
+              <!-- Phone -->
+              <div class="flex items-center gap-3">
+                <div class="w-9 h-9 rounded-lg bg-green-50 flex items-center justify-center shrink-0">
+                  <svg class="w-4 h-4 text-green-500" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M2.25 6.75c0 8.284 6.716 15 15 15h2.25a2.25 2.25 0 002.25-2.25v-1.372c0-.516-.351-.966-.852-1.091l-4.423-1.106c-.44-.11-.902.055-1.173.417l-.97 1.293c-.282.376-.769.542-1.21.38a12.035 12.035 0 01-7.143-7.143c-.162-.441.004-.928.38-1.21l1.293-.97c.363-.271.527-.734.417-1.173L6.963 3.102a1.125 1.125 0 00-1.091-.852H4.5A2.25 2.25 0 002.25 4.5v2.25z"/></svg>
+                </div>
+                <div>
+                  <p class="text-xs text-gray-400">Phone</p>
+                  <p class="text-sm font-medium text-navy-900">1800-123-4567 (Toll Free)</p>
+                </div>
+              </div>
+
+              <!-- Working Hours -->
+              <div class="flex items-center gap-3">
+                <div class="w-9 h-9 rounded-lg bg-blue-50 flex items-center justify-center shrink-0">
+                  <svg class="w-4 h-4 text-blue-500" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                </div>
+                <div>
+                  <p class="text-xs text-gray-400">Working Hours</p>
+                  <p class="text-sm font-medium text-navy-900">Mon-Sat, 9AM - 9PM IST</p>
+                </div>
+              </div>
+
+              <!-- Divider -->
+              <div class="border-t border-gray-100"></div>
+
+              <!-- Live Chat Button -->
+              <button class="w-full flex items-center justify-center gap-2 bg-brand-500 hover:bg-brand-600 text-white text-sm font-semibold py-3 rounded-lg transition">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M8.625 12a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0H8.25m4.125 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0H12m4.125 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0h-.375M21 12c0 4.556-4.03 8.25-9 8.25a9.764 9.764 0 01-2.555-.337A5.972 5.972 0 015.41 20.97a5.969 5.969 0 01-.474-.065 4.48 4.48 0 00.978-2.025c.09-.457-.133-.901-.467-1.226C3.93 16.178 3 14.189 3 12c0-4.556 4.03-8.25 9-8.25s9 3.694 9 8.25z"/></svg>
+                Start Live Chat
+              </button>
+
+              <!-- Status Indicator -->
+              <div class="flex items-center justify-center gap-1.5">
+                <span class="w-2 h-2 rounded-full bg-green-400 animate-pulse"></span>
+                <span class="text-xs text-gray-400">Support agents are online</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+    </main>
+  </div>
+
+
+  <!-- ===== VIEW TICKET MODAL ===== -->
+  <div id="viewModal" class="fixed inset-0 z-[100] hidden items-center justify-center bg-black/40 backdrop-blur-sm">
+    <div class="relative w-full max-w-lg mx-4 bg-white rounded-2xl shadow-2xl overflow-hidden">
+      <div class="flex items-center justify-between px-6 py-4 border-b border-gray-100 bg-gray-50">
+        <h3 class="text-lg font-bold text-gray-900">Ticket Details</h3>
+        <button onclick="closeViewModal()" class="p-1.5 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M6 18L18 6M6 6l12 12"/></svg>
+        </button>
+      </div>
+      <div class="px-6 py-5 space-y-4" id="viewModalBody"></div>
+      <div class="flex justify-end gap-3 px-6 py-4 border-t border-gray-100 bg-gray-50" id="viewModalFooter"></div>
+    </div>
+  </div>
+
+  <!-- ===== JavaScript ===== -->
+  <script>
+    function viewTicket(card) {
+      var d = card.dataset;
+      var priorityColor = d.priority === 'High' ? 'bg-red-100 text-red-700' :
+                          d.priority === 'Medium' ? 'bg-orange-100 text-orange-700' :
+                          'bg-green-100 text-green-700';
+      var statusColor = d.status === 'Open' ? 'bg-blue-100 text-blue-700' :
+                        d.status === 'In Progress' ? 'bg-orange-100 text-orange-700' :
+                        d.status === 'Resolved' ? 'bg-green-100 text-green-700' :
+                        'bg-gray-100 text-gray-600';
+      document.getElementById('viewModalBody').innerHTML =
+        '<div class="flex items-center gap-2 mb-3">' +
+          '<span class="font-mono text-xs text-gray-400">' + d.ticketid + '</span>' +
+          '<span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold ' + priorityColor + '">' + d.priority + '</span>' +
+          '<span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold ' + statusColor + '">' + d.status + '</span>' +
+          '<span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-medium bg-gray-100 text-gray-600">' + d.category + '</span>' +
+        '</div>' +
+        '<h4 class="text-base font-semibold text-gray-900 mb-3">' + d.title + '</h4>' +
+        '<div class="grid grid-cols-2 gap-4">' +
+          '<div class="space-y-1"><p class="text-xs font-semibold text-gray-400 uppercase tracking-wider">Assigned To</p><p class="text-sm text-gray-700">' + d.assigned + '</p></div>' +
+          '<div class="space-y-1"><p class="text-xs font-semibold text-gray-400 uppercase tracking-wider">Last Updated</p><p class="text-sm text-gray-700">' + d.updated + '</p></div>' +
+          '<div class="space-y-1"><p class="text-xs font-semibold text-gray-400 uppercase tracking-wider">Replies</p><p class="text-sm text-gray-700">' + d.replies + ' replies</p></div>' +
+          '<div class="space-y-1"><p class="text-xs font-semibold text-gray-400 uppercase tracking-wider">Attachments</p><p class="text-sm text-gray-700">' + d.attachments + ' files</p></div>' +
+        '</div>';
+      var footer = '<button onclick="closeViewModal()" class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 transition">Close</button>';
+      if (d.status === 'Open' || d.status === 'In Progress') {
+        footer += '<button onclick="alert('Reply to ' + d.ticketid + '')" class="px-4 py-2 text-sm font-medium text-white bg-brand-500 rounded-lg hover:bg-brand-600 transition">Reply</button>';
+      }
+      document.getElementById('viewModalFooter').innerHTML = footer;
+      var modal = document.getElementById('viewModal');
+      modal.classList.remove('hidden');
+      modal.classList.add('flex');
+    }
+
+    function closeViewModal() { var m = document.getElementById('viewModal'); m.classList.add('hidden'); m.classList.remove('flex'); }
+    document.getElementById('viewModal').addEventListener('click', function(e) { if (e.target === this) closeViewModal(); });
+    document.addEventListener('keydown', function(e) { if (e.key === 'Escape') closeViewModal(); });
+  </script>
+
+  <script src="shared-layout.js"></script>
+  <script>renderSellerLayout('support');</script>
+</body>
+</html>

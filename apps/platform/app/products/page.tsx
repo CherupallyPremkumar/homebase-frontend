@@ -1,7 +1,7 @@
 'use client';
 
-import { ProductList } from '@/features/product/ui';
+import { ProductList } from '@/features/product/components';
 
-export default function ProductsPage() {
+export default function Page() {
   return <ProductList />;
 }

@@ -31,6 +31,7 @@ export function createAuthConfig(appConfig: AuthAppConfig): NextAuthConfig {
             scope: 'openid email profile',
           },
         },
+        checks: ['state'],
       }),
     ],
     basePath: appConfig.basePath || '/api/auth',

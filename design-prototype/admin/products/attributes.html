@@ -1,0 +1,871 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HomeBase — Product Attributes</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brand: { 50:'#FFF7ED',100:'#FFEDD5',200:'#FED7AA',300:'#FDBA74',400:'#FB923C',500:'#F97316',600:'#EA580C',700:'#C2410C' },
+            navy: { 700:'#1E3A5F',800:'#0F1E30',900:'#0A1628' },
+          },
+          fontFamily: { sans: ['Inter','system-ui','sans-serif'] }
+        }
+      }
+    }
+  </script>
+  <style>
+    .stat-card{transition:all .2s ease}.stat-card:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(0,0,0,.08)}
+    .table-row{transition:background .15s ease}.table-row:hover{background:#FFF7ED}
+    .tab-btn.active{border-color:#F97316;color:#F97316;font-weight:600}
+    .filter-tab{transition:all .15s ease}.filter-tab:hover{background:#FFF7ED}
+    .filter-tab.active{border-color:#F97316;color:#F97316;font-weight:600}
+    .dropdown-menu{display:none}.dropdown:hover .dropdown-menu{display:block}
+    .modal-backdrop{background:rgba(10,22,40,.45);backdrop-filter:blur(4px)}
+    .toggle-track{transition:background .2s ease}.toggle-track.on{background:#F97316}
+    .toggle-knob{transition:transform .2s ease}.toggle-track.on .toggle-knob{transform:translateX(18px)}
+  </style>
+</head>
+<body class="font-sans bg-gray-50 text-gray-900">
+
+  <!-- TOP HEADER -->
+  <header id="admin-header" class="fixed top-0 left-0 right-0 z-50 bg-white border-b border-gray-200 h-16"></header>
+
+  <div class="flex pt-16 min-h-screen">
+    <!-- SIDEBAR -->
+    <aside id="admin-sidebar" class="fixed left-0 top-16 bottom-0 w-60 z-40 flex flex-col overflow-y-auto" style="background:#0A1628;"></aside>
+
+    <!-- MAIN CONTENT -->
+    <main class="flex-1 ml-60 p-6 lg:p-8">
+
+      <!-- ===== PAGE HEADER ===== -->
+      <div class="flex items-center justify-between mb-6">
+        <div>
+          <h1 class="text-2xl font-bold text-gray-900">Product Attributes</h1>
+          <p class="text-sm text-gray-500 mt-1">Define product properties for search, filters, and variations</p>
+        </div>
+        <div class="flex items-center gap-3">
+          <button class="flex items-center gap-2 bg-white border border-gray-200 text-gray-700 px-4 py-2.5 rounded-lg text-sm font-medium shadow-sm hover:bg-gray-50 transition">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3"/></svg>
+            Export
+          </button>
+          <button onclick="openAddAttributeModal()" class="flex items-center gap-2 bg-brand-500 hover:bg-brand-600 text-white px-4 py-2.5 rounded-lg text-sm font-medium shadow-sm transition">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 4.5v15m7.5-7.5h-15"/></svg>
+            Add Attribute
+          </button>
+        </div>
+      </div>
+
+      <!-- ===== STATS ROW ===== -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+        <!-- Total Attributes -->
+        <div class="stat-card bg-white rounded-xl border border-gray-100 p-5 shadow-sm">
+          <div class="flex items-center justify-between mb-3">
+            <p class="text-sm font-medium text-gray-500">Total Attributes</p>
+            <div class="w-9 h-9 rounded-lg bg-gray-50 flex items-center justify-center">
+              <svg class="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M9.568 3H5.25A2.25 2.25 0 003 5.25v4.318c0 .597.237 1.17.659 1.591l9.581 9.581c.699.699 1.78.872 2.607.33a18.095 18.095 0 005.223-5.223c.542-.827.369-1.908-.33-2.607L11.16 3.66A2.25 2.25 0 009.568 3z"/><path d="M6 6h.008v.008H6V6z"/></svg>
+            </div>
+          </div>
+          <p class="text-2xl font-bold text-gray-900">48</p>
+          <p class="text-xs text-gray-400 mt-1">Defined across all categories</p>
+        </div>
+        <!-- Filterable -->
+        <div class="stat-card bg-white rounded-xl border border-gray-100 p-5 shadow-sm">
+          <div class="flex items-center justify-between mb-3">
+            <p class="text-sm font-medium text-gray-500">Filterable</p>
+            <div class="w-9 h-9 rounded-lg bg-blue-50 flex items-center justify-center">
+              <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M12 3c2.755 0 5.455.232 8.083.678.533.09.917.556.917 1.096v1.044a2.25 2.25 0 01-.659 1.591l-5.432 5.432a2.25 2.25 0 00-.659 1.591v2.927a2.25 2.25 0 01-1.244 2.013L9.75 21v-6.568a2.25 2.25 0 00-.659-1.591L3.659 7.409A2.25 2.25 0 013 5.818V4.774c0-.54.384-1.006.917-1.096A48.32 48.32 0 0112 3z"/></svg>
+            </div>
+          </div>
+          <p class="text-2xl font-bold text-blue-600">12</p>
+          <p class="text-xs text-blue-600 mt-1">Available in storefront filters</p>
+        </div>
+        <!-- Searchable -->
+        <div class="stat-card bg-white rounded-xl border border-gray-100 p-5 shadow-sm">
+          <div class="flex items-center justify-between mb-3">
+            <p class="text-sm font-medium text-gray-500">Searchable</p>
+            <div class="w-9 h-9 rounded-lg bg-green-50 flex items-center justify-center">
+              <svg class="w-5 h-5 text-green-600" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z"/></svg>
+            </div>
+          </div>
+          <p class="text-2xl font-bold text-green-600">18</p>
+          <p class="text-xs text-green-600 mt-1">Indexed for product search</p>
+        </div>
+        <!-- Used in Variations -->
+        <div class="stat-card bg-white rounded-xl border border-gray-100 p-5 shadow-sm">
+          <div class="flex items-center justify-between mb-3">
+            <p class="text-sm font-medium text-gray-500">Used in Variations</p>
+            <div class="w-9 h-9 rounded-lg bg-purple-50 flex items-center justify-center">
+              <svg class="w-5 h-5 text-purple-600" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M3.75 6A2.25 2.25 0 016 3.75h2.25A2.25 2.25 0 0110.5 6v2.25a2.25 2.25 0 01-2.25 2.25H6a2.25 2.25 0 01-2.25-2.25V6zM3.75 15.75A2.25 2.25 0 016 13.5h2.25a2.25 2.25 0 012.25 2.25V18a2.25 2.25 0 01-2.25 2.25H6A2.25 2.25 0 013.75 18v-2.25zM13.5 6a2.25 2.25 0 012.25-2.25H18A2.25 2.25 0 0120.25 6v2.25A2.25 2.25 0 0118 10.5h-2.25a2.25 2.25 0 01-2.25-2.25V6zM13.5 15.75a2.25 2.25 0 012.25-2.25H18a2.25 2.25 0 012.25 2.25V18A2.25 2.25 0 0118 20.25h-2.25A2.25 2.25 0 0113.5 18v-2.25z"/></svg>
+            </div>
+          </div>
+          <p class="text-2xl font-bold text-purple-600">8</p>
+          <p class="text-xs text-purple-600 mt-1">Create configurable products</p>
+        </div>
+      </div>
+
+      <!-- ===== TAB NAVIGATION ===== -->
+      <div class="bg-white rounded-xl border border-gray-100 shadow-sm">
+        <div class="px-6 pt-5 pb-0">
+          <nav class="-mb-px flex items-center gap-0 border-b border-gray-200">
+            <button class="tab-btn active border-b-2 px-4 pb-3 text-sm font-medium" onclick="switchTab('attributes',this)">Attributes <span class="ml-1 bg-gray-100 text-gray-600 text-[11px] font-bold px-1.5 py-0.5 rounded-full">48</span></button>
+            <button class="tab-btn border-b-2 border-transparent px-4 pb-3 text-sm font-medium text-gray-500" onclick="switchTab('attributeSets',this)">Attribute Sets <span class="ml-1 bg-gray-100 text-gray-600 text-[11px] font-bold px-1.5 py-0.5 rounded-full">6</span></button>
+            <button class="tab-btn border-b-2 border-transparent px-4 pb-3 text-sm font-medium text-gray-500" onclick="switchTab('categoryMapping',this)">Category Mapping <span class="ml-1 bg-gray-100 text-gray-600 text-[11px] font-bold px-1.5 py-0.5 rounded-full">6</span></button>
+          </nav>
+        </div>
+
+        <!-- ===== ATTRIBUTES TAB (default, shown) ===== -->
+        <div id="tab-attributes">
+          <!-- Search + Filter -->
+          <div class="px-6 py-4 flex items-center justify-between border-b border-gray-100">
+            <div class="flex items-center gap-3">
+              <select id="inputTypeFilter" onchange="filterByType()" class="text-xs border border-gray-200 rounded-lg px-3 py-2 bg-gray-50 text-gray-600 outline-none focus:border-brand-400">
+                <option value="all">All Input Types</option>
+                <option value="dropdown">Dropdown</option>
+                <option value="text">Text</option>
+                <option value="number">Number</option>
+                <option value="color-swatch">Color Swatch</option>
+                <option value="boolean">Boolean</option>
+                <option value="multi-select">Multi-select</option>
+              </select>
+            </div>
+            <div class="relative">
+              <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z"/></svg>
+              <input type="search" placeholder="Search attributes..." class="w-56 rounded-lg border border-gray-200 bg-gray-50 py-2 pl-9 pr-4 text-sm outline-none focus:border-brand-400 focus:ring-2 focus:ring-brand-100 transition">
+            </div>
+          </div>
+
+          <!-- Table -->
+          <div class="overflow-x-auto">
+            <table class="w-full text-sm">
+              <thead>
+                <tr class="bg-gray-50 text-left">
+                  <th class="px-6 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Code</th>
+                  <th class="px-6 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Label</th>
+                  <th class="px-6 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Input Type</th>
+                  <th class="px-6 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider text-center">Required</th>
+                  <th class="px-6 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider text-center">Filterable</th>
+                  <th class="px-6 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider text-center">Searchable</th>
+                  <th class="px-6 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider text-center">Variations</th>
+                  <th class="px-6 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider text-right">Products</th>
+                  <th class="px-6 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Actions</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-gray-100">
+                <!-- Row 1: color -->
+                <tr class="table-row" data-type="color-swatch">
+                  <td class="px-6 py-4"><code class="text-xs font-mono bg-gray-100 text-gray-700 px-2 py-1 rounded">color</code></td>
+                  <td class="px-6 py-4 font-medium text-gray-900">Color</td>
+                  <td class="px-6 py-4"><span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-orange-100 text-orange-700">Color Swatch</span></td>
+                  <td class="px-6 py-4 text-center"><svg class="w-5 h-5 text-green-500 mx-auto" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4.5 12.75l6 6 9-13.5"/></svg></td>
+                  <td class="px-6 py-4 text-center"><svg class="w-5 h-5 text-green-500 mx-auto" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4.5 12.75l6 6 9-13.5"/></svg></td>
+                  <td class="px-6 py-4 text-center"><svg class="w-5 h-5 text-green-500 mx-auto" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4.5 12.75l6 6 9-13.5"/></svg></td>
+                  <td class="px-6 py-4 text-center"><svg class="w-5 h-5 text-green-500 mx-auto" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4.5 12.75l6 6 9-13.5"/></svg></td>
+                  <td class="px-6 py-4 text-right font-medium text-gray-900">892</td>
+                  <td class="px-6 py-4">
+                    <div class="flex items-center gap-2">
+                      <button class="text-gray-400 hover:text-brand-500 p-1 rounded transition" title="Edit"><svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10"/></svg></button>
+                      <button class="text-gray-400 hover:text-red-500 p-1 rounded transition" title="Delete"><svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0"/></svg></button>
+                    </div>
+                  </td>
+                </tr>
+                <!-- Row 2: size -->
+                <tr class="table-row" data-type="dropdown">
+                  <td class="px-6 py-4"><code class="text-xs font-mono bg-gray-100 text-gray-700 px-2 py-1 rounded">size</code></td>
+                  <td class="px-6 py-4 font-medium text-gray-900">Size</td>
+                  <td class="px-6 py-4"><span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-700">Dropdown</span></td>
+                  <td class="px-6 py-4 text-center"><svg class="w-5 h-5 text-green-500 mx-auto" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4.5 12.75l6 6 9-13.5"/></svg></td>
+                  <td class="px-6 py-4 text-center"><svg class="w-5 h-5 text-green-500 mx-auto" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4.5 12.75l6 6 9-13.5"/></svg></td>
+                  <td class="px-6 py-4 text-center"><svg class="w-5 h-5 text-green-500 mx-auto" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4.5 12.75l6 6 9-13.5"/></svg></td>
+                  <td class="px-6 py-4 text-center"><svg class="w-5 h-5 text-green-500 mx-auto" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4.5 12.75l6 6 9-13.5"/></svg></td>
+                  <td class="px-6 py-4 text-right font-medium text-gray-900">756</td>
+                  <td class="px-6 py-4">
+                    <div class="flex items-center gap-2">
+                      <button class="text-gray-400 hover:text-brand-500 p-1 rounded transition" title="Edit"><svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10"/></svg></button>
+                      <button class="text-gray-400 hover:text-red-500 p-1 rounded transition" title="Delete"><svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0"/></svg></button>
+                    </div>
+                  </td>
+                </tr>
+                <!-- Row 3: material -->
+                <tr class="table-row" data-type="dropdown">
+                  <td class="px-6 py-4"><code class="text-xs font-mono bg-gray-100 text-gray-700 px-2 py-1 rounded">material</code></td>
+                  <td class="px-6 py-4 font-medium text-gray-900">Material</td>
+                  <td class="px-6 py-4"><span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-700">Dropdown</span></td>
+                  <td class="px-6 py-4 text-center"><svg class="w-4 h-4 text-gray-300 mx-auto" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M5 12h14"/></svg></td>
+                  <td class="px-6 py-4 text-center"><svg class="w-5 h-5 text-green-500 mx-auto" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4.5 12.75l6 6 9-13.5"/></svg></td>
+                  <td class="px-6 py-4 text-center"><svg class="w-5 h-5 text-green-500 mx-auto" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4.5 12.75l6 6 9-13.5"/></svg></td>
+                  <td class="px-6 py-4 text-center"><svg class="w-4 h-4 text-gray-300 mx-auto" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M5 12h14"/></svg></td>
+                  <td class="px-6 py-4 text-right font-medium text-gray-900">634</td>
+                  <td class="px-6 py-4">
+                    <div class="flex items-center gap-2">
+                      <button class="text-gray-400 hover:text-brand-500 p-1 rounded transition" title="Edit"><svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10"/></svg></button>
+                      <button class="text-gray-400 hover:text-red-500 p-1 rounded transition" title="Delete"><svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0"/></svg></button>
+                    </div>
+                  </td>
+                </tr>
+                <!-- Row 4: brand -->
+                <tr class="table-row" data-type="dropdown">
+                  <td class="px-6 py-4"><code class="text-xs font-mono bg-gray-100 text-gray-700 px-2 py-1 rounded">brand</code></td>
+                  <td class="px-6 py-4 font-medium text-gray-900">Brand</td>
+                  <td class="px-6 py-4"><span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-700">Dropdown</span></td>
+                  <td class="px-6 py-4 text-center"><svg class="w-5 h-5 text-green-500 mx-auto" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4.5 12.75l6 6 9-13.5"/></svg></td>
+                  <td class="px-6 py-4 text-center"><svg class="w-5 h-5 text-green-500 mx-auto" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4.5 12.75l6 6 9-13.5"/></svg></td>
+                  <td class="px-6 py-4 text-center"><svg class="w-5 h-5 text-green-500 mx-auto" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4.5 12.75l6 6 9-13.5"/></svg></td>
+                  <td class="px-6 py-4 text-center"><svg class="w-4 h-4 text-gray-300 mx-auto" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M5 12h14"/></svg></td>
+                  <td class="px-6 py-4 text-right font-medium text-gray-900">847</td>
+                  <td class="px-6 py-4">
+                    <div class="flex items-center gap-2">
+                      <button class="text-gray-400 hover:text-brand-500 p-1 rounded transition" title="Edit"><svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10"/></svg></button>
+                      <button class="text-gray-400 hover:text-red-500 p-1 rounded transition" title="Delete"><svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0"/></svg></button>
+                    </div>
+                  </td>
+                </tr>
+                <!-- Row 5: weight_kg -->
+                <tr class="table-row" data-type="number">
+                  <td class="px-6 py-4"><code class="text-xs font-mono bg-gray-100 text-gray-700 px-2 py-1 rounded">weight_kg</code></td>
+                  <td class="px-6 py-4 font-medium text-gray-900">Weight (kg)</td>
+                  <td class="px-6 py-4"><span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-700">Number</span></td>
+                  <td class="px-6 py-4 text-center"><svg class="w-5 h-5 text-green-500 mx-auto" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4.5 12.75l6 6 9-13.5"/></svg></td>
+                  <td class="px-6 py-4 text-center"><svg class="w-4 h-4 text-gray-300 mx-auto" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M5 12h14"/></svg></td>
+                  <td class="px-6 py-4 text-center"><svg class="w-4 h-4 text-gray-300 mx-auto" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M5 12h14"/></svg></td>
+                  <td class="px-6 py-4 text-center"><svg class="w-4 h-4 text-gray-300 mx-auto" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M5 12h14"/></svg></td>
+                  <td class="px-6 py-4 text-right font-medium text-gray-900">912</td>
+                  <td class="px-6 py-4">
+                    <div class="flex items-center gap-2">
+                      <button class="text-gray-400 hover:text-brand-500 p-1 rounded transition" title="Edit"><svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10"/></svg></button>
+                      <button class="text-gray-400 hover:text-red-500 p-1 rounded transition" title="Delete"><svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0"/></svg></button>
+                    </div>
+                  </td>
+                </tr>
+                <!-- Row 6: voltage -->
+                <tr class="table-row" data-type="dropdown">
+                  <td class="px-6 py-4"><code class="text-xs font-mono bg-gray-100 text-gray-700 px-2 py-1 rounded">voltage</code></td>
+                  <td class="px-6 py-4 font-medium text-gray-900">Voltage</td>
+                  <td class="px-6 py-4"><span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-700">Dropdown</span></td>
+                  <td class="px-6 py-4 text-center"><svg class="w-4 h-4 text-gray-300 mx-auto" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M5 12h14"/></svg></td>
+                  <td class="px-6 py-4 text-center"><svg class="w-5 h-5 text-green-500 mx-auto" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4.5 12.75l6 6 9-13.5"/></svg></td>
+                  <td class="px-6 py-4 text-center"><svg class="w-4 h-4 text-gray-300 mx-auto" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M5 12h14"/></svg></td>
+                  <td class="px-6 py-4 text-center"><svg class="w-5 h-5 text-green-500 mx-auto" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4.5 12.75l6 6 9-13.5"/></svg></td>
+                  <td class="px-6 py-4 text-right font-medium text-gray-900">234</td>
+                  <td class="px-6 py-4">
+                    <div class="flex items-center gap-2">
+                      <button class="text-gray-400 hover:text-brand-500 p-1 rounded transition" title="Edit"><svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10"/></svg></button>
+                      <button class="text-gray-400 hover:text-red-500 p-1 rounded transition" title="Delete"><svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0"/></svg></button>
+                    </div>
+                  </td>
+                </tr>
+                <!-- Row 7: wattage -->
+                <tr class="table-row" data-type="number">
+                  <td class="px-6 py-4"><code class="text-xs font-mono bg-gray-100 text-gray-700 px-2 py-1 rounded">wattage</code></td>
+                  <td class="px-6 py-4 font-medium text-gray-900">Wattage</td>
+                  <td class="px-6 py-4"><span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-700">Number</span></td>
+                  <td class="px-6 py-4 text-center"><svg class="w-4 h-4 text-gray-300 mx-auto" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M5 12h14"/></svg></td>
+                  <td class="px-6 py-4 text-center"><svg class="w-5 h-5 text-green-500 mx-auto" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4.5 12.75l6 6 9-13.5"/></svg></td>
+                  <td class="px-6 py-4 text-center"><svg class="w-4 h-4 text-gray-300 mx-auto" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M5 12h14"/></svg></td>
+                  <td class="px-6 py-4 text-center"><svg class="w-4 h-4 text-gray-300 mx-auto" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M5 12h14"/></svg></td>
+                  <td class="px-6 py-4 text-right font-medium text-gray-900">189</td>
+                  <td class="px-6 py-4">
+                    <div class="flex items-center gap-2">
+                      <button class="text-gray-400 hover:text-brand-500 p-1 rounded transition" title="Edit"><svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10"/></svg></button>
+                      <button class="text-gray-400 hover:text-red-500 p-1 rounded transition" title="Delete"><svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0"/></svg></button>
+                    </div>
+                  </td>
+                </tr>
+                <!-- Row 8: finish -->
+                <tr class="table-row" data-type="dropdown">
+                  <td class="px-6 py-4"><code class="text-xs font-mono bg-gray-100 text-gray-700 px-2 py-1 rounded">finish</code></td>
+                  <td class="px-6 py-4 font-medium text-gray-900">Finish</td>
+                  <td class="px-6 py-4"><span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-700">Dropdown</span></td>
+                  <td class="px-6 py-4 text-center"><svg class="w-4 h-4 text-gray-300 mx-auto" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M5 12h14"/></svg></td>
+                  <td class="px-6 py-4 text-center"><svg class="w-5 h-5 text-green-500 mx-auto" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4.5 12.75l6 6 9-13.5"/></svg></td>
+                  <td class="px-6 py-4 text-center"><svg class="w-5 h-5 text-green-500 mx-auto" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4.5 12.75l6 6 9-13.5"/></svg></td>
+                  <td class="px-6 py-4 text-center"><svg class="w-5 h-5 text-green-500 mx-auto" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4.5 12.75l6 6 9-13.5"/></svg></td>
+                  <td class="px-6 py-4 text-right font-medium text-gray-900">345</td>
+                  <td class="px-6 py-4">
+                    <div class="flex items-center gap-2">
+                      <button class="text-gray-400 hover:text-brand-500 p-1 rounded transition" title="Edit"><svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10"/></svg></button>
+                      <button class="text-gray-400 hover:text-red-500 p-1 rounded transition" title="Delete"><svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0"/></svg></button>
+                    </div>
+                  </td>
+                </tr>
+                <!-- Row 9: warranty_years -->
+                <tr class="table-row" data-type="dropdown">
+                  <td class="px-6 py-4"><code class="text-xs font-mono bg-gray-100 text-gray-700 px-2 py-1 rounded">warranty_years</code></td>
+                  <td class="px-6 py-4 font-medium text-gray-900">Warranty</td>
+                  <td class="px-6 py-4"><span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-700">Dropdown</span></td>
+                  <td class="px-6 py-4 text-center"><svg class="w-4 h-4 text-gray-300 mx-auto" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M5 12h14"/></svg></td>
+                  <td class="px-6 py-4 text-center"><svg class="w-4 h-4 text-gray-300 mx-auto" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M5 12h14"/></svg></td>
+                  <td class="px-6 py-4 text-center"><svg class="w-4 h-4 text-gray-300 mx-auto" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M5 12h14"/></svg></td>
+                  <td class="px-6 py-4 text-center"><svg class="w-4 h-4 text-gray-300 mx-auto" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M5 12h14"/></svg></td>
+                  <td class="px-6 py-4 text-right font-medium text-gray-900">678</td>
+                  <td class="px-6 py-4">
+                    <div class="flex items-center gap-2">
+                      <button class="text-gray-400 hover:text-brand-500 p-1 rounded transition" title="Edit"><svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10"/></svg></button>
+                      <button class="text-gray-400 hover:text-red-500 p-1 rounded transition" title="Delete"><svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0"/></svg></button>
+                    </div>
+                  </td>
+                </tr>
+                <!-- Row 10: pack_quantity -->
+                <tr class="table-row" data-type="number">
+                  <td class="px-6 py-4"><code class="text-xs font-mono bg-gray-100 text-gray-700 px-2 py-1 rounded">pack_quantity</code></td>
+                  <td class="px-6 py-4 font-medium text-gray-900">Pack Qty</td>
+                  <td class="px-6 py-4"><span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-700">Number</span></td>
+                  <td class="px-6 py-4 text-center"><svg class="w-4 h-4 text-gray-300 mx-auto" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M5 12h14"/></svg></td>
+                  <td class="px-6 py-4 text-center"><svg class="w-4 h-4 text-gray-300 mx-auto" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M5 12h14"/></svg></td>
+                  <td class="px-6 py-4 text-center"><svg class="w-4 h-4 text-gray-300 mx-auto" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M5 12h14"/></svg></td>
+                  <td class="px-6 py-4 text-center"><svg class="w-4 h-4 text-gray-300 mx-auto" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M5 12h14"/></svg></td>
+                  <td class="px-6 py-4 text-right font-medium text-gray-900">456</td>
+                  <td class="px-6 py-4">
+                    <div class="flex items-center gap-2">
+                      <button class="text-gray-400 hover:text-brand-500 p-1 rounded transition" title="Edit"><svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10"/></svg></button>
+                      <button class="text-gray-400 hover:text-red-500 p-1 rounded transition" title="Delete"><svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0"/></svg></button>
+                    </div>
+                  </td>
+                </tr>
+                <!-- Row 11: hsn_code -->
+                <tr class="table-row" data-type="text">
+                  <td class="px-6 py-4"><code class="text-xs font-mono bg-gray-100 text-gray-700 px-2 py-1 rounded">hsn_code</code></td>
+                  <td class="px-6 py-4 font-medium text-gray-900">HSN Code</td>
+                  <td class="px-6 py-4"><span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-700">Text</span></td>
+                  <td class="px-6 py-4 text-center"><svg class="w-5 h-5 text-green-500 mx-auto" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4.5 12.75l6 6 9-13.5"/></svg></td>
+                  <td class="px-6 py-4 text-center"><svg class="w-4 h-4 text-gray-300 mx-auto" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M5 12h14"/></svg></td>
+                  <td class="px-6 py-4 text-center"><svg class="w-5 h-5 text-green-500 mx-auto" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4.5 12.75l6 6 9-13.5"/></svg></td>
+                  <td class="px-6 py-4 text-center"><svg class="w-4 h-4 text-gray-300 mx-auto" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M5 12h14"/></svg></td>
+                  <td class="px-6 py-4 text-right font-medium text-gray-900">912</td>
+                  <td class="px-6 py-4">
+                    <div class="flex items-center gap-2">
+                      <button class="text-gray-400 hover:text-brand-500 p-1 rounded transition" title="Edit"><svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10"/></svg></button>
+                      <button class="text-gray-400 hover:text-red-500 p-1 rounded transition" title="Delete"><svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0"/></svg></button>
+                    </div>
+                  </td>
+                </tr>
+                <!-- Row 12: country_origin -->
+                <tr class="table-row" data-type="dropdown">
+                  <td class="px-6 py-4"><code class="text-xs font-mono bg-gray-100 text-gray-700 px-2 py-1 rounded">country_origin</code></td>
+                  <td class="px-6 py-4 font-medium text-gray-900">Country of Origin</td>
+                  <td class="px-6 py-4"><span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-700">Dropdown</span></td>
+                  <td class="px-6 py-4 text-center"><svg class="w-5 h-5 text-green-500 mx-auto" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4.5 12.75l6 6 9-13.5"/></svg></td>
+                  <td class="px-6 py-4 text-center"><svg class="w-5 h-5 text-green-500 mx-auto" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4.5 12.75l6 6 9-13.5"/></svg></td>
+                  <td class="px-6 py-4 text-center"><svg class="w-4 h-4 text-gray-300 mx-auto" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M5 12h14"/></svg></td>
+                  <td class="px-6 py-4 text-center"><svg class="w-4 h-4 text-gray-300 mx-auto" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M5 12h14"/></svg></td>
+                  <td class="px-6 py-4 text-right font-medium text-gray-900">912</td>
+                  <td class="px-6 py-4">
+                    <div class="flex items-center gap-2">
+                      <button class="text-gray-400 hover:text-brand-500 p-1 rounded transition" title="Edit"><svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10"/></svg></button>
+                      <button class="text-gray-400 hover:text-red-500 p-1 rounded transition" title="Delete"><svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0"/></svg></button>
+                    </div>
+                  </td>
+                </tr>
+                <!-- Row 13: capacity_litres -->
+                <tr class="table-row" data-type="number">
+                  <td class="px-6 py-4"><code class="text-xs font-mono bg-gray-100 text-gray-700 px-2 py-1 rounded">capacity_litres</code></td>
+                  <td class="px-6 py-4 font-medium text-gray-900">Capacity (L)</td>
+                  <td class="px-6 py-4"><span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-700">Number</span></td>
+                  <td class="px-6 py-4 text-center"><svg class="w-4 h-4 text-gray-300 mx-auto" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M5 12h14"/></svg></td>
+                  <td class="px-6 py-4 text-center"><svg class="w-5 h-5 text-green-500 mx-auto" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4.5 12.75l6 6 9-13.5"/></svg></td>
+                  <td class="px-6 py-4 text-center"><svg class="w-4 h-4 text-gray-300 mx-auto" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M5 12h14"/></svg></td>
+                  <td class="px-6 py-4 text-center"><svg class="w-5 h-5 text-green-500 mx-auto" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4.5 12.75l6 6 9-13.5"/></svg></td>
+                  <td class="px-6 py-4 text-right font-medium text-gray-900">123</td>
+                  <td class="px-6 py-4">
+                    <div class="flex items-center gap-2">
+                      <button class="text-gray-400 hover:text-brand-500 p-1 rounded transition" title="Edit"><svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10"/></svg></button>
+                      <button class="text-gray-400 hover:text-red-500 p-1 rounded transition" title="Delete"><svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0"/></svg></button>
+                    </div>
+                  </td>
+                </tr>
+                <!-- Row 14: energy_rating -->
+                <tr class="table-row" data-type="dropdown">
+                  <td class="px-6 py-4"><code class="text-xs font-mono bg-gray-100 text-gray-700 px-2 py-1 rounded">energy_rating</code></td>
+                  <td class="px-6 py-4 font-medium text-gray-900">Energy Rating</td>
+                  <td class="px-6 py-4"><span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-700">Dropdown</span></td>
+                  <td class="px-6 py-4 text-center"><svg class="w-4 h-4 text-gray-300 mx-auto" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M5 12h14"/></svg></td>
+                  <td class="px-6 py-4 text-center"><svg class="w-5 h-5 text-green-500 mx-auto" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4.5 12.75l6 6 9-13.5"/></svg></td>
+                  <td class="px-6 py-4 text-center"><svg class="w-5 h-5 text-green-500 mx-auto" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4.5 12.75l6 6 9-13.5"/></svg></td>
+                  <td class="px-6 py-4 text-center"><svg class="w-4 h-4 text-gray-300 mx-auto" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M5 12h14"/></svg></td>
+                  <td class="px-6 py-4 text-right font-medium text-gray-900">267</td>
+                  <td class="px-6 py-4">
+                    <div class="flex items-center gap-2">
+                      <button class="text-gray-400 hover:text-brand-500 p-1 rounded transition" title="Edit"><svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10"/></svg></button>
+                      <button class="text-gray-400 hover:text-red-500 p-1 rounded transition" title="Delete"><svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0"/></svg></button>
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Pagination -->
+          <div class="px-6 py-4 border-t border-gray-100 flex items-center justify-between">
+            <p class="text-xs text-gray-400">Showing 1-14 of 48 attributes</p>
+            <div class="flex items-center gap-1">
+              <button class="px-3 py-1.5 text-xs font-medium text-gray-400 bg-gray-50 rounded-lg border border-gray-200">Previous</button>
+              <button class="px-3 py-1.5 text-xs font-semibold text-white bg-brand-500 rounded-lg">1</button>
+              <button class="px-3 py-1.5 text-xs font-medium text-gray-600 bg-gray-50 rounded-lg border border-gray-200 hover:bg-gray-100">2</button>
+              <button class="px-3 py-1.5 text-xs font-medium text-gray-600 bg-gray-50 rounded-lg border border-gray-200 hover:bg-gray-100">3</button>
+              <span class="px-2 text-gray-400">...</span>
+              <button class="px-3 py-1.5 text-xs font-medium text-gray-600 bg-gray-50 rounded-lg border border-gray-200 hover:bg-gray-100">4</button>
+              <button class="px-3 py-1.5 text-xs font-medium text-gray-600 bg-gray-50 rounded-lg border border-gray-200 hover:bg-gray-100">Next</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- ===== ATTRIBUTE SETS TAB (hidden) ===== -->
+        <div id="tab-attributeSets" class="hidden">
+          <!-- Header with button -->
+          <div class="px-6 py-4 flex items-center justify-between border-b border-gray-100">
+            <p class="text-sm text-gray-500">Group attributes into sets assigned to product categories</p>
+            <button class="flex items-center gap-2 bg-brand-500 hover:bg-brand-600 text-white px-4 py-2 rounded-lg text-sm font-medium shadow-sm transition">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 4.5v15m7.5-7.5h-15"/></svg>
+              Create Attribute Set
+            </button>
+          </div>
+
+          <!-- Table -->
+          <div class="overflow-x-auto">
+            <table class="w-full text-sm">
+              <thead>
+                <tr class="bg-gray-50 text-left">
+                  <th class="px-6 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Set Name</th>
+                  <th class="px-6 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Based On</th>
+                  <th class="px-6 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider text-right">Attributes</th>
+                  <th class="px-6 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider text-right">Products</th>
+                  <th class="px-6 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Categories</th>
+                  <th class="px-6 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Actions</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-gray-100">
+                <!-- Default -->
+                <tr class="table-row">
+                  <td class="px-6 py-4 font-medium text-gray-900">Default</td>
+                  <td class="px-6 py-4 text-gray-400">&mdash;</td>
+                  <td class="px-6 py-4 text-right font-medium text-gray-900">24</td>
+                  <td class="px-6 py-4 text-right font-medium text-gray-900">5,234</td>
+                  <td class="px-6 py-4"><span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-600">All Categories</span></td>
+                  <td class="px-6 py-4">
+                    <button class="text-gray-400 hover:text-brand-500 p-1 rounded transition" title="Edit"><svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10"/></svg></button>
+                  </td>
+                </tr>
+                <!-- Apparel -->
+                <tr class="table-row">
+                  <td class="px-6 py-4 font-medium text-gray-900">Apparel</td>
+                  <td class="px-6 py-4 text-gray-500">Default</td>
+                  <td class="px-6 py-4 text-right font-medium text-gray-900">32</td>
+                  <td class="px-6 py-4 text-right font-medium text-gray-900">1,890</td>
+                  <td class="px-6 py-4">
+                    <div class="flex flex-wrap gap-1">
+                      <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-medium bg-gray-100 text-gray-600">Clothing</span>
+                      <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-medium bg-gray-100 text-gray-600">Footwear</span>
+                      <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-medium bg-gray-100 text-gray-600">Accessories</span>
+                    </div>
+                  </td>
+                  <td class="px-6 py-4">
+                    <button class="text-gray-400 hover:text-brand-500 p-1 rounded transition" title="Edit"><svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10"/></svg></button>
+                  </td>
+                </tr>
+                <!-- Electronics -->
+                <tr class="table-row">
+                  <td class="px-6 py-4 font-medium text-gray-900">Electronics</td>
+                  <td class="px-6 py-4 text-gray-500">Default</td>
+                  <td class="px-6 py-4 text-right font-medium text-gray-900">28</td>
+                  <td class="px-6 py-4 text-right font-medium text-gray-900">2,456</td>
+                  <td class="px-6 py-4">
+                    <div class="flex flex-wrap gap-1">
+                      <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-medium bg-gray-100 text-gray-600">Electronics</span>
+                      <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-medium bg-gray-100 text-gray-600">Gadgets</span>
+                    </div>
+                  </td>
+                  <td class="px-6 py-4">
+                    <button class="text-gray-400 hover:text-brand-500 p-1 rounded transition" title="Edit"><svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10"/></svg></button>
+                  </td>
+                </tr>
+                <!-- Home & Kitchen -->
+                <tr class="table-row">
+                  <td class="px-6 py-4 font-medium text-gray-900">Home & Kitchen</td>
+                  <td class="px-6 py-4 text-gray-500">Default</td>
+                  <td class="px-6 py-4 text-right font-medium text-gray-900">26</td>
+                  <td class="px-6 py-4 text-right font-medium text-gray-900">891</td>
+                  <td class="px-6 py-4">
+                    <div class="flex flex-wrap gap-1">
+                      <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-medium bg-gray-100 text-gray-600">Home</span>
+                      <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-medium bg-gray-100 text-gray-600">Kitchen</span>
+                      <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-medium bg-gray-100 text-gray-600">Furniture</span>
+                    </div>
+                  </td>
+                  <td class="px-6 py-4">
+                    <button class="text-gray-400 hover:text-brand-500 p-1 rounded transition" title="Edit"><svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10"/></svg></button>
+                  </td>
+                </tr>
+                <!-- Power Tools -->
+                <tr class="table-row">
+                  <td class="px-6 py-4 font-medium text-gray-900">Power Tools</td>
+                  <td class="px-6 py-4 text-gray-500">Electronics</td>
+                  <td class="px-6 py-4 text-right font-medium text-gray-900">30</td>
+                  <td class="px-6 py-4 text-right font-medium text-gray-900">345</td>
+                  <td class="px-6 py-4">
+                    <div class="flex flex-wrap gap-1">
+                      <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-medium bg-gray-100 text-gray-600">Tools</span>
+                      <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-medium bg-gray-100 text-gray-600">Hardware</span>
+                    </div>
+                  </td>
+                  <td class="px-6 py-4">
+                    <button class="text-gray-400 hover:text-brand-500 p-1 rounded transition" title="Edit"><svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10"/></svg></button>
+                  </td>
+                </tr>
+                <!-- Paints & Coatings -->
+                <tr class="table-row">
+                  <td class="px-6 py-4 font-medium text-gray-900">Paints & Coatings</td>
+                  <td class="px-6 py-4 text-gray-500">Default</td>
+                  <td class="px-6 py-4 text-right font-medium text-gray-900">22</td>
+                  <td class="px-6 py-4 text-right font-medium text-gray-900">567</td>
+                  <td class="px-6 py-4">
+                    <div class="flex flex-wrap gap-1">
+                      <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-medium bg-gray-100 text-gray-600">Paints</span>
+                      <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-medium bg-gray-100 text-gray-600">Wall Care</span>
+                    </div>
+                  </td>
+                  <td class="px-6 py-4">
+                    <button class="text-gray-400 hover:text-brand-500 p-1 rounded transition" title="Edit"><svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10"/></svg></button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Pagination -->
+          <div class="px-6 py-4 border-t border-gray-100 flex items-center justify-between">
+            <p class="text-xs text-gray-400">Showing 1-6 of 6 attribute sets</p>
+            <div class="flex items-center gap-1">
+              <button class="px-3 py-1.5 text-xs font-medium text-gray-400 bg-gray-50 rounded-lg border border-gray-200">Previous</button>
+              <button class="px-3 py-1.5 text-xs font-semibold text-white bg-brand-500 rounded-lg">1</button>
+              <button class="px-3 py-1.5 text-xs font-medium text-gray-400 bg-gray-50 rounded-lg border border-gray-200">Next</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- ===== CATEGORY MAPPING TAB (hidden) ===== -->
+        <div id="tab-categoryMapping" class="hidden">
+          <!-- Header -->
+          <div class="px-6 py-4 border-b border-gray-100">
+            <p class="text-sm text-gray-500">Map required and optional attributes to each product category</p>
+          </div>
+
+          <!-- Table -->
+          <div class="overflow-x-auto">
+            <table class="w-full text-sm">
+              <thead>
+                <tr class="bg-gray-50 text-left">
+                  <th class="px-6 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Category</th>
+                  <th class="px-6 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Required Attributes</th>
+                  <th class="px-6 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Optional Attributes</th>
+                  <th class="px-6 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider text-right">Products</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-gray-100">
+                <!-- Electronics -->
+                <tr class="table-row">
+                  <td class="px-6 py-4 font-medium text-gray-900">Electronics</td>
+                  <td class="px-6 py-4">
+                    <div class="flex flex-wrap gap-1">
+                      <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-medium bg-orange-100 text-orange-700">brand</span>
+                      <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-medium bg-orange-100 text-orange-700">voltage</span>
+                      <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-medium bg-orange-100 text-orange-700">wattage</span>
+                      <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-medium bg-orange-100 text-orange-700">weight_kg</span>
+                      <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-medium bg-orange-100 text-orange-700">country_origin</span>
+                    </div>
+                  </td>
+                  <td class="px-6 py-4">
+                    <div class="flex flex-wrap gap-1">
+                      <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-medium bg-gray-100 text-gray-600">color</span>
+                      <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-medium bg-gray-100 text-gray-600">finish</span>
+                      <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-medium bg-gray-100 text-gray-600">warranty_years</span>
+                      <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-medium bg-gray-100 text-gray-600">energy_rating</span>
+                    </div>
+                  </td>
+                  <td class="px-6 py-4 text-right font-medium text-gray-900">2,456</td>
+                </tr>
+                <!-- Apparel -->
+                <tr class="table-row">
+                  <td class="px-6 py-4 font-medium text-gray-900">Apparel</td>
+                  <td class="px-6 py-4">
+                    <div class="flex flex-wrap gap-1">
+                      <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-medium bg-orange-100 text-orange-700">brand</span>
+                      <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-medium bg-orange-100 text-orange-700">color</span>
+                      <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-medium bg-orange-100 text-orange-700">size</span>
+                      <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-medium bg-orange-100 text-orange-700">material</span>
+                      <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-medium bg-orange-100 text-orange-700">country_origin</span>
+                    </div>
+                  </td>
+                  <td class="px-6 py-4">
+                    <div class="flex flex-wrap gap-1">
+                      <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-medium bg-gray-100 text-gray-600">finish</span>
+                      <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-medium bg-gray-100 text-gray-600">pack_quantity</span>
+                    </div>
+                  </td>
+                  <td class="px-6 py-4 text-right font-medium text-gray-900">1,890</td>
+                </tr>
+                <!-- Home & Kitchen -->
+                <tr class="table-row">
+                  <td class="px-6 py-4 font-medium text-gray-900">Home & Kitchen</td>
+                  <td class="px-6 py-4">
+                    <div class="flex flex-wrap gap-1">
+                      <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-medium bg-orange-100 text-orange-700">brand</span>
+                      <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-medium bg-orange-100 text-orange-700">weight_kg</span>
+                      <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-medium bg-orange-100 text-orange-700">material</span>
+                      <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-medium bg-orange-100 text-orange-700">country_origin</span>
+                    </div>
+                  </td>
+                  <td class="px-6 py-4">
+                    <div class="flex flex-wrap gap-1">
+                      <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-medium bg-gray-100 text-gray-600">color</span>
+                      <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-medium bg-gray-100 text-gray-600">finish</span>
+                      <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-medium bg-gray-100 text-gray-600">capacity_litres</span>
+                    </div>
+                  </td>
+                  <td class="px-6 py-4 text-right font-medium text-gray-900">891</td>
+                </tr>
+                <!-- Power Tools -->
+                <tr class="table-row">
+                  <td class="px-6 py-4 font-medium text-gray-900">Power Tools</td>
+                  <td class="px-6 py-4">
+                    <div class="flex flex-wrap gap-1">
+                      <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-medium bg-orange-100 text-orange-700">brand</span>
+                      <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-medium bg-orange-100 text-orange-700">voltage</span>
+                      <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-medium bg-orange-100 text-orange-700">wattage</span>
+                      <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-medium bg-orange-100 text-orange-700">weight_kg</span>
+                      <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-medium bg-orange-100 text-orange-700">warranty_years</span>
+                    </div>
+                  </td>
+                  <td class="px-6 py-4">
+                    <div class="flex flex-wrap gap-1">
+                      <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-medium bg-gray-100 text-gray-600">color</span>
+                      <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-medium bg-gray-100 text-gray-600">finish</span>
+                    </div>
+                  </td>
+                  <td class="px-6 py-4 text-right font-medium text-gray-900">345</td>
+                </tr>
+                <!-- Paints & Coatings -->
+                <tr class="table-row">
+                  <td class="px-6 py-4 font-medium text-gray-900">Paints & Coatings</td>
+                  <td class="px-6 py-4">
+                    <div class="flex flex-wrap gap-1">
+                      <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-medium bg-orange-100 text-orange-700">brand</span>
+                      <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-medium bg-orange-100 text-orange-700">finish</span>
+                      <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-medium bg-orange-100 text-orange-700">capacity_litres</span>
+                      <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-medium bg-orange-100 text-orange-700">hsn_code</span>
+                    </div>
+                  </td>
+                  <td class="px-6 py-4">
+                    <div class="flex flex-wrap gap-1">
+                      <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-medium bg-gray-100 text-gray-600">color</span>
+                      <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-medium bg-gray-100 text-gray-600">pack_quantity</span>
+                    </div>
+                  </td>
+                  <td class="px-6 py-4 text-right font-medium text-gray-900">567</td>
+                </tr>
+                <!-- Lighting -->
+                <tr class="table-row">
+                  <td class="px-6 py-4 font-medium text-gray-900">Lighting</td>
+                  <td class="px-6 py-4">
+                    <div class="flex flex-wrap gap-1">
+                      <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-medium bg-orange-100 text-orange-700">brand</span>
+                      <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-medium bg-orange-100 text-orange-700">wattage</span>
+                      <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-medium bg-orange-100 text-orange-700">voltage</span>
+                      <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-medium bg-orange-100 text-orange-700">energy_rating</span>
+                    </div>
+                  </td>
+                  <td class="px-6 py-4">
+                    <div class="flex flex-wrap gap-1">
+                      <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-medium bg-gray-100 text-gray-600">color</span>
+                      <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-medium bg-gray-100 text-gray-600">warranty_years</span>
+                      <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-medium bg-gray-100 text-gray-600">pack_quantity</span>
+                    </div>
+                  </td>
+                  <td class="px-6 py-4 text-right font-medium text-gray-900">234</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Pagination -->
+          <div class="px-6 py-4 border-t border-gray-100 flex items-center justify-between">
+            <p class="text-xs text-gray-400">Showing 1-6 of 6 category mappings</p>
+            <div class="flex items-center gap-1">
+              <button class="px-3 py-1.5 text-xs font-medium text-gray-400 bg-gray-50 rounded-lg border border-gray-200">Previous</button>
+              <button class="px-3 py-1.5 text-xs font-semibold text-white bg-brand-500 rounded-lg">1</button>
+              <button class="px-3 py-1.5 text-xs font-medium text-gray-400 bg-gray-50 rounded-lg border border-gray-200">Next</button>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+    </main>
+  </div>
+
+  <!-- ===== ADD ATTRIBUTE MODAL ===== -->
+  <div id="addAttributeModal" class="fixed inset-0 z-[60] hidden">
+    <div class="modal-backdrop absolute inset-0" onclick="closeAddAttributeModal()"></div>
+    <div class="relative z-10 flex items-center justify-center min-h-screen p-4">
+      <div class="bg-white rounded-2xl shadow-2xl w-full max-w-lg overflow-hidden">
+        <!-- Modal Header -->
+        <div class="px-6 py-4 border-b border-gray-100 flex items-center justify-between">
+          <div>
+            <h3 class="text-lg font-bold text-gray-900">Add New Attribute</h3>
+            <p class="text-xs text-gray-400 mt-0.5">Define a new product attribute definition</p>
+          </div>
+          <button onclick="closeAddAttributeModal()" class="p-1.5 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M6 18L18 6M6 6l12 12"/></svg>
+          </button>
+        </div>
+        <!-- Modal Body -->
+        <div class="px-6 py-5 space-y-4 max-h-[70vh] overflow-y-auto">
+          <!-- Attribute Code -->
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Attribute Code <span class="text-red-500">*</span></label>
+            <input type="text" id="attrCode" placeholder="e.g. thread_count" pattern="[a-z_]+" class="w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm outline-none focus:border-brand-400 focus:ring-2 focus:ring-brand-100 transition font-mono">
+            <p class="text-xs text-gray-400 mt-1">Lowercase letters and underscores only</p>
+          </div>
+          <!-- Label -->
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Label <span class="text-red-500">*</span></label>
+            <input type="text" placeholder="e.g. Thread Count" class="w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm outline-none focus:border-brand-400 focus:ring-2 focus:ring-brand-100 transition">
+          </div>
+          <!-- Input Type -->
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Input Type <span class="text-red-500">*</span></label>
+            <select class="w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm outline-none focus:border-brand-400 focus:ring-2 focus:ring-brand-100 transition text-gray-600">
+              <option value="" disabled selected>Select input type</option>
+              <option>Text</option>
+              <option>Number</option>
+              <option>Dropdown</option>
+              <option>Multi-select</option>
+              <option>Boolean</option>
+              <option>Color Swatch</option>
+              <option>Date</option>
+              <option>Price</option>
+            </select>
+          </div>
+          <!-- Toggle Switches Row 1 -->
+          <div class="grid grid-cols-2 gap-4">
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2">Required</label>
+              <button type="button" onclick="toggleSwitch(this)" class="toggle-track w-11 h-6 bg-gray-200 rounded-full relative cursor-pointer">
+                <span class="toggle-knob absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full shadow-sm"></span>
+              </button>
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2">Filterable</label>
+              <button type="button" onclick="toggleSwitch(this)" class="toggle-track w-11 h-6 bg-gray-200 rounded-full relative cursor-pointer">
+                <span class="toggle-knob absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full shadow-sm"></span>
+              </button>
+            </div>
+          </div>
+          <!-- Toggle Switches Row 2 -->
+          <div class="grid grid-cols-2 gap-4">
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2">Searchable</label>
+              <button type="button" onclick="toggleSwitch(this)" class="toggle-track w-11 h-6 bg-gray-200 rounded-full relative cursor-pointer">
+                <span class="toggle-knob absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full shadow-sm"></span>
+              </button>
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2">Used in Variations</label>
+              <button type="button" onclick="toggleSwitch(this)" class="toggle-track w-11 h-6 bg-gray-200 rounded-full relative cursor-pointer">
+                <span class="toggle-knob absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full shadow-sm"></span>
+              </button>
+            </div>
+          </div>
+          <!-- Scope -->
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Scope</label>
+            <select class="w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm outline-none focus:border-brand-400 focus:ring-2 focus:ring-brand-100 transition text-gray-600">
+              <option>Global</option>
+              <option>Store View</option>
+            </select>
+          </div>
+          <!-- Description -->
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Description</label>
+            <textarea rows="3" placeholder="Brief description of this attribute and how it's used..." class="w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm outline-none focus:border-brand-400 focus:ring-2 focus:ring-brand-100 transition resize-none"></textarea>
+          </div>
+        </div>
+        <!-- Modal Footer -->
+        <div class="px-6 py-4 border-t border-gray-100 flex items-center justify-end gap-3 bg-gray-50/50">
+          <button onclick="closeAddAttributeModal()" class="px-4 py-2.5 text-sm font-medium text-gray-600 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 transition">Cancel</button>
+          <button onclick="saveAttribute()" class="px-5 py-2.5 text-sm font-medium text-white bg-brand-500 hover:bg-brand-600 rounded-lg shadow-sm transition">Save Attribute</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+<script src="../shared-layout.js"></script>
+<script>renderAdminLayout('attributes', '../');</script>
+<script>
+  function switchTab(tabId, btn) {
+    // Hide all tab panels
+    document.getElementById('tab-attributes').classList.add('hidden');
+    document.getElementById('tab-attributeSets').classList.add('hidden');
+    document.getElementById('tab-categoryMapping').classList.add('hidden');
+    // Show selected panel
+    document.getElementById('tab-' + tabId).classList.remove('hidden');
+    // Update tab button styles
+    document.querySelectorAll('.tab-btn').forEach(function(b) {
+      b.classList.remove('active');
+      b.classList.add('border-transparent','text-gray-500');
+    });
+    btn.classList.add('active');
+    btn.classList.remove('border-transparent','text-gray-500');
+  }
+
+  function filterByType() {
+    var selected = document.getElementById('inputTypeFilter').value;
+    var rows = document.querySelectorAll('#tab-attributes tbody tr');
+    rows.forEach(function(row) {
+      if (selected === 'all' || row.getAttribute('data-type') === selected) {
+        row.style.display = '';
+      } else {
+        row.style.display = 'none';
+      }
+    });
+  }
+
+  function openAddAttributeModal() {
+    document.getElementById('addAttributeModal').classList.remove('hidden');
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closeAddAttributeModal() {
+    document.getElementById('addAttributeModal').classList.add('hidden');
+    document.body.style.overflow = '';
+  }
+
+  function saveAttribute() {
+    var code = document.getElementById('attrCode').value.trim();
+    if (!code) {
+      alert('Attribute code is required.');
+      return;
+    }
+    if (!/^[a-z_]+$/.test(code)) {
+      alert('Attribute code must contain only lowercase letters and underscores.');
+      return;
+    }
+    alert('Attribute "' + code + '" has been saved successfully.');
+    closeAddAttributeModal();
+  }
+
+  function toggleSwitch(el) {
+    el.classList.toggle('on');
+  }
+
+  // Close modal on Escape key
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') closeAddAttributeModal();
+  });
+</script>
+</body>
+</html>

@@ -1,0 +1,636 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HomeBase — Warehouse Orders (Pick & Pack)</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              50: '#FFF7ED',
+              100: '#FFEDD5',
+              200: '#FED7AA',
+              300: '#FDBA74',
+              400: '#FB923C',
+              500: '#F97316',
+              600: '#EA580C',
+              700: '#C2410C',
+            },
+            teal: {
+              800: '#0F2027',
+              900: '#0A1A1F',
+            },
+            success: '#16A34A',
+            warning: '#EAB308',
+            danger: '#DC2626',
+          },
+          fontFamily: {
+            sans: ['Inter', 'system-ui', 'sans-serif'],
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+    .scrollbar-hide::-webkit-scrollbar { display: none; }
+    .sidebar-link { transition: all 0.15s ease; }
+    .sidebar-link:hover { background: rgba(255,255,255,0.06); }
+    .sidebar-link.active { background: rgba(249,115,22,0.15); border-right: 3px solid #F97316; }
+    .stat-card { transition: all 0.2s ease; }
+    .stat-card:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,0.1); }
+    .table-row { transition: background 0.15s ease; }
+    .table-row:hover { background: #FFF7ED; }
+    .table-row.urgent { background: #FEF2F2; }
+    .table-row.urgent:hover { background: #FEE2E2; }
+    .table-row.express-row { background: #FFFBEB; }
+    .table-row.express-row:hover { background: #FEF3C7; }
+    .dropdown-menu { display: none; }
+    .dropdown:hover .dropdown-menu { display: block; }
+    .filter-tab { transition: all 0.15s ease; }
+    .filter-tab.active { color: #F97316; border-color: #F97316; background: #FFF7ED; }
+    .filter-tab:hover:not(.active) { color: #374151; background: #F9FAFB; }
+    .sidebar-scroll::-webkit-scrollbar { width: 4px; }
+    .sidebar-scroll::-webkit-scrollbar-track { background: transparent; }
+    .sidebar-scroll::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.12); border-radius: 2px; }
+    .expandable-content { max-height: 0; overflow: hidden; transition: max-height 0.35s ease; }
+    .expandable-content.open { max-height: 800px; }
+    .check-item { transition: all 0.15s ease; }
+    .check-item:hover { background: #F9FAFB; }
+  </style>
+</head>
+<body class="font-sans bg-gray-50 text-gray-900">
+
+  <!-- ===== TOP HEADER BAR ===== -->
+  <header id="warehouse-header" class="fixed top-0 left-0 right-0 z-50 bg-white border-b border-gray-200 h-16"></header>
+
+  <!-- ===== LAYOUT: SIDEBAR + MAIN ===== -->
+  <div class="flex pt-16 min-h-screen">
+
+    <!-- ===== LEFT SIDEBAR (Dark Teal #0F2027) ===== -->
+    <aside id="warehouse-sidebar" class="fixed left-0 top-16 bottom-0 w-60 z-40 flex flex-col overflow-y-auto" style="background:#0F2027;"></aside>
+
+    <!-- ===== MAIN CONTENT ===== -->
+    <main class="ml-60 flex-1 p-8">
+
+      <!-- Page Title + Print Button -->
+      <div class="flex items-center justify-between mb-6">
+        <div>
+          <h1 class="text-2xl font-bold text-gray-900">Pick & Pack</h1>
+          <p class="text-sm text-gray-500 mt-1">Manage order fulfillment across all warehouse zones</p>
+        </div>
+        <button onclick="window.print()" class="flex items-center gap-2 bg-white border border-gray-200 text-gray-700 text-sm font-medium px-5 py-2.5 rounded-lg hover:bg-gray-50 hover:border-gray-300 transition shadow-sm">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M6.72 13.829c-.24.03-.48.062-.72.096m.72-.096a42.415 42.415 0 0110.56 0m-10.56 0L6.34 18m10.94-4.171c.24.03.48.062.72.096m-.72-.096L17.66 18m0 0l.229 2.523a1.125 1.125 0 01-1.12 1.227H7.231c-.662 0-1.18-.568-1.12-1.227L6.34 18m11.318 0h1.091A2.25 2.25 0 0021 15.75V9.456c0-1.081-.768-2.015-1.837-2.175a48.055 48.055 0 00-1.913-.247M6.34 18H5.25A2.25 2.25 0 013 15.75V9.456c0-1.081.768-2.015 1.837-2.175a48.041 48.041 0 011.913-.247m0 0a48.424 48.424 0 0110.5 0m-10.5 0V5.625a2.25 2.25 0 012.25-2.25h5.25a2.25 2.25 0 012.25 2.25v1.834"/></svg>
+          Print Pick List
+        </button>
+      </div>
+
+      <!-- ===== STATS ROW ===== -->
+      <div class="grid grid-cols-5 gap-4 mb-6">
+        <!-- Pending Pick -->
+        <div class="stat-card bg-white rounded-xl border border-gray-200 p-5">
+          <div class="flex items-center justify-between mb-3">
+            <div class="w-10 h-10 rounded-lg bg-amber-50 flex items-center justify-center">
+              <svg class="w-5 h-5 text-amber-500" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+            </div>
+            <span class="text-xs font-medium text-amber-600 bg-amber-50 px-2 py-0.5 rounded-full">Queued</span>
+          </div>
+          <p class="text-2xl font-bold text-gray-900">45</p>
+          <p class="text-xs text-gray-500 mt-1">Pending Pick</p>
+        </div>
+
+        <!-- Picking -->
+        <div class="stat-card bg-white rounded-xl border border-gray-200 p-5">
+          <div class="flex items-center justify-between mb-3">
+            <div class="w-10 h-10 rounded-lg bg-blue-50 flex items-center justify-center">
+              <svg class="w-5 h-5 text-blue-500" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M15.75 10.5V6a3.75 3.75 0 10-7.5 0v4.5m11.356-1.993l1.263 12c.07.665-.45 1.243-1.119 1.243H4.25a1.125 1.125 0 01-1.12-1.243l1.264-12A1.125 1.125 0 015.513 7.5h12.974c.576 0 1.059.435 1.119 1.007zM8.625 10.5a.375.375 0 11-.75 0 .375.375 0 01.75 0zm7.5 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z"/></svg>
+            </div>
+            <span class="text-xs font-medium text-blue-600 bg-blue-50 px-2 py-0.5 rounded-full">Active</span>
+          </div>
+          <p class="text-2xl font-bold text-gray-900">12</p>
+          <p class="text-xs text-gray-500 mt-1">Picking</p>
+        </div>
+
+        <!-- Packing -->
+        <div class="stat-card bg-white rounded-xl border border-gray-200 p-5">
+          <div class="flex items-center justify-between mb-3">
+            <div class="w-10 h-10 rounded-lg bg-purple-50 flex items-center justify-center">
+              <svg class="w-5 h-5 text-purple-500" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M21 7.5l-9-5.25L3 7.5m18 0l-9 5.25m9-5.25v9l-9 5.25M3 7.5l9 5.25M3 7.5v9l9 5.25m0-9v9"/></svg>
+            </div>
+            <span class="text-xs font-medium text-purple-600 bg-purple-50 px-2 py-0.5 rounded-full">In Progress</span>
+          </div>
+          <p class="text-2xl font-bold text-gray-900">8</p>
+          <p class="text-xs text-gray-500 mt-1">Packing</p>
+        </div>
+
+        <!-- Ready to Ship -->
+        <div class="stat-card bg-white rounded-xl border border-gray-200 p-5">
+          <div class="flex items-center justify-between mb-3">
+            <div class="w-10 h-10 rounded-lg bg-green-50 flex items-center justify-center">
+              <svg class="w-5 h-5 text-green-500" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+            </div>
+            <span class="text-xs font-medium text-green-600 bg-green-50 px-2 py-0.5 rounded-full">Ready</span>
+          </div>
+          <p class="text-2xl font-bold text-gray-900">15</p>
+          <p class="text-xs text-gray-500 mt-1">Ready to Ship</p>
+        </div>
+
+        <!-- Dispatched Today -->
+        <div class="stat-card bg-white rounded-xl border border-gray-200 p-5">
+          <div class="flex items-center justify-between mb-3">
+            <div class="w-10 h-10 rounded-lg bg-brand-50 flex items-center justify-center">
+              <svg class="w-5 h-5 text-brand-500" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M6 12L3.269 3.126A59.768 59.768 0 0121.485 12 59.77 59.77 0 013.27 20.876L5.999 12zm0 0h7.5"/></svg>
+            </div>
+            <span class="text-xs font-medium text-brand-600 bg-brand-50 px-2 py-0.5 rounded-full">Today</span>
+          </div>
+          <p class="text-2xl font-bold text-gray-900">89</p>
+          <p class="text-xs text-gray-500 mt-1">Dispatched Today</p>
+        </div>
+      </div>
+
+      <!-- ===== FILTER TABS ===== -->
+      <div class="bg-white rounded-xl border border-gray-200 mb-6">
+        <div class="flex items-center border-b border-gray-100 px-4 overflow-x-auto scrollbar-hide">
+          <button class="filter-tab active px-4 py-3 text-sm font-medium border-b-2 border-transparent whitespace-nowrap" onclick="setActiveTab(this)">All <span class="ml-1 text-xs text-gray-400 font-normal">(169)</span></button>
+          <button class="filter-tab px-4 py-3 text-sm font-medium text-gray-500 border-b-2 border-transparent whitespace-nowrap" onclick="setActiveTab(this)">Pending Pick <span class="ml-1 text-xs text-gray-400 font-normal">(45)</span></button>
+          <button class="filter-tab px-4 py-3 text-sm font-medium text-gray-500 border-b-2 border-transparent whitespace-nowrap" onclick="setActiveTab(this)">Picking <span class="ml-1 text-xs text-gray-400 font-normal">(12)</span></button>
+          <button class="filter-tab px-4 py-3 text-sm font-medium text-gray-500 border-b-2 border-transparent whitespace-nowrap" onclick="setActiveTab(this)">Packing <span class="ml-1 text-xs text-gray-400 font-normal">(8)</span></button>
+          <button class="filter-tab px-4 py-3 text-sm font-medium text-gray-500 border-b-2 border-transparent whitespace-nowrap" onclick="setActiveTab(this)">Ready to Ship <span class="ml-1 text-xs text-gray-400 font-normal">(15)</span></button>
+          <button class="filter-tab px-4 py-3 text-sm font-medium text-gray-500 border-b-2 border-transparent whitespace-nowrap" onclick="setActiveTab(this)">Dispatched <span class="ml-1 text-xs text-gray-400 font-normal">(89)</span></button>
+        </div>
+
+        <!-- ===== ORDERS TABLE ===== -->
+        <div class="overflow-x-auto">
+          <table class="w-full text-sm">
+            <thead>
+              <tr class="border-b border-gray-100 text-left">
+                <th class="px-5 py-3.5 text-[11px] font-semibold text-gray-500 uppercase tracking-wider">Order ID</th>
+                <th class="px-5 py-3.5 text-[11px] font-semibold text-gray-500 uppercase tracking-wider">Customer</th>
+                <th class="px-5 py-3.5 text-[11px] font-semibold text-gray-500 uppercase tracking-wider">Items</th>
+                <th class="px-5 py-3.5 text-[11px] font-semibold text-gray-500 uppercase tracking-wider">Priority</th>
+                <th class="px-5 py-3.5 text-[11px] font-semibold text-gray-500 uppercase tracking-wider">Zone</th>
+                <th class="px-5 py-3.5 text-[11px] font-semibold text-gray-500 uppercase tracking-wider">Assigned Picker</th>
+                <th class="px-5 py-3.5 text-[11px] font-semibold text-gray-500 uppercase tracking-wider">Status</th>
+                <th class="px-5 py-3.5 text-[11px] font-semibold text-gray-500 uppercase tracking-wider">Due By</th>
+                <th class="px-5 py-3.5 text-[11px] font-semibold text-gray-500 uppercase tracking-wider">Actions</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-50">
+
+              <!-- Row 1: Same Day - URGENT -->
+              <tr class="table-row urgent cursor-pointer" onclick="togglePickList('pick-list-1')">
+                <td class="px-5 py-3.5">
+                  <div class="flex items-center gap-2">
+                    <span class="font-semibold text-gray-900">#ORD-7841</span>
+                    <span class="inline-flex items-center gap-1 bg-red-100 text-red-700 text-[10px] font-bold px-1.5 py-0.5 rounded uppercase">
+                      <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M8.485 2.495c.673-1.167 2.357-1.167 3.03 0l6.28 10.875c.673 1.167-.17 2.625-1.516 2.625H3.72c-1.347 0-2.189-1.458-1.515-2.625L8.485 2.495zM10 5a.75.75 0 01.75.75v3.5a.75.75 0 01-1.5 0v-3.5A.75.75 0 0110 5zm0 9a1 1 0 100-2 1 1 0 000 2z" clip-rule="evenodd"/></svg>
+                      Urgent
+                    </span>
+                  </div>
+                </td>
+                <td class="px-5 py-3.5 text-gray-700">Priya Sharma</td>
+                <td class="px-5 py-3.5"><span class="font-medium text-gray-900">3</span></td>
+                <td class="px-5 py-3.5"><span class="inline-flex items-center bg-red-100 text-red-700 text-xs font-semibold px-2.5 py-1 rounded-full">Same Day</span></td>
+                <td class="px-5 py-3.5 text-gray-700 font-medium">A-1</td>
+                <td class="px-5 py-3.5 text-gray-700">Rajesh K.</td>
+                <td class="px-5 py-3.5"><span class="inline-flex items-center gap-1.5 bg-blue-100 text-blue-700 text-xs font-semibold px-2.5 py-1 rounded-full"><span class="w-1.5 h-1.5 rounded-full bg-blue-500"></span>Picking</span></td>
+                <td class="px-5 py-3.5"><span class="text-red-600 font-semibold">11:30 AM</span></td>
+                <td class="px-5 py-3.5">
+                  <div class="flex items-center gap-1">
+                    <button class="p-1.5 text-gray-400 hover:text-brand-500 hover:bg-brand-50 rounded-lg transition" title="View Details">
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z"/><path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                    </button>
+                    <button class="p-1.5 text-gray-400 hover:text-brand-500 hover:bg-brand-50 rounded-lg transition" title="Reassign Picker">
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M19 7.5v3m0 0v3m0-3h3m-3 0h-3m-2.25-4.125a3.375 3.375 0 11-6.75 0 3.375 3.375 0 016.75 0zM4 19.235v-.11a6.375 6.375 0 0112.75 0v.109A12.318 12.318 0 0110.374 21c-2.331 0-4.512-.645-6.374-1.766z"/></svg>
+                    </button>
+                  </div>
+                </td>
+              </tr>
+
+              <!-- EXPANDABLE PICK LIST for Row 1 -->
+              <tr id="pick-list-1" class="hidden">
+                <td colspan="9" class="p-0">
+                  <div class="bg-gray-50 border-l-4 border-brand-500 mx-4 my-3 rounded-xl overflow-hidden">
+                    <!-- Pick List Header -->
+                    <div class="bg-white px-6 py-4 border-b border-gray-100 flex items-center justify-between">
+                      <div>
+                        <h3 class="text-sm font-bold text-gray-900">Pick List - #ORD-7841</h3>
+                        <p class="text-xs text-gray-500 mt-0.5">Zone A-1 | Assigned to Rajesh K. | Same Day Delivery</p>
+                      </div>
+                      <button class="flex items-center gap-2 bg-brand-500 hover:bg-brand-600 text-white text-sm font-medium px-4 py-2 rounded-lg transition" onclick="event.stopPropagation(); markAllPicked()">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                        Mark All Picked
+                      </button>
+                    </div>
+                    <!-- Pick Items -->
+                    <div class="divide-y divide-gray-100">
+                      <div class="check-item flex items-center gap-4 px-6 py-3.5 bg-white">
+                        <input type="checkbox" class="w-4 h-4 rounded border-gray-300 text-brand-500 focus:ring-brand-400 cursor-pointer" onclick="event.stopPropagation()">
+                        <div class="flex-1 min-w-0">
+                          <p class="text-sm font-medium text-gray-900">Wireless Bluetooth Headphones</p>
+                          <p class="text-xs text-gray-500 mt-0.5">SKU: WBH-2204</p>
+                        </div>
+                        <div class="text-center px-4">
+                          <p class="text-[10px] text-gray-400 uppercase tracking-wider">Bin Location</p>
+                          <p class="text-sm font-bold text-gray-900 mt-0.5">A-1-04-B</p>
+                        </div>
+                        <div class="text-center px-4">
+                          <p class="text-[10px] text-gray-400 uppercase tracking-wider">Qty to Pick</p>
+                          <p class="text-sm font-bold text-brand-500 mt-0.5">1</p>
+                        </div>
+                      </div>
+                      <div class="check-item flex items-center gap-4 px-6 py-3.5 bg-white">
+                        <input type="checkbox" class="w-4 h-4 rounded border-gray-300 text-brand-500 focus:ring-brand-400 cursor-pointer" onclick="event.stopPropagation()">
+                        <div class="flex-1 min-w-0">
+                          <p class="text-sm font-medium text-gray-900">Phone Protective Case (Black)</p>
+                          <p class="text-xs text-gray-500 mt-0.5">SKU: PPC-1190</p>
+                        </div>
+                        <div class="text-center px-4">
+                          <p class="text-[10px] text-gray-400 uppercase tracking-wider">Bin Location</p>
+                          <p class="text-sm font-bold text-gray-900 mt-0.5">A-1-07-D</p>
+                        </div>
+                        <div class="text-center px-4">
+                          <p class="text-[10px] text-gray-400 uppercase tracking-wider">Qty to Pick</p>
+                          <p class="text-sm font-bold text-brand-500 mt-0.5">2</p>
+                        </div>
+                      </div>
+                      <div class="check-item flex items-center gap-4 px-6 py-3.5 bg-white">
+                        <input type="checkbox" class="w-4 h-4 rounded border-gray-300 text-brand-500 focus:ring-brand-400 cursor-pointer" onclick="event.stopPropagation()">
+                        <div class="flex-1 min-w-0">
+                          <p class="text-sm font-medium text-gray-900">USB-C Fast Charger 65W</p>
+                          <p class="text-xs text-gray-500 mt-0.5">SKU: UFC-0331</p>
+                        </div>
+                        <div class="text-center px-4">
+                          <p class="text-[10px] text-gray-400 uppercase tracking-wider">Bin Location</p>
+                          <p class="text-sm font-bold text-gray-900 mt-0.5">A-1-02-A</p>
+                        </div>
+                        <div class="text-center px-4">
+                          <p class="text-[10px] text-gray-400 uppercase tracking-wider">Qty to Pick</p>
+                          <p class="text-sm font-bold text-brand-500 mt-0.5">1</p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </td>
+              </tr>
+
+              <!-- Row 2: Same Day - URGENT -->
+              <tr class="table-row urgent">
+                <td class="px-5 py-3.5">
+                  <div class="flex items-center gap-2">
+                    <span class="font-semibold text-gray-900">#ORD-7839</span>
+                    <span class="inline-flex items-center gap-1 bg-red-100 text-red-700 text-[10px] font-bold px-1.5 py-0.5 rounded uppercase">
+                      <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M8.485 2.495c.673-1.167 2.357-1.167 3.03 0l6.28 10.875c.673 1.167-.17 2.625-1.516 2.625H3.72c-1.347 0-2.189-1.458-1.515-2.625L8.485 2.495zM10 5a.75.75 0 01.75.75v3.5a.75.75 0 01-1.5 0v-3.5A.75.75 0 0110 5zm0 9a1 1 0 100-2 1 1 0 000 2z" clip-rule="evenodd"/></svg>
+                      Urgent
+                    </span>
+                  </div>
+                </td>
+                <td class="px-5 py-3.5 text-gray-700">Amit Patel</td>
+                <td class="px-5 py-3.5"><span class="font-medium text-gray-900">1</span></td>
+                <td class="px-5 py-3.5"><span class="inline-flex items-center bg-red-100 text-red-700 text-xs font-semibold px-2.5 py-1 rounded-full">Same Day</span></td>
+                <td class="px-5 py-3.5 text-gray-700 font-medium">B-3</td>
+                <td class="px-5 py-3.5 text-gray-500 italic">Unassigned</td>
+                <td class="px-5 py-3.5"><span class="inline-flex items-center gap-1.5 bg-amber-100 text-amber-700 text-xs font-semibold px-2.5 py-1 rounded-full"><span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span>Pending</span></td>
+                <td class="px-5 py-3.5"><span class="text-red-600 font-semibold">12:00 PM</span></td>
+                <td class="px-5 py-3.5">
+                  <div class="flex items-center gap-1">
+                    <button class="p-1.5 text-gray-400 hover:text-brand-500 hover:bg-brand-50 rounded-lg transition" title="View Details">
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z"/><path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                    </button>
+                    <button class="p-1.5 text-gray-400 hover:text-brand-500 hover:bg-brand-50 rounded-lg transition" title="Assign Picker">
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M19 7.5v3m0 0v3m0-3h3m-3 0h-3m-2.25-4.125a3.375 3.375 0 11-6.75 0 3.375 3.375 0 016.75 0zM4 19.235v-.11a6.375 6.375 0 0112.75 0v.109A12.318 12.318 0 0110.374 21c-2.331 0-4.512-.645-6.374-1.766z"/></svg>
+                    </button>
+                  </div>
+                </td>
+              </tr>
+
+              <!-- Row 3: Express -->
+              <tr class="table-row express-row">
+                <td class="px-5 py-3.5"><span class="font-semibold text-gray-900">#ORD-7838</span></td>
+                <td class="px-5 py-3.5 text-gray-700">Deepa Nair</td>
+                <td class="px-5 py-3.5"><span class="font-medium text-gray-900">5</span></td>
+                <td class="px-5 py-3.5"><span class="inline-flex items-center bg-orange-100 text-orange-700 text-xs font-semibold px-2.5 py-1 rounded-full">Express</span></td>
+                <td class="px-5 py-3.5 text-gray-700 font-medium">A-2</td>
+                <td class="px-5 py-3.5 text-gray-700">Sunil M.</td>
+                <td class="px-5 py-3.5"><span class="inline-flex items-center gap-1.5 bg-blue-100 text-blue-700 text-xs font-semibold px-2.5 py-1 rounded-full"><span class="w-1.5 h-1.5 rounded-full bg-blue-500"></span>Picking</span></td>
+                <td class="px-5 py-3.5"><span class="text-orange-600 font-medium">2:00 PM</span></td>
+                <td class="px-5 py-3.5">
+                  <div class="flex items-center gap-1">
+                    <button class="p-1.5 text-gray-400 hover:text-brand-500 hover:bg-brand-50 rounded-lg transition" title="View Details">
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z"/><path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                    </button>
+                    <button class="p-1.5 text-gray-400 hover:text-brand-500 hover:bg-brand-50 rounded-lg transition" title="Reassign Picker">
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M19 7.5v3m0 0v3m0-3h3m-3 0h-3m-2.25-4.125a3.375 3.375 0 11-6.75 0 3.375 3.375 0 016.75 0zM4 19.235v-.11a6.375 6.375 0 0112.75 0v.109A12.318 12.318 0 0110.374 21c-2.331 0-4.512-.645-6.374-1.766z"/></svg>
+                    </button>
+                  </div>
+                </td>
+              </tr>
+
+              <!-- Row 4: Express - Packing -->
+              <tr class="table-row express-row cursor-pointer" onclick="togglePackingChecklist('packing-1')">
+                <td class="px-5 py-3.5"><span class="font-semibold text-gray-900">#ORD-7835</span></td>
+                <td class="px-5 py-3.5 text-gray-700">Vikram Singh</td>
+                <td class="px-5 py-3.5"><span class="font-medium text-gray-900">2</span></td>
+                <td class="px-5 py-3.5"><span class="inline-flex items-center bg-orange-100 text-orange-700 text-xs font-semibold px-2.5 py-1 rounded-full">Express</span></td>
+                <td class="px-5 py-3.5 text-gray-700 font-medium">C-1</td>
+                <td class="px-5 py-3.5 text-gray-700">Meena R.</td>
+                <td class="px-5 py-3.5"><span class="inline-flex items-center gap-1.5 bg-purple-100 text-purple-700 text-xs font-semibold px-2.5 py-1 rounded-full"><span class="w-1.5 h-1.5 rounded-full bg-purple-500"></span>Packing</span></td>
+                <td class="px-5 py-3.5"><span class="text-orange-600 font-medium">3:30 PM</span></td>
+                <td class="px-5 py-3.5">
+                  <div class="flex items-center gap-1">
+                    <button class="p-1.5 text-gray-400 hover:text-brand-500 hover:bg-brand-50 rounded-lg transition" title="View Details">
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z"/><path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                    </button>
+                    <button class="p-1.5 text-gray-400 hover:text-brand-500 hover:bg-brand-50 rounded-lg transition" title="Reassign">
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M19 7.5v3m0 0v3m0-3h3m-3 0h-3m-2.25-4.125a3.375 3.375 0 11-6.75 0 3.375 3.375 0 016.75 0zM4 19.235v-.11a6.375 6.375 0 0112.75 0v.109A12.318 12.318 0 0110.374 21c-2.331 0-4.512-.645-6.374-1.766z"/></svg>
+                    </button>
+                  </div>
+                </td>
+              </tr>
+
+              <!-- EXPANDABLE PACKING CHECKLIST for Row 4 -->
+              <tr id="packing-1" class="hidden">
+                <td colspan="9" class="p-0">
+                  <div class="bg-gray-50 border-l-4 border-purple-500 mx-4 my-3 rounded-xl overflow-hidden">
+                    <!-- Packing Header -->
+                    <div class="bg-white px-6 py-4 border-b border-gray-100 flex items-center justify-between">
+                      <div>
+                        <h3 class="text-sm font-bold text-gray-900">Packing Checklist - #ORD-7835</h3>
+                        <p class="text-xs text-gray-500 mt-0.5">2 items | Express Delivery | Packed by Meena R.</p>
+                      </div>
+                      <button class="flex items-center gap-2 bg-purple-600 hover:bg-purple-700 text-white text-sm font-medium px-4 py-2 rounded-lg transition" onclick="event.stopPropagation(); completePacking()">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 7.5l-9-5.25L3 7.5m18 0l-9 5.25m9-5.25v9l-9 5.25M3 7.5l9 5.25M3 7.5v9l9 5.25m0-9v9"/></svg>
+                        Complete Packing
+                      </button>
+                    </div>
+                    <!-- Checklist Items -->
+                    <div class="divide-y divide-gray-100">
+                      <div class="check-item flex items-center gap-4 px-6 py-3.5 bg-white">
+                        <input type="checkbox" checked class="w-4 h-4 rounded border-gray-300 text-purple-600 focus:ring-purple-400 cursor-pointer" onclick="event.stopPropagation()">
+                        <div class="flex-1">
+                          <p class="text-sm font-medium text-gray-900">Items Verified</p>
+                          <p class="text-xs text-gray-500">All items match the pick list and are in good condition</p>
+                        </div>
+                        <span class="text-xs text-green-600 font-medium bg-green-50 px-2 py-0.5 rounded-full">Done</span>
+                      </div>
+                      <div class="check-item flex items-center gap-4 px-6 py-3.5 bg-white">
+                        <input type="checkbox" checked class="w-4 h-4 rounded border-gray-300 text-purple-600 focus:ring-purple-400 cursor-pointer" onclick="event.stopPropagation()">
+                        <div class="flex-1">
+                          <p class="text-sm font-medium text-gray-900">Packaging Selected</p>
+                          <p class="text-xs text-gray-500">Appropriate box or envelope chosen for the items</p>
+                        </div>
+                        <span class="inline-flex items-center gap-1 text-xs text-gray-700 font-medium bg-gray-100 px-2.5 py-0.5 rounded-full">
+                          <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M21 7.5l-9-5.25L3 7.5m18 0l-9 5.25m9-5.25v9l-9 5.25M3 7.5l9 5.25M3 7.5v9l9 5.25m0-9v9"/></svg>
+                          Medium Box
+                        </span>
+                      </div>
+                      <div class="check-item flex items-center gap-4 px-6 py-3.5 bg-white">
+                        <input type="checkbox" class="w-4 h-4 rounded border-gray-300 text-purple-600 focus:ring-purple-400 cursor-pointer" onclick="event.stopPropagation()">
+                        <div class="flex-1">
+                          <p class="text-sm font-medium text-gray-900">Weight Entered</p>
+                          <p class="text-xs text-gray-500">Record the total package weight for shipping</p>
+                        </div>
+                        <div class="flex items-center gap-1.5" onclick="event.stopPropagation()">
+                          <input type="number" placeholder="0.00" class="w-20 bg-gray-50 border border-gray-200 rounded-lg py-1.5 px-2.5 text-sm text-center outline-none focus:border-purple-400 focus:ring-1 focus:ring-purple-100">
+                          <span class="text-xs text-gray-500 font-medium">kg</span>
+                        </div>
+                      </div>
+                      <div class="check-item flex items-center gap-4 px-6 py-3.5 bg-white">
+                        <input type="checkbox" class="w-4 h-4 rounded border-gray-300 text-purple-600 focus:ring-purple-400 cursor-pointer" onclick="event.stopPropagation()">
+                        <div class="flex-1">
+                          <p class="text-sm font-medium text-gray-900">Shipping Label Generated</p>
+                          <p class="text-xs text-gray-500">Print and attach shipping label to the package</p>
+                        </div>
+                        <button class="text-xs text-purple-600 hover:text-purple-700 font-medium bg-purple-50 hover:bg-purple-100 px-3 py-1 rounded-lg transition" onclick="event.stopPropagation()">
+                          Generate Label
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </td>
+              </tr>
+
+              <!-- Row 5: Normal - Pending -->
+              <tr class="table-row">
+                <td class="px-5 py-3.5"><span class="font-semibold text-gray-900">#ORD-7836</span></td>
+                <td class="px-5 py-3.5 text-gray-700">Lakshmi Iyer</td>
+                <td class="px-5 py-3.5"><span class="font-medium text-gray-900">4</span></td>
+                <td class="px-5 py-3.5"><span class="inline-flex items-center bg-gray-100 text-gray-600 text-xs font-semibold px-2.5 py-1 rounded-full">Normal</span></td>
+                <td class="px-5 py-3.5 text-gray-700 font-medium">B-2</td>
+                <td class="px-5 py-3.5 text-gray-500 italic">Unassigned</td>
+                <td class="px-5 py-3.5"><span class="inline-flex items-center gap-1.5 bg-amber-100 text-amber-700 text-xs font-semibold px-2.5 py-1 rounded-full"><span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span>Pending</span></td>
+                <td class="px-5 py-3.5"><span class="text-gray-600">5:00 PM</span></td>
+                <td class="px-5 py-3.5">
+                  <div class="flex items-center gap-1">
+                    <button class="p-1.5 text-gray-400 hover:text-brand-500 hover:bg-brand-50 rounded-lg transition" title="View Details">
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z"/><path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                    </button>
+                    <button class="p-1.5 text-gray-400 hover:text-brand-500 hover:bg-brand-50 rounded-lg transition" title="Assign Picker">
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M19 7.5v3m0 0v3m0-3h3m-3 0h-3m-2.25-4.125a3.375 3.375 0 11-6.75 0 3.375 3.375 0 016.75 0zM4 19.235v-.11a6.375 6.375 0 0112.75 0v.109A12.318 12.318 0 0110.374 21c-2.331 0-4.512-.645-6.374-1.766z"/></svg>
+                    </button>
+                  </div>
+                </td>
+              </tr>
+
+              <!-- Row 6: Normal - Ready to Ship -->
+              <tr class="table-row">
+                <td class="px-5 py-3.5"><span class="font-semibold text-gray-900">#ORD-7830</span></td>
+                <td class="px-5 py-3.5 text-gray-700">Rahul Gupta</td>
+                <td class="px-5 py-3.5"><span class="font-medium text-gray-900">2</span></td>
+                <td class="px-5 py-3.5"><span class="inline-flex items-center bg-gray-100 text-gray-600 text-xs font-semibold px-2.5 py-1 rounded-full">Normal</span></td>
+                <td class="px-5 py-3.5 text-gray-700 font-medium">A-3</td>
+                <td class="px-5 py-3.5 text-gray-700">Arun P.</td>
+                <td class="px-5 py-3.5"><span class="inline-flex items-center gap-1.5 bg-green-100 text-green-700 text-xs font-semibold px-2.5 py-1 rounded-full"><span class="w-1.5 h-1.5 rounded-full bg-green-500"></span>Ready</span></td>
+                <td class="px-5 py-3.5"><span class="text-gray-600">6:00 PM</span></td>
+                <td class="px-5 py-3.5">
+                  <div class="flex items-center gap-1">
+                    <button class="p-1.5 text-gray-400 hover:text-brand-500 hover:bg-brand-50 rounded-lg transition" title="View Details">
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z"/><path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                    </button>
+                    <button class="p-1.5 text-gray-400 hover:text-green-600 hover:bg-green-50 rounded-lg transition" title="Dispatch">
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M6 12L3.269 3.126A59.768 59.768 0 0121.485 12 59.77 59.77 0 013.27 20.876L5.999 12zm0 0h7.5"/></svg>
+                    </button>
+                  </div>
+                </td>
+              </tr>
+
+              <!-- Row 7: Normal - Dispatched -->
+              <tr class="table-row">
+                <td class="px-5 py-3.5"><span class="font-semibold text-gray-900">#ORD-7825</span></td>
+                <td class="px-5 py-3.5 text-gray-700">Sneha Reddy</td>
+                <td class="px-5 py-3.5"><span class="font-medium text-gray-900">6</span></td>
+                <td class="px-5 py-3.5"><span class="inline-flex items-center bg-gray-100 text-gray-600 text-xs font-semibold px-2.5 py-1 rounded-full">Normal</span></td>
+                <td class="px-5 py-3.5 text-gray-700 font-medium">C-2</td>
+                <td class="px-5 py-3.5 text-gray-700">Karthik S.</td>
+                <td class="px-5 py-3.5"><span class="inline-flex items-center gap-1.5 bg-gray-100 text-gray-600 text-xs font-semibold px-2.5 py-1 rounded-full"><span class="w-1.5 h-1.5 rounded-full bg-gray-400"></span>Dispatched</span></td>
+                <td class="px-5 py-3.5"><span class="text-gray-400 line-through">10:30 AM</span></td>
+                <td class="px-5 py-3.5">
+                  <div class="flex items-center gap-1">
+                    <button class="p-1.5 text-gray-400 hover:text-brand-500 hover:bg-brand-50 rounded-lg transition" title="View Details">
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z"/><path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                    </button>
+                    <button class="p-1.5 text-gray-400 hover:text-blue-500 hover:bg-blue-50 rounded-lg transition" title="Track Shipment">
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z"/><path d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z"/></svg>
+                    </button>
+                  </div>
+                </td>
+              </tr>
+
+              <!-- Row 8: Express - Picking -->
+              <tr class="table-row express-row">
+                <td class="px-5 py-3.5"><span class="font-semibold text-gray-900">#ORD-7837</span></td>
+                <td class="px-5 py-3.5 text-gray-700">Kavitha Das</td>
+                <td class="px-5 py-3.5"><span class="font-medium text-gray-900">3</span></td>
+                <td class="px-5 py-3.5"><span class="inline-flex items-center bg-orange-100 text-orange-700 text-xs font-semibold px-2.5 py-1 rounded-full">Express</span></td>
+                <td class="px-5 py-3.5 text-gray-700 font-medium">A-1</td>
+                <td class="px-5 py-3.5 text-gray-700">Rajesh K.</td>
+                <td class="px-5 py-3.5"><span class="inline-flex items-center gap-1.5 bg-blue-100 text-blue-700 text-xs font-semibold px-2.5 py-1 rounded-full"><span class="w-1.5 h-1.5 rounded-full bg-blue-500"></span>Picking</span></td>
+                <td class="px-5 py-3.5"><span class="text-orange-600 font-medium">4:00 PM</span></td>
+                <td class="px-5 py-3.5">
+                  <div class="flex items-center gap-1">
+                    <button class="p-1.5 text-gray-400 hover:text-brand-500 hover:bg-brand-50 rounded-lg transition" title="View Details">
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z"/><path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                    </button>
+                    <button class="p-1.5 text-gray-400 hover:text-brand-500 hover:bg-brand-50 rounded-lg transition" title="Reassign Picker">
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M19 7.5v3m0 0v3m0-3h3m-3 0h-3m-2.25-4.125a3.375 3.375 0 11-6.75 0 3.375 3.375 0 016.75 0zM4 19.235v-.11a6.375 6.375 0 0112.75 0v.109A12.318 12.318 0 0110.374 21c-2.331 0-4.512-.645-6.374-1.766z"/></svg>
+                    </button>
+                  </div>
+                </td>
+              </tr>
+
+            </tbody>
+          </table>
+        </div>
+
+        <!-- ===== PAGINATION ===== -->
+        <div class="flex items-center justify-between px-5 py-4 border-t border-gray-100">
+          <div class="flex items-center gap-2">
+            <span class="text-sm text-gray-500">Showing</span>
+            <select class="bg-white border border-gray-200 rounded-lg px-2.5 py-1.5 text-sm text-gray-700 outline-none focus:border-brand-400 focus:ring-1 focus:ring-brand-100">
+              <option>10</option>
+              <option>25</option>
+              <option>50</option>
+            </select>
+            <span class="text-sm text-gray-500">of <span class="font-medium text-gray-700">169</span> orders</span>
+          </div>
+          <div class="flex items-center gap-1">
+            <button class="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition disabled:opacity-40" disabled>
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M15.75 19.5L8.25 12l7.5-7.5"/></svg>
+            </button>
+            <button class="w-9 h-9 rounded-lg bg-brand-500 text-white text-sm font-semibold">1</button>
+            <button class="w-9 h-9 rounded-lg text-gray-600 hover:bg-gray-100 text-sm font-medium transition">2</button>
+            <button class="w-9 h-9 rounded-lg text-gray-600 hover:bg-gray-100 text-sm font-medium transition">3</button>
+            <span class="w-9 h-9 flex items-center justify-center text-gray-400 text-sm">...</span>
+            <button class="w-9 h-9 rounded-lg text-gray-600 hover:bg-gray-100 text-sm font-medium transition">17</button>
+            <button class="p-2 text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded-lg transition">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M8.25 4.5l7.5 7.5-7.5 7.5"/></svg>
+            </button>
+          </div>
+        </div>
+      </div>
+
+    </main>
+  </div>
+
+  <!-- ===== JAVASCRIPT ===== -->
+  <script>
+    // Filter tab switching
+    function setActiveTab(el) {
+      document.querySelectorAll('.filter-tab').forEach(t => {
+        t.classList.remove('active');
+        t.classList.add('text-gray-500');
+      });
+      el.classList.add('active');
+      el.classList.remove('text-gray-500');
+    }
+
+    // Toggle pick list expansion
+    function togglePickList(id) {
+      const row = document.getElementById(id);
+      if (row) {
+        row.classList.toggle('hidden');
+      }
+    }
+
+    // Toggle packing checklist expansion
+    function togglePackingChecklist(id) {
+      const row = document.getElementById(id);
+      if (row) {
+        row.classList.toggle('hidden');
+      }
+    }
+
+    // Mark all items as picked
+    function markAllPicked() {
+      const pickList = document.getElementById('pick-list-1');
+      if (pickList) {
+        const checkboxes = pickList.querySelectorAll('input[type="checkbox"]');
+        checkboxes.forEach(cb => cb.checked = true);
+
+        // Update the status badge in the parent row
+        const parentRow = pickList.previousElementSibling;
+        if (parentRow) {
+          const statusCell = parentRow.querySelectorAll('td')[6];
+          if (statusCell) {
+            statusCell.innerHTML = '<span class="inline-flex items-center gap-1.5 bg-purple-100 text-purple-700 text-xs font-semibold px-2.5 py-1 rounded-full"><span class="w-1.5 h-1.5 rounded-full bg-purple-500"></span>Packing</span>';
+          }
+        }
+
+        // Show confirmation toast
+        showToast('All items picked! Order moved to Packing.', 'success');
+      }
+    }
+
+    // Complete packing
+    function completePacking() {
+      const packingList = document.getElementById('packing-1');
+      if (packingList) {
+        const checkboxes = packingList.querySelectorAll('input[type="checkbox"]');
+        checkboxes.forEach(cb => cb.checked = true);
+
+        // Update the status badge in the parent row
+        const parentRow = packingList.previousElementSibling;
+        if (parentRow) {
+          const statusCell = parentRow.querySelectorAll('td')[6];
+          if (statusCell) {
+            statusCell.innerHTML = '<span class="inline-flex items-center gap-1.5 bg-green-100 text-green-700 text-xs font-semibold px-2.5 py-1 rounded-full"><span class="w-1.5 h-1.5 rounded-full bg-green-500"></span>Ready</span>';
+          }
+        }
+
+        showToast('Packing complete! Order is Ready to Ship.', 'success');
+      }
+    }
+
+    // Toast notification
+    function showToast(message, type) {
+      const toast = document.createElement('div');
+      const bgColor = type === 'success' ? 'bg-green-600' : 'bg-brand-500';
+      toast.className = `fixed bottom-6 right-6 ${bgColor} text-white px-5 py-3 rounded-xl shadow-lg text-sm font-medium z-50 flex items-center gap-2 transform translate-y-4 opacity-0 transition-all duration-300`;
+      toast.innerHTML = `
+        <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+        ${message}
+      `;
+      document.body.appendChild(toast);
+
+      requestAnimationFrame(() => {
+        toast.style.transform = 'translateY(0)';
+        toast.style.opacity = '1';
+      });
+
+      setTimeout(() => {
+        toast.style.transform = 'translateY(4px)';
+        toast.style.opacity = '0';
+        setTimeout(() => toast.remove(), 300);
+      }, 3000);
+    }
+  </script>
+
+  <script src="shared-layout.js"></script>
+  <script>renderWarehouseLayout('orders');</script>
+</body>
+</html>

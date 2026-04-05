@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HomeBase — Order #HB-78234</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              50: '#FFF7ED',
+              100: '#FFEDD5',
+              200: '#FED7AA',
+              300: '#FDBA74',
+              400: '#FB923C',
+              500: '#F97316',
+              600: '#EA580C',
+              700: '#C2410C',
+            },
+            navy: {
+              700: '#1E3A5F',
+              800: '#1A2E4A',
+              900: '#0F1B2D',
+            },
+            success: '#16A34A',
+            warning: '#EAB308',
+            danger: '#DC2626',
+          },
+          fontFamily: {
+            sans: ['Inter', 'system-ui', 'sans-serif'],
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+    .scrollbar-hide::-webkit-scrollbar { display: none; }
+    .sidebar-link { transition: all 0.15s ease; }
+    .sidebar-link:hover { background: rgba(255,255,255,0.08); }
+    .sidebar-link.active { background: rgba(249,115,22,0.15); border-right: 3px solid #F97316; }
+    .dropdown-menu { display: none; }
+    .dropdown:hover .dropdown-menu { display: block; }
+    .sidebar-scroll::-webkit-scrollbar { width: 4px; }
+    .sidebar-scroll::-webkit-scrollbar-track { background: transparent; }
+    .sidebar-scroll::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); border-radius: 2px; }
+    .timeline-step.completed .timeline-dot { background: #16A34A; border-color: #16A34A; }
+    .timeline-step.completed .timeline-line { background: #16A34A; }
+    .timeline-step.active .timeline-dot { background: #F97316; border-color: #F97316; box-shadow: 0 0 0 4px rgba(249,115,22,0.2); }
+    .timeline-step .timeline-dot { width: 14px; height: 14px; border-radius: 50%; border: 2px solid #D1D5DB; background: white; }
+    .timeline-step .timeline-line { width: 2px; height: 32px; background: #E5E7EB; margin: 4px auto; }
+  </style>
+</head>
+<body class="font-sans bg-gray-50 text-gray-900">
+
+  <header id="seller-header" class="fixed top-0 left-0 right-0 z-50 bg-white border-b border-gray-200 h-16"></header>
+  <aside id="seller-sidebar" class="fixed left-0 top-16 bottom-0 w-60 z-40 flex flex-col overflow-y-auto" style="background:#0F1B2D;"></aside>
+
+  <main class="ml-60 pt-16 p-6 min-h-screen">
+
+    <!-- Breadcrumb -->
+    <nav class="flex items-center gap-2 text-sm mb-5">
+      <a href="seller-orders.html" class="text-brand-500 hover:text-brand-600 font-medium">Orders</a>
+      <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M8.25 4.5l7.5 7.5-7.5 7.5"/></svg>
+      <span class="text-gray-600 font-medium">#HB-78234</span>
+    </nav>
+
+    <!-- Page Header -->
+    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
+      <div>
+        <div class="flex items-center gap-3">
+          <h1 class="text-2xl font-bold text-gray-900">Order #HB-78234</h1>
+          <span class="bg-blue-100 text-blue-700 text-xs font-bold px-3 py-1 rounded-full uppercase">Confirmed</span>
+        </div>
+        <p class="text-sm text-gray-500 mt-1">Placed on 27 Mar 2026 at 3:42 PM</p>
+      </div>
+      <div class="flex items-center gap-2">
+        <button onclick="alert('Print invoice for #HB-78234')" class="flex items-center gap-1.5 bg-white border border-gray-200 text-gray-700 text-sm font-medium px-4 py-2 rounded-lg hover:bg-gray-50 transition">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M6.72 13.829c-.24.03-.48.062-.72.096m.72-.096a42.415 42.415 0 0110.56 0m-10.56 0L6.34 18m10.94-4.171c.24.03.48.062.72.096m-.72-.096L17.66 18m0 0l.229 2.523a1.125 1.125 0 01-1.12 1.227H7.231c-.662 0-1.18-.568-1.12-1.227L6.34 18m11.318 0h1.091A2.25 2.25 0 0021 15.75V9.456c0-1.081-.768-2.015-1.837-2.175a48.055 48.055 0 00-1.913-.247M6.34 18H5.25A2.25 2.25 0 013 15.75V9.456c0-1.081.768-2.015 1.837-2.175a48.041 48.041 0 011.913-.247m0 0a48.159 48.159 0 018.5 0m-8.5 0V6.375c0-.621.504-1.125 1.125-1.125h6.75c.621 0 1.125.504 1.125 1.125v1.059"/></svg>
+          Print Invoice
+        </button>
+        <button onclick="alert('Download packing slip')" class="flex items-center gap-1.5 bg-white border border-gray-200 text-gray-700 text-sm font-medium px-4 py-2 rounded-lg hover:bg-gray-50 transition">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3"/></svg>
+          Packing Slip
+        </button>
+      </div>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+
+      <!-- Left Column (2/3) -->
+      <div class="lg:col-span-2 space-y-6">
+
+        <!-- Order Status Timeline -->
+        <div class="bg-white rounded-xl border border-gray-100 p-6">
+          <h2 class="text-base font-semibold text-gray-900 mb-5">Order Status</h2>
+          <div class="flex items-start justify-between">
+            <!-- Step 1: Placed -->
+            <div class="timeline-step completed flex flex-col items-center flex-1">
+              <div class="timeline-dot flex items-center justify-center">
+                <svg class="w-2.5 h-2.5 text-white" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+              </div>
+              <p class="text-xs font-semibold text-green-600 mt-2">Placed</p>
+              <p class="text-[10px] text-gray-400">27 Mar, 3:42 PM</p>
+            </div>
+            <div class="flex-1 flex items-center mt-1.5"><div class="w-full h-0.5 bg-green-500 rounded"></div></div>
+            <!-- Step 2: Confirmed -->
+            <div class="timeline-step active flex flex-col items-center flex-1">
+              <div class="timeline-dot"></div>
+              <p class="text-xs font-semibold text-brand-600 mt-2">Confirmed</p>
+              <p class="text-[10px] text-gray-400">27 Mar, 4:10 PM</p>
+            </div>
+            <div class="flex-1 flex items-center mt-1.5"><div class="w-full h-0.5 bg-gray-200 rounded"></div></div>
+            <!-- Step 3: Packed -->
+            <div class="timeline-step flex flex-col items-center flex-1">
+              <div class="timeline-dot"></div>
+              <p class="text-xs font-medium text-gray-400 mt-2">Packed</p>
+              <p class="text-[10px] text-gray-300">Pending</p>
+            </div>
+            <div class="flex-1 flex items-center mt-1.5"><div class="w-full h-0.5 bg-gray-200 rounded"></div></div>
+            <!-- Step 4: Shipped -->
+            <div class="timeline-step flex flex-col items-center flex-1">
+              <div class="timeline-dot"></div>
+              <p class="text-xs font-medium text-gray-400 mt-2">Shipped</p>
+              <p class="text-[10px] text-gray-300">Pending</p>
+            </div>
+            <div class="flex-1 flex items-center mt-1.5"><div class="w-full h-0.5 bg-gray-200 rounded"></div></div>
+            <!-- Step 5: Delivered -->
+            <div class="timeline-step flex flex-col items-center flex-1">
+              <div class="timeline-dot"></div>
+              <p class="text-xs font-medium text-gray-400 mt-2">Delivered</p>
+              <p class="text-[10px] text-gray-300">Pending</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- STM Actions -->
+        <div class="bg-brand-50 border border-brand-200 rounded-xl p-5">
+          <div class="flex items-center gap-3 mb-3">
+            <svg class="w-5 h-5 text-brand-600" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z"/></svg>
+            <p class="text-sm font-semibold text-brand-800">Action Required: Order is confirmed. Pack and ship within 24 hours.</p>
+          </div>
+          <div class="flex items-center gap-3">
+            <button onclick="alert('Mark as Packed & Ready to Ship')" class="bg-brand-500 hover:bg-brand-600 text-white text-sm font-medium px-4 py-2 rounded-lg transition">Mark as Packed</button>
+            <button onclick="alert('Ship Order - Enter tracking details')" class="bg-white border border-brand-300 text-brand-600 hover:bg-brand-50 text-sm font-medium px-4 py-2 rounded-lg transition">Ship Order</button>
+            <button onclick="if(confirm('Cancel this order? This cannot be undone.'))alert('Order cancelled')" class="bg-white border border-red-300 text-red-600 hover:bg-red-50 text-sm font-medium px-4 py-2 rounded-lg transition">Cancel Order</button>
+          </div>
+        </div>
+
+        <!-- Order Items -->
+        <div class="bg-white rounded-xl border border-gray-100">
+          <div class="px-6 py-4 border-b border-gray-100">
+            <h2 class="text-base font-semibold text-gray-900">Items (2)</h2>
+          </div>
+          <div class="divide-y divide-gray-50">
+            <div class="flex items-center gap-4 px-6 py-4">
+              <div class="w-16 h-16 bg-gray-100 rounded-lg flex items-center justify-center text-2xl shrink-0">&#127911;</div>
+              <div class="flex-1 min-w-0">
+                <p class="text-sm font-semibold text-gray-900">Premium Wireless Earbuds</p>
+                <p class="text-xs text-gray-500 mt-0.5">SKU: RJS-EBD-001 | Color: Black | Qty: 2</p>
+              </div>
+              <div class="text-right shrink-0">
+                <p class="text-sm font-bold text-gray-900">&#8377;1,598</p>
+                <p class="text-xs text-gray-400">&#8377;799 x 2</p>
+              </div>
+            </div>
+            <div class="flex items-center gap-4 px-6 py-4">
+              <div class="w-16 h-16 bg-gray-100 rounded-lg flex items-center justify-center text-2xl shrink-0">&#128187;</div>
+              <div class="flex-1 min-w-0">
+                <p class="text-sm font-semibold text-gray-900">Smart LED Desk Lamp</p>
+                <p class="text-xs text-gray-500 mt-0.5">SKU: RJS-LMP-042 | Color: White | Qty: 1</p>
+              </div>
+              <div class="text-right shrink-0">
+                <p class="text-sm font-bold text-gray-900">&#8377;899</p>
+                <p class="text-xs text-gray-400">&#8377;899 x 1</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Pricing Breakdown -->
+        <div class="bg-white rounded-xl border border-gray-100 p-6">
+          <h2 class="text-base font-semibold text-gray-900 mb-4">Pricing Breakdown</h2>
+          <div class="space-y-2.5">
+            <div class="flex items-center justify-between text-sm">
+              <span class="text-gray-600">Subtotal (3 items)</span>
+              <span class="text-gray-900 font-medium">&#8377;2,497</span>
+            </div>
+            <div class="flex items-center justify-between text-sm">
+              <span class="text-gray-600">Shipping Fee</span>
+              <span class="text-green-600 font-medium">FREE</span>
+            </div>
+            <div class="flex items-center justify-between text-sm">
+              <span class="text-gray-600">Coupon (WELCOME10 - 10%)</span>
+              <span class="text-red-500 font-medium">-&#8377;249</span>
+            </div>
+            <div class="flex items-center justify-between text-sm">
+              <span class="text-gray-600">GST (18%)</span>
+              <span class="text-gray-900 font-medium">&#8377;405</span>
+            </div>
+            <div class="border-t border-gray-100 pt-2.5 flex items-center justify-between">
+              <span class="text-base font-bold text-gray-900">Order Total</span>
+              <span class="text-base font-bold text-gray-900">&#8377;2,653</span>
+            </div>
+          </div>
+          <div class="mt-4 pt-4 border-t border-gray-100 space-y-2">
+            <div class="flex items-center justify-between text-sm">
+              <span class="text-gray-500">Commission (5%)</span>
+              <span class="text-red-500 font-medium">-&#8377;125</span>
+            </div>
+            <div class="flex items-center justify-between text-sm">
+              <span class="text-gray-500">Payment Gateway (2%)</span>
+              <span class="text-red-500 font-medium">-&#8377;50</span>
+            </div>
+            <div class="flex items-center justify-between text-sm font-semibold">
+              <span class="text-green-700">Your Net Earnings</span>
+              <span class="text-green-700">&#8377;2,478</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Seller Notes -->
+        <div class="bg-white rounded-xl border border-gray-100 p-6">
+          <h2 class="text-base font-semibold text-gray-900 mb-3">Seller Notes</h2>
+          <div class="space-y-3">
+            <div class="bg-gray-50 rounded-lg p-3">
+              <p class="text-sm text-gray-700">Customer requested gift wrapping. Include thank you card.</p>
+              <p class="text-xs text-gray-400 mt-1">Added by you, 27 Mar 4:15 PM</p>
+            </div>
+            <div class="flex gap-2">
+              <input type="text" id="noteInput" placeholder="Add a note about this order..." class="flex-1 border border-gray-200 rounded-lg px-3 py-2.5 text-sm outline-none focus:border-brand-400 focus:ring-2 focus:ring-brand-100" />
+              <button onclick="var n=document.getElementById('noteInput');if(n.value.trim()){alert('Note added: '+n.value);n.value='';}" class="bg-brand-500 hover:bg-brand-600 text-white text-sm font-medium px-4 py-2.5 rounded-lg transition">Add</button>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Right Column (1/3) -->
+      <div class="space-y-6">
+
+        <!-- Customer Info -->
+        <div class="bg-white rounded-xl border border-gray-100 p-5">
+          <h3 class="text-sm font-semibold text-gray-900 mb-4">Customer</h3>
+          <div class="flex items-center gap-3 mb-4">
+            <div class="w-10 h-10 rounded-full bg-gradient-to-br from-blue-400 to-blue-600 flex items-center justify-center text-white text-sm font-bold">AK</div>
+            <div>
+              <p class="text-sm font-semibold text-gray-900">Arun Kumar</p>
+              <p class="text-xs text-gray-500">arun.kumar@email.com</p>
+            </div>
+          </div>
+          <div class="space-y-2 text-sm">
+            <div class="flex items-center gap-2 text-gray-600">
+              <svg class="w-4 h-4 text-gray-400 shrink-0" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M2.25 6.75c0 8.284 6.716 15 15 15h2.25a2.25 2.25 0 002.25-2.25v-1.372c0-.516-.351-.966-.852-1.091l-4.423-1.106c-.44-.11-.902.055-1.173.417l-.97 1.293c-.282.376-.769.542-1.21.38a12.035 12.035 0 01-7.143-7.143c-.162-.441.004-.928.38-1.21l1.293-.97c.363-.271.527-.734.417-1.173L6.963 3.102a1.125 1.125 0 00-1.091-.852H4.5A2.25 2.25 0 002.25 4.5v2.25z"/></svg>
+              +91 98765 43210
+            </div>
+            <div class="flex items-center gap-2 text-gray-600">
+              <svg class="w-4 h-4 text-gray-400 shrink-0" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M9 12h3.75M9 15h3.75M9 18h3.75m3 .75H18a2.25 2.25 0 002.25-2.25V6.108c0-1.135-.845-2.098-1.976-2.192a48.424 48.424 0 00-1.123-.08m-5.801 0c-.065.21-.1.433-.1.664 0 .414.336.75.75.75h4.5a.75.75 0 00.75-.75 2.25 2.25 0 00-.1-.664m-5.8 0A2.251 2.251 0 0113.5 2.25H15c1.012 0 1.867.668 2.15 1.586m-5.8 0c-.376.023-.75.05-1.124.08C9.095 4.01 8.25 4.973 8.25 6.108V8.25m0 0H4.875c-.621 0-1.125.504-1.125 1.125v11.25c0 .621.504 1.125 1.125 1.125h9.75c.621 0 1.125-.504 1.125-1.125V9.375c0-.621-.504-1.125-1.125-1.125H8.25z"/></svg>
+              12 orders on HomeBase
+            </div>
+          </div>
+        </div>
+
+        <!-- Shipping Address -->
+        <div class="bg-white rounded-xl border border-gray-100 p-5">
+          <h3 class="text-sm font-semibold text-gray-900 mb-3">Shipping Address</h3>
+          <div class="text-sm text-gray-600 space-y-0.5">
+            <p class="font-medium text-gray-800">Arun Kumar</p>
+            <p>42, 3rd Cross, Indiranagar</p>
+            <p>Stage 2, 12th Main Road</p>
+            <p>Bangalore, Karnataka 560038</p>
+            <p class="text-gray-500 mt-1">Phone: +91 98765 43210</p>
+          </div>
+          <a href="https://maps.google.com" target="_blank" class="inline-flex items-center gap-1 text-xs text-brand-500 hover:text-brand-600 font-medium mt-3">
+            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z"/><path d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z"/></svg>
+            View on Map
+          </a>
+        </div>
+
+        <!-- Payment Info -->
+        <div class="bg-white rounded-xl border border-gray-100 p-5">
+          <h3 class="text-sm font-semibold text-gray-900 mb-3">Payment</h3>
+          <div class="space-y-2.5 text-sm">
+            <div class="flex items-center justify-between">
+              <span class="text-gray-500">Method</span>
+              <span class="text-gray-900 font-medium">UPI (PhonePe)</span>
+            </div>
+            <div class="flex items-center justify-between">
+              <span class="text-gray-500">Transaction ID</span>
+              <span class="text-gray-900 font-medium text-xs">TXN-8829104756</span>
+            </div>
+            <div class="flex items-center justify-between">
+              <span class="text-gray-500">Status</span>
+              <span class="bg-green-100 text-green-700 text-xs font-semibold px-2 py-0.5 rounded-full">Paid</span>
+            </div>
+            <div class="flex items-center justify-between">
+              <span class="text-gray-500">Paid At</span>
+              <span class="text-gray-900 font-medium">27 Mar, 3:42 PM</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Shipping Info -->
+        <div class="bg-white rounded-xl border border-gray-100 p-5">
+          <h3 class="text-sm font-semibold text-gray-900 mb-3">Shipping</h3>
+          <div class="space-y-2.5 text-sm">
+            <div class="flex items-center justify-between">
+              <span class="text-gray-500">Carrier</span>
+              <span class="text-gray-900 font-medium">Delhivery</span>
+            </div>
+            <div class="flex items-center justify-between">
+              <span class="text-gray-500">Tracking #</span>
+              <span class="text-gray-400 italic text-xs">Not yet shipped</span>
+            </div>
+            <div class="flex items-center justify-between">
+              <span class="text-gray-500">Weight</span>
+              <span class="text-gray-900 font-medium">450g</span>
+            </div>
+            <div class="flex items-center justify-between">
+              <span class="text-gray-500">Est. Delivery</span>
+              <span class="text-gray-900 font-medium">30 Mar - 01 Apr</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+  </main>
+
+  <script src="shared-layout.js"></script>
+  <script>renderSellerLayout('orders');</script>
+
+</body>
+</html>

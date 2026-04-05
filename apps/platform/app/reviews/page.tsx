@@ -1,6 +1,6 @@
 'use client';
 
-import { ReviewList } from '@/features/review/ui';
+import { ReviewList } from '@/features/review/components';
 
 export default function ReviewsPage() {
   return <ReviewList />;

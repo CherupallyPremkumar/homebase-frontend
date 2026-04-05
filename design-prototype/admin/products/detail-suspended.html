@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HomeBase — Product Suspended</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      theme: { extend: { colors: { brand: { 50:'#FFF7ED',100:'#FFEDD5',200:'#FED7AA',300:'#FDBA74',400:'#FB923C',500:'#F97316',600:'#EA580C',700:'#C2410C' }, navy: { 700:'#1E3A5F',800:'#1A2E4A',900:'#0F1B2D' }, success:'#16A34A', warning:'#EAB308', danger:'#DC2626' }, fontFamily: { sans:['Inter','system-ui','sans-serif'] } } }
+    }
+  </script>
+  <style>
+    .sidebar-link { transition: all 0.15s ease; }
+    .sidebar-link:hover { background: rgba(255,255,255,0.06); }
+    .sidebar-link.active { background: rgba(249,115,22,0.15); border-right: 3px solid #F97316; }
+    .detail-tab { transition: all 0.15s ease; }
+    .detail-tab.active { color: #F97316; border-color: #F97316; }
+    .tab-panel { display: none; }
+    .tab-panel.active { display: block; }
+  </style>
+</head>
+<body class="font-sans bg-gray-50 text-gray-900">
+
+  <header id="admin-header" class="fixed top-0 left-0 right-0 z-50 bg-white border-b border-gray-200 h-16"></header>
+  <aside id="admin-sidebar" class="fixed left-0 top-16 bottom-0 w-60 z-40 flex flex-col overflow-y-auto" style="background:#0A1628;"></aside>
+
+  <main class="ml-60 pt-16 p-6 lg:p-8 min-h-screen">
+
+    <nav class="flex items-center gap-2 text-sm mb-5">
+      <a href="index.html" class="text-gray-400 hover:text-brand-500">Products</a>
+      <svg class="w-3.5 h-3.5 text-gray-300" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M8.25 4.5l7.5 7.5-7.5 7.5"/></svg>
+      <span class="text-gray-700 font-medium">Havells 9W LED Bulb Pack of 10</span>
+    </nav>
+
+    <!-- ===== SUSPENSION BANNER ===== -->
+    <div class="rounded-xl border border-red-200 bg-red-50 p-4 mb-6">
+      <div class="flex items-start gap-3">
+        <svg class="w-6 h-6 text-red-600 shrink-0 mt-0.5" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z"/></svg>
+        <div class="flex-1">
+          <p class="text-sm font-semibold text-red-800">This product has been suspended</p>
+          <p class="text-xs text-red-700 mt-0.5">Suspended by Super Admin on 25 Mar 2026</p>
+        </div>
+      </div>
+      <div class="mt-3 ml-9 bg-white rounded-lg border border-red-100 p-3">
+        <p class="text-xs font-semibold text-red-700 uppercase tracking-wider mb-1">Suspension Reason</p>
+        <p class="text-sm text-gray-800">Misleading wattage claim — 3 buyer complaints reported that the bulb does not deliver 9W equivalent brightness. Product specifications may be inaccurate. Seller has been notified to provide updated test certificates.</p>
+      </div>
+      <div class="mt-3 ml-9 bg-white rounded-lg border border-amber-100 p-3">
+        <p class="text-xs font-semibold text-amber-700 uppercase tracking-wider mb-1">Buyer Complaints (3)</p>
+        <div class="space-y-2 mt-2">
+          <div class="flex items-start gap-2 text-sm">
+            <span class="text-gray-400 text-xs shrink-0 mt-0.5">#1</span>
+            <div>
+              <p class="text-gray-700">"Bulb is very dim. Not even close to 9W. Feels like 5W max."</p>
+              <p class="text-xs text-gray-400">By Vikram K. &middot; 22 Mar 2026</p>
+            </div>
+          </div>
+          <div class="flex items-start gap-2 text-sm">
+            <span class="text-gray-400 text-xs shrink-0 mt-0.5">#2</span>
+            <div>
+              <p class="text-gray-700">"Compared with actual 9W bulb from local store — this one is significantly dimmer."</p>
+              <p class="text-xs text-gray-400">By Sunita M. &middot; 23 Mar 2026</p>
+            </div>
+          </div>
+          <div class="flex items-start gap-2 text-sm">
+            <span class="text-gray-400 text-xs shrink-0 mt-0.5">#3</span>
+            <div>
+              <p class="text-gray-700">"False advertising. Returned the product."</p>
+              <p class="text-xs text-gray-400">By Rahul P. &middot; 24 Mar 2026</p>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="mt-4 ml-9 flex items-center gap-2">
+        <button onclick="if(confirm('Reactivate this product? It will go live again.')) alert('Product reactivated — now Published')" class="flex items-center gap-1.5 bg-green-600 text-white px-4 py-2 rounded-lg text-sm font-semibold hover:bg-green-700 transition">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4.5 12.75l6 6 9-13.5"/></svg>Reactivate
+        </button>
+        <button onclick="if(confirm('Permanently disable this product? It will be removed from marketplace.')) alert('Product disabled')" class="flex items-center gap-1.5 bg-white border border-red-200 text-red-600 px-4 py-2 rounded-lg text-sm font-semibold hover:bg-red-50 transition">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"/></svg>Permanently Disable
+        </button>
+        <button onclick="alert('Message sent to Patel Lighting Solutions')" class="flex items-center gap-1.5 bg-white border border-gray-200 text-gray-700 px-4 py-2 rounded-lg text-sm font-medium hover:bg-gray-50 transition">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0L3.32 8.91a2.25 2.25 0 01-1.07-1.916V6.75"/></svg>Message Seller
+        </button>
+      </div>
+    </div>
+
+    <!-- ===== REMEDIATION CHECKLIST + APPEAL + TIMELINE ===== -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
+      <!-- Remediation Checklist -->
+      <div class="lg:col-span-2 bg-white rounded-xl border border-gray-100 shadow-sm p-6">
+        <div class="flex items-center justify-between mb-4">
+          <div class="flex items-center gap-2">
+            <svg class="w-5 h-5 text-brand-500" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M11.35 3.836c-.065.21-.1.433-.1.664 0 .414.336.75.75.75h4.5a.75.75 0 00.75-.75 2.25 2.25 0 00-.1-.664m-5.8 0A2.251 2.251 0 0113.5 2.25H15c1.012 0 1.867.668 2.15 1.586m-5.8 0c-.376.023-.75.05-1.124.08C9.095 4.01 8.25 4.973 8.25 6.108V8.25m8.9-4.414c.376.023.75.05 1.124.08 1.131.094 1.976 1.057 1.976 2.192V16.5A2.25 2.25 0 0118 18.75h-2.25m-7.5-10.5H4.875c-.621 0-1.125.504-1.125 1.125v11.25c0 .621.504 1.125 1.125 1.125h9.75c.621 0 1.125-.504 1.125-1.125V18.75m-7.5-10.5h6.375c.621 0 1.125.504 1.125 1.125v9.375m-8.25-3l1.5 1.5 3-3.75"/></svg>
+            <h3 class="text-sm font-semibold text-gray-900">Remediation Checklist</h3>
+          </div>
+          <span class="text-xs font-semibold text-amber-600 bg-amber-50 px-2.5 py-1 rounded-full">1 of 3 completed</span>
+        </div>
+        <p class="text-xs text-gray-500 mb-4">The seller must complete all steps below before this product can be reactivated.</p>
+        <div class="space-y-3">
+          <!-- Step 1: Fix description — pending -->
+          <div class="flex items-start gap-3 p-3 rounded-lg border border-amber-200 bg-amber-50/50">
+            <input type="checkbox" disabled class="mt-1 w-4 h-4 rounded border-gray-300 text-brand-500 focus:ring-brand-500">
+            <div class="flex-1">
+              <p class="text-sm font-medium text-gray-800">Fix product description and wattage claim</p>
+              <p class="text-xs text-gray-500 mt-0.5">Update the product description to accurately reflect the bulb's actual wattage output. Remove or correct "9W equivalent brightness" claim if not substantiated.</p>
+            </div>
+            <span class="shrink-0 inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-semibold bg-amber-100 text-amber-700">
+              <span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span>Pending
+            </span>
+          </div>
+          <!-- Step 2: Upload test certificate — pending -->
+          <div class="flex items-start gap-3 p-3 rounded-lg border border-amber-200 bg-amber-50/50">
+            <input type="checkbox" disabled class="mt-1 w-4 h-4 rounded border-gray-300 text-brand-500 focus:ring-brand-500">
+            <div class="flex-1">
+              <p class="text-sm font-medium text-gray-800">Upload third-party test certificate</p>
+              <p class="text-xs text-gray-500 mt-0.5">Provide an independent lab test report confirming the actual wattage and lumen output of the LED bulb. Must be from a BIS-accredited laboratory.</p>
+            </div>
+            <span class="shrink-0 inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-semibold bg-amber-100 text-amber-700">
+              <span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span>Pending
+            </span>
+          </div>
+          <!-- Step 3: Respond to buyer complaints — done -->
+          <div class="flex items-start gap-3 p-3 rounded-lg border border-green-200 bg-green-50/50">
+            <input type="checkbox" checked disabled class="mt-1 w-4 h-4 rounded border-gray-300 text-green-600 focus:ring-green-500">
+            <div class="flex-1">
+              <p class="text-sm font-medium text-gray-800 line-through">Respond to buyer complaints</p>
+              <p class="text-xs text-gray-500 mt-0.5">Seller responded to all 3 complaints on 27 Mar 2026. Offered refund/replacement to affected buyers.</p>
+            </div>
+            <span class="shrink-0 inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-semibold bg-green-100 text-green-700">
+              <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4.5 12.75l6 6 9-13.5"/></svg>Done
+            </span>
+          </div>
+        </div>
+        <!-- Estimated Reactivation -->
+        <div class="mt-4 bg-blue-50 rounded-lg border border-blue-100 p-3 flex items-center gap-3">
+          <svg class="w-5 h-5 text-blue-500 shrink-0" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5"/></svg>
+          <div>
+            <p class="text-sm text-blue-900">If remediation completed by <span class="font-semibold">Apr 5, 2026</span>, estimated reactivation: <span class="font-semibold">Apr 7, 2026</span></p>
+            <p class="text-xs text-blue-600 mt-0.5">Review takes 24-48 hours after all remediation steps are completed.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Appeal & Account Impact -->
+      <div class="space-y-6">
+        <!-- Submit Appeal -->
+        <div class="bg-white rounded-xl border border-gray-100 shadow-sm p-6">
+          <div class="flex items-center gap-2 mb-3">
+            <svg class="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M12 9v6m3-3H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+            <h3 class="text-sm font-semibold text-gray-900">Submit Appeal</h3>
+          </div>
+          <p class="text-xs text-gray-500 mb-3">If the seller believes this suspension is incorrect, they may submit an appeal with supporting documents.</p>
+          <div class="mb-3">
+            <textarea placeholder="Reason for appeal (optional admin notes)..." rows="3" class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm text-gray-700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-brand-500 resize-none"></textarea>
+          </div>
+          <div class="mb-3 border-2 border-dashed border-gray-300 rounded-lg p-4 text-center hover:border-brand-400 transition cursor-pointer" onclick="alert('File picker opened — upload supporting documents')">
+            <svg class="w-8 h-8 text-gray-300 mx-auto mb-1" fill="none" stroke="currentColor" stroke-width="1" viewBox="0 0 24 24"><path d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5m-13.5-9L12 3m0 0l4.5 4.5M12 3v13.5"/></svg>
+            <p class="text-xs text-gray-500">Drop files here or click to upload</p>
+            <p class="text-[10px] text-gray-400 mt-0.5">PDF, JPG, PNG up to 10MB each</p>
+          </div>
+          <button onclick="if(confirm('Submit appeal for review by senior admin?')) alert('Appeal submitted. You will be notified within 48 hours.')" class="w-full flex items-center justify-center gap-2 bg-brand-500 text-white px-4 py-2.5 rounded-lg text-sm font-semibold hover:bg-brand-600 transition">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M6 12L3.269 3.126A59.768 59.768 0 0121.485 12 59.77 59.77 0 013.27 20.876L5.999 12zm0 0h7.5"/></svg>
+            Submit Appeal
+          </button>
+        </div>
+
+        <!-- Account Impact Warning -->
+        <div class="bg-red-50 rounded-xl border border-red-200 p-5">
+          <div class="flex items-center gap-2 mb-3">
+            <svg class="w-5 h-5 text-red-600" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z"/></svg>
+            <h3 class="text-sm font-semibold text-red-800">Account Impact</h3>
+          </div>
+          <div class="space-y-2.5 text-sm">
+            <div class="flex justify-between items-center">
+              <span class="text-red-700">Active suspensions</span>
+              <span class="font-semibold text-red-800">1 of 3 max</span>
+            </div>
+            <div class="h-2 bg-red-100 rounded-full overflow-hidden">
+              <div class="h-full bg-red-500 rounded-full" style="width:33%"></div>
+            </div>
+          </div>
+          <div class="mt-3 bg-white/60 rounded-lg px-3 py-2 border border-red-100">
+            <p class="text-xs text-red-700 font-semibold">2 more suspensions will trigger a full seller account review.</p>
+            <p class="text-[10px] text-red-600 mt-0.5">Account review may result in temporary marketplace access restriction for all products.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== SUSPENSION HISTORY ===== -->
+    <div class="bg-white rounded-xl border border-gray-100 shadow-sm p-6 mb-6">
+      <div class="flex items-center gap-2 mb-4">
+        <svg class="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+        <h3 class="text-sm font-semibold text-gray-900">Suspension History for This Product</h3>
+      </div>
+      <div class="space-y-3">
+        <!-- Current suspension -->
+        <div class="flex items-start gap-4 p-4 rounded-lg bg-red-50 border border-red-200">
+          <div class="shrink-0 w-10 h-10 rounded-full bg-red-100 flex items-center justify-center">
+            <span class="text-red-700 text-xs font-bold">#2</span>
+          </div>
+          <div class="flex-1">
+            <div class="flex items-center gap-2">
+              <p class="text-sm font-semibold text-red-800">Current Suspension</p>
+              <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-semibold bg-red-100 text-red-700">
+                <span class="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse"></span>Active
+              </span>
+            </div>
+            <p class="text-xs text-gray-600 mt-0.5">Suspended 25 Mar 2026 — Misleading wattage claim (3 buyer complaints)</p>
+            <p class="text-xs text-gray-400 mt-0.5">Duration so far: 8 days</p>
+          </div>
+        </div>
+        <!-- Previous suspension -->
+        <div class="flex items-start gap-4 p-4 rounded-lg bg-gray-50 border border-gray-200">
+          <div class="shrink-0 w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center">
+            <span class="text-gray-600 text-xs font-bold">#1</span>
+          </div>
+          <div class="flex-1">
+            <div class="flex items-center gap-2">
+              <p class="text-sm font-semibold text-gray-700">Previous Suspension</p>
+              <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-semibold bg-green-100 text-green-700">
+                <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4.5 12.75l6 6 9-13.5"/></svg>Resolved
+              </span>
+            </div>
+            <p class="text-xs text-gray-600 mt-0.5">Suspended 15 Jan 2026 — Similar issue: inaccurate brightness specification</p>
+            <p class="text-xs text-gray-400 mt-0.5">Reactivated 22 Jan 2026 (7 days). Seller corrected spec sheet at that time.</p>
+          </div>
+        </div>
+      </div>
+      <div class="mt-4 bg-amber-50 rounded-lg border border-amber-200 p-3 flex items-start gap-2">
+        <svg class="w-4 h-4 text-amber-600 shrink-0 mt-0.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z"/></svg>
+        <p class="text-xs text-amber-800">This product was previously suspended for a similar issue on 15 Jan 2026 and reactivated on 22 Jan 2026. Repeated violations on the same product may result in permanent listing removal.</p>
+      </div>
+    </div>
+
+    <!-- ===== PRODUCT HEADER ===== -->
+    <div class="bg-white rounded-xl border border-gray-100 shadow-sm p-6 mb-6 opacity-75">
+      <div class="flex flex-col lg:flex-row gap-6">
+        <div class="shrink-0">
+          <div class="w-48 h-48 rounded-xl bg-gray-100 border border-gray-200 flex items-center justify-center mb-3 grayscale opacity-60">
+            <svg class="w-16 h-16 text-gray-300" fill="none" stroke="currentColor" stroke-width="0.5" viewBox="0 0 24 24"><path d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.409a2.25 2.25 0 013.182 0l2.909 2.909M6.75 19.5h10.5a2.25 2.25 0 002.25-2.25V6.75a2.25 2.25 0 00-2.25-2.25H6.75A2.25 2.25 0 004.5 6.75v10.5a2.25 2.25 0 002.25 2.25z"/></svg>
+          </div>
+        </div>
+        <div class="flex-1 min-w-0">
+          <div class="flex items-start justify-between gap-4">
+            <div>
+              <div class="flex items-center gap-2 mb-1">
+                <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold bg-orange-50 text-orange-700"><span class="w-1.5 h-1.5 rounded-full bg-orange-500"></span>Suspended</span>
+                <span class="text-xs text-gray-400">Since 25 Mar 2026</span>
+              </div>
+              <h1 class="text-xl font-bold text-gray-900">Havells 9W LED Bulb Pack of 10</h1>
+              <p class="text-sm text-gray-400 mt-0.5">Electrical &rsaquo; Lighting &rsaquo; LED Bulbs</p>
+              <div class="flex items-center gap-3 mt-2">
+                <span class="text-xs font-mono bg-gray-100 text-gray-600 px-2 py-0.5 rounded">SKU: HAV-LED-9W-10</span>
+                <span class="text-xs font-mono bg-gray-100 text-gray-600 px-2 py-0.5 rounded">HSN: 85395000</span>
+                <div class="flex items-center gap-1"><svg class="w-3.5 h-3.5 text-amber-400" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg><span class="text-sm font-medium text-gray-700">3.8</span><span class="text-xs text-gray-400">(42 reviews)</span></div>
+              </div>
+              <div class="flex items-center gap-2 mt-3">
+                <div class="w-7 h-7 rounded-full bg-gradient-to-br from-violet-400 to-violet-600 flex items-center justify-center text-white text-[10px] font-bold">PL</div>
+                <div>
+                  <a href="../sellers/detail.html" class="text-sm font-medium text-brand-600 hover:underline">Patel Lighting Solutions</a>
+                  <span class="text-xs text-gray-400 ml-1">Verified Seller</span>
+                </div>
+              </div>
+            </div>
+            <div class="text-right shrink-0">
+              <p class="text-xs text-gray-400 line-through">MRP &#8377;1,200</p>
+              <p class="text-2xl font-bold text-gray-500 line-through">&#8377;890</p>
+              <p class="text-xs font-semibold text-red-500">Not available for sale</p>
+              <div class="mt-2 bg-red-50 rounded-lg px-3 py-2 text-center border border-red-100">
+                <p class="text-xs text-red-600 font-semibold">Stock: Frozen</p>
+                <p class="text-[10px] text-red-500">Was: 156 available, 12 reserved</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== TABS ===== -->
+    <div class="bg-white rounded-xl border border-gray-100 shadow-sm">
+      <div class="border-b border-gray-200 px-6">
+        <div class="flex gap-0 -mb-px">
+          <button onclick="switchTab('activity')" class="detail-tab active text-sm font-semibold px-5 py-4 border-b-2 border-brand-500 text-brand-500">Activity Log</button>
+          <button onclick="switchTab('overview')" class="detail-tab text-sm font-medium px-5 py-4 border-b-2 border-transparent text-gray-500">Overview</button>
+          <button onclick="switchTab('reviews')" class="detail-tab text-sm font-medium px-5 py-4 border-b-2 border-transparent text-gray-500">Reviews <span class="ml-1 bg-red-100 text-red-700 text-[10px] font-bold px-1.5 py-0.5 rounded-full">3 negative</span></button>
+        </div>
+      </div>
+
+      <!-- ===== ACTIVITY LOG (default tab for Suspended) ===== -->
+      <div id="panel-activity" class="tab-panel active p-6">
+        <h3 class="text-sm font-semibold text-gray-900 mb-4">State Transition History</h3>
+        <div class="relative pl-6 border-l-2 border-gray-200 space-y-6">
+          <div class="relative">
+            <div class="absolute -left-[25px] w-4 h-4 rounded-full bg-orange-500 border-2 border-white"></div>
+            <p class="text-sm font-medium text-gray-900">Suspended</p>
+            <p class="text-xs text-gray-400">By Super Admin &middot; 25 Mar 2026, 2:15 PM</p>
+            <p class="text-xs text-red-600 mt-1">Reason: Misleading wattage claim — 3 buyer complaints</p>
+          </div>
+          <div class="relative">
+            <div class="absolute -left-[25px] w-4 h-4 rounded-full bg-green-500 border-2 border-white"></div>
+            <p class="text-sm font-medium text-gray-900">Published</p>
+            <p class="text-xs text-gray-400">By Super Admin &middot; 10 Mar 2026, 11:00 AM</p>
+            <p class="text-xs text-gray-500 mt-1">Approved and made live. Was active for 15 days before suspension.</p>
+          </div>
+          <div class="relative">
+            <div class="absolute -left-[25px] w-4 h-4 rounded-full bg-amber-500 border-2 border-white"></div>
+            <p class="text-sm font-medium text-gray-900">Under Review</p>
+            <p class="text-xs text-gray-400">System &middot; 10 Mar 2026, 10:00 AM</p>
+          </div>
+          <div class="relative">
+            <div class="absolute -left-[25px] w-4 h-4 rounded-full bg-green-500 border-2 border-white"></div>
+            <p class="text-sm font-medium text-gray-900">Reactivated (from 1st suspension)</p>
+            <p class="text-xs text-gray-400">By Super Admin &middot; 22 Jan 2026, 3:00 PM</p>
+            <p class="text-xs text-gray-500 mt-1">Seller corrected spec sheet. Product returned to Published state.</p>
+          </div>
+          <div class="relative">
+            <div class="absolute -left-[25px] w-4 h-4 rounded-full bg-orange-500 border-2 border-white"></div>
+            <p class="text-sm font-medium text-gray-900">Suspended (1st time)</p>
+            <p class="text-xs text-gray-400">By Super Admin &middot; 15 Jan 2026, 10:30 AM</p>
+            <p class="text-xs text-red-600 mt-1">Reason: Inaccurate brightness specification reported by 1 buyer</p>
+          </div>
+          <div class="relative">
+            <div class="absolute -left-[25px] w-4 h-4 rounded-full bg-green-500 border-2 border-white"></div>
+            <p class="text-sm font-medium text-gray-900">Published (initial)</p>
+            <p class="text-xs text-gray-400">By Super Admin &middot; 10 Jan 2026, 11:00 AM</p>
+          </div>
+          <div class="relative">
+            <div class="absolute -left-[25px] w-4 h-4 rounded-full bg-blue-500 border-2 border-white"></div>
+            <p class="text-sm font-medium text-gray-900">Submitted for Review</p>
+            <p class="text-xs text-gray-400">By Patel Lighting Solutions &middot; 10 Mar 2026, 9:30 AM</p>
+          </div>
+          <div class="relative">
+            <div class="absolute -left-[25px] w-4 h-4 rounded-full bg-gray-400 border-2 border-white"></div>
+            <p class="text-sm font-medium text-gray-900">Draft Created</p>
+            <p class="text-xs text-gray-400">By Patel Lighting Solutions &middot; 9 Mar 2026, 4:00 PM</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== OVERVIEW ===== -->
+      <div id="panel-overview" class="tab-panel p-6">
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <div class="lg:col-span-2 space-y-6">
+            <div>
+              <h3 class="text-sm font-semibold text-gray-900 mb-3">Vital Information</h3>
+              <div class="grid grid-cols-2 gap-x-8 gap-y-3 text-sm">
+                <div><p class="text-xs text-gray-400 uppercase tracking-wider mb-0.5">Brand</p><p class="text-gray-800 font-medium">Havells</p></div>
+                <div><p class="text-xs text-gray-400 uppercase tracking-wider mb-0.5">Manufacturer</p><p class="text-gray-800 font-medium">Havells India Ltd.</p></div>
+                <div><p class="text-xs text-gray-400 uppercase tracking-wider mb-0.5">Wattage</p><p class="text-gray-800 font-medium border-b-2 border-red-300">9W <span class="text-xs text-red-500 ml-1">(disputed)</span></p></div>
+                <div><p class="text-xs text-gray-400 uppercase tracking-wider mb-0.5">Pack Size</p><p class="text-gray-800 font-medium">10 bulbs</p></div>
+                <div><p class="text-xs text-gray-400 uppercase tracking-wider mb-0.5">Base Type</p><p class="text-gray-800">B22</p></div>
+                <div><p class="text-xs text-gray-400 uppercase tracking-wider mb-0.5">Color Temperature</p><p class="text-gray-800">6500K (Cool Daylight)</p></div>
+                <div><p class="text-xs text-gray-400 uppercase tracking-wider mb-0.5">Warranty</p><p class="text-gray-800">2 Years</p></div>
+                <div><p class="text-xs text-gray-400 uppercase tracking-wider mb-0.5">Country of Origin</p><p class="text-gray-800">India</p></div>
+              </div>
+            </div>
+            <hr class="border-gray-100">
+            <div>
+              <h3 class="text-sm font-semibold text-gray-900 mb-3">Description</h3>
+              <p class="text-sm text-gray-600 leading-relaxed">Havells 9W LED Bulb offers bright cool daylight illumination perfect for homes and offices. B22 base, energy efficient, 25000 hours life span. ISI marked. Pack of 10 bulbs for great value.</p>
+            </div>
+          </div>
+          <div class="space-y-4">
+            <div class="bg-red-50 rounded-xl p-4 border border-red-100">
+              <h4 class="text-xs font-semibold text-red-600 uppercase tracking-wider mb-3">Suspension Impact</h4>
+              <div class="space-y-2.5 text-sm">
+                <div class="flex justify-between"><span class="text-red-500">Days Suspended</span><span class="font-semibold text-red-700">7</span></div>
+                <div class="flex justify-between"><span class="text-red-500">Lost Revenue (est.)</span><span class="font-semibold text-red-700">&#8377;18,200</span></div>
+                <div class="flex justify-between"><span class="text-red-500">Cancelled Orders</span><span class="font-semibold text-red-700">4</span></div>
+                <div class="flex justify-between"><span class="text-red-500">Frozen Stock</span><span class="font-semibold text-red-700">156 units</span></div>
+              </div>
+            </div>
+            <div class="bg-gray-50 rounded-xl p-4 border border-gray-100">
+              <h4 class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3">Before Suspension</h4>
+              <div class="space-y-2.5 text-sm">
+                <div class="flex justify-between"><span class="text-gray-500">Views (30d)</span><span>892</span></div>
+                <div class="flex justify-between"><span class="text-gray-500">Orders (30d)</span><span>28</span></div>
+                <div class="flex justify-between"><span class="text-gray-500">Conversion</span><span>3.1%</span></div>
+                <div class="flex justify-between"><span class="text-gray-500">Return Rate</span><span class="text-red-600 font-semibold">12.5%</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== REVIEWS ===== -->
+      <div id="panel-reviews" class="tab-panel p-6">
+        <div class="flex items-center gap-3 mb-4">
+          <h3 class="text-sm font-semibold text-gray-900">Recent Negative Reviews</h3>
+          <span class="text-xs text-red-600 bg-red-50 px-2 py-0.5 rounded-full font-medium">These led to suspension</span>
+        </div>
+        <div class="divide-y divide-gray-100">
+          <div class="py-4 bg-red-50/30 rounded-lg px-4 mb-2">
+            <div class="flex items-center gap-2 mb-1"><div class="flex gap-0.5"><svg class="w-3.5 h-3.5 text-amb-400" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg><svg class="w-3.5 h-3.5 text-gray-300" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg><svg class="w-3.5 h-3.5 text-gray-300" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg><svg class="w-3.5 h-3.5 text-gray-300" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg><svg class="w-3.5 h-3.5 text-gray-300" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg></div><span class="text-sm font-semibold text-gray-800">Very dim, not 9W</span></div>
+            <p class="text-xs text-gray-400 mb-1">By Vikram K. &middot; 22 Mar 2026 &middot; Verified Purchase</p>
+            <p class="text-sm text-gray-600">Bulb is very dim. Not even close to 9W. Feels like 5W max. Very disappointed.</p>
+          </div>
+          <div class="py-4 bg-red-50/30 rounded-lg px-4 mb-2">
+            <div class="flex items-center gap-2 mb-1"><div class="flex gap-0.5"><svg class="w-3.5 h-3.5 text-amber-400" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg><svg class="w-3.5 h-3.5 text-amber-400" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg><svg class="w-3.5 h-3.5 text-gray-300" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg><svg class="w-3.5 h-3.5 text-gray-300" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg><svg class="w-3.5 h-3.5 text-gray-300" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg></div><span class="text-sm font-semibold text-gray-800">False advertising</span></div>
+            <p class="text-xs text-gray-400 mb-1">By Rahul P. &middot; 24 Mar 2026 &middot; Verified Purchase &middot; Returned</p>
+            <p class="text-sm text-gray-600">False advertising. Returned the product. Will never buy from this seller again.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+<script>
+  function switchTab(tabId) {
+    document.querySelectorAll('.detail-tab').forEach(function(t) { t.classList.remove('active','text-brand-500'); t.classList.add('text-gray-500'); t.style.borderBottomColor='transparent'; });
+    document.querySelectorAll('.tab-panel').forEach(function(p) { p.classList.remove('active'); });
+    event.target.closest('.detail-tab').classList.add('active','text-brand-500'); event.target.closest('.detail-tab').classList.remove('text-gray-500'); event.target.closest('.detail-tab').style.borderBottomColor='#F97316';
+    document.getElementById('panel-'+tabId).classList.add('active');
+  }
+</script>
+<script src="../shared-layout.js"></script>
+<script>renderAdminLayout('products', '../');</script>
+</body>
+</html>

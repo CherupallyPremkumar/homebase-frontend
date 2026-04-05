@@ -9,7 +9,7 @@ function getServerBaseUrl(): string {
     if (process.env.NODE_ENV === 'production') {
       throw new Error('BACKEND_URL environment variable is required in production');
     }
-    return 'http://localhost:8080';
+    return 'http://localhost:8081';
   }
   return url;
 }
@@ -34,6 +34,6 @@ export function getApiClient(): HttpClient {
   return serverClient;
 }
 
-export function createApiClient(baseUrl: string): HttpClient {
-  return createHttpClient(baseUrl);
+export function createApiClient(baseUrl: string, defaultHeaders?: Record<string, string>): HttpClient {
+  return createHttpClient(baseUrl, defaultHeaders);
 }

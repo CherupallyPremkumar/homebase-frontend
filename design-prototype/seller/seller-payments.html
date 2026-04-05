@@ -1,0 +1,605 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HomeBase — Payment Settings</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              50: '#FFF7ED',
+              100: '#FFEDD5',
+              200: '#FED7AA',
+              300: '#FDBA74',
+              400: '#FB923C',
+              500: '#F97316',
+              600: '#EA580C',
+              700: '#C2410C',
+            },
+            navy: {
+              700: '#1E3A5F',
+              800: '#1A2E4A',
+              900: '#0F1B2D',
+            },
+            success: '#16A34A',
+            warning: '#EAB308',
+            danger: '#DC2626',
+          },
+          fontFamily: {
+            sans: ['Inter', 'system-ui', 'sans-serif'],
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+    .scrollbar-hide::-webkit-scrollbar { display: none; }
+    .sidebar-link { transition: all 0.15s ease; }
+    .sidebar-link:hover { background: rgba(255,255,255,0.08); }
+    .sidebar-link.active { background: rgba(249,115,22,0.15); border-right: 3px solid #F97316; }
+    .dropdown-menu { display: none; }
+    .dropdown:hover .dropdown-menu { display: block; }
+    .sidebar-scroll::-webkit-scrollbar { width: 4px; }
+    .sidebar-scroll::-webkit-scrollbar-track { background: transparent; }
+    .sidebar-scroll::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); border-radius: 2px; }
+    .card-hover { transition: all 0.2s ease; }
+    .card-hover:hover { box-shadow: 0 4px 16px rgba(0,0,0,0.06); }
+    .bank-card { transition: all 0.2s ease; }
+    .bank-card:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(0,0,0,0.08); }
+    .table-row { transition: background 0.15s ease; }
+    .table-row:hover { background: #FFF7ED; }
+    .toggle-track { transition: background 0.2s ease; }
+    .toggle-knob { transition: transform 0.2s ease; }
+    .upload-zone { transition: all 0.2s ease; }
+    .upload-zone:hover { border-color: #F97316; background: #FFF7ED; }
+  </style>
+</head>
+<body class="font-sans bg-gray-50 text-gray-900">
+
+  <!-- ===== TOP HEADER BAR ===== -->
+  <header id="seller-header" class="fixed top-0 left-0 right-0 z-50 bg-white border-b border-gray-200 h-16"></header>
+
+  <!-- ===== LAYOUT: SIDEBAR + MAIN ===== -->
+  <div class="flex pt-16 min-h-screen">
+
+    <!-- ===== LEFT SIDEBAR ===== -->
+    <aside id="seller-sidebar" class="fixed left-0 top-16 bottom-0 w-60 z-40 flex flex-col overflow-y-auto" style="background:#0F1B2D;"></aside>
+
+    <!-- ===== MAIN CONTENT ===== -->
+    <main class="flex-1 ml-60 p-6">
+
+      <!-- Page Header -->
+      <div class="flex items-center justify-between mb-6">
+        <div>
+          <div class="flex items-center gap-2 text-sm text-gray-400 mb-1">
+            <a href="seller-dashboard.html" class="hover:text-brand-500 transition">Dashboard</a>
+            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M8.25 4.5l7.5 7.5-7.5 7.5"/></svg>
+            <span class="text-gray-600">Payment Settings</span>
+          </div>
+          <h1 class="text-2xl font-bold text-navy-900">Payment Settings</h1>
+          <p class="text-sm text-gray-500 mt-1">Manage your payout preferences, bank accounts, and tax information.</p>
+        </div>
+        <div class="flex items-center gap-3">
+          <button onclick="saveAllSettings()" class="bg-brand-500 hover:bg-brand-600 text-white text-sm font-semibold px-5 py-2.5 rounded-lg transition flex items-center gap-2 shadow-sm">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4.5 12.75l6 6 9-13.5"/></svg>
+            Save Changes
+          </button>
+        </div>
+      </div>
+
+      <!-- Content Grid -->
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+
+        <!-- ===== PAYOUT SCHEDULE CARD ===== -->
+        <div class="bg-white rounded-xl border border-gray-100 shadow-sm card-hover">
+          <div class="flex items-center gap-3 p-5 border-b border-gray-100">
+            <div class="w-10 h-10 rounded-lg bg-brand-50 flex items-center justify-center">
+              <svg class="w-5 h-5 text-brand-500" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5"/></svg>
+            </div>
+            <div>
+              <h2 class="text-base font-semibold text-navy-900">Payout Schedule</h2>
+              <p class="text-xs text-gray-400">Configure when and how you receive payouts</p>
+            </div>
+          </div>
+          <div class="p-5 space-y-5">
+            <!-- Current Schedule -->
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1.5">Payout Frequency</label>
+              <select id="payoutSchedule" class="w-full border border-gray-200 rounded-lg px-4 py-2.5 text-sm text-gray-700 bg-white outline-none focus:border-brand-400 focus:ring-2 focus:ring-brand-100 transition appearance-none" style="background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2220%22%20height%3D%2220%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%239CA3AF%22%20stroke-width%3D%222%22%3E%3Cpath%20d%3D%22M19.5%208.25l-7.5%207.5-7.5-7.5%22%2F%3E%3C%2Fsvg%3E'); background-position: right 12px center; background-repeat: no-repeat; background-size: 16px; padding-right: 40px;">
+                <option value="daily">Daily</option>
+                <option value="weekly" selected>Weekly</option>
+                <option value="biweekly">Bi-weekly</option>
+                <option value="monthly">Monthly</option>
+              </select>
+            </div>
+            <!-- Next Payout Date -->
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1.5">Next Payout Date</label>
+              <div class="flex items-center gap-3 bg-gray-50 border border-gray-200 rounded-lg px-4 py-2.5">
+                <svg class="w-4.5 h-4.5 text-gray-400" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5m-9-6h.008v.008H12v-.008zM12 15h.008v.008H12V15zm0 2.25h.008v.008H12v-.008zM9.75 15h.008v.008H9.75V15zm0 2.25h.008v.008H9.75v-.008zM7.5 15h.008v.008H7.5V15zm0 2.25h.008v.008H7.5v-.008zm6.75-4.5h.008v.008h-.008v-.008zm0 2.25h.008v.008h-.008V15zm0 2.25h.008v.008h-.008v-.008zm2.25-4.5h.008v.008H16.5v-.008zm0 2.25h.008v.008H16.5V15z"/></svg>
+                <span class="text-sm font-medium text-gray-700">April 2, 2026</span>
+                <span class="ml-auto text-xs text-brand-500 font-medium bg-brand-50 px-2 py-0.5 rounded-full">In 5 days</span>
+              </div>
+            </div>
+            <!-- Minimum Payout Threshold -->
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1.5">Minimum Payout Threshold</label>
+              <div class="relative">
+                <span class="absolute left-4 top-1/2 -translate-y-1/2 text-sm font-medium text-gray-500">&#8377;</span>
+                <input type="number" value="500" min="100" step="100" class="w-full border border-gray-200 rounded-lg pl-8 pr-4 py-2.5 text-sm text-gray-700 outline-none focus:border-brand-400 focus:ring-2 focus:ring-brand-100 transition">
+              </div>
+              <p class="text-xs text-gray-400 mt-1.5">Payouts will only be processed when your balance exceeds this amount.</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- ===== UPI SETTINGS CARD ===== -->
+        <div class="bg-white rounded-xl border border-gray-100 shadow-sm card-hover">
+          <div class="flex items-center gap-3 p-5 border-b border-gray-100">
+            <div class="w-10 h-10 rounded-lg bg-purple-50 flex items-center justify-center">
+              <svg class="w-5 h-5 text-purple-500" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M10.5 1.5H8.25A2.25 2.25 0 006 3.75v16.5a2.25 2.25 0 002.25 2.25h7.5A2.25 2.25 0 0018 20.25V3.75a2.25 2.25 0 00-2.25-2.25H13.5m-3 0V3h3V1.5m-3 0h3m-3 18.75h3"/></svg>
+            </div>
+            <div>
+              <h2 class="text-base font-semibold text-navy-900">UPI Settings</h2>
+              <p class="text-xs text-gray-400">Manage your UPI payment methods</p>
+            </div>
+          </div>
+          <div class="p-5">
+            <!-- UPI ID Card -->
+            <div class="border border-gray-200 rounded-xl p-4 mb-4">
+              <div class="flex items-start justify-between">
+                <div class="flex items-center gap-3">
+                  <div class="w-10 h-10 rounded-lg bg-gradient-to-br from-green-500 to-emerald-600 flex items-center justify-center">
+                    <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M3.75 4.875c0-.621.504-1.125 1.125-1.125h4.5c.621 0 1.125.504 1.125 1.125v4.5c0 .621-.504 1.125-1.125 1.125h-4.5A1.125 1.125 0 013.75 9.375v-4.5zM3.75 14.625c0-.621.504-1.125 1.125-1.125h4.5c.621 0 1.125.504 1.125 1.125v4.5c0 .621-.504 1.125-1.125 1.125h-4.5a1.125 1.125 0 01-1.125-1.125v-4.5zM13.5 4.875c0-.621.504-1.125 1.125-1.125h4.5c.621 0 1.125.504 1.125 1.125v4.5c0 .621-.504 1.125-1.125 1.125h-4.5A1.125 1.125 0 0113.5 9.375v-4.5z"/><path d="M6.75 6.75h.75v.75h-.75v-.75zM6.75 16.5h.75v.75h-.75v-.75zM16.5 6.75h.75v.75h-.75v-.75zM13.5 13.5h.75v.75h-.75v-.75zM13.5 19.5h.75v.75h-.75v-.75zM19.5 13.5h.75v.75h-.75v-.75zM19.5 19.5h.75v.75h-.75v-.75zM16.5 16.5h.75v.75h-.75v-.75z"/></svg>
+                  </div>
+                  <div>
+                    <p class="text-sm font-semibold text-gray-800">rajeshstore@okicici</p>
+                    <p class="text-xs text-gray-400 mt-0.5">ICICI Bank UPI</p>
+                  </div>
+                </div>
+                <span class="flex items-center gap-1 text-xs font-semibold text-success bg-green-50 px-2 py-1 rounded-full">
+                  <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M4.5 12.75l6 6 9-13.5"/></svg>
+                  Verified
+                </span>
+              </div>
+              <div class="flex items-center gap-2 mt-3 pt-3 border-t border-gray-100">
+                <button class="text-xs font-medium text-gray-500 hover:text-brand-500 transition flex items-center gap-1">
+                  <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10"/></svg>
+                  Edit
+                </button>
+                <span class="text-gray-200">|</span>
+                <button class="text-xs font-medium text-danger hover:text-red-700 transition flex items-center gap-1">
+                  <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0"/></svg>
+                  Remove
+                </button>
+              </div>
+            </div>
+            <!-- Add UPI Button -->
+            <button class="w-full border-2 border-dashed border-gray-200 rounded-xl py-3.5 text-sm font-medium text-gray-500 hover:text-brand-500 hover:border-brand-300 hover:bg-brand-50 transition flex items-center justify-center gap-2">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 4.5v15m7.5-7.5h-15"/></svg>
+              Add UPI ID
+            </button>
+          </div>
+        </div>
+
+        <!-- ===== BANK ACCOUNTS CARD ===== -->
+        <div class="bg-white rounded-xl border border-gray-100 shadow-sm card-hover lg:col-span-2">
+          <div class="flex items-center justify-between p-5 border-b border-gray-100">
+            <div class="flex items-center gap-3">
+              <div class="w-10 h-10 rounded-lg bg-blue-50 flex items-center justify-center">
+                <svg class="w-5 h-5 text-blue-500" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M12 21v-8.25M15.75 21v-8.25M8.25 21v-8.25M3 9l9-6 9 6m-1.5 12V10.332A48.36 48.36 0 0012 9.75c-2.551 0-5.056.2-7.5.582V21M3 21h18M12 6.75h.008v.008H12V6.75z"/></svg>
+              </div>
+              <div>
+                <h2 class="text-base font-semibold text-navy-900">Bank Accounts</h2>
+                <p class="text-xs text-gray-400">Manage your linked bank accounts for payouts</p>
+              </div>
+            </div>
+            <button class="bg-brand-500 hover:bg-brand-600 text-white text-sm font-medium px-4 py-2 rounded-lg transition flex items-center gap-1.5">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 4.5v15m7.5-7.5h-15"/></svg>
+              Add Bank Account
+            </button>
+          </div>
+          <div class="p-5">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <!-- Primary Bank Account -->
+              <div class="bank-card border border-gray-200 rounded-xl p-5 relative overflow-hidden">
+                <div class="absolute top-0 right-0 w-24 h-24 bg-blue-50/50 rounded-full -translate-y-1/2 translate-x-1/2"></div>
+                <div class="relative">
+                  <div class="flex items-start justify-between mb-4">
+                    <div class="flex items-center gap-3">
+                      <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-600 to-blue-800 flex items-center justify-center text-white text-xs font-bold">HDFC</div>
+                      <div>
+                        <p class="text-sm font-semibold text-gray-800">HDFC Bank</p>
+                        <p class="text-xs text-gray-400 mt-0.5">Savings Account</p>
+                      </div>
+                    </div>
+                    <div class="flex items-center gap-1.5">
+                      <span class="text-xs font-semibold text-white bg-brand-500 px-2.5 py-0.5 rounded-full">Primary</span>
+                    </div>
+                  </div>
+                  <div class="bg-gray-50 rounded-lg px-4 py-3 mb-4">
+                    <div class="flex items-center justify-between">
+                      <div>
+                        <p class="text-[10px] text-gray-400 uppercase tracking-wider">Account Number</p>
+                        <p class="text-sm font-mono font-semibold text-gray-700 mt-0.5">**** **** **** 4827</p>
+                      </div>
+                      <div class="text-right">
+                        <p class="text-[10px] text-gray-400 uppercase tracking-wider">IFSC</p>
+                        <p class="text-sm font-mono font-medium text-gray-600 mt-0.5">HDFC0001234</p>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="flex items-center justify-between">
+                    <span class="flex items-center gap-1 text-xs font-semibold text-success bg-green-50 px-2 py-1 rounded-full">
+                      <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M4.5 12.75l6 6 9-13.5"/></svg>
+                      Verified
+                    </span>
+                    <div class="flex items-center gap-2">
+                      <button class="text-xs font-medium text-gray-500 hover:text-brand-500 transition flex items-center gap-1 px-2 py-1 rounded hover:bg-gray-50">
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10"/></svg>
+                        Edit
+                      </button>
+                      <button class="text-xs font-medium text-danger hover:text-red-700 transition flex items-center gap-1 px-2 py-1 rounded hover:bg-red-50">
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0"/></svg>
+                        Remove
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Secondary Bank Account -->
+              <div class="bank-card border border-gray-200 rounded-xl p-5 relative overflow-hidden">
+                <div class="absolute top-0 right-0 w-24 h-24 bg-indigo-50/50 rounded-full -translate-y-1/2 translate-x-1/2"></div>
+                <div class="relative">
+                  <div class="flex items-start justify-between mb-4">
+                    <div class="flex items-center gap-3">
+                      <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-indigo-600 to-indigo-800 flex items-center justify-center text-white text-xs font-bold">SBI</div>
+                      <div>
+                        <p class="text-sm font-semibold text-gray-800">State Bank of India</p>
+                        <p class="text-xs text-gray-400 mt-0.5">Current Account</p>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="bg-gray-50 rounded-lg px-4 py-3 mb-4">
+                    <div class="flex items-center justify-between">
+                      <div>
+                        <p class="text-[10px] text-gray-400 uppercase tracking-wider">Account Number</p>
+                        <p class="text-sm font-mono font-semibold text-gray-700 mt-0.5">**** **** **** 9123</p>
+                      </div>
+                      <div class="text-right">
+                        <p class="text-[10px] text-gray-400 uppercase tracking-wider">IFSC</p>
+                        <p class="text-sm font-mono font-medium text-gray-600 mt-0.5">SBIN0005678</p>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="flex items-center justify-between">
+                    <span class="flex items-center gap-1 text-xs font-semibold text-success bg-green-50 px-2 py-1 rounded-full">
+                      <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M4.5 12.75l6 6 9-13.5"/></svg>
+                      Verified
+                    </span>
+                    <div class="flex items-center gap-2">
+                      <button onclick="setPrimary(this)" class="text-xs font-medium text-brand-500 hover:text-brand-600 transition flex items-center gap-1 px-2 py-1 rounded hover:bg-brand-50">
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M11.48 3.499a.562.562 0 011.04 0l2.125 5.111a.563.563 0 00.475.345l5.518.442c.499.04.701.663.321.988l-4.204 3.602a.563.563 0 00-.182.557l1.285 5.385a.562.562 0 01-.84.61l-4.725-2.885a.563.563 0 00-.586 0L6.982 20.54a.562.562 0 01-.84-.61l1.285-5.386a.562.562 0 00-.182-.557l-4.204-3.602a.563.563 0 01.321-.988l5.518-.442a.563.563 0 00.475-.345L11.48 3.5z"/></svg>
+                        Set as Primary
+                      </button>
+                      <button class="text-xs font-medium text-gray-500 hover:text-brand-500 transition flex items-center gap-1 px-2 py-1 rounded hover:bg-gray-50">
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10"/></svg>
+                        Edit
+                      </button>
+                      <button class="text-xs font-medium text-danger hover:text-red-700 transition flex items-center gap-1 px-2 py-1 rounded hover:bg-red-50">
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0"/></svg>
+                        Remove
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ===== TAX INFORMATION CARD ===== -->
+        <div class="bg-white rounded-xl border border-gray-100 shadow-sm card-hover">
+          <div class="flex items-center gap-3 p-5 border-b border-gray-100">
+            <div class="w-10 h-10 rounded-lg bg-green-50 flex items-center justify-center">
+              <svg class="w-5 h-5 text-green-600" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z"/></svg>
+            </div>
+            <div>
+              <h2 class="text-base font-semibold text-navy-900">Tax Information</h2>
+              <p class="text-xs text-gray-400">GST, PAN and tax compliance details</p>
+            </div>
+          </div>
+          <div class="p-5 space-y-4">
+            <!-- GSTIN -->
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1.5">GSTIN</label>
+              <div class="flex items-center gap-3 bg-gray-50 border border-gray-200 rounded-lg px-4 py-2.5">
+                <span class="text-sm font-mono font-semibold text-gray-700">29ABCDE1234F1Z5</span>
+                <span class="ml-auto flex items-center gap-1 text-xs font-semibold text-success bg-green-50 px-2 py-0.5 rounded-full border border-green-100">
+                  <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M4.5 12.75l6 6 9-13.5"/></svg>
+                  Verified
+                </span>
+              </div>
+            </div>
+            <!-- PAN -->
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1.5">PAN</label>
+              <div class="flex items-center gap-3 bg-gray-50 border border-gray-200 rounded-lg px-4 py-2.5">
+                <span class="text-sm font-mono font-semibold text-gray-700">ABCDE1234F</span>
+                <span class="ml-auto flex items-center gap-1 text-xs font-semibold text-success bg-green-50 px-2 py-0.5 rounded-full border border-green-100">
+                  <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M4.5 12.75l6 6 9-13.5"/></svg>
+                  Verified
+                </span>
+              </div>
+            </div>
+            <!-- TDS Toggle -->
+            <div class="flex items-center justify-between bg-gray-50 border border-gray-200 rounded-lg px-4 py-3">
+              <div>
+                <p class="text-sm font-medium text-gray-700">TDS Applicable</p>
+                <p class="text-xs text-gray-400 mt-0.5">Tax Deducted at Source on payouts</p>
+              </div>
+              <button onclick="toggleTDS(this)" class="toggle-track w-11 h-6 bg-brand-500 rounded-full relative cursor-pointer" data-active="true">
+                <span class="toggle-knob absolute top-0.5 w-5 h-5 bg-white rounded-full shadow-sm" style="left: calc(100% - 22px);"></span>
+              </button>
+            </div>
+            <!-- Tax Certificate Upload -->
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1.5">Tax Certificate</label>
+              <div class="upload-zone border-2 border-dashed border-gray-200 rounded-xl p-6 text-center cursor-pointer">
+                <svg class="w-8 h-8 text-gray-300 mx-auto mb-2" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M12 16.5V9.75m0 0l3 3m-3-3l-3 3M6.75 19.5a4.5 4.5 0 01-1.41-8.775 5.25 5.25 0 0110.233-2.33 3 3 0 013.758 3.848A3.752 3.752 0 0118 19.5H6.75z"/></svg>
+                <p class="text-sm font-medium text-gray-600">Drop your tax certificate here</p>
+                <p class="text-xs text-gray-400 mt-1">PDF, JPG or PNG up to 5MB</p>
+                <button class="mt-3 text-xs font-medium text-brand-500 hover:text-brand-600 bg-brand-50 px-3 py-1.5 rounded-lg transition">Browse Files</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ===== PAYMENT HISTORY CARD ===== -->
+        <div class="bg-white rounded-xl border border-gray-100 shadow-sm card-hover">
+          <div class="flex items-center justify-between p-5 border-b border-gray-100">
+            <div class="flex items-center gap-3">
+              <div class="w-10 h-10 rounded-lg bg-amber-50 flex items-center justify-center">
+                <svg class="w-5 h-5 text-amber-500" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+              </div>
+              <div>
+                <h2 class="text-base font-semibold text-navy-900">Payment History</h2>
+                <p class="text-xs text-gray-400">Recent payouts and transactions</p>
+              </div>
+            </div>
+            <a href="seller-settlements.html" class="text-xs font-medium text-brand-500 hover:text-brand-600 transition">View All</a>
+          </div>
+          <div class="overflow-x-auto">
+            <table class="w-full">
+              <thead>
+                <tr class="border-b border-gray-100">
+                  <th class="text-left text-[10px] font-semibold text-gray-400 uppercase tracking-wider px-5 py-3">Date</th>
+                  <th class="text-left text-[10px] font-semibold text-gray-400 uppercase tracking-wider px-5 py-3">Amount</th>
+                  <th class="text-left text-[10px] font-semibold text-gray-400 uppercase tracking-wider px-5 py-3">Method</th>
+                  <th class="text-left text-[10px] font-semibold text-gray-400 uppercase tracking-wider px-5 py-3">Reference ID</th>
+                  <th class="text-left text-[10px] font-semibold text-gray-400 uppercase tracking-wider px-5 py-3">Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                <!-- Row 1 -->
+                <tr class="table-row border-b border-gray-50">
+                  <td class="px-5 py-3">
+                    <p class="text-sm font-medium text-gray-700">Mar 26, 2026</p>
+                  </td>
+                  <td class="px-5 py-3">
+                    <p class="text-sm font-semibold text-navy-900">&#8377;24,500</p>
+                  </td>
+                  <td class="px-5 py-3">
+                    <span class="flex items-center gap-1.5 text-xs font-medium text-gray-600">
+                      <svg class="w-3.5 h-3.5 text-blue-500" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M12 21v-8.25M15.75 21v-8.25M8.25 21v-8.25M3 9l9-6 9 6m-1.5 12V10.332A48.36 48.36 0 0012 9.75c-2.551 0-5.056.2-7.5.582V21M3 21h18M12 6.75h.008v.008H12V6.75z"/></svg>
+                      Bank (HDFC)
+                    </span>
+                  </td>
+                  <td class="px-5 py-3">
+                    <p class="text-xs font-mono text-gray-500">TXN20260326001</p>
+                  </td>
+                  <td class="px-5 py-3">
+                    <span class="inline-flex items-center gap-1 text-xs font-semibold text-success bg-green-50 px-2.5 py-1 rounded-full">
+                      <span class="w-1.5 h-1.5 rounded-full bg-success"></span>
+                      Completed
+                    </span>
+                  </td>
+                </tr>
+                <!-- Row 2 -->
+                <tr class="table-row border-b border-gray-50">
+                  <td class="px-5 py-3">
+                    <p class="text-sm font-medium text-gray-700">Mar 19, 2026</p>
+                  </td>
+                  <td class="px-5 py-3">
+                    <p class="text-sm font-semibold text-navy-900">&#8377;18,750</p>
+                  </td>
+                  <td class="px-5 py-3">
+                    <span class="flex items-center gap-1.5 text-xs font-medium text-gray-600">
+                      <svg class="w-3.5 h-3.5 text-blue-500" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M12 21v-8.25M15.75 21v-8.25M8.25 21v-8.25M3 9l9-6 9 6m-1.5 12V10.332A48.36 48.36 0 0012 9.75c-2.551 0-5.056.2-7.5.582V21M3 21h18M12 6.75h.008v.008H12V6.75z"/></svg>
+                      Bank (HDFC)
+                    </span>
+                  </td>
+                  <td class="px-5 py-3">
+                    <p class="text-xs font-mono text-gray-500">TXN20260319002</p>
+                  </td>
+                  <td class="px-5 py-3">
+                    <span class="inline-flex items-center gap-1 text-xs font-semibold text-success bg-green-50 px-2.5 py-1 rounded-full">
+                      <span class="w-1.5 h-1.5 rounded-full bg-success"></span>
+                      Completed
+                    </span>
+                  </td>
+                </tr>
+                <!-- Row 3 -->
+                <tr class="table-row border-b border-gray-50">
+                  <td class="px-5 py-3">
+                    <p class="text-sm font-medium text-gray-700">Mar 12, 2026</p>
+                  </td>
+                  <td class="px-5 py-3">
+                    <p class="text-sm font-semibold text-navy-900">&#8377;31,200</p>
+                  </td>
+                  <td class="px-5 py-3">
+                    <span class="flex items-center gap-1.5 text-xs font-medium text-gray-600">
+                      <svg class="w-3.5 h-3.5 text-green-500" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M10.5 1.5H8.25A2.25 2.25 0 006 3.75v16.5a2.25 2.25 0 002.25 2.25h7.5A2.25 2.25 0 0018 20.25V3.75a2.25 2.25 0 00-2.25-2.25H13.5m-3 0V3h3V1.5m-3 0h3m-3 18.75h3"/></svg>
+                      UPI
+                    </span>
+                  </td>
+                  <td class="px-5 py-3">
+                    <p class="text-xs font-mono text-gray-500">TXN20260312003</p>
+                  </td>
+                  <td class="px-5 py-3">
+                    <span class="inline-flex items-center gap-1 text-xs font-semibold text-success bg-green-50 px-2.5 py-1 rounded-full">
+                      <span class="w-1.5 h-1.5 rounded-full bg-success"></span>
+                      Completed
+                    </span>
+                  </td>
+                </tr>
+                <!-- Row 4 -->
+                <tr class="table-row border-b border-gray-50">
+                  <td class="px-5 py-3">
+                    <p class="text-sm font-medium text-gray-700">Mar 5, 2026</p>
+                  </td>
+                  <td class="px-5 py-3">
+                    <p class="text-sm font-semibold text-navy-900">&#8377;15,800</p>
+                  </td>
+                  <td class="px-5 py-3">
+                    <span class="flex items-center gap-1.5 text-xs font-medium text-gray-600">
+                      <svg class="w-3.5 h-3.5 text-blue-500" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M12 21v-8.25M15.75 21v-8.25M8.25 21v-8.25M3 9l9-6 9 6m-1.5 12V10.332A48.36 48.36 0 0012 9.75c-2.551 0-5.056.2-7.5.582V21M3 21h18M12 6.75h.008v.008H12V6.75z"/></svg>
+                      Bank (SBI)
+                    </span>
+                  </td>
+                  <td class="px-5 py-3">
+                    <p class="text-xs font-mono text-gray-500">TXN20260305004</p>
+                  </td>
+                  <td class="px-5 py-3">
+                    <span class="inline-flex items-center gap-1 text-xs font-semibold text-success bg-green-50 px-2.5 py-1 rounded-full">
+                      <span class="w-1.5 h-1.5 rounded-full bg-success"></span>
+                      Completed
+                    </span>
+                  </td>
+                </tr>
+                <!-- Row 5 (Processing) -->
+                <tr class="table-row">
+                  <td class="px-5 py-3">
+                    <p class="text-sm font-medium text-gray-700">Mar 28, 2026</p>
+                  </td>
+                  <td class="px-5 py-3">
+                    <p class="text-sm font-semibold text-navy-900">&#8377;12,350</p>
+                  </td>
+                  <td class="px-5 py-3">
+                    <span class="flex items-center gap-1.5 text-xs font-medium text-gray-600">
+                      <svg class="w-3.5 h-3.5 text-blue-500" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M12 21v-8.25M15.75 21v-8.25M8.25 21v-8.25M3 9l9-6 9 6m-1.5 12V10.332A48.36 48.36 0 0012 9.75c-2.551 0-5.056.2-7.5.582V21M3 21h18M12 6.75h.008v.008H12V6.75z"/></svg>
+                      Bank (HDFC)
+                    </span>
+                  </td>
+                  <td class="px-5 py-3">
+                    <p class="text-xs font-mono text-gray-500">TXN20260328005</p>
+                  </td>
+                  <td class="px-5 py-3">
+                    <span class="inline-flex items-center gap-1 text-xs font-semibold text-amber-600 bg-amber-50 px-2.5 py-1 rounded-full">
+                      <span class="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse"></span>
+                      Processing
+                    </span>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Bottom Save Bar -->
+      <div class="mt-8 bg-white rounded-xl border border-gray-100 shadow-sm p-5 flex items-center justify-between">
+        <div class="flex items-center gap-3">
+          <div class="w-8 h-8 rounded-lg bg-blue-50 flex items-center justify-center">
+            <svg class="w-4 h-4 text-blue-500" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M11.25 11.25l.041-.02a.75.75 0 011.063.852l-.708 2.836a.75.75 0 001.063.853l.041-.021M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9-3.75h.008v.008H12V8.25z"/></svg>
+          </div>
+          <div>
+            <p class="text-sm font-medium text-gray-700">Unsaved changes will be lost</p>
+            <p class="text-xs text-gray-400">Make sure to save your payment settings before leaving this page.</p>
+          </div>
+        </div>
+        <div class="flex items-center gap-3">
+          <button class="text-sm font-medium text-gray-500 hover:text-gray-700 px-4 py-2.5 rounded-lg hover:bg-gray-50 transition">Discard</button>
+          <button onclick="saveAllSettings()" class="bg-brand-500 hover:bg-brand-600 text-white text-sm font-semibold px-6 py-2.5 rounded-lg transition shadow-sm flex items-center gap-2">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4.5 12.75l6 6 9-13.5"/></svg>
+            Save Changes
+          </button>
+        </div>
+      </div>
+
+    </main>
+  </div>
+
+  <!-- ===== Toast Notification ===== -->
+  <div id="toast" class="fixed bottom-6 right-6 z-50 transform translate-y-20 opacity-0 transition-all duration-300 pointer-events-none">
+    <div class="bg-navy-900 text-white px-5 py-3.5 rounded-xl shadow-2xl flex items-center gap-3 min-w-[300px]">
+      <div id="toastIcon" class="w-8 h-8 rounded-full bg-success flex items-center justify-center shrink-0">
+        <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M4.5 12.75l6 6 9-13.5"/></svg>
+      </div>
+      <div>
+        <p id="toastTitle" class="text-sm font-semibold">Settings Saved</p>
+        <p id="toastMessage" class="text-xs text-gray-400">Your payment settings have been updated.</p>
+      </div>
+      <button onclick="hideToast()" class="ml-auto text-gray-400 hover:text-white transition">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M6 18L18 6M6 6l12 12"/></svg>
+      </button>
+    </div>
+  </div>
+
+  <script>
+    // Toggle TDS
+    function toggleTDS(btn) {
+      const isActive = btn.dataset.active === 'true';
+      const knob = btn.querySelector('.toggle-knob');
+      if (isActive) {
+        btn.classList.remove('bg-brand-500');
+        btn.classList.add('bg-gray-300');
+        knob.style.left = '2px';
+        btn.dataset.active = 'false';
+      } else {
+        btn.classList.remove('bg-gray-300');
+        btn.classList.add('bg-brand-500');
+        knob.style.left = 'calc(100% - 22px)';
+        btn.dataset.active = 'true';
+      }
+    }
+
+    // Set as Primary
+    function setPrimary(btn) {
+      showToast('Primary Account Updated', 'SBI account has been set as your primary payout account.');
+    }
+
+    // Save all settings
+    function saveAllSettings() {
+      showToast('Settings Saved', 'Your payment settings have been updated successfully.');
+    }
+
+    // Toast
+    function showToast(title, message) {
+      const toast = document.getElementById('toast');
+      document.getElementById('toastTitle').textContent = title;
+      document.getElementById('toastMessage').textContent = message;
+      toast.classList.remove('translate-y-20', 'opacity-0', 'pointer-events-none');
+      toast.classList.add('translate-y-0', 'opacity-100', 'pointer-events-auto');
+      setTimeout(hideToast, 4000);
+    }
+
+    function hideToast() {
+      const toast = document.getElementById('toast');
+      toast.classList.add('translate-y-20', 'opacity-0', 'pointer-events-none');
+      toast.classList.remove('translate-y-0', 'opacity-100', 'pointer-events-auto');
+    }
+  </script>
+
+  <script src="shared-layout.js"></script>
+  <script>renderSellerLayout('payments');</script>
+</body>
+</html>

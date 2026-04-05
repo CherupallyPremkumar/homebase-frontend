@@ -1,0 +1,1047 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HomeBase — Category Management</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              50: '#FFF7ED',
+              100: '#FFEDD5',
+              200: '#FED7AA',
+              300: '#FDBA74',
+              400: '#FB923C',
+              500: '#F97316',
+              600: '#EA580C',
+              700: '#C2410C',
+            },
+            navy: {
+              700: '#1E3A5F',
+              800: '#152238',
+              900: '#0A1628',
+            },
+            success: '#16A34A',
+            warning: '#EAB308',
+            danger: '#DC2626',
+          },
+          fontFamily: {
+            sans: ['Inter', 'system-ui', 'sans-serif'],
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+    .scrollbar-hide::-webkit-scrollbar { display: none; }
+    .sidebar-link { transition: all 0.15s ease; }
+    .sidebar-link:hover { background: rgba(255,255,255,0.08); }
+    .sidebar-link.active { background: rgba(249,115,22,0.15); border-right: 3px solid #F97316; }
+    .stat-card { transition: all 0.2s ease; }
+    .stat-card:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,0.08); }
+    .table-row { transition: background 0.15s ease; }
+    .table-row:hover { background: #FFF7ED; }
+    .filter-tab { transition: all 0.15s ease; }
+    .filter-tab.active { color: #F97316; border-color: #F97316; }
+    .filter-tab:hover:not(.active) { color: #374151; border-color: #D1D5DB; }
+    .dropdown-menu { display: none; }
+    .dropdown:hover .dropdown-menu { display: block; }
+    .sidebar-scroll::-webkit-scrollbar { width: 4px; }
+    .sidebar-scroll::-webkit-scrollbar-track { background: transparent; }
+    .sidebar-scroll::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); border-radius: 2px; }
+    .tree-children { overflow: hidden; transition: max-height 0.3s ease; }
+    .tree-children.collapsed { max-height: 0 !important; }
+  </style>
+</head>
+<body class="font-sans bg-gray-50 text-gray-900">
+
+  <!-- ===== TOP HEADER BAR ===== -->
+  <header id="admin-header" class="fixed top-0 left-0 right-0 z-50 bg-white border-b border-gray-200 h-16"></header>
+
+  <!-- ===== LAYOUT: SIDEBAR + MAIN ===== -->
+  <div class="flex pt-16 min-h-screen">
+
+    <!-- ===== LEFT SIDEBAR ===== -->
+    <aside id="admin-sidebar" class="fixed left-0 top-16 bottom-0 w-60 z-40 flex flex-col overflow-y-auto" style="background:#0A1628;"></aside>
+
+    <!-- ===== MAIN CONTENT ===== -->
+    <main class="flex-1 ml-60 p-6 lg:p-8">
+
+      <!-- Page Header -->
+      <div class="flex items-center justify-between mb-8">
+        <div>
+          <h1 class="text-2xl font-bold text-gray-900">Category Management</h1>
+          <p class="text-sm text-gray-500 mt-1">Organize products with hierarchical categories and attributes</p>
+        </div>
+        <div class="flex items-center gap-3">
+          <button class="flex items-center gap-2 bg-white border border-gray-200 text-gray-700 text-sm font-medium px-4 py-2.5 rounded-lg hover:bg-gray-50 transition shadow-sm">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3"/></svg>
+            Export
+          </button>
+          <button onclick="openAddCategoryModal()" class="flex items-center gap-2 bg-brand-500 text-white rounded-lg px-4 py-2.5 text-sm font-semibold hover:bg-brand-600 transition shadow-sm">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 4.5v15m7.5-7.5h-15"/></svg>
+            Add Category
+          </button>
+        </div>
+      </div>
+
+      <!-- Stats Cards -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 mb-8">
+        <!-- Total Categories -->
+        <div class="stat-card bg-white rounded-xl border border-gray-100 p-5 shadow-sm">
+          <div class="flex items-center justify-between mb-3">
+            <span class="text-sm font-medium text-gray-500">Total Categories</span>
+            <div class="w-9 h-9 rounded-lg bg-blue-50 flex items-center justify-center">
+              <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M3.75 12h16.5m-16.5 3.75h16.5M3.75 19.5h16.5M5.625 4.5h12.75a1.875 1.875 0 010 3.75H5.625a1.875 1.875 0 010-3.75z"/></svg>
+            </div>
+          </div>
+          <p class="text-2xl font-bold text-gray-900">86</p>
+          <div class="flex items-center gap-1 mt-1">
+            <span class="text-xs font-semibold text-gray-500">9 root, 24 sub, 53 leaf</span>
+          </div>
+        </div>
+
+        <!-- Active -->
+        <div class="stat-card bg-white rounded-xl border border-gray-100 p-5 shadow-sm">
+          <div class="flex items-center justify-between mb-3">
+            <span class="text-sm font-medium text-gray-500">Active Categories</span>
+            <div class="w-9 h-9 rounded-lg bg-green-50 flex items-center justify-center">
+              <svg class="w-5 h-5 text-green-600" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+            </div>
+          </div>
+          <p class="text-2xl font-bold text-gray-900">78</p>
+          <div class="flex items-center gap-1 mt-1">
+            <svg class="w-3.5 h-3.5 text-green-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M2.25 18L9 11.25l4.306 4.307a11.95 11.95 0 015.814-5.519l2.74-1.22m0 0l-5.94-2.281m5.94 2.28l-2.28 5.941"/></svg>
+            <span class="text-xs font-semibold text-green-600">87.5% active</span>
+          </div>
+        </div>
+
+        <!-- Inactive -->
+        <div class="stat-card bg-white rounded-xl border border-gray-100 p-5 shadow-sm">
+          <div class="flex items-center justify-between mb-3">
+            <span class="text-sm font-medium text-gray-500">Inactive Categories</span>
+            <div class="w-9 h-9 rounded-lg bg-red-50 flex items-center justify-center">
+              <svg class="w-5 h-5 text-red-600" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"/></svg>
+            </div>
+          </div>
+          <p class="text-2xl font-bold text-gray-900">8</p>
+          <div class="flex items-center gap-1 mt-1">
+            <span class="text-xs font-semibold text-gray-500">Disabled or archived</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Filter Tabs + Search -->
+      <div class="bg-white rounded-xl border border-gray-100 shadow-sm mb-8">
+        <div class="flex items-center justify-between px-6 pt-5 pb-0">
+          <div class="flex items-center gap-0 border-b border-gray-200 -mb-px">
+            <button class="filter-tab active text-sm font-semibold px-4 pb-3 border-b-2 border-brand-500 text-brand-500" onclick="filterCategories('all', this)">All <span class="ml-1 bg-gray-100 text-gray-600 text-[11px] font-bold px-1.5 py-0.5 rounded-full">86</span></button>
+            <button class="filter-tab text-sm font-medium px-4 pb-3 border-b-2 border-transparent text-gray-500" onclick="filterCategories('active', this)">Active <span class="ml-1 bg-green-100 text-green-700 text-[11px] font-bold px-1.5 py-0.5 rounded-full">78</span></button>
+            <button class="filter-tab text-sm font-medium px-4 pb-3 border-b-2 border-transparent text-gray-500" onclick="filterCategories('inactive', this)">Inactive <span class="ml-1 bg-red-100 text-red-700 text-[11px] font-bold px-1.5 py-0.5 rounded-full">8</span></button>
+          </div>
+          <div class="relative mb-3">
+            <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+            <input type="text" placeholder="Search categories..." class="bg-gray-50 border border-gray-200 rounded-lg py-2 pl-9 pr-4 text-sm outline-none focus:border-brand-400 focus:ring-2 focus:ring-brand-100 transition w-64">
+          </div>
+        </div>
+
+        <!-- Category Tree -->
+        <div class="px-6 py-5">
+
+          <!-- Electronics -->
+          <div class="tree-node border border-gray-100 rounded-lg mb-3" data-status="active">
+            <div class="flex items-center justify-between px-4 py-3 bg-gray-50 rounded-t-lg">
+              <div class="flex items-center gap-3">
+                <button onclick="toggleTree(this)" class="tree-toggle text-gray-500 hover:text-gray-700 transition">
+                  <svg class="w-5 h-5 transform transition-transform" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M19.5 8.25l-7.5 7.5-7.5-7.5"/></svg>
+                </button>
+                <div class="w-8 h-8 rounded-lg bg-blue-50 flex items-center justify-center">
+                  <svg class="w-4 h-4 text-blue-500" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M10.5 1.5H8.25A2.25 2.25 0 006 3.75v16.5a2.25 2.25 0 002.25 2.25h7.5A2.25 2.25 0 0018 20.25V3.75a2.25 2.25 0 00-2.25-2.25H13.5m-3 0V3h3V1.5m-3 0h3m-3 18.75h3"/></svg>
+                </div>
+                <div>
+                  <p class="text-sm font-semibold text-gray-900">Electronics</p>
+                  <p class="text-xs text-gray-400">1,245 products &middot; 89 sellers</p>
+                  <div class="flex items-center gap-2 mt-1">
+                    <span class="text-[10px] text-gray-400 font-mono bg-gray-50 px-1.5 py-0.5 rounded">ID: CAT-001</span>
+                    <span class="text-[10px] text-gray-400 font-mono bg-gray-50 px-1.5 py-0.5 rounded">slug: electronics</span>
+                    <span class="text-[10px] text-gray-400 bg-gray-50 px-1.5 py-0.5 rounded">parent: root</span>
+                    <span class="text-[10px] text-gray-400 bg-gray-50 px-1.5 py-0.5 rounded">sort: 1</span>
+                  </div>
+                </div>
+              </div>
+              <div class="flex items-center gap-3">
+                <span class="text-xs font-medium text-gray-500 bg-gray-100 px-2 py-0.5 rounded">Commission: <span class="text-gray-800 font-semibold">8%</span></span>
+                <span class="text-xs font-medium text-gray-500 bg-gray-100 px-2 py-0.5 rounded">HSN: <span class="text-gray-800 font-mono">8517</span></span>
+                <span class="inline-flex items-center gap-1 px-2.5 py-1 bg-green-50 text-green-700 text-xs font-semibold rounded-full">
+                  <span class="w-1.5 h-1.5 bg-green-500 rounded-full"></span> Active
+                </span>
+                <button onclick="editCategory('Electronics')" class="p-1.5 text-gray-400 hover:text-brand-500 hover:bg-brand-50 rounded-md transition" title="Edit">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10"/></svg>
+                </button>
+                <button onclick="deleteCategory('Electronics')" class="p-1.5 text-red-400 hover:text-red-600 hover:bg-red-50 rounded-md transition" title="Delete">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0"/></svg>
+                </button>
+              </div>
+            </div>
+            <div class="tree-children pl-10 pr-4 py-2" style="max-height:600px;">
+
+              <!-- Mobile Phones -->
+              <div class="tree-node border-l-2 border-gray-200 ml-2 mb-2">
+                <div class="flex items-center justify-between px-4 py-2.5">
+                  <div class="flex items-center gap-3">
+                    <button onclick="toggleTree(this)" class="tree-toggle text-gray-400 hover:text-gray-700 transition">
+                      <svg class="w-4 h-4 transform transition-transform" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M19.5 8.25l-7.5 7.5-7.5-7.5"/></svg>
+                    </button>
+                    <div>
+                      <p class="text-sm font-medium text-gray-800">Mobile Phones</p>
+                      <p class="text-xs text-gray-400">456 products</p>
+                    </div>
+                  </div>
+                  <div class="flex items-center gap-1.5">
+                    <button onclick="editCategory('Mobile Phones')" class="p-1 text-gray-400 hover:text-brand-500 rounded transition"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10"/></svg></button>
+                    <button onclick="deleteCategory('Mobile Phones')" class="p-1 text-red-400 hover:text-red-600 rounded transition"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0"/></svg></button>
+                  </div>
+                </div>
+                <div class="tree-children pl-8 py-1" style="max-height:200px;">
+                  <div class="flex items-center justify-between px-4 py-2 border-l-2 border-gray-100 ml-2">
+                    <div><p class="text-sm text-gray-700">Smartphones</p><p class="text-xs text-gray-400">320 products</p></div>
+                    <div class="flex items-center gap-1.5">
+                      <button onclick="editCategory('Smartphones')" class="p-1 text-gray-400 hover:text-brand-500 rounded transition"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10"/></svg></button>
+                      <button onclick="deleteCategory('Smartphones')" class="p-1 text-red-400 hover:text-red-600 rounded transition"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0"/></svg></button>
+                    </div>
+                  </div>
+                  <div class="flex items-center justify-between px-4 py-2 border-l-2 border-gray-100 ml-2">
+                    <div><p class="text-sm text-gray-700">Feature Phones</p><p class="text-xs text-gray-400">136 products</p></div>
+                    <div class="flex items-center gap-1.5">
+                      <button onclick="editCategory('Feature Phones')" class="p-1 text-gray-400 hover:text-brand-500 rounded transition"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10"/></svg></button>
+                      <button onclick="deleteCategory('Feature Phones')" class="p-1 text-red-400 hover:text-red-600 rounded transition"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0"/></svg></button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Audio -->
+              <div class="tree-node border-l-2 border-gray-200 ml-2 mb-2">
+                <div class="flex items-center justify-between px-4 py-2.5">
+                  <div class="flex items-center gap-3">
+                    <button onclick="toggleTree(this)" class="tree-toggle text-gray-400 hover:text-gray-700 transition">
+                      <svg class="w-4 h-4 transform transition-transform" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M19.5 8.25l-7.5 7.5-7.5-7.5"/></svg>
+                    </button>
+                    <div>
+                      <p class="text-sm font-medium text-gray-800">Audio</p>
+                      <p class="text-xs text-gray-400">189 products</p>
+                    </div>
+                  </div>
+                  <div class="flex items-center gap-1.5">
+                    <button onclick="editCategory('Audio')" class="p-1 text-gray-400 hover:text-brand-500 rounded transition"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10"/></svg></button>
+                    <button onclick="deleteCategory('Audio')" class="p-1 text-red-400 hover:text-red-600 rounded transition"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0"/></svg></button>
+                  </div>
+                </div>
+                <div class="tree-children pl-8 py-1" style="max-height:200px;">
+                  <div class="flex items-center justify-between px-4 py-2 border-l-2 border-gray-100 ml-2">
+                    <div><p class="text-sm text-gray-700">Headphones</p><p class="text-xs text-gray-400">98 products</p></div>
+                    <div class="flex items-center gap-1.5">
+                      <button onclick="editCategory('Headphones')" class="p-1 text-gray-400 hover:text-brand-500 rounded transition"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10"/></svg></button>
+                      <button onclick="deleteCategory('Headphones')" class="p-1 text-red-400 hover:text-red-600 rounded transition"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0"/></svg></button>
+                    </div>
+                  </div>
+                  <div class="flex items-center justify-between px-4 py-2 border-l-2 border-gray-100 ml-2">
+                    <div><p class="text-sm text-gray-700">Speakers</p><p class="text-xs text-gray-400">91 products</p></div>
+                    <div class="flex items-center gap-1.5">
+                      <button onclick="editCategory('Speakers')" class="p-1 text-gray-400 hover:text-brand-500 rounded transition"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10"/></svg></button>
+                      <button onclick="deleteCategory('Speakers')" class="p-1 text-red-400 hover:text-red-600 rounded transition"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0"/></svg></button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Leaf nodes under Electronics -->
+              <div class="flex items-center justify-between px-4 py-2.5 border-l-2 border-gray-200 ml-2 mb-1">
+                <div><p class="text-sm font-medium text-gray-800">Laptops</p><p class="text-xs text-gray-400">234 products</p></div>
+                <div class="flex items-center gap-1.5">
+                  <button onclick="editCategory('Laptops')" class="p-1 text-gray-400 hover:text-brand-500 rounded transition"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10"/></svg></button>
+                  <button onclick="deleteCategory('Laptops')" class="p-1 text-red-400 hover:text-red-600 rounded transition"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0"/></svg></button>
+                </div>
+              </div>
+              <div class="flex items-center justify-between px-4 py-2.5 border-l-2 border-gray-200 ml-2 mb-1">
+                <div><p class="text-sm font-medium text-gray-800">Cameras</p><p class="text-xs text-gray-400">89 products</p></div>
+                <div class="flex items-center gap-1.5">
+                  <button onclick="editCategory('Cameras')" class="p-1 text-gray-400 hover:text-brand-500 rounded transition"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10"/></svg></button>
+                  <button onclick="deleteCategory('Cameras')" class="p-1 text-red-400 hover:text-red-600 rounded transition"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0"/></svg></button>
+                </div>
+              </div>
+              <div class="flex items-center justify-between px-4 py-2.5 border-l-2 border-gray-200 ml-2 mb-1">
+                <div><p class="text-sm font-medium text-gray-800">Gaming</p><p class="text-xs text-gray-400">156 products</p></div>
+                <div class="flex items-center gap-1.5">
+                  <button onclick="editCategory('Gaming')" class="p-1 text-gray-400 hover:text-brand-500 rounded transition"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10"/></svg></button>
+                  <button onclick="deleteCategory('Gaming')" class="p-1 text-red-400 hover:text-red-600 rounded transition"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0"/></svg></button>
+                </div>
+              </div>
+              <div class="flex items-center justify-between px-4 py-2.5 border-l-2 border-gray-200 ml-2 mb-1">
+                <div><p class="text-sm font-medium text-gray-800">Wearables</p><p class="text-xs text-gray-400">121 products</p></div>
+                <div class="flex items-center gap-1.5">
+                  <button onclick="editCategory('Wearables')" class="p-1 text-gray-400 hover:text-brand-500 rounded transition"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10"/></svg></button>
+                  <button onclick="deleteCategory('Wearables')" class="p-1 text-red-400 hover:text-red-600 rounded transition"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0"/></svg></button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Fashion -->
+          <div class="tree-node border border-gray-100 rounded-lg mb-3" data-status="active">
+            <div class="flex items-center justify-between px-4 py-3 bg-gray-50 rounded-t-lg">
+              <div class="flex items-center gap-3">
+                <button onclick="toggleTree(this)" class="tree-toggle text-gray-500 hover:text-gray-700 transition">
+                  <svg class="w-5 h-5 transform transition-transform" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M19.5 8.25l-7.5 7.5-7.5-7.5"/></svg>
+                </button>
+                <div class="w-8 h-8 rounded-lg bg-pink-50 flex items-center justify-center">
+                  <svg class="w-4 h-4 text-pink-500" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M15.75 10.5V6a3.75 3.75 0 10-7.5 0v4.5m11.356-1.993l1.263 12c.07.665-.45 1.243-1.119 1.243H4.25a1.125 1.125 0 01-1.12-1.243l1.264-12A1.125 1.125 0 015.513 7.5h12.974c.576 0 1.059.435 1.119 1.007zM8.625 10.5a.375.375 0 11-.75 0 .375.375 0 01.75 0zm7.5 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z"/></svg>
+                </div>
+                <div>
+                  <p class="text-sm font-semibold text-gray-900">Fashion</p>
+                  <p class="text-xs text-gray-400">2,340 products &middot; 156 sellers</p>
+                </div>
+              </div>
+              <div class="flex items-center gap-3">
+                <span class="text-xs font-medium text-gray-500 bg-gray-100 px-2 py-0.5 rounded">Commission: <span class="text-gray-800 font-semibold">15%</span></span>
+                <span class="text-xs font-medium text-gray-500 bg-gray-100 px-2 py-0.5 rounded">HSN: <span class="text-gray-800 font-mono">6109</span></span>
+                <span class="inline-flex items-center gap-1 px-2.5 py-1 bg-green-50 text-green-700 text-xs font-semibold rounded-full">
+                  <span class="w-1.5 h-1.5 bg-green-500 rounded-full"></span> Active
+                </span>
+                <button onclick="editCategory('Fashion')" class="p-1.5 text-gray-400 hover:text-brand-500 hover:bg-brand-50 rounded-md transition" title="Edit">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10"/></svg>
+                </button>
+                <button onclick="deleteCategory('Fashion')" class="p-1.5 text-red-400 hover:text-red-600 hover:bg-red-50 rounded-md transition" title="Delete">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0"/></svg>
+                </button>
+              </div>
+            </div>
+            <div class="tree-children pl-10 pr-4 py-2" style="max-height:300px;">
+              <div class="flex items-center justify-between px-4 py-2.5 border-l-2 border-gray-200 ml-2 mb-1">
+                <div><p class="text-sm font-medium text-gray-800">Men</p><p class="text-xs text-gray-400">890 products</p></div>
+                <div class="flex items-center gap-1.5">
+                  <button onclick="editCategory('Men')" class="p-1 text-gray-400 hover:text-brand-500 rounded transition"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10"/></svg></button>
+                  <button onclick="deleteCategory('Men')" class="p-1 text-red-400 hover:text-red-600 rounded transition"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0"/></svg></button>
+                </div>
+              </div>
+              <div class="flex items-center justify-between px-4 py-2.5 border-l-2 border-gray-200 ml-2 mb-1">
+                <div><p class="text-sm font-medium text-gray-800">Women</p><p class="text-xs text-gray-400">1,120 products</p></div>
+                <div class="flex items-center gap-1.5">
+                  <button onclick="editCategory('Women')" class="p-1 text-gray-400 hover:text-brand-500 rounded transition"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10"/></svg></button>
+                  <button onclick="deleteCategory('Women')" class="p-1 text-red-400 hover:text-red-600 rounded transition"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0"/></svg></button>
+                </div>
+              </div>
+              <div class="flex items-center justify-between px-4 py-2.5 border-l-2 border-gray-200 ml-2 mb-1">
+                <div><p class="text-sm font-medium text-gray-800">Kids</p><p class="text-xs text-gray-400">330 products</p></div>
+                <div class="flex items-center gap-1.5">
+                  <button onclick="editCategory('Kids')" class="p-1 text-gray-400 hover:text-brand-500 rounded transition"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10"/></svg></button>
+                  <button onclick="deleteCategory('Kids')" class="p-1 text-red-400 hover:text-red-600 rounded transition"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0"/></svg></button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Home & Living -->
+          <div class="tree-node border border-gray-100 rounded-lg mb-3" data-status="active">
+            <div class="flex items-center justify-between px-4 py-3 bg-gray-50 rounded-t-lg">
+              <div class="flex items-center gap-3">
+                <button onclick="toggleTree(this)" class="tree-toggle text-gray-500 hover:text-gray-700 transition">
+                  <svg class="w-5 h-5 transform transition-transform" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M19.5 8.25l-7.5 7.5-7.5-7.5"/></svg>
+                </button>
+                <div class="w-8 h-8 rounded-lg bg-amber-50 flex items-center justify-center">
+                  <svg class="w-4 h-4 text-amber-500" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M2.25 12l8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25"/></svg>
+                </div>
+                <div>
+                  <p class="text-sm font-semibold text-gray-900">Home & Living</p>
+                  <p class="text-xs text-gray-400">780 products &middot; 64 sellers</p>
+                </div>
+              </div>
+              <div class="flex items-center gap-3">
+                <span class="text-xs font-medium text-gray-500 bg-gray-100 px-2 py-0.5 rounded">Commission: <span class="text-gray-800 font-semibold">12%</span></span>
+                <span class="text-xs font-medium text-gray-500 bg-gray-100 px-2 py-0.5 rounded">HSN: <span class="text-gray-800 font-mono">9403</span></span>
+                <span class="inline-flex items-center gap-1 px-2.5 py-1 bg-green-50 text-green-700 text-xs font-semibold rounded-full">
+                  <span class="w-1.5 h-1.5 bg-green-500 rounded-full"></span> Active
+                </span>
+                <button onclick="editCategory('Home & Living')" class="p-1.5 text-gray-400 hover:text-brand-500 hover:bg-brand-50 rounded-md transition" title="Edit">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10"/></svg>
+                </button>
+                <button onclick="deleteCategory('Home & Living')" class="p-1.5 text-red-400 hover:text-red-600 hover:bg-red-50 rounded-md transition" title="Delete">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0"/></svg>
+                </button>
+              </div>
+            </div>
+            <div class="tree-children pl-10 pr-4 py-2" style="max-height:300px;">
+              <div class="flex items-center justify-between px-4 py-2.5 border-l-2 border-gray-200 ml-2 mb-1">
+                <div><p class="text-sm font-medium text-gray-800">Furniture</p><p class="text-xs text-gray-400">234 products</p></div>
+                <div class="flex items-center gap-1.5">
+                  <button onclick="editCategory('Furniture')" class="p-1 text-gray-400 hover:text-brand-500 rounded transition"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10"/></svg></button>
+                  <button onclick="deleteCategory('Furniture')" class="p-1 text-red-400 hover:text-red-600 rounded transition"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0"/></svg></button>
+                </div>
+              </div>
+              <div class="flex items-center justify-between px-4 py-2.5 border-l-2 border-gray-200 ml-2 mb-1">
+                <div><p class="text-sm font-medium text-gray-800">Kitchen</p><p class="text-xs text-gray-400">312 products</p></div>
+                <div class="flex items-center gap-1.5">
+                  <button onclick="editCategory('Kitchen')" class="p-1 text-gray-400 hover:text-brand-500 rounded transition"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10"/></svg></button>
+                  <button onclick="deleteCategory('Kitchen')" class="p-1 text-red-400 hover:text-red-600 rounded transition"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0"/></svg></button>
+                </div>
+              </div>
+              <div class="flex items-center justify-between px-4 py-2.5 border-l-2 border-gray-200 ml-2 mb-1">
+                <div><p class="text-sm font-medium text-gray-800">Decor</p><p class="text-xs text-gray-400">234 products</p></div>
+                <div class="flex items-center gap-1.5">
+                  <button onclick="editCategory('Decor')" class="p-1 text-gray-400 hover:text-brand-500 rounded transition"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10"/></svg></button>
+                  <button onclick="deleteCategory('Decor')" class="p-1 text-red-400 hover:text-red-600 rounded transition"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0"/></svg></button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Beauty & Personal Care -->
+          <div class="tree-node border border-gray-100 rounded-lg mb-3" data-status="active">
+            <div class="flex items-center justify-between px-4 py-3 bg-gray-50 rounded-lg">
+              <div class="flex items-center gap-3">
+                <button onclick="toggleTree(this)" class="tree-toggle text-gray-500 hover:text-gray-700 transition">
+                  <svg class="w-5 h-5 transform rotate-[-90deg] transition-transform" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M19.5 8.25l-7.5 7.5-7.5-7.5"/></svg>
+                </button>
+                <div class="w-8 h-8 rounded-lg bg-purple-50 flex items-center justify-center">
+                  <svg class="w-4 h-4 text-purple-500" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09z"/></svg>
+                </div>
+                <div>
+                  <p class="text-sm font-semibold text-gray-900">Beauty & Personal Care</p>
+                  <p class="text-xs text-gray-400">1,890 products &middot; 112 sellers</p>
+                </div>
+              </div>
+              <div class="flex items-center gap-3">
+                <span class="text-xs font-medium text-gray-500 bg-gray-100 px-2 py-0.5 rounded">Commission: <span class="text-gray-800 font-semibold">5%</span></span>
+                <span class="text-xs font-medium text-gray-500 bg-gray-100 px-2 py-0.5 rounded">HSN: <span class="text-gray-800 font-mono">3304</span></span>
+                <span class="inline-flex items-center gap-1 px-2.5 py-1 bg-green-50 text-green-700 text-xs font-semibold rounded-full"><span class="w-1.5 h-1.5 bg-green-500 rounded-full"></span> Active</span>
+                <button onclick="editCategory('Beauty')" class="p-1.5 text-gray-400 hover:text-brand-500 hover:bg-brand-50 rounded-md transition" title="Edit"><svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10"/></svg></button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Grocery & Gourmet -->
+          <div class="tree-node border border-gray-100 rounded-lg mb-3" data-status="active">
+            <div class="flex items-center justify-between px-4 py-3 bg-gray-50 rounded-lg">
+              <div class="flex items-center gap-3">
+                <button onclick="toggleTree(this)" class="tree-toggle text-gray-500 hover:text-gray-700 transition">
+                  <svg class="w-5 h-5 transform rotate-[-90deg] transition-transform" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M19.5 8.25l-7.5 7.5-7.5-7.5"/></svg>
+                </button>
+                <div class="w-8 h-8 rounded-lg bg-green-50 flex items-center justify-center">
+                  <svg class="w-4 h-4 text-green-500" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25a3 3 0 00-3 3h15.75m-12.75-3h11.218c1.121-2.3 2.1-4.684 2.924-7.138a60.114 60.114 0 00-16.536-1.84M7.5 14.25L5.106 5.272M6 20.25a.75.75 0 11-1.5 0 .75.75 0 011.5 0zm12.75 0a.75.75 0 11-1.5 0 .75.75 0 011.5 0z"/></svg>
+                </div>
+                <div>
+                  <p class="text-sm font-semibold text-gray-900">Grocery & Gourmet</p>
+                  <p class="text-xs text-gray-400">3,210 products &middot; 78 sellers</p>
+                </div>
+              </div>
+              <div class="flex items-center gap-3">
+                <span class="text-xs font-medium text-gray-500 bg-gray-100 px-2 py-0.5 rounded">Commission: <span class="text-gray-800 font-semibold">4%</span></span>
+                <span class="text-xs font-medium text-gray-500 bg-gray-100 px-2 py-0.5 rounded">HSN: <span class="text-gray-800 font-mono">2106</span></span>
+                <span class="inline-flex items-center gap-1 px-2.5 py-1 bg-green-50 text-green-700 text-xs font-semibold rounded-full"><span class="w-1.5 h-1.5 bg-green-500 rounded-full"></span> Active</span>
+                <button onclick="editCategory('Grocery')" class="p-1.5 text-gray-400 hover:text-brand-500 hover:bg-brand-50 rounded-md transition" title="Edit"><svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10"/></svg></button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Health & Wellness -->
+          <div class="tree-node border border-gray-100 rounded-lg mb-3" data-status="active">
+            <div class="flex items-center justify-between px-4 py-3 bg-gray-50 rounded-lg">
+              <div class="flex items-center gap-3">
+                <button onclick="toggleTree(this)" class="tree-toggle text-gray-500 hover:text-gray-700 transition">
+                  <svg class="w-5 h-5 transform rotate-[-90deg] transition-transform" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M19.5 8.25l-7.5 7.5-7.5-7.5"/></svg>
+                </button>
+                <div class="w-8 h-8 rounded-lg bg-red-50 flex items-center justify-center">
+                  <svg class="w-4 h-4 text-red-500" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12z"/></svg>
+                </div>
+                <div>
+                  <p class="text-sm font-semibold text-gray-900">Health & Wellness</p>
+                  <p class="text-xs text-gray-400">920 products &middot; 45 sellers</p>
+                </div>
+              </div>
+              <div class="flex items-center gap-3">
+                <span class="text-xs font-medium text-gray-500 bg-gray-100 px-2 py-0.5 rounded">Commission: <span class="text-gray-800 font-semibold">6%</span></span>
+                <span class="text-xs font-medium text-gray-500 bg-gray-100 px-2 py-0.5 rounded">HSN: <span class="text-gray-800 font-mono">3004</span></span>
+                <span class="inline-flex items-center gap-1 px-2.5 py-1 bg-green-50 text-green-700 text-xs font-semibold rounded-full"><span class="w-1.5 h-1.5 bg-green-500 rounded-full"></span> Active</span>
+                <button onclick="editCategory('Health')" class="p-1.5 text-gray-400 hover:text-brand-500 hover:bg-brand-50 rounded-md transition" title="Edit"><svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10"/></svg></button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Sports & Fitness -->
+          <div class="tree-node border border-gray-100 rounded-lg mb-3" data-status="active">
+            <div class="flex items-center justify-between px-4 py-3 bg-gray-50 rounded-lg">
+              <div class="flex items-center gap-3">
+                <button onclick="toggleTree(this)" class="tree-toggle text-gray-500 hover:text-gray-700 transition">
+                  <svg class="w-5 h-5 transform rotate-[-90deg] transition-transform" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M19.5 8.25l-7.5 7.5-7.5-7.5"/></svg>
+                </button>
+                <div class="w-8 h-8 rounded-lg bg-emerald-50 flex items-center justify-center">
+                  <svg class="w-4 h-4 text-emerald-500" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M16.5 18.75h-9m9 0a3 3 0 013 3h-15a3 3 0 013-3m9 0v-3.375c0-.621-.503-1.125-1.125-1.125h-.871M7.5 18.75v-3.375c0-.621.504-1.125 1.125-1.125h.872m5.007 0H9.497m5.007 0a7.454 7.454 0 01-.982-3.172M9.497 14.25a7.454 7.454 0 00.981-3.172M5.25 4.236c-.982.143-1.954.317-2.916.52A6.003 6.003 0 007.73 9.728M5.25 4.236V4.5c0 2.108.966 3.99 2.48 5.228M5.25 4.236V2.721C7.456 2.41 9.71 2.25 12 2.25c2.291 0 4.545.16 6.75.47v1.516M18.75 4.236c.982.143 1.954.317 2.916.52A6.003 6.003 0 0016.27 9.728M18.75 4.236V4.5c0 2.108-.966 3.99-2.48 5.228M18.75 4.236V2.721M12 12.75a2.25 2.25 0 01-2.248-2.354M12 12.75a2.25 2.25 0 002.248-2.354M12 12.75V14.25"/></svg>
+                </div>
+                <div>
+                  <p class="text-sm font-semibold text-gray-900">Sports & Fitness</p>
+                  <p class="text-xs text-gray-400">560 products &middot; 34 sellers</p>
+                </div>
+              </div>
+              <div class="flex items-center gap-3">
+                <span class="text-xs font-medium text-gray-500 bg-gray-100 px-2 py-0.5 rounded">Commission: <span class="text-gray-800 font-semibold">10%</span></span>
+                <span class="text-xs font-medium text-gray-500 bg-gray-100 px-2 py-0.5 rounded">HSN: <span class="text-gray-800 font-mono">9506</span></span>
+                <span class="inline-flex items-center gap-1 px-2.5 py-1 bg-green-50 text-green-700 text-xs font-semibold rounded-full"><span class="w-1.5 h-1.5 bg-green-500 rounded-full"></span> Active</span>
+                <button onclick="editCategory('Sports')" class="p-1.5 text-gray-400 hover:text-brand-500 hover:bg-brand-50 rounded-md transition" title="Edit"><svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10"/></svg></button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Books -->
+          <div class="tree-node border border-gray-100 rounded-lg mb-3" data-status="active">
+            <div class="flex items-center justify-between px-4 py-3 bg-gray-50 rounded-lg">
+              <div class="flex items-center gap-3">
+                <div class="w-5 h-5 ml-0.5 mr-0.5"></div>
+                <div class="w-8 h-8 rounded-lg bg-indigo-50 flex items-center justify-center">
+                  <svg class="w-4 h-4 text-indigo-500" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M12 6.042A8.967 8.967 0 006 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 016 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 016-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0018 18a8.967 8.967 0 00-6 2.292m0-14.25v14.25"/></svg>
+                </div>
+                <div>
+                  <p class="text-sm font-semibold text-gray-900">Books</p>
+                  <p class="text-xs text-gray-400">2,450 products &middot; 23 sellers</p>
+                </div>
+              </div>
+              <div class="flex items-center gap-3">
+                <span class="text-xs font-medium text-gray-500 bg-gray-100 px-2 py-0.5 rounded">Commission: <span class="text-gray-800 font-semibold">3%</span></span>
+                <span class="text-xs font-medium text-gray-500 bg-gray-100 px-2 py-0.5 rounded">HSN: <span class="text-gray-800 font-mono">4901</span></span>
+                <span class="inline-flex items-center gap-1 px-2.5 py-1 bg-green-50 text-green-700 text-xs font-semibold rounded-full"><span class="w-1.5 h-1.5 bg-green-500 rounded-full"></span> Active</span>
+                <button onclick="editCategory('Books')" class="p-1.5 text-gray-400 hover:text-brand-500 hover:bg-brand-50 rounded-md transition" title="Edit"><svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10"/></svg></button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Automotive (INACTIVE) -->
+          <div class="tree-node border border-gray-100 rounded-lg mb-3 opacity-60" data-status="inactive">
+            <div class="flex items-center justify-between px-4 py-3 bg-red-50/30 rounded-lg">
+              <div class="flex items-center gap-3">
+                <div class="w-5 h-5 ml-0.5 mr-0.5"></div>
+                <div class="w-8 h-8 rounded-lg bg-gray-100 flex items-center justify-center">
+                  <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M8.25 18.75a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m3 0h6m-9 0H3.375a1.125 1.125 0 01-1.125-1.125V14.25m17.25 4.5a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m3 0H21"/></svg>
+                </div>
+                <div>
+                  <p class="text-sm font-semibold text-gray-500">Automotive</p>
+                  <p class="text-xs text-gray-400">0 products &middot; Disabled</p>
+                </div>
+              </div>
+              <div class="flex items-center gap-3">
+                <span class="inline-flex items-center gap-1 px-2.5 py-1 bg-red-50 text-red-600 text-xs font-semibold rounded-full"><span class="w-1.5 h-1.5 bg-red-400 rounded-full"></span> Inactive</span>
+                <button onclick="editCategory('Automotive')" class="p-1.5 text-gray-400 hover:text-brand-500 hover:bg-brand-50 rounded-md transition" title="Enable"><svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10"/></svg></button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Baby Products (INACTIVE) -->
+          <div class="tree-node border border-gray-100 rounded-lg mb-3 opacity-60" data-status="inactive">
+            <div class="flex items-center justify-between px-4 py-3 bg-red-50/30 rounded-lg">
+              <div class="flex items-center gap-3">
+                <div class="w-5 h-5 ml-0.5 mr-0.5"></div>
+                <div class="w-8 h-8 rounded-lg bg-gray-100 flex items-center justify-center">
+                  <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M15.182 15.182a4.5 4.5 0 01-6.364 0M21 12a9 9 0 11-18 0 9 9 0 0118 0zM9.75 9.75c0 .414-.168.75-.375.75S9 10.164 9 9.75 9.168 9 9.375 9s.375.336.375.75zm-.375 0h.008v.015h-.008V9.75zm5.625 0c0 .414-.168.75-.375.75s-.375-.336-.375-.75.168-.75.375-.75.375.336.375.75zm-.375 0h.008v.015h-.008V9.75z"/></svg>
+                </div>
+                <div>
+                  <p class="text-sm font-semibold text-gray-500">Baby Products</p>
+                  <p class="text-xs text-gray-400">0 products &middot; Disabled</p>
+                </div>
+              </div>
+              <div class="flex items-center gap-3">
+                <span class="inline-flex items-center gap-1 px-2.5 py-1 bg-red-50 text-red-600 text-xs font-semibold rounded-full"><span class="w-1.5 h-1.5 bg-red-400 rounded-full"></span> Inactive</span>
+                <button onclick="editCategory('Baby Products')" class="p-1.5 text-gray-400 hover:text-brand-500 hover:bg-brand-50 rounded-md transition" title="Enable"><svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10"/></svg></button>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- ===== CATEGORY RULES — All 7 sections in one master table ===== -->
+      <div class="bg-white rounded-xl border border-gray-100 shadow-sm">
+        <div class="flex items-center justify-between px-6 py-5 border-b border-gray-100">
+          <div>
+            <h2 class="text-lg font-bold text-gray-900">Category Rules & Configuration</h2>
+            <p class="text-sm text-gray-500 mt-0.5">Commission, tax, attributes, listing rules, restrictions, returns, and shipping per category</p>
+          </div>
+        </div>
+        <div class="overflow-x-auto">
+          <table class="w-full text-sm">
+            <thead>
+              <tr class="border-b border-gray-200 bg-gray-50/80">
+                <th class="text-left text-[10px] font-semibold text-gray-500 uppercase tracking-wider px-5 py-3 sticky left-0 bg-gray-50/80">Category</th>
+                <th class="text-center text-[10px] font-semibold text-gray-500 uppercase tracking-wider px-4 py-3">Commission</th>
+                <th class="text-center text-[10px] font-semibold text-gray-500 uppercase tracking-wider px-4 py-3">GST Rate</th>
+                <th class="text-left text-[10px] font-semibold text-gray-500 uppercase tracking-wider px-4 py-3">Required Attributes</th>
+                <th class="text-left text-[10px] font-semibold text-gray-500 uppercase tracking-wider px-4 py-3">Listing Rules</th>
+                <th class="text-center text-[10px] font-semibold text-gray-500 uppercase tracking-wider px-4 py-3">Gated?</th>
+                <th class="text-left text-[10px] font-semibold text-gray-500 uppercase tracking-wider px-4 py-3">Return Policy</th>
+                <th class="text-left text-[10px] font-semibold text-gray-500 uppercase tracking-wider px-4 py-3">Shipping Rules</th>
+                <th class="text-center text-[10px] font-semibold text-gray-500 uppercase tracking-wider px-4 py-3">Actions</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-100">
+              <!-- Electronics -->
+              <tr class="hover:bg-brand-50/20">
+                <td class="px-5 py-4 font-semibold text-gray-900 sticky left-0 bg-white">Electronics</td>
+                <td class="px-4 py-4 text-center"><span class="font-bold text-brand-600">8%</span></td>
+                <td class="px-4 py-4 text-center"><span class="bg-blue-50 text-blue-700 text-xs font-semibold px-2 py-0.5 rounded">18%</span></td>
+                <td class="px-4 py-4">
+                  <div class="flex flex-wrap gap-1">
+                    <span class="text-[10px] bg-green-50 text-green-700 px-1.5 py-0.5 rounded font-medium">Brand*</span>
+                    <span class="text-[10px] bg-green-50 text-green-700 px-1.5 py-0.5 rounded font-medium">Model*</span>
+                    <span class="text-[10px] bg-green-50 text-green-700 px-1.5 py-0.5 rounded font-medium">Warranty*</span>
+                    <span class="text-[10px] bg-gray-100 text-gray-600 px-1.5 py-0.5 rounded">Color</span>
+                    <span class="text-[10px] bg-gray-100 text-gray-600 px-1.5 py-0.5 rounded">Weight</span>
+                  </div>
+                </td>
+                <td class="px-4 py-4">
+                  <p class="text-xs text-gray-600">Min 5 images</p>
+                  <p class="text-xs text-gray-600">Description 200+ chars</p>
+                  <p class="text-xs text-gray-600">EAN/UPC required</p>
+                </td>
+                <td class="px-4 py-4 text-center"><span class="text-xs font-semibold text-gray-400">No</span></td>
+                <td class="px-4 py-4">
+                  <p class="text-xs text-gray-700 font-medium">10 days</p>
+                  <p class="text-[10px] text-gray-400">Replacement only</p>
+                </td>
+                <td class="px-4 py-4">
+                  <p class="text-xs text-gray-600">Max 25 kg</p>
+                  <p class="text-[10px] text-gray-400">Fragile handling</p>
+                </td>
+                <td class="px-4 py-4 text-center"><button onclick="editCategoryRules('Electronics')" class="p-1.5 text-gray-400 hover:text-brand-500 hover:bg-brand-50 rounded-md transition" title="Edit Rules"><svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10"/></svg></button></td>
+              </tr>
+              <!-- Fashion -->
+              <tr class="hover:bg-brand-50/20">
+                <td class="px-5 py-4 font-semibold text-gray-900 sticky left-0 bg-white">Fashion</td>
+                <td class="px-4 py-4 text-center"><span class="font-bold text-brand-600">15%</span></td>
+                <td class="px-4 py-4 text-center"><span class="bg-blue-50 text-blue-700 text-xs font-semibold px-2 py-0.5 rounded">5%</span></td>
+                <td class="px-4 py-4">
+                  <div class="flex flex-wrap gap-1">
+                    <span class="text-[10px] bg-green-50 text-green-700 px-1.5 py-0.5 rounded font-medium">Size*</span>
+                    <span class="text-[10px] bg-green-50 text-green-700 px-1.5 py-0.5 rounded font-medium">Color*</span>
+                    <span class="text-[10px] bg-green-50 text-green-700 px-1.5 py-0.5 rounded font-medium">Material*</span>
+                    <span class="text-[10px] bg-gray-100 text-gray-600 px-1.5 py-0.5 rounded">Pattern</span>
+                    <span class="text-[10px] bg-gray-100 text-gray-600 px-1.5 py-0.5 rounded">Fit</span>
+                  </div>
+                </td>
+                <td class="px-4 py-4">
+                  <p class="text-xs text-gray-600">Min 4 images</p>
+                  <p class="text-xs text-gray-600">Size chart required</p>
+                  <p class="text-xs text-gray-600">Model photo preferred</p>
+                </td>
+                <td class="px-4 py-4 text-center"><span class="text-xs font-semibold text-gray-400">No</span></td>
+                <td class="px-4 py-4">
+                  <p class="text-xs text-gray-700 font-medium">30 days</p>
+                  <p class="text-[10px] text-gray-400">Return & refund</p>
+                </td>
+                <td class="px-4 py-4">
+                  <p class="text-xs text-gray-600">Max 5 kg</p>
+                  <p class="text-[10px] text-gray-400">Standard</p>
+                </td>
+                <td class="px-4 py-4 text-center"><button onclick="editCategoryRules('Fashion')" class="p-1.5 text-gray-400 hover:text-brand-500 hover:bg-brand-50 rounded-md transition" title="Edit Rules"><svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10"/></svg></button></td>
+              </tr>
+              <!-- Home & Living -->
+              <tr class="hover:bg-brand-50/20">
+                <td class="px-5 py-4 font-semibold text-gray-900 sticky left-0 bg-white">Home & Living</td>
+                <td class="px-4 py-4 text-center"><span class="font-bold text-brand-600">12%</span></td>
+                <td class="px-4 py-4 text-center"><span class="bg-blue-50 text-blue-700 text-xs font-semibold px-2 py-0.5 rounded">18%</span></td>
+                <td class="px-4 py-4">
+                  <div class="flex flex-wrap gap-1">
+                    <span class="text-[10px] bg-green-50 text-green-700 px-1.5 py-0.5 rounded font-medium">Dimensions*</span>
+                    <span class="text-[10px] bg-green-50 text-green-700 px-1.5 py-0.5 rounded font-medium">Material*</span>
+                    <span class="text-[10px] bg-green-50 text-green-700 px-1.5 py-0.5 rounded font-medium">Weight*</span>
+                    <span class="text-[10px] bg-gray-100 text-gray-600 px-1.5 py-0.5 rounded">Assembly</span>
+                  </div>
+                </td>
+                <td class="px-4 py-4">
+                  <p class="text-xs text-gray-600">Min 5 images</p>
+                  <p class="text-xs text-gray-600">Dimensions in listing</p>
+                  <p class="text-xs text-gray-600">Assembly info if needed</p>
+                </td>
+                <td class="px-4 py-4 text-center"><span class="text-xs font-semibold text-gray-400">No</span></td>
+                <td class="px-4 py-4">
+                  <p class="text-xs text-gray-700 font-medium">7 days</p>
+                  <p class="text-[10px] text-gray-400">Replacement only</p>
+                </td>
+                <td class="px-4 py-4">
+                  <p class="text-xs text-gray-600">Max 50 kg</p>
+                  <p class="text-[10px] text-gray-400">Heavy/bulky surcharge</p>
+                </td>
+                <td class="px-4 py-4 text-center"><button onclick="editCategoryRules('Home & Living')" class="p-1.5 text-gray-400 hover:text-brand-500 hover:bg-brand-50 rounded-md transition" title="Edit Rules"><svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10"/></svg></button></td>
+              </tr>
+              <!-- Beauty -->
+              <tr class="hover:bg-brand-50/20">
+                <td class="px-5 py-4 font-semibold text-gray-900 sticky left-0 bg-white">Beauty & Personal Care</td>
+                <td class="px-4 py-4 text-center"><span class="font-bold text-brand-600">5%</span></td>
+                <td class="px-4 py-4 text-center"><span class="bg-blue-50 text-blue-700 text-xs font-semibold px-2 py-0.5 rounded">18%</span></td>
+                <td class="px-4 py-4">
+                  <div class="flex flex-wrap gap-1">
+                    <span class="text-[10px] bg-green-50 text-green-700 px-1.5 py-0.5 rounded font-medium">Ingredients*</span>
+                    <span class="text-[10px] bg-green-50 text-green-700 px-1.5 py-0.5 rounded font-medium">Expiry*</span>
+                    <span class="text-[10px] bg-green-50 text-green-700 px-1.5 py-0.5 rounded font-medium">Mfg Date*</span>
+                    <span class="text-[10px] bg-gray-100 text-gray-600 px-1.5 py-0.5 rounded">Skin Type</span>
+                  </div>
+                </td>
+                <td class="px-4 py-4">
+                  <p class="text-xs text-gray-600">Min 3 images</p>
+                  <p class="text-xs text-gray-600">Ingredient list required</p>
+                  <p class="text-xs text-gray-600">No misleading claims</p>
+                </td>
+                <td class="px-4 py-4 text-center">
+                  <span class="inline-flex items-center gap-1 text-xs font-semibold text-amber-700 bg-amber-50 px-2 py-0.5 rounded-full">
+                    <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z"/></svg>Gated
+                  </span>
+                  <p class="text-[10px] text-amber-600 mt-1">CDSCO license</p>
+                </td>
+                <td class="px-4 py-4">
+                  <p class="text-xs text-gray-700 font-medium">Non-returnable</p>
+                  <p class="text-[10px] text-gray-400">Hygiene policy</p>
+                </td>
+                <td class="px-4 py-4">
+                  <p class="text-xs text-gray-600">Max 10 kg</p>
+                  <p class="text-[10px] text-gray-400">Leak-proof packaging</p>
+                </td>
+                <td class="px-4 py-4 text-center"><button onclick="editCategoryRules('Beauty & Personal Care')" class="p-1.5 text-gray-400 hover:text-brand-500 hover:bg-brand-50 rounded-md transition" title="Edit Rules"><svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10"/></svg></button></td>
+              </tr>
+              <!-- Grocery -->
+              <tr class="hover:bg-brand-50/20">
+                <td class="px-5 py-4 font-semibold text-gray-900 sticky left-0 bg-white">Grocery & Gourmet</td>
+                <td class="px-4 py-4 text-center"><span class="font-bold text-brand-600">4%</span></td>
+                <td class="px-4 py-4 text-center"><span class="bg-blue-50 text-blue-700 text-xs font-semibold px-2 py-0.5 rounded">5%</span></td>
+                <td class="px-4 py-4">
+                  <div class="flex flex-wrap gap-1">
+                    <span class="text-[10px] bg-green-50 text-green-700 px-1.5 py-0.5 rounded font-medium">FSSAI No.*</span>
+                    <span class="text-[10px] bg-green-50 text-green-700 px-1.5 py-0.5 rounded font-medium">Expiry*</span>
+                    <span class="text-[10px] bg-green-50 text-green-700 px-1.5 py-0.5 rounded font-medium">Net Qty*</span>
+                    <span class="text-[10px] bg-green-50 text-green-700 px-1.5 py-0.5 rounded font-medium">Nutritional Info*</span>
+                  </div>
+                </td>
+                <td class="px-4 py-4">
+                  <p class="text-xs text-gray-600">Min 3 images</p>
+                  <p class="text-xs text-gray-600">FSSAI badge on image</p>
+                  <p class="text-xs text-gray-600">Allergen info mandatory</p>
+                </td>
+                <td class="px-4 py-4 text-center">
+                  <span class="inline-flex items-center gap-1 text-xs font-semibold text-red-700 bg-red-50 px-2 py-0.5 rounded-full">
+                    <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z"/></svg>Restricted
+                  </span>
+                  <p class="text-[10px] text-red-600 mt-1">FSSAI license required</p>
+                </td>
+                <td class="px-4 py-4">
+                  <p class="text-xs text-gray-700 font-medium">Non-returnable</p>
+                  <p class="text-[10px] text-gray-400">Perishable goods</p>
+                </td>
+                <td class="px-4 py-4">
+                  <p class="text-xs text-gray-600">Max 15 kg</p>
+                  <p class="text-[10px] text-red-500 font-medium">Cold chain for perishable</p>
+                  <p class="text-[10px] text-gray-400">Same-day if local</p>
+                </td>
+                <td class="px-4 py-4 text-center"><button onclick="editCategoryRules('Grocery & Gourmet')" class="p-1.5 text-gray-400 hover:text-brand-500 hover:bg-brand-50 rounded-md transition" title="Edit Rules"><svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10"/></svg></button></td>
+              </tr>
+              <!-- Health -->
+              <tr class="hover:bg-brand-50/20">
+                <td class="px-5 py-4 font-semibold text-gray-900 sticky left-0 bg-white">Health & Wellness</td>
+                <td class="px-4 py-4 text-center"><span class="font-bold text-brand-600">6%</span></td>
+                <td class="px-4 py-4 text-center"><span class="bg-blue-50 text-blue-700 text-xs font-semibold px-2 py-0.5 rounded">12%</span></td>
+                <td class="px-4 py-4">
+                  <div class="flex flex-wrap gap-1">
+                    <span class="text-[10px] bg-green-50 text-green-700 px-1.5 py-0.5 rounded font-medium">Composition*</span>
+                    <span class="text-[10px] bg-green-50 text-green-700 px-1.5 py-0.5 rounded font-medium">Dosage*</span>
+                    <span class="text-[10px] bg-green-50 text-green-700 px-1.5 py-0.5 rounded font-medium">Expiry*</span>
+                    <span class="text-[10px] bg-gray-100 text-gray-600 px-1.5 py-0.5 rounded">Usage</span>
+                  </div>
+                </td>
+                <td class="px-4 py-4">
+                  <p class="text-xs text-gray-600">Min 3 images</p>
+                  <p class="text-xs text-gray-600">No medical claims</p>
+                  <p class="text-xs text-gray-600">Disclaimer required</p>
+                </td>
+                <td class="px-4 py-4 text-center">
+                  <span class="inline-flex items-center gap-1 text-xs font-semibold text-red-700 bg-red-50 px-2 py-0.5 rounded-full">
+                    <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z"/></svg>Restricted
+                  </span>
+                  <p class="text-[10px] text-red-600 mt-1">Drug license / AYUSH</p>
+                </td>
+                <td class="px-4 py-4">
+                  <p class="text-xs text-gray-700 font-medium">Non-returnable</p>
+                  <p class="text-[10px] text-gray-400">Safety policy</p>
+                </td>
+                <td class="px-4 py-4">
+                  <p class="text-xs text-gray-600">Max 10 kg</p>
+                  <p class="text-[10px] text-gray-400">Temperature controlled</p>
+                </td>
+                <td class="px-4 py-4 text-center"><button onclick="editCategoryRules('Health & Wellness')" class="p-1.5 text-gray-400 hover:text-brand-500 hover:bg-brand-50 rounded-md transition" title="Edit Rules"><svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10"/></svg></button></td>
+              </tr>
+              <!-- Sports -->
+              <tr class="hover:bg-brand-50/20">
+                <td class="px-5 py-4 font-semibold text-gray-900 sticky left-0 bg-white">Sports & Fitness</td>
+                <td class="px-4 py-4 text-center"><span class="font-bold text-brand-600">10%</span></td>
+                <td class="px-4 py-4 text-center"><span class="bg-blue-50 text-blue-700 text-xs font-semibold px-2 py-0.5 rounded">18%</span></td>
+                <td class="px-4 py-4">
+                  <div class="flex flex-wrap gap-1">
+                    <span class="text-[10px] bg-green-50 text-green-700 px-1.5 py-0.5 rounded font-medium">Sport Type*</span>
+                    <span class="text-[10px] bg-green-50 text-green-700 px-1.5 py-0.5 rounded font-medium">Size*</span>
+                    <span class="text-[10px] bg-gray-100 text-gray-600 px-1.5 py-0.5 rounded">Weight</span>
+                    <span class="text-[10px] bg-gray-100 text-gray-600 px-1.5 py-0.5 rounded">Level</span>
+                  </div>
+                </td>
+                <td class="px-4 py-4">
+                  <p class="text-xs text-gray-600">Min 4 images</p>
+                  <p class="text-xs text-gray-600">Usage instructions</p>
+                </td>
+                <td class="px-4 py-4 text-center"><span class="text-xs font-semibold text-gray-400">No</span></td>
+                <td class="px-4 py-4">
+                  <p class="text-xs text-gray-700 font-medium">10 days</p>
+                  <p class="text-[10px] text-gray-400">Unused, tags attached</p>
+                </td>
+                <td class="px-4 py-4">
+                  <p class="text-xs text-gray-600">Max 30 kg</p>
+                  <p class="text-[10px] text-gray-400">Oversized surcharge &gt;20kg</p>
+                </td>
+                <td class="px-4 py-4 text-center"><button onclick="editCategoryRules('Sports & Fitness')" class="p-1.5 text-gray-400 hover:text-brand-500 hover:bg-brand-50 rounded-md transition" title="Edit Rules"><svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10"/></svg></button></td>
+              </tr>
+              <!-- Books -->
+              <tr class="hover:bg-brand-50/20">
+                <td class="px-5 py-4 font-semibold text-gray-900 sticky left-0 bg-white">Books</td>
+                <td class="px-4 py-4 text-center"><span class="font-bold text-brand-600">3%</span></td>
+                <td class="px-4 py-4 text-center"><span class="bg-green-50 text-green-700 text-xs font-semibold px-2 py-0.5 rounded">0%</span></td>
+                <td class="px-4 py-4">
+                  <div class="flex flex-wrap gap-1">
+                    <span class="text-[10px] bg-green-50 text-green-700 px-1.5 py-0.5 rounded font-medium">ISBN*</span>
+                    <span class="text-[10px] bg-green-50 text-green-700 px-1.5 py-0.5 rounded font-medium">Author*</span>
+                    <span class="text-[10px] bg-green-50 text-green-700 px-1.5 py-0.5 rounded font-medium">Publisher*</span>
+                    <span class="text-[10px] bg-green-50 text-green-700 px-1.5 py-0.5 rounded font-medium">Language*</span>
+                  </div>
+                </td>
+                <td class="px-4 py-4">
+                  <p class="text-xs text-gray-600">Min 1 image (cover)</p>
+                  <p class="text-xs text-gray-600">ISBN mandatory</p>
+                </td>
+                <td class="px-4 py-4 text-center"><span class="text-xs font-semibold text-gray-400">No</span></td>
+                <td class="px-4 py-4">
+                  <p class="text-xs text-gray-700 font-medium">10 days</p>
+                  <p class="text-[10px] text-gray-400">Undamaged only</p>
+                </td>
+                <td class="px-4 py-4">
+                  <p class="text-xs text-gray-600">Max 10 kg</p>
+                  <p class="text-[10px] text-gray-400">Standard</p>
+                </td>
+                <td class="px-4 py-4 text-center"><button onclick="editCategoryRules('Books')" class="p-1.5 text-gray-400 hover:text-brand-500 hover:bg-brand-50 rounded-md transition" title="Edit Rules"><svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10"/></svg></button></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <!-- Legend -->
+        <div class="px-6 py-3 border-t border-gray-100 flex items-center gap-4 text-[10px] text-gray-400">
+          <span><span class="inline-block w-2 h-2 bg-green-200 rounded mr-1"></span> * = Required attribute</span>
+          <span><span class="inline-block w-2 h-2 bg-gray-200 rounded mr-1"></span> Optional attribute</span>
+          <span><svg class="w-3 h-3 inline text-amber-500 mr-0.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z"/></svg> Gated = needs approval before listing</span>
+          <span><svg class="w-3 h-3 inline text-red-500 mr-0.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z"/></svg> Restricted = license/certification required</span>
+        </div>
+      </div>
+
+    </main>
+  </div>
+
+  <!-- ===== ADD CATEGORY MODAL ===== -->
+  <div id="addCategoryModal" class="fixed inset-0 z-[100] hidden items-center justify-center bg-black/40 backdrop-blur-sm">
+    <div class="relative w-full max-w-lg mx-4 bg-white rounded-2xl shadow-2xl overflow-hidden">
+      <div class="flex items-center justify-between px-6 py-4 border-b border-gray-100 bg-gray-50">
+        <h3 id="modalTitle" class="text-lg font-bold text-gray-900">Add New Category</h3>
+        <button onclick="closeAddCategoryModal()" class="p-1.5 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M6 18L18 6M6 6l12 12"/></svg>
+        </button>
+      </div>
+      <div class="px-6 py-5 space-y-4 max-h-[70vh] overflow-y-auto">
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1.5">Category Name *</label>
+          <input type="text" id="catName" placeholder="e.g. Smartphones" class="w-full border border-gray-200 rounded-lg py-2.5 px-4 text-sm outline-none focus:border-brand-400 focus:ring-2 focus:ring-brand-100 transition">
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1.5">Parent Category</label>
+          <select id="catParent" class="w-full border border-gray-200 rounded-lg py-2.5 px-4 text-sm outline-none focus:border-brand-400 focus:ring-2 focus:ring-brand-100 transition bg-white">
+            <option value="">None (Root Category)</option>
+            <option value="electronics">Electronics</option>
+            <option value="mobile-phones">Electronics > Mobile Phones</option>
+            <option value="audio">Electronics > Audio</option>
+            <option value="fashion">Fashion</option>
+            <option value="home-living">Home & Living</option>
+            <option value="beauty">Beauty & Personal Care</option>
+            <option value="grocery">Grocery & Gourmet</option>
+            <option value="health">Health & Wellness</option>
+            <option value="sports">Sports & Fitness</option>
+            <option value="books">Books</option>
+          </select>
+        </div>
+        <div class="grid grid-cols-2 gap-4">
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1.5">Commission Rate *</label>
+            <div class="relative"><input type="number" id="catCommission" placeholder="8" class="w-full border border-gray-200 rounded-lg py-2.5 px-4 pr-8 text-sm outline-none focus:border-brand-400 focus:ring-2 focus:ring-brand-100 transition"><span class="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-gray-400">%</span></div>
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1.5">GST Rate *</label>
+            <select class="w-full border border-gray-200 rounded-lg py-2.5 px-4 text-sm outline-none focus:border-brand-400 transition bg-white">
+              <option>0% (Exempt)</option>
+              <option>5%</option>
+              <option>12%</option>
+              <option selected>18%</option>
+              <option>28%</option>
+            </select>
+          </div>
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1.5">HSN Code *</label>
+          <input type="text" placeholder="e.g. 8517" class="w-full border border-gray-200 rounded-lg py-2.5 px-4 text-sm outline-none focus:border-brand-400 focus:ring-2 focus:ring-brand-100 transition font-mono">
+        </div>
+        <div class="grid grid-cols-2 gap-4">
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1.5">Return Policy</label>
+            <select class="w-full border border-gray-200 rounded-lg py-2.5 px-4 text-sm outline-none focus:border-brand-400 transition bg-white">
+              <option>7 days - Replacement</option>
+              <option selected>10 days - Replacement</option>
+              <option>30 days - Return & Refund</option>
+              <option>Non-returnable</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1.5">Max Shipping Weight</label>
+            <div class="relative"><input type="number" placeholder="25" class="w-full border border-gray-200 rounded-lg py-2.5 px-4 pr-8 text-sm outline-none focus:border-brand-400 focus:ring-2 focus:ring-brand-100 transition"><span class="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-gray-400">kg</span></div>
+          </div>
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1.5">Listing Restrictions</label>
+          <select class="w-full border border-gray-200 rounded-lg py-2.5 px-4 text-sm outline-none focus:border-brand-400 transition bg-white">
+            <option selected>Open — any seller can list</option>
+            <option>Gated — needs admin approval</option>
+            <option>Restricted — requires license/certification upload</option>
+          </select>
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1.5">Listing Rules</label>
+          <div class="grid grid-cols-3 gap-3">
+            <div><label class="text-xs text-gray-500">Min Images</label><input type="number" value="3" class="w-full border border-gray-200 rounded-lg py-2 px-3 text-sm outline-none focus:border-brand-400 transition mt-1"></div>
+            <div><label class="text-xs text-gray-500">Min Description</label><input type="number" value="100" class="w-full border border-gray-200 rounded-lg py-2 px-3 text-sm outline-none focus:border-brand-400 transition mt-1"><span class="text-[10px] text-gray-400">chars</span></div>
+            <div><label class="text-xs text-gray-500">EAN/UPC</label><select class="w-full border border-gray-200 rounded-lg py-2 px-3 text-sm outline-none focus:border-brand-400 transition bg-white mt-1"><option>Optional</option><option>Required</option></select></div>
+          </div>
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1.5">Description</label>
+          <textarea id="catDesc" rows="2" placeholder="Brief description of the category" class="w-full border border-gray-200 rounded-lg py-2.5 px-4 text-sm outline-none focus:border-brand-400 focus:ring-2 focus:ring-brand-100 transition resize-none"></textarea>
+        </div>
+      </div>
+      <div class="flex justify-end gap-3 px-6 py-4 border-t border-gray-100 bg-gray-50">
+        <button onclick="closeAddCategoryModal()" class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 transition">Cancel</button>
+        <button id="modalSaveBtn" onclick="saveCategory()" class="px-5 py-2 text-sm font-semibold text-white bg-brand-500 rounded-lg hover:bg-brand-600 transition">Save Category</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== JAVASCRIPT ===== -->
+  <script>
+    function toggleTree(btn) {
+      var svg = btn.querySelector('svg');
+      var node = btn.closest('.tree-node');
+      var children = node.querySelector('.tree-children');
+      if (!children) return;
+      children.classList.toggle('collapsed');
+      svg.style.transform = children.classList.contains('collapsed') ? 'rotate(-90deg)' : 'rotate(0deg)';
+    }
+
+    var editingCategory = null;
+
+    function editCategoryRules(name) {
+      editingCategory = name;
+      document.getElementById('catName').value = name;
+      document.getElementById('modalTitle').textContent = 'Edit Rules: ' + name;
+      document.getElementById('modalSaveBtn').textContent = 'Save Changes';
+      openAddCategoryModal();
+    }
+
+    function editCategory(name) {
+      editingCategory = name;
+      // Pre-fill modal with category data
+      document.getElementById('catName').value = name;
+      document.getElementById('modalTitle').textContent = 'Edit Category: ' + name;
+      document.getElementById('modalSaveBtn').textContent = 'Save Changes';
+      openAddCategoryModal();
+    }
+
+    function deleteCategory(name) {
+      if (confirm('Are you sure you want to delete "' + name + '"?\n\nThis will also affect all child categories and products.')) {
+        alert('Category "' + name + '" deleted successfully.');
+      }
+    }
+
+    function openAddCategoryModal() {
+      if (!editingCategory) {
+        document.getElementById('catName').value = '';
+        document.getElementById('modalTitle').textContent = 'Add New Category';
+        document.getElementById('modalSaveBtn').textContent = 'Save Category';
+      }
+      var modal = document.getElementById('addCategoryModal');
+      modal.classList.remove('hidden');
+      modal.classList.add('flex');
+    }
+
+    function closeAddCategoryModal() {
+      var modal = document.getElementById('addCategoryModal');
+      modal.classList.add('hidden');
+      modal.classList.remove('flex');
+      editingCategory = null;
+    }
+
+    function saveCategory() {
+      var name = document.getElementById('catName').value.trim();
+      var parent = document.getElementById('catParent').value;
+      if (!name) { alert('Please enter a category name.'); return; }
+      if (editingCategory) {
+        alert('Category "' + editingCategory + '" updated to "' + name + '" successfully!');
+      } else {
+        alert('Category "' + name + '" created successfully!' + (parent ? '\nParent: ' + parent : '\nAs root category'));
+      }
+      closeAddCategoryModal();
+    }
+
+    document.getElementById('addCategoryModal').addEventListener('click', function(e) {
+      if (e.target === this) closeAddCategoryModal();
+    });
+
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape') closeAddCategoryModal();
+    });
+
+    function filterCategories(filter, btn) {
+      document.querySelectorAll('.filter-tab').forEach(function(t) {
+        t.classList.remove('active', 'text-brand-500', 'border-brand-500');
+        t.classList.add('text-gray-500', 'border-transparent');
+      });
+      btn.classList.add('active', 'text-brand-500', 'border-brand-500');
+      btn.classList.remove('text-gray-500', 'border-transparent');
+
+      var nodes = document.querySelectorAll('.tree-node[data-status]');
+      nodes.forEach(function(node) {
+        var status = node.getAttribute('data-status');
+        if (filter === 'all') {
+          node.style.display = '';
+        } else if (filter === 'active' && status === 'active') {
+          node.style.display = '';
+        } else if (filter === 'inactive' && status === 'inactive') {
+          node.style.display = '';
+        } else {
+          node.style.display = 'none';
+        }
+      });
+    }
+  </script>
+
+  <script src="../shared-layout.js"></script>
+  <script>renderAdminLayout('categories', '../');</script>
+
+</body>
+</html>

@@ -1,0 +1,633 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HomeBase — Reports</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              50: '#FFF7ED',
+              100: '#FFEDD5',
+              200: '#FED7AA',
+              300: '#FDBA74',
+              400: '#FB923C',
+              500: '#F97316',
+              600: '#EA580C',
+              700: '#C2410C',
+            },
+            navy: {
+              700: '#1E3A5F',
+              800: '#152238',
+              900: '#0A1628',
+            },
+            success: '#16A34A',
+            warning: '#EAB308',
+            danger: '#DC2626',
+          },
+          fontFamily: {
+            sans: ['Inter', 'system-ui', 'sans-serif'],
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+    .scrollbar-hide::-webkit-scrollbar { display: none; }
+    .sidebar-link { transition: all 0.15s ease; }
+    .sidebar-link:hover { background: rgba(255,255,255,0.08); }
+    .sidebar-link.active { background: rgba(249,115,22,0.15); border-right: 3px solid #F97316; }
+    .stat-card { transition: all 0.2s ease; }
+    .stat-card:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,0.08); }
+    .table-row { transition: background 0.15s ease; }
+    .table-row:hover { background: #FFF7ED; }
+    .filter-tab { transition: all 0.15s ease; }
+    .filter-tab.active { color: #F97316; border-color: #F97316; }
+    .filter-tab:hover:not(.active) { color: #374151; border-color: #D1D5DB; }
+    .dropdown-menu { display: none; }
+    .dropdown:hover .dropdown-menu { display: block; }
+    .sidebar-scroll::-webkit-scrollbar { width: 4px; }
+    .sidebar-scroll::-webkit-scrollbar-track { background: transparent; }
+    .sidebar-scroll::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); border-radius: 2px; }
+    .report-card { transition: all 0.2s ease; }
+    .report-card:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,0.08); border-color: #FB923C; }
+  </style>
+</head>
+<body class="font-sans bg-gray-50 text-gray-900">
+
+  <!-- ===== TOP HEADER BAR ===== -->
+  <header id="admin-header" class="fixed top-0 left-0 right-0 z-50 bg-white border-b border-gray-200 h-16"></header>
+
+  <!-- ===== LAYOUT: SIDEBAR + MAIN ===== -->
+  <div class="flex pt-16 min-h-screen">
+
+    <!-- ===== LEFT SIDEBAR ===== -->
+    <aside id="admin-sidebar" class="fixed left-0 top-16 bottom-0 w-60 z-40 flex flex-col overflow-y-auto" style="background:#0A1628;"></aside>
+
+    <!-- ===== MAIN CONTENT ===== -->
+    <main class="flex-1 ml-60 p-6 lg:p-8">
+
+      <!-- Page Header -->
+      <div class="flex items-center justify-between mb-8">
+        <div>
+          <h1 class="text-2xl font-bold text-gray-900">Reports</h1>
+          <p class="text-sm text-gray-500 mt-1">Generate, schedule, and download platform reports</p>
+        </div>
+        <div class="flex items-center gap-3">
+          <button onclick="openGenerateModal()" class="flex items-center gap-2 bg-brand-500 text-white rounded-lg px-4 py-2.5 text-sm font-semibold hover:bg-brand-600 transition shadow-sm">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m2.25 0H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z"/></svg>
+            Generate Report
+          </button>
+        </div>
+      </div>
+
+      <!-- Report Cards Grid (2x3) -->
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 mb-8">
+
+        <!-- Sales Report -->
+        <div class="report-card bg-white rounded-xl border border-gray-100 p-6 shadow-sm cursor-pointer" onclick="openGenerateModalFor('Sales Report')">
+          <div class="flex items-start justify-between mb-4">
+            <div class="w-12 h-12 rounded-xl bg-green-50 flex items-center justify-center">
+              <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M2.25 18.75a60.07 60.07 0 0115.797 2.101c.727.198 1.453-.342 1.453-1.096V18.75M3.75 4.5v.75A.75.75 0 013 6h-.75m0 0v-.375c0-.621.504-1.125 1.125-1.125H20.25M2.25 6v9m18-10.5v.75c0 .414.336.75.75.75h.75m-1.5-1.5h.375c.621 0 1.125.504 1.125 1.125v9.75c0 .621-.504 1.125-1.125 1.125h-.375m1.5-1.5H21a.75.75 0 00-.75.75v.75m0 0H3.75m0 0h-.375a1.125 1.125 0 01-1.125-1.125V15m1.5 1.5v-.75A.75.75 0 003 15h-.75M15 10.5a3 3 0 11-6 0 3 3 0 016 0zm3 0h.008v.008H18V10.5zm-12 0h.008v.008H6V10.5z"/></svg>
+            </div>
+            <span class="inline-flex items-center px-2 py-0.5 bg-green-50 text-green-700 text-[10px] font-bold rounded-full uppercase">Popular</span>
+          </div>
+          <h3 class="text-base font-bold text-gray-900 mb-1">Sales Report</h3>
+          <p class="text-sm text-gray-500 mb-4">Revenue, orders, GMV breakdown by period, category, and seller with trend analysis.</p>
+          <div class="flex items-center justify-between">
+            <button onclick="event.stopPropagation(); openGenerateModalFor('Sales Report')" class="flex items-center gap-1.5 bg-brand-500 text-white rounded-lg px-3.5 py-2 text-xs font-semibold hover:bg-brand-600 transition">
+              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m2.25 0H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z"/></svg>
+              Generate
+            </button>
+            <span class="text-[11px] text-gray-400">Last: Mar 25, 2026</span>
+          </div>
+        </div>
+
+        <!-- Seller Performance -->
+        <div class="report-card bg-white rounded-xl border border-gray-100 p-6 shadow-sm cursor-pointer" onclick="openGenerateModalFor('Seller Performance')">
+          <div class="flex items-start justify-between mb-4">
+            <div class="w-12 h-12 rounded-xl bg-blue-50 flex items-center justify-center">
+              <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M13.5 21v-7.5a.75.75 0 01.75-.75h3a.75.75 0 01.75.75V21m-4.5 0H2.36m11.14 0H18m0 0h3.64m-1.39 0V9.349m-16.5 11.65V9.35m0 0a3.001 3.001 0 003.75-.615A2.993 2.993 0 009.75 9.75c.896 0 1.7-.393 2.25-1.016a2.993 2.993 0 002.25 1.016c.896 0 1.7-.393 2.25-1.016A3.001 3.001 0 0021 9.349m-18 0a2.993 2.993 0 00.397-1.599A3 3 0 016 4.5h12a3 3 0 012.603 3.25 2.993 2.993 0 00.397 1.599"/></svg>
+            </div>
+          </div>
+          <h3 class="text-base font-bold text-gray-900 mb-1">Seller Performance</h3>
+          <p class="text-sm text-gray-500 mb-4">Individual seller metrics: order fulfillment, returns, ratings, SLA compliance, and revenue.</p>
+          <div class="flex items-center justify-between">
+            <button onclick="event.stopPropagation(); openGenerateModalFor('Seller Performance')" class="flex items-center gap-1.5 bg-brand-500 text-white rounded-lg px-3.5 py-2 text-xs font-semibold hover:bg-brand-600 transition">
+              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m2.25 0H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z"/></svg>
+              Generate
+            </button>
+            <span class="text-[11px] text-gray-400">Last: Mar 22, 2026</span>
+          </div>
+        </div>
+
+        <!-- Tax Report -->
+        <div class="report-card bg-white rounded-xl border border-gray-100 p-6 shadow-sm cursor-pointer" onclick="openGenerateModalFor('Tax Report (GSTR-1/3B)')">
+          <div class="flex items-start justify-between mb-4">
+            <div class="w-12 h-12 rounded-xl bg-purple-50 flex items-center justify-center">
+              <svg class="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M15 8.25H9m6 3H9m3 6l-3-3h1.5a3 3 0 100-6M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+            </div>
+            <span class="inline-flex items-center px-2 py-0.5 bg-purple-50 text-purple-700 text-[10px] font-bold rounded-full uppercase">Compliance</span>
+          </div>
+          <h3 class="text-base font-bold text-gray-900 mb-1">Tax Report (GSTR-1/3B)</h3>
+          <p class="text-sm text-gray-500 mb-4">GST-compliant tax reports for filing. GSTR-1 outward supplies and GSTR-3B summary returns.</p>
+          <div class="flex items-center justify-between">
+            <button onclick="event.stopPropagation(); openGenerateModalFor('Tax Report (GSTR-1/3B)')" class="flex items-center gap-1.5 bg-brand-500 text-white rounded-lg px-3.5 py-2 text-xs font-semibold hover:bg-brand-600 transition">
+              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m2.25 0H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z"/></svg>
+              Generate
+            </button>
+            <span class="text-[11px] text-gray-400">Last: Mar 20, 2026</span>
+          </div>
+        </div>
+
+        <!-- Inventory Report -->
+        <div class="report-card bg-white rounded-xl border border-gray-100 p-6 shadow-sm cursor-pointer" onclick="openGenerateModalFor('Inventory Report')">
+          <div class="flex items-start justify-between mb-4">
+            <div class="w-12 h-12 rounded-xl bg-amber-50 flex items-center justify-center">
+              <svg class="w-6 h-6 text-amber-600" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M20.25 7.5l-.625 10.632a2.25 2.25 0 01-2.247 2.118H6.622a2.25 2.25 0 01-2.247-2.118L3.75 7.5M10 11.25h4M3.375 7.5h17.25c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125z"/></svg>
+            </div>
+          </div>
+          <h3 class="text-base font-bold text-gray-900 mb-1">Inventory Report</h3>
+          <p class="text-sm text-gray-500 mb-4">Stock levels, low inventory alerts, dead stock identification, and warehouse utilization.</p>
+          <div class="flex items-center justify-between">
+            <button onclick="event.stopPropagation(); openGenerateModalFor('Inventory Report')" class="flex items-center gap-1.5 bg-brand-500 text-white rounded-lg px-3.5 py-2 text-xs font-semibold hover:bg-brand-600 transition">
+              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m2.25 0H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z"/></svg>
+              Generate
+            </button>
+            <span class="text-[11px] text-gray-400">Last: Mar 18, 2026</span>
+          </div>
+        </div>
+
+        <!-- Financial Reconciliation -->
+        <div class="report-card bg-white rounded-xl border border-gray-100 p-6 shadow-sm cursor-pointer" onclick="openGenerateModalFor('Financial Reconciliation')">
+          <div class="flex items-start justify-between mb-4">
+            <div class="w-12 h-12 rounded-xl bg-red-50 flex items-center justify-center">
+              <svg class="w-6 h-6 text-red-600" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 013 19.875v-6.75zM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v11.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V8.625zM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v15.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V4.125z"/></svg>
+            </div>
+            <span class="inline-flex items-center px-2 py-0.5 bg-red-50 text-red-700 text-[10px] font-bold rounded-full uppercase">Finance</span>
+          </div>
+          <h3 class="text-base font-bold text-gray-900 mb-1">Financial Reconciliation</h3>
+          <p class="text-sm text-gray-500 mb-4">Payment gateway reconciliation, settlement summaries, commission tracking, and refund ledger.</p>
+          <div class="flex items-center justify-between">
+            <button onclick="event.stopPropagation(); openGenerateModalFor('Financial Reconciliation')" class="flex items-center gap-1.5 bg-brand-500 text-white rounded-lg px-3.5 py-2 text-xs font-semibold hover:bg-brand-600 transition">
+              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m2.25 0H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z"/></svg>
+              Generate
+            </button>
+            <span class="text-[11px] text-gray-400">Last: Mar 15, 2026</span>
+          </div>
+        </div>
+
+        <!-- Customer Analytics -->
+        <div class="report-card bg-white rounded-xl border border-gray-100 p-6 shadow-sm cursor-pointer" onclick="openGenerateModalFor('Customer Analytics')">
+          <div class="flex items-start justify-between mb-4">
+            <div class="w-12 h-12 rounded-xl bg-cyan-50 flex items-center justify-center">
+              <svg class="w-6 h-6 text-cyan-600" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M15 19.128a9.38 9.38 0 002.625.372 9.337 9.337 0 004.121-.952 4.125 4.125 0 00-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 018.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0111.964-3.07M12 6.375a3.375 3.375 0 11-6.75 0 3.375 3.375 0 016.75 0zm8.25 2.25a2.625 2.625 0 11-5.25 0 2.625 2.625 0 015.25 0z"/></svg>
+            </div>
+          </div>
+          <h3 class="text-base font-bold text-gray-900 mb-1">Customer Analytics</h3>
+          <p class="text-sm text-gray-500 mb-4">User acquisition, retention cohorts, LTV analysis, geographic distribution, and behavior funnels.</p>
+          <div class="flex items-center justify-between">
+            <button onclick="event.stopPropagation(); openGenerateModalFor('Customer Analytics')" class="flex items-center gap-1.5 bg-brand-500 text-white rounded-lg px-3.5 py-2 text-xs font-semibold hover:bg-brand-600 transition">
+              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m2.25 0H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z"/></svg>
+              Generate
+            </button>
+            <span class="text-[11px] text-gray-400">Last: Mar 24, 2026</span>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Scheduled Reports -->
+      <div class="bg-white rounded-xl border border-gray-100 shadow-sm mb-8">
+        <div class="flex items-center justify-between px-6 pt-5 pb-0">
+          <div class="flex items-center gap-0 border-b border-gray-200 -mb-px">
+            <button class="filter-tab active text-sm font-semibold px-4 pb-3 border-b-2 border-brand-500 text-brand-500" onclick="filterScheduled('all', this)">All Scheduled <span class="ml-1 bg-gray-100 text-gray-600 text-[11px] font-bold px-1.5 py-0.5 rounded-full">4</span></button>
+            <button class="filter-tab text-sm font-medium px-4 pb-3 border-b-2 border-transparent text-gray-500" onclick="filterScheduled('active', this)">Active <span class="ml-1 bg-green-100 text-green-700 text-[11px] font-bold px-1.5 py-0.5 rounded-full">3</span></button>
+            <button class="filter-tab text-sm font-medium px-4 pb-3 border-b-2 border-transparent text-gray-500" onclick="filterScheduled('paused', this)">Paused <span class="ml-1 bg-amber-100 text-amber-700 text-[11px] font-bold px-1.5 py-0.5 rounded-full">1</span></button>
+          </div>
+          <div class="relative mb-3">
+            <button onclick="alert('Create new scheduled report')" class="flex items-center gap-1.5 bg-white border border-gray-200 text-gray-700 text-sm font-medium px-3 py-2 rounded-lg hover:bg-gray-50 transition">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 4.5v15m7.5-7.5h-15"/></svg>
+              Schedule New
+            </button>
+          </div>
+        </div>
+
+        <div class="overflow-x-auto">
+          <table class="w-full">
+            <thead>
+              <tr class="border-b border-gray-100">
+                <th class="text-left text-[11px] font-semibold text-gray-400 uppercase tracking-wider px-6 py-3">Report Name</th>
+                <th class="text-left text-[11px] font-semibold text-gray-400 uppercase tracking-wider px-4 py-3">Frequency</th>
+                <th class="text-left text-[11px] font-semibold text-gray-400 uppercase tracking-wider px-4 py-3">Next Run</th>
+                <th class="text-left text-[11px] font-semibold text-gray-400 uppercase tracking-wider px-4 py-3">Recipient</th>
+                <th class="text-left text-[11px] font-semibold text-gray-400 uppercase tracking-wider px-4 py-3">Status</th>
+                <th class="text-right text-[11px] font-semibold text-gray-400 uppercase tracking-wider px-6 py-3">Actions</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-50">
+              <tr class="table-row">
+                <td class="px-6 py-4">
+                  <div class="flex items-center gap-3">
+                    <div class="w-8 h-8 rounded-lg bg-green-50 flex items-center justify-center">
+                      <svg class="w-4 h-4 text-green-600" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M2.25 18.75a60.07 60.07 0 0115.797 2.101c.727.198 1.453-.342 1.453-1.096V18.75M3.75 4.5v.75A.75.75 0 013 6h-.75m0 0v-.375c0-.621.504-1.125 1.125-1.125H20.25M2.25 6v9m18-10.5v.75c0 .414.336.75.75.75h.75"/></svg>
+                    </div>
+                    <div>
+                      <p class="text-sm font-semibold text-gray-900">Weekly Sales Summary</p>
+                      <p class="text-xs text-gray-400">Sales Report - CSV</p>
+                    </div>
+                  </div>
+                </td>
+                <td class="px-4 py-4"><span class="text-sm text-gray-700">Weekly (Monday)</span></td>
+                <td class="px-4 py-4"><span class="text-sm text-gray-700">Mar 31, 2026</span></td>
+                <td class="px-4 py-4"><span class="text-sm text-gray-600">admin@homebase.in</span></td>
+                <td class="px-4 py-4">
+                  <span class="inline-flex items-center gap-1 px-2.5 py-1 bg-green-50 text-green-700 text-xs font-semibold rounded-full">
+                    <span class="w-1.5 h-1.5 bg-green-500 rounded-full"></span> Active
+                  </span>
+                </td>
+                <td class="px-6 py-4">
+                  <div class="flex items-center justify-end gap-1.5">
+                    <button onclick="editSchedule('Weekly Sales Summary')" class="p-1.5 text-gray-400 hover:text-brand-500 hover:bg-brand-50 rounded-md transition" title="Edit"><svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10"/></svg></button>
+                    <button onclick="toggleSchedule('Weekly Sales Summary')" class="p-1.5 text-gray-400 hover:text-amber-500 hover:bg-amber-50 rounded-md transition" title="Pause"><svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M15.75 5.25v13.5m-7.5-13.5v13.5"/></svg></button>
+                    <button onclick="deleteSchedule('Weekly Sales Summary')" class="p-1.5 text-red-400 hover:text-red-600 hover:bg-red-50 rounded-md transition" title="Delete"><svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0"/></svg></button>
+                  </div>
+                </td>
+              </tr>
+              <tr class="table-row">
+                <td class="px-6 py-4">
+                  <div class="flex items-center gap-3">
+                    <div class="w-8 h-8 rounded-lg bg-purple-50 flex items-center justify-center">
+                      <svg class="w-4 h-4 text-purple-600" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M15 8.25H9m6 3H9m3 6l-3-3h1.5a3 3 0 100-6M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                    </div>
+                    <div>
+                      <p class="text-sm font-semibold text-gray-900">Monthly GSTR-1 Report</p>
+                      <p class="text-xs text-gray-400">Tax Report - Excel</p>
+                    </div>
+                  </div>
+                </td>
+                <td class="px-4 py-4"><span class="text-sm text-gray-700">Monthly (1st)</span></td>
+                <td class="px-4 py-4"><span class="text-sm text-gray-700">Apr 1, 2026</span></td>
+                <td class="px-4 py-4"><span class="text-sm text-gray-600">finance@homebase.in</span></td>
+                <td class="px-4 py-4">
+                  <span class="inline-flex items-center gap-1 px-2.5 py-1 bg-green-50 text-green-700 text-xs font-semibold rounded-full">
+                    <span class="w-1.5 h-1.5 bg-green-500 rounded-full"></span> Active
+                  </span>
+                </td>
+                <td class="px-6 py-4">
+                  <div class="flex items-center justify-end gap-1.5">
+                    <button onclick="editSchedule('Monthly GSTR-1 Report')" class="p-1.5 text-gray-400 hover:text-brand-500 hover:bg-brand-50 rounded-md transition" title="Edit"><svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10"/></svg></button>
+                    <button onclick="toggleSchedule('Monthly GSTR-1 Report')" class="p-1.5 text-gray-400 hover:text-amber-500 hover:bg-amber-50 rounded-md transition" title="Pause"><svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M15.75 5.25v13.5m-7.5-13.5v13.5"/></svg></button>
+                    <button onclick="deleteSchedule('Monthly GSTR-1 Report')" class="p-1.5 text-red-400 hover:text-red-600 hover:bg-red-50 rounded-md transition" title="Delete"><svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0"/></svg></button>
+                  </div>
+                </td>
+              </tr>
+              <tr class="table-row">
+                <td class="px-6 py-4">
+                  <div class="flex items-center gap-3">
+                    <div class="w-8 h-8 rounded-lg bg-blue-50 flex items-center justify-center">
+                      <svg class="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M13.5 21v-7.5a.75.75 0 01.75-.75h3a.75.75 0 01.75.75V21m-4.5 0H2.36m11.14 0H18"/></svg>
+                    </div>
+                    <div>
+                      <p class="text-sm font-semibold text-gray-900">Seller KPI Dashboard</p>
+                      <p class="text-xs text-gray-400">Seller Performance - PDF</p>
+                    </div>
+                  </div>
+                </td>
+                <td class="px-4 py-4"><span class="text-sm text-gray-700">Bi-weekly (Fri)</span></td>
+                <td class="px-4 py-4"><span class="text-sm text-gray-700">Apr 4, 2026</span></td>
+                <td class="px-4 py-4"><span class="text-sm text-gray-600">ops@homebase.in</span></td>
+                <td class="px-4 py-4">
+                  <span class="inline-flex items-center gap-1 px-2.5 py-1 bg-green-50 text-green-700 text-xs font-semibold rounded-full">
+                    <span class="w-1.5 h-1.5 bg-green-500 rounded-full"></span> Active
+                  </span>
+                </td>
+                <td class="px-6 py-4">
+                  <div class="flex items-center justify-end gap-1.5">
+                    <button onclick="editSchedule('Seller KPI Dashboard')" class="p-1.5 text-gray-400 hover:text-brand-500 hover:bg-brand-50 rounded-md transition" title="Edit"><svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10"/></svg></button>
+                    <button onclick="toggleSchedule('Seller KPI Dashboard')" class="p-1.5 text-gray-400 hover:text-amber-500 hover:bg-amber-50 rounded-md transition" title="Pause"><svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M15.75 5.25v13.5m-7.5-13.5v13.5"/></svg></button>
+                    <button onclick="deleteSchedule('Seller KPI Dashboard')" class="p-1.5 text-red-400 hover:text-red-600 hover:bg-red-50 rounded-md transition" title="Delete"><svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0"/></svg></button>
+                  </div>
+                </td>
+              </tr>
+              <tr class="table-row bg-amber-50/30">
+                <td class="px-6 py-4">
+                  <div class="flex items-center gap-3">
+                    <div class="w-8 h-8 rounded-lg bg-amber-50 flex items-center justify-center">
+                      <svg class="w-4 h-4 text-amber-600" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M20.25 7.5l-.625 10.632a2.25 2.25 0 01-2.247 2.118H6.622a2.25 2.25 0 01-2.247-2.118L3.75 7.5M10 11.25h4M3.375 7.5h17.25c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125z"/></svg>
+                    </div>
+                    <div>
+                      <p class="text-sm font-semibold text-gray-900">Inventory Snapshot</p>
+                      <p class="text-xs text-gray-400">Inventory Report - CSV</p>
+                    </div>
+                  </div>
+                </td>
+                <td class="px-4 py-4"><span class="text-sm text-gray-700">Daily (6 AM)</span></td>
+                <td class="px-4 py-4"><span class="text-sm text-gray-400">Paused</span></td>
+                <td class="px-4 py-4"><span class="text-sm text-gray-600">warehouse@homebase.in</span></td>
+                <td class="px-4 py-4">
+                  <span class="inline-flex items-center gap-1 px-2.5 py-1 bg-amber-50 text-amber-700 text-xs font-semibold rounded-full">
+                    <span class="w-1.5 h-1.5 bg-amber-500 rounded-full"></span> Paused
+                  </span>
+                </td>
+                <td class="px-6 py-4">
+                  <div class="flex items-center justify-end gap-1.5">
+                    <button onclick="editSchedule('Inventory Snapshot')" class="p-1.5 text-gray-400 hover:text-brand-500 hover:bg-brand-50 rounded-md transition" title="Edit"><svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10"/></svg></button>
+                    <button onclick="toggleSchedule('Inventory Snapshot')" class="p-1.5 text-gray-400 hover:text-green-500 hover:bg-green-50 rounded-md transition" title="Resume"><svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M5.25 5.653c0-.856.917-1.398 1.667-.986l11.54 6.348a1.125 1.125 0 010 1.971l-11.54 6.347a1.125 1.125 0 01-1.667-.985V5.653z"/></svg></button>
+                    <button onclick="deleteSchedule('Inventory Snapshot')" class="p-1.5 text-red-400 hover:text-red-600 hover:bg-red-50 rounded-md transition" title="Delete"><svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0"/></svg></button>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Download History -->
+      <div class="bg-white rounded-xl border border-gray-100 shadow-sm">
+        <div class="flex items-center justify-between px-6 py-5 border-b border-gray-100">
+          <div>
+            <h2 class="text-lg font-bold text-gray-900">Download History</h2>
+            <p class="text-sm text-gray-500 mt-0.5">Recently generated reports</p>
+          </div>
+        </div>
+        <div class="overflow-x-auto">
+          <table class="w-full">
+            <thead>
+              <tr class="border-b border-gray-100">
+                <th class="text-left text-[11px] font-semibold text-gray-400 uppercase tracking-wider px-6 py-3">Report Name</th>
+                <th class="text-left text-[11px] font-semibold text-gray-400 uppercase tracking-wider px-4 py-3">Generated On</th>
+                <th class="text-left text-[11px] font-semibold text-gray-400 uppercase tracking-wider px-4 py-3">Format</th>
+                <th class="text-left text-[11px] font-semibold text-gray-400 uppercase tracking-wider px-4 py-3">Size</th>
+                <th class="text-right text-[11px] font-semibold text-gray-400 uppercase tracking-wider px-6 py-3">Actions</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-50">
+              <tr class="table-row">
+                <td class="px-6 py-4">
+                  <div class="flex items-center gap-3">
+                    <div class="w-8 h-8 rounded-lg bg-green-50 flex items-center justify-center">
+                      <svg class="w-4 h-4 text-green-600" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m2.25 0H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z"/></svg>
+                    </div>
+                    <p class="text-sm font-semibold text-gray-900">Sales_Report_Mar2026_Week4.csv</p>
+                  </div>
+                </td>
+                <td class="px-4 py-4"><span class="text-sm text-gray-600">Mar 25, 2026 09:15 AM</span></td>
+                <td class="px-4 py-4"><span class="text-xs font-mono bg-green-50 text-green-700 px-2 py-0.5 rounded font-semibold">CSV</span></td>
+                <td class="px-4 py-4"><span class="text-sm text-gray-600">2.4 MB</span></td>
+                <td class="px-6 py-4 text-right">
+                  <button onclick="alert('Downloading Sales_Report_Mar2026_Week4.csv')" class="inline-flex items-center gap-1.5 text-brand-500 hover:text-brand-600 text-sm font-semibold transition">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3"/></svg>
+                    Download
+                  </button>
+                </td>
+              </tr>
+              <tr class="table-row">
+                <td class="px-6 py-4">
+                  <div class="flex items-center gap-3">
+                    <div class="w-8 h-8 rounded-lg bg-purple-50 flex items-center justify-center">
+                      <svg class="w-4 h-4 text-purple-600" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m2.25 0H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z"/></svg>
+                    </div>
+                    <p class="text-sm font-semibold text-gray-900">GSTR1_February_2026.xlsx</p>
+                  </div>
+                </td>
+                <td class="px-4 py-4"><span class="text-sm text-gray-600">Mar 20, 2026 11:30 AM</span></td>
+                <td class="px-4 py-4"><span class="text-xs font-mono bg-blue-50 text-blue-700 px-2 py-0.5 rounded font-semibold">Excel</span></td>
+                <td class="px-4 py-4"><span class="text-sm text-gray-600">5.8 MB</span></td>
+                <td class="px-6 py-4 text-right">
+                  <button onclick="alert('Downloading GSTR1_February_2026.xlsx')" class="inline-flex items-center gap-1.5 text-brand-500 hover:text-brand-600 text-sm font-semibold transition">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3"/></svg>
+                    Download
+                  </button>
+                </td>
+              </tr>
+              <tr class="table-row">
+                <td class="px-6 py-4">
+                  <div class="flex items-center gap-3">
+                    <div class="w-8 h-8 rounded-lg bg-amber-50 flex items-center justify-center">
+                      <svg class="w-4 h-4 text-amber-600" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m2.25 0H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z"/></svg>
+                    </div>
+                    <p class="text-sm font-semibold text-gray-900">Inventory_Snapshot_20260318.csv</p>
+                  </div>
+                </td>
+                <td class="px-4 py-4"><span class="text-sm text-gray-600">Mar 18, 2026 06:00 AM</span></td>
+                <td class="px-4 py-4"><span class="text-xs font-mono bg-green-50 text-green-700 px-2 py-0.5 rounded font-semibold">CSV</span></td>
+                <td class="px-4 py-4"><span class="text-sm text-gray-600">1.2 MB</span></td>
+                <td class="px-6 py-4 text-right">
+                  <button onclick="alert('Downloading Inventory_Snapshot_20260318.csv')" class="inline-flex items-center gap-1.5 text-brand-500 hover:text-brand-600 text-sm font-semibold transition">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3"/></svg>
+                    Download
+                  </button>
+                </td>
+              </tr>
+              <tr class="table-row">
+                <td class="px-6 py-4">
+                  <div class="flex items-center gap-3">
+                    <div class="w-8 h-8 rounded-lg bg-red-50 flex items-center justify-center">
+                      <svg class="w-4 h-4 text-red-600" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m2.25 0H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z"/></svg>
+                    </div>
+                    <p class="text-sm font-semibold text-gray-900">Financial_Recon_March_W2.pdf</p>
+                  </div>
+                </td>
+                <td class="px-4 py-4"><span class="text-sm text-gray-600">Mar 15, 2026 02:45 PM</span></td>
+                <td class="px-4 py-4"><span class="text-xs font-mono bg-red-50 text-red-700 px-2 py-0.5 rounded font-semibold">PDF</span></td>
+                <td class="px-4 py-4"><span class="text-sm text-gray-600">3.1 MB</span></td>
+                <td class="px-6 py-4 text-right">
+                  <button onclick="alert('Downloading Financial_Recon_March_W2.pdf')" class="inline-flex items-center gap-1.5 text-brand-500 hover:text-brand-600 text-sm font-semibold transition">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3"/></svg>
+                    Download
+                  </button>
+                </td>
+              </tr>
+              <tr class="table-row">
+                <td class="px-6 py-4">
+                  <div class="flex items-center gap-3">
+                    <div class="w-8 h-8 rounded-lg bg-cyan-50 flex items-center justify-center">
+                      <svg class="w-4 h-4 text-cyan-600" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m2.25 0H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z"/></svg>
+                    </div>
+                    <p class="text-sm font-semibold text-gray-900">Customer_Analytics_Q1_2026.xlsx</p>
+                  </div>
+                </td>
+                <td class="px-4 py-4"><span class="text-sm text-gray-600">Mar 24, 2026 10:00 AM</span></td>
+                <td class="px-4 py-4"><span class="text-xs font-mono bg-blue-50 text-blue-700 px-2 py-0.5 rounded font-semibold">Excel</span></td>
+                <td class="px-4 py-4"><span class="text-sm text-gray-600">4.7 MB</span></td>
+                <td class="px-6 py-4 text-right">
+                  <button onclick="alert('Downloading Customer_Analytics_Q1_2026.xlsx')" class="inline-flex items-center gap-1.5 text-brand-500 hover:text-brand-600 text-sm font-semibold transition">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3"/></svg>
+                    Download
+                  </button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Pagination -->
+        <div class="flex items-center justify-between px-6 py-4 border-t border-gray-100">
+          <div class="flex items-center gap-2">
+            <span class="text-sm text-gray-500">Showing</span>
+            <select class="bg-white border border-gray-200 rounded-lg text-sm px-2.5 py-1.5 outline-none focus:border-brand-400">
+              <option>5</option>
+              <option>10</option>
+              <option>25</option>
+            </select>
+            <span class="text-sm text-gray-500">of 28 reports</span>
+          </div>
+          <div class="flex items-center gap-1">
+            <button class="w-9 h-9 flex items-center justify-center rounded-lg border border-gray-200 text-gray-400 hover:bg-gray-50 transition" disabled>
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M15.75 19.5L8.25 12l7.5-7.5"/></svg>
+            </button>
+            <button class="w-9 h-9 flex items-center justify-center rounded-lg bg-brand-500 text-white text-sm font-semibold">1</button>
+            <button class="w-9 h-9 flex items-center justify-center rounded-lg border border-gray-200 text-gray-700 text-sm font-medium hover:bg-gray-50 transition">2</button>
+            <button class="w-9 h-9 flex items-center justify-center rounded-lg border border-gray-200 text-gray-700 text-sm font-medium hover:bg-gray-50 transition">3</button>
+            <span class="w-9 h-9 flex items-center justify-center text-gray-400 text-sm">...</span>
+            <button class="w-9 h-9 flex items-center justify-center rounded-lg border border-gray-200 text-gray-700 text-sm font-medium hover:bg-gray-50 transition">6</button>
+            <button class="w-9 h-9 flex items-center justify-center rounded-lg border border-gray-200 text-gray-700 hover:bg-gray-50 transition">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M8.25 4.5l7.5 7.5-7.5 7.5"/></svg>
+            </button>
+          </div>
+        </div>
+      </div>
+
+    </main>
+  </div>
+
+  <!-- ===== GENERATE REPORT MODAL ===== -->
+  <div id="generateModal" class="fixed inset-0 z-[100] hidden items-center justify-center bg-black/40 backdrop-blur-sm">
+    <div class="relative w-full max-w-lg mx-4 bg-white rounded-2xl shadow-2xl overflow-hidden">
+      <div class="flex items-center justify-between px-6 py-4 border-b border-gray-100 bg-gray-50">
+        <h3 id="generateModalTitle" class="text-lg font-bold text-gray-900">Generate Report</h3>
+        <button onclick="closeGenerateModal()" class="p-1.5 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M6 18L18 6M6 6l12 12"/></svg>
+        </button>
+      </div>
+      <div class="px-6 py-5 space-y-4">
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1.5">Report Type</label>
+          <select id="genReportType" class="w-full border border-gray-200 rounded-lg py-2.5 px-4 text-sm outline-none focus:border-brand-400 focus:ring-2 focus:ring-brand-100 transition bg-white">
+            <option>Sales Report</option>
+            <option>Seller Performance</option>
+            <option>Tax Report (GSTR-1/3B)</option>
+            <option>Inventory Report</option>
+            <option>Financial Reconciliation</option>
+            <option>Customer Analytics</option>
+          </select>
+        </div>
+        <div class="grid grid-cols-2 gap-4">
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1.5">From Date</label>
+            <input type="date" value="2026-03-01" class="w-full border border-gray-200 rounded-lg py-2.5 px-4 text-sm outline-none focus:border-brand-400 focus:ring-2 focus:ring-brand-100 transition">
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1.5">To Date</label>
+            <input type="date" value="2026-03-28" class="w-full border border-gray-200 rounded-lg py-2.5 px-4 text-sm outline-none focus:border-brand-400 focus:ring-2 focus:ring-brand-100 transition">
+          </div>
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1.5">Format</label>
+          <div class="flex items-center gap-3">
+            <label class="flex items-center gap-2 cursor-pointer">
+              <input type="radio" name="format" value="csv" checked class="text-brand-500 focus:ring-brand-400">
+              <span class="text-sm text-gray-700">CSV</span>
+            </label>
+            <label class="flex items-center gap-2 cursor-pointer">
+              <input type="radio" name="format" value="pdf" class="text-brand-500 focus:ring-brand-400">
+              <span class="text-sm text-gray-700">PDF</span>
+            </label>
+            <label class="flex items-center gap-2 cursor-pointer">
+              <input type="radio" name="format" value="excel" class="text-brand-500 focus:ring-brand-400">
+              <span class="text-sm text-gray-700">Excel</span>
+            </label>
+          </div>
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1.5">Email to (optional)</label>
+          <input type="email" placeholder="admin@homebase.in" class="w-full border border-gray-200 rounded-lg py-2.5 px-4 text-sm outline-none focus:border-brand-400 focus:ring-2 focus:ring-brand-100 transition">
+        </div>
+      </div>
+      <div class="flex justify-end gap-3 px-6 py-4 border-t border-gray-100 bg-gray-50">
+        <button onclick="closeGenerateModal()" class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 transition">Cancel</button>
+        <button onclick="generateReport()" class="px-5 py-2 text-sm font-semibold text-white bg-brand-500 rounded-lg hover:bg-brand-600 transition">Generate & Download</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== JAVASCRIPT ===== -->
+  <script>
+    function openGenerateModal() {
+      document.getElementById('generateModalTitle').textContent = 'Generate Report';
+      var modal = document.getElementById('generateModal');
+      modal.classList.remove('hidden');
+      modal.classList.add('flex');
+    }
+
+    function openGenerateModalFor(type) {
+      document.getElementById('generateModalTitle').textContent = 'Generate: ' + type;
+      var select = document.getElementById('genReportType');
+      for (var i = 0; i < select.options.length; i++) {
+        if (select.options[i].text === type) { select.selectedIndex = i; break; }
+      }
+      var modal = document.getElementById('generateModal');
+      modal.classList.remove('hidden');
+      modal.classList.add('flex');
+    }
+
+    function closeGenerateModal() {
+      var modal = document.getElementById('generateModal');
+      modal.classList.add('hidden');
+      modal.classList.remove('flex');
+    }
+
+    function generateReport() {
+      var type = document.getElementById('genReportType').value;
+      var format = document.querySelector('input[name="format"]:checked').value.toUpperCase();
+      alert('Generating ' + type + ' in ' + format + ' format...\n\nYour report will be ready for download shortly.');
+      closeGenerateModal();
+    }
+
+    function editSchedule(name) {
+      alert('Edit scheduled report: ' + name);
+    }
+
+    function toggleSchedule(name) {
+      if (confirm('Toggle schedule for "' + name + '"?')) {
+        alert('Schedule status updated for "' + name + '".');
+      }
+    }
+
+    function deleteSchedule(name) {
+      if (confirm('Delete scheduled report "' + name + '"?\n\nThis cannot be undone.')) {
+        alert('Scheduled report "' + name + '" deleted.');
+      }
+    }
+
+    function filterScheduled(filter, btn) {
+      document.querySelectorAll('.filter-tab').forEach(function(t) {
+        t.classList.remove('active', 'text-brand-500', 'border-brand-500');
+        t.classList.add('text-gray-500', 'border-transparent');
+      });
+      btn.classList.add('active', 'text-brand-500', 'border-brand-500');
+      btn.classList.remove('text-gray-500', 'border-transparent');
+      alert('Filtering scheduled reports: ' + filter);
+    }
+
+    document.getElementById('generateModal').addEventListener('click', function(e) {
+      if (e.target === this) closeGenerateModal();
+    });
+
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape') closeGenerateModal();
+    });
+  </script>
+
+  <script src="../shared-layout.js"></script>
+  <script>renderAdminLayout('reports', '../');</script>
+
+</body>
+</html>

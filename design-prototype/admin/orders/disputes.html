@@ -1,0 +1,945 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HomeBase — Dispute Management</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              50: '#FFF7ED',
+              100: '#FFEDD5',
+              200: '#FED7AA',
+              300: '#FDBA74',
+              400: '#FB923C',
+              500: '#F97316',
+              600: '#EA580C',
+              700: '#C2410C',
+            },
+            navy: {
+              700: '#1E3A5F',
+              800: '#0F1E30',
+              900: '#0A1628',
+            },
+            success: '#16A34A',
+            warning: '#EAB308',
+            danger: '#DC2626',
+          },
+          fontFamily: {
+            sans: ['Inter', 'system-ui', 'sans-serif'],
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+    .scrollbar-hide::-webkit-scrollbar { display: none; }
+    .sidebar-link { transition: all 0.15s ease; }
+    .sidebar-link:hover { background: rgba(255,255,255,0.06); }
+    .sidebar-link.active { background: rgba(249,115,22,0.15); border-right: 3px solid #F97316; }
+    .stat-card { transition: all 0.2s ease; }
+    .stat-card:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,0.1); }
+    .table-row { transition: background 0.15s ease; }
+    .table-row:hover { background: #FFF7ED; }
+    .dropdown-menu { display: none; }
+    .dropdown:hover .dropdown-menu { display: block; }
+    .filter-tab { transition: all 0.15s ease; }
+    .filter-tab:hover { color: #F97316; }
+    .filter-tab.active { color: #F97316; border-bottom-color: #F97316; }
+    .escalated-row { border-left: 3px solid #DC2626; background: #FEF2F2; }
+    .escalated-row:hover { background: #FEE2E2; }
+    .stepper-line { height: 3px; }
+    .stepper-step.completed .stepper-dot { background: #16A34A; border-color: #16A34A; }
+    .stepper-step.completed .stepper-label { color: #16A34A; }
+    .stepper-step.active .stepper-dot { background: #F97316; border-color: #F97316; box-shadow: 0 0 0 4px rgba(249,115,22,0.2); }
+    .stepper-step.active .stepper-label { color: #F97316; font-weight: 700; }
+    .stepper-step.pending .stepper-dot { background: #E5E7EB; border-color: #D1D5DB; }
+    .stepper-step.pending .stepper-label { color: #9CA3AF; }
+    .bar-fill { transition: width 0.6s ease; }
+    .bulk-bar { transition: transform 0.2s ease, opacity 0.2s ease; }
+    .evidence-thumb { transition: all 0.15s ease; }
+    .evidence-thumb:hover { transform: scale(1.05); box-shadow: 0 4px 12px rgba(0,0,0,0.15); }
+  </style>
+</head>
+<body class="font-sans bg-gray-50 text-gray-900">
+
+  <header id="admin-header" class="fixed top-0 left-0 right-0 z-50 bg-white border-b border-gray-200 h-16"></header>
+
+  <div class="flex pt-16 min-h-screen">
+    <aside id="admin-sidebar" class="fixed left-0 top-16 bottom-0 w-60 z-40 flex flex-col overflow-y-auto" style="background:#0A1628;"></aside>
+
+    <main class="flex-1 ml-60 p-6 lg:p-8">
+
+      <!-- Page Header -->
+      <div class="mb-8">
+        <div class="flex items-center justify-between">
+          <div>
+            <h1 class="text-2xl font-bold text-gray-900">Dispute Management</h1>
+            <p class="text-sm text-gray-500 mt-1">Mediate customer-seller disputes, review evidence, and issue resolutions.</p>
+          </div>
+          <div class="flex items-center gap-3">
+            <button onclick="alert('Export disputes report')" class="flex items-center gap-2 border border-gray-200 bg-white rounded-lg px-4 py-2.5 text-sm font-semibold text-gray-700 hover:bg-gray-50 transition">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3"/></svg>
+              Export Report
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Stats Cards -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+        <div class="stat-card bg-white rounded-xl border border-gray-200 p-5">
+          <div class="flex items-center justify-between mb-3">
+            <span class="text-xs font-semibold text-gray-500 uppercase tracking-wide">Open</span>
+            <div class="w-8 h-8 rounded-lg bg-blue-50 flex items-center justify-center">
+              <svg class="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M2.25 13.5h3.86a2.25 2.25 0 012.012 1.244l.256.512a2.25 2.25 0 002.013 1.244h3.218a2.25 2.25 0 002.013-1.244l.256-.512a2.25 2.25 0 012.013-1.244h3.859m-17.5 0V6.75A2.25 2.25 0 016 4.5h12a2.25 2.25 0 012.25 2.25v6.75m-17.5 0v6.75A2.25 2.25 0 006 20.25h12a2.25 2.25 0 002.25-2.25v-6.75"/></svg>
+            </div>
+          </div>
+          <p class="text-2xl font-bold text-blue-600">8</p>
+          <p class="text-xs text-gray-500 mt-1">Awaiting review</p>
+        </div>
+        <div class="stat-card bg-white rounded-xl border border-gray-200 p-5">
+          <div class="flex items-center justify-between mb-3">
+            <span class="text-xs font-semibold text-gray-500 uppercase tracking-wide">Under Review</span>
+            <div class="w-8 h-8 rounded-lg bg-yellow-50 flex items-center justify-center">
+              <svg class="w-4 h-4 text-yellow-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z"/></svg>
+            </div>
+          </div>
+          <p class="text-2xl font-bold text-yellow-600">5</p>
+          <p class="text-xs text-gray-500 mt-1">Being investigated</p>
+        </div>
+        <div class="stat-card bg-white rounded-xl border border-gray-200 p-5">
+          <div class="flex items-center justify-between mb-3">
+            <span class="text-xs font-semibold text-gray-500 uppercase tracking-wide">Resolved</span>
+            <div class="w-8 h-8 rounded-lg bg-green-50 flex items-center justify-center">
+              <svg class="w-4 h-4 text-green-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+            </div>
+          </div>
+          <p class="text-2xl font-bold text-green-600">45</p>
+          <p class="text-xs text-gray-500 mt-1">This month</p>
+        </div>
+        <div class="stat-card bg-white rounded-xl border border-red-200 p-5 ring-1 ring-red-100">
+          <div class="flex items-center justify-between mb-3">
+            <span class="text-xs font-semibold text-red-600 uppercase tracking-wide">Escalated</span>
+            <div class="w-8 h-8 rounded-lg bg-red-50 flex items-center justify-center">
+              <svg class="w-4 h-4 text-red-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126z"/></svg>
+            </div>
+          </div>
+          <p class="text-2xl font-bold text-red-600">2</p>
+          <p class="text-xs text-gray-500 mt-1">Urgent attention needed</p>
+        </div>
+      </div>
+
+      <!-- Resolution Workflow Stepper (for top dispute DSP-2045) -->
+      <div class="bg-white rounded-xl border border-gray-200 p-6 mb-6">
+        <div class="flex items-center justify-between mb-5">
+          <div>
+            <h2 class="text-sm font-bold text-gray-900">Resolution Workflow</h2>
+            <p class="text-xs text-gray-500 mt-0.5">DSP-2045 — Rajesh Kumar vs Sharma Electronics — &#8377;45,000</p>
+          </div>
+          <span class="px-2.5 py-1 text-xs font-semibold rounded-full bg-red-100 text-red-700">Escalated</span>
+        </div>
+        <div class="relative flex items-center justify-between">
+          <!-- Connecting line -->
+          <div class="absolute top-4 left-[calc(12.5%)] right-[calc(12.5%)] stepper-line bg-gray-200 z-0"></div>
+          <div class="absolute top-4 left-[calc(12.5%)] stepper-line bg-green-500 z-0" style="width:50%"></div>
+
+          <!-- Step 1: Received -->
+          <div class="stepper-step completed relative z-10 flex flex-col items-center" style="width:25%">
+            <div class="stepper-dot w-8 h-8 rounded-full border-2 flex items-center justify-center">
+              <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M4.5 12.75l6 6 9-13.5"/></svg>
+            </div>
+            <p class="stepper-label text-xs font-semibold mt-2">Received</p>
+            <p class="text-[10px] text-gray-400 mt-0.5">15 Mar, 10:22 AM</p>
+          </div>
+
+          <!-- Step 2: Under Review -->
+          <div class="stepper-step completed relative z-10 flex flex-col items-center" style="width:25%">
+            <div class="stepper-dot w-8 h-8 rounded-full border-2 flex items-center justify-center">
+              <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M4.5 12.75l6 6 9-13.5"/></svg>
+            </div>
+            <p class="stepper-label text-xs font-semibold mt-2">Under Review</p>
+            <p class="text-[10px] text-gray-400 mt-0.5">16 Mar, 3:15 PM</p>
+          </div>
+
+          <!-- Step 3: Mediation (Active) -->
+          <div class="stepper-step active relative z-10 flex flex-col items-center" style="width:25%">
+            <div class="stepper-dot w-8 h-8 rounded-full border-2 flex items-center justify-center">
+              <span class="text-white text-xs font-bold">3</span>
+            </div>
+            <p class="stepper-label text-xs font-semibold mt-2">Mediation</p>
+            <p class="text-[10px] text-gray-400 mt-0.5">In progress</p>
+          </div>
+
+          <!-- Step 4: Resolved (Pending) -->
+          <div class="stepper-step pending relative z-10 flex flex-col items-center" style="width:25%">
+            <div class="stepper-dot w-8 h-8 rounded-full border-2 flex items-center justify-center">
+              <span class="text-gray-400 text-xs font-bold">4</span>
+            </div>
+            <p class="stepper-label text-xs font-semibold mt-2">Resolved</p>
+            <p class="text-[10px] text-gray-400 mt-0.5">Pending</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Evidence Viewer + Chargeback Tracking Row -->
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
+
+        <!-- Evidence Viewer (spans 2 cols) -->
+        <div class="lg:col-span-2 bg-white rounded-xl border border-gray-200 overflow-hidden">
+          <div class="px-6 py-4 border-b border-gray-100 flex items-center justify-between">
+            <div>
+              <h2 class="text-sm font-bold text-gray-900">Evidence Viewer</h2>
+              <p class="text-xs text-gray-500 mt-0.5">DSP-2045 — Customer vs Seller evidence comparison</p>
+            </div>
+            <button onclick="alert('Open full evidence in new tab')" class="text-xs text-brand-600 hover:text-brand-700 font-semibold">View Full Case</button>
+          </div>
+          <div class="p-6 space-y-5">
+
+            <!-- Customer Evidence -->
+            <div>
+              <div class="flex items-center gap-2 mb-3">
+                <div class="w-6 h-6 rounded-full bg-blue-500 flex items-center justify-center">
+                  <svg class="w-3 h-3 text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0"/></svg>
+                </div>
+                <h3 class="text-xs font-bold text-gray-900 uppercase tracking-wide">Customer Evidence</h3>
+                <span class="text-[10px] text-gray-400 ml-1">Rajesh Kumar</span>
+              </div>
+              <div class="bg-blue-50 rounded-lg border border-blue-100 p-4">
+                <p class="text-sm text-gray-700 mb-3">"I ordered a Samsung 55-inch TV but the box arrived with visible dents. Upon opening, the screen has a crack running across the bottom third. The delivery agent did not wait for me to inspect. I have CCTV footage of the delivery."</p>
+                <div class="flex gap-3">
+                  <div class="evidence-thumb w-20 h-20 rounded-lg bg-blue-100 border border-blue-200 flex flex-col items-center justify-center cursor-pointer" onclick="alert('View photo: Damaged box exterior')">
+                    <svg class="w-5 h-5 text-blue-400 mb-1" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.409a2.25 2.25 0 013.182 0l2.909 2.909M3.75 21h16.5A2.25 2.25 0 0022.5 18.75V5.25A2.25 2.25 0 0020.25 3H3.75A2.25 2.25 0 001.5 5.25v13.5A2.25 2.25 0 003.75 21z"/></svg>
+                    <span class="text-[10px] text-blue-500 font-medium">Box damage</span>
+                  </div>
+                  <div class="evidence-thumb w-20 h-20 rounded-lg bg-blue-100 border border-blue-200 flex flex-col items-center justify-center cursor-pointer" onclick="alert('View photo: Cracked screen close-up')">
+                    <svg class="w-5 h-5 text-blue-400 mb-1" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.409a2.25 2.25 0 013.182 0l2.909 2.909M3.75 21h16.5A2.25 2.25 0 0022.5 18.75V5.25A2.25 2.25 0 0020.25 3H3.75A2.25 2.25 0 001.5 5.25v13.5A2.25 2.25 0 003.75 21z"/></svg>
+                    <span class="text-[10px] text-blue-500 font-medium">Screen crack</span>
+                  </div>
+                  <div class="evidence-thumb w-20 h-20 rounded-lg bg-blue-100 border border-blue-200 flex flex-col items-center justify-center cursor-pointer" onclick="alert('View photo: CCTV delivery screenshot')">
+                    <svg class="w-5 h-5 text-blue-400 mb-1" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="m15.75 10.5 4.72-4.72a.75.75 0 0 1 1.28.53v11.38a.75.75 0 0 1-1.28.53l-4.72-4.72M4.5 18.75h9a2.25 2.25 0 0 0 2.25-2.25v-9a2.25 2.25 0 0 0-2.25-2.25h-9A2.25 2.25 0 0 0 2.25 7.5v9a2.25 2.25 0 0 0 2.25 2.25Z"/></svg>
+                    <span class="text-[10px] text-blue-500 font-medium">CCTV clip</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Seller Response -->
+            <div>
+              <div class="flex items-center gap-2 mb-3">
+                <div class="w-6 h-6 rounded-full bg-green-500 flex items-center justify-center">
+                  <svg class="w-3 h-3 text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M13.5 21v-7.5a.75.75 0 01.75-.75h3a.75.75 0 01.75.75V21m-4.5 0H2.36m11.14 0H18m0 0h3.64m-1.39 0V9.349m-16.5 11.65V9.35m0 0a3.001 3.001 0 003.75-.615A2.993 2.993 0 009.75 9.75c.896 0 1.7-.393 2.25-1.016a2.993 2.993 0 002.25 1.016c.896 0 1.7-.393 2.25-1.016a3.001 3.001 0 003.75.614m-16.5 0a3.004 3.004 0 01-.621-4.72L4.318 3.44A1.5 1.5 0 015.378 3h13.243a1.5 1.5 0 011.06.44l1.19 1.189a3 3 0 01-.621 4.72"/></svg>
+                </div>
+                <h3 class="text-xs font-bold text-gray-900 uppercase tracking-wide">Seller Response</h3>
+                <span class="text-[10px] text-gray-400 ml-1">Sharma Electronics</span>
+              </div>
+              <div class="bg-green-50 rounded-lg border border-green-100 p-4">
+                <p class="text-sm text-gray-700 mb-3">"The product was packed in original Samsung packaging with foam inserts and shipped via BlueDart with insurance. Our warehouse QC photos show the item was in perfect condition before dispatch. The damage likely occurred during transit. We have filed a claim with the courier."</p>
+                <div class="flex gap-3">
+                  <div class="evidence-thumb w-20 h-20 rounded-lg bg-green-100 border border-green-200 flex flex-col items-center justify-center cursor-pointer" onclick="alert('View: Shipping proof document')">
+                    <svg class="w-5 h-5 text-green-500 mb-1" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m2.25 0H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z"/></svg>
+                    <span class="text-[10px] text-green-600 font-medium">AWB proof</span>
+                  </div>
+                  <div class="evidence-thumb w-20 h-20 rounded-lg bg-green-100 border border-green-200 flex flex-col items-center justify-center cursor-pointer" onclick="alert('View: Warehouse QC photo before dispatch')">
+                    <svg class="w-5 h-5 text-green-500 mb-1" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.409a2.25 2.25 0 013.182 0l2.909 2.909M3.75 21h16.5A2.25 2.25 0 0022.5 18.75V5.25A2.25 2.25 0 0020.25 3H3.75A2.25 2.25 0 001.5 5.25v13.5A2.25 2.25 0 003.75 21z"/></svg>
+                    <span class="text-[10px] text-green-600 font-medium">QC photo</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Admin Notes -->
+            <div>
+              <div class="flex items-center gap-2 mb-2">
+                <div class="w-6 h-6 rounded-full bg-gray-700 flex items-center justify-center">
+                  <svg class="w-3 h-3 text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 12h3.75M9 15h3.75M9 18h3.75m3 .75H18a2.25 2.25 0 002.25-2.25V6.108c0-1.135-.845-2.098-1.976-2.192a48.424 48.424 0 00-1.123-.08m-5.801 0c-.065.21-.1.433-.1.664 0 .414.336.75.75.75h4.5a.75.75 0 00.75-.75 2.25 2.25 0 00-.1-.664m-5.8 0A2.251 2.251 0 0113.5 2.25H15a2.25 2.25 0 012.15 1.586m-5.8 0c-.376.023-.75.05-1.124.08C9.095 4.01 8.25 4.973 8.25 6.108V8.25m0 0H4.875c-.621 0-1.125.504-1.125 1.125v11.25c0 .621.504 1.125 1.125 1.125h9.75c.621 0 1.125-.504 1.125-1.125V9.375c0-.621-.504-1.125-1.125-1.125H8.25z"/></svg>
+                </div>
+                <h3 class="text-xs font-bold text-gray-900 uppercase tracking-wide">Admin Notes</h3>
+                <span class="text-[10px] text-gray-400 ml-1">Internal only</span>
+              </div>
+              <textarea rows="2" placeholder="Add internal investigation notes for this dispute..." class="w-full border border-gray-200 rounded-lg p-3 text-sm outline-none focus:border-brand-400 focus:ring-2 focus:ring-brand-100 resize-none bg-gray-50">Courier (BlueDart) claim filed. Awaiting transit damage investigation report. Customer CCTV footage is compelling — box was already dented on arrival. Likely transit damage.</textarea>
+            </div>
+          </div>
+        </div>
+
+        <!-- Chargeback Tracking -->
+        <div class="bg-white rounded-xl border border-gray-200 overflow-hidden flex flex-col">
+          <div class="px-6 py-4 border-b border-gray-100">
+            <h2 class="text-sm font-bold text-gray-900">Chargeback Tracking</h2>
+            <p class="text-xs text-gray-500 mt-0.5">April 2026 overview</p>
+          </div>
+          <div class="p-6 flex-1 flex flex-col justify-between">
+            <div class="space-y-5">
+              <!-- Chargebacks This Month -->
+              <div class="flex items-center justify-between">
+                <div>
+                  <p class="text-xs text-gray-500">Chargebacks This Month</p>
+                  <p class="text-2xl font-bold text-gray-900 mt-0.5">3</p>
+                </div>
+                <div class="w-10 h-10 rounded-lg bg-red-50 flex items-center justify-center">
+                  <svg class="w-5 h-5 text-red-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M2.25 8.25h19.5M2.25 9h19.5m-16.5 5.25h6m-6 2.25h3m-3.75 3h15a2.25 2.25 0 002.25-2.25V6.75A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25v10.5A2.25 2.25 0 004.5 19.5z"/></svg>
+                </div>
+              </div>
+              <div class="h-px bg-gray-100"></div>
+
+              <!-- Win Rate -->
+              <div>
+                <div class="flex items-center justify-between mb-2">
+                  <p class="text-xs text-gray-500">Win Rate</p>
+                  <p class="text-sm font-bold text-green-600">67%</p>
+                </div>
+                <div class="w-full h-2 bg-gray-100 rounded-full overflow-hidden">
+                  <div class="h-full bg-green-500 rounded-full" style="width:67%"></div>
+                </div>
+                <p class="text-[10px] text-gray-400 mt-1">2 of 3 chargebacks won in your favor</p>
+              </div>
+              <div class="h-px bg-gray-100"></div>
+
+              <!-- Total Disputed -->
+              <div class="flex items-center justify-between">
+                <div>
+                  <p class="text-xs text-gray-500">Total Disputed Amount</p>
+                  <p class="text-xl font-bold text-gray-900 mt-0.5">&#8377;18,400</p>
+                </div>
+                <div class="flex items-center gap-1 text-xs text-red-500 font-medium">
+                  <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4.5 19.5l15-15m0 0H8.25m11.25 0v11.25"/></svg>
+                  +12% vs last month
+                </div>
+              </div>
+              <div class="h-px bg-gray-100"></div>
+
+              <!-- Breakdown -->
+              <div class="grid grid-cols-3 gap-3 text-center">
+                <div>
+                  <p class="text-lg font-bold text-green-600">2</p>
+                  <p class="text-[10px] text-gray-500">Won</p>
+                </div>
+                <div>
+                  <p class="text-lg font-bold text-red-600">1</p>
+                  <p class="text-[10px] text-gray-500">Lost</p>
+                </div>
+                <div>
+                  <p class="text-lg font-bold text-yellow-600">0</p>
+                  <p class="text-[10px] text-gray-500">Pending</p>
+                </div>
+              </div>
+            </div>
+
+            <button onclick="alert('Navigate to chargeback details page')" class="mt-5 w-full flex items-center justify-center gap-2 py-2.5 border border-gray-200 bg-gray-50 rounded-lg text-sm font-semibold text-gray-700 hover:bg-gray-100 transition">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M13.5 6H5.25A2.25 2.25 0 003 8.25v10.5A2.25 2.25 0 005.25 21h10.5A2.25 2.25 0 0018 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25"/></svg>
+              View Chargeback Details
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Dispute Root Cause Analysis + SLA Tracker Row -->
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+
+        <!-- Root Cause Analysis -->
+        <div class="bg-white rounded-xl border border-gray-200 p-6">
+          <div class="flex items-center justify-between mb-5">
+            <div>
+              <h2 class="text-sm font-bold text-gray-900">Dispute Root Cause Analysis</h2>
+              <p class="text-xs text-gray-500 mt-0.5">Last 30 days breakdown by category</p>
+            </div>
+            <span class="text-xs text-gray-400 font-medium">60 total disputes</span>
+          </div>
+          <div class="space-y-4">
+            <!-- Quality Issue -->
+            <div>
+              <div class="flex items-center justify-between mb-1.5">
+                <div class="flex items-center gap-2">
+                  <div class="w-2.5 h-2.5 rounded-full bg-yellow-500"></div>
+                  <span class="text-sm font-medium text-gray-700">Quality Issue</span>
+                </div>
+                <div class="flex items-center gap-2">
+                  <span class="text-sm font-bold text-gray-900">34%</span>
+                  <span class="text-xs text-gray-400">20 cases</span>
+                </div>
+              </div>
+              <div class="w-full h-3 bg-gray-100 rounded-full overflow-hidden">
+                <div class="bar-fill h-full bg-yellow-500 rounded-full" style="width:34%"></div>
+              </div>
+            </div>
+            <!-- Delivery Problem -->
+            <div>
+              <div class="flex items-center justify-between mb-1.5">
+                <div class="flex items-center gap-2">
+                  <div class="w-2.5 h-2.5 rounded-full bg-blue-500"></div>
+                  <span class="text-sm font-medium text-gray-700">Delivery Problem</span>
+                </div>
+                <div class="flex items-center gap-2">
+                  <span class="text-sm font-bold text-gray-900">28%</span>
+                  <span class="text-xs text-gray-400">17 cases</span>
+                </div>
+              </div>
+              <div class="w-full h-3 bg-gray-100 rounded-full overflow-hidden">
+                <div class="bar-fill h-full bg-blue-500 rounded-full" style="width:28%"></div>
+              </div>
+            </div>
+            <!-- Wrong Item -->
+            <div>
+              <div class="flex items-center justify-between mb-1.5">
+                <div class="flex items-center gap-2">
+                  <div class="w-2.5 h-2.5 rounded-full bg-purple-500"></div>
+                  <span class="text-sm font-medium text-gray-700">Wrong Item</span>
+                </div>
+                <div class="flex items-center gap-2">
+                  <span class="text-sm font-bold text-gray-900">18%</span>
+                  <span class="text-xs text-gray-400">11 cases</span>
+                </div>
+              </div>
+              <div class="w-full h-3 bg-gray-100 rounded-full overflow-hidden">
+                <div class="bar-fill h-full bg-purple-500 rounded-full" style="width:18%"></div>
+              </div>
+            </div>
+            <!-- Not as Described -->
+            <div>
+              <div class="flex items-center justify-between mb-1.5">
+                <div class="flex items-center gap-2">
+                  <div class="w-2.5 h-2.5 rounded-full bg-brand-500"></div>
+                  <span class="text-sm font-medium text-gray-700">Not as Described</span>
+                </div>
+                <div class="flex items-center gap-2">
+                  <span class="text-sm font-bold text-gray-900">12%</span>
+                  <span class="text-xs text-gray-400">7 cases</span>
+                </div>
+              </div>
+              <div class="w-full h-3 bg-gray-100 rounded-full overflow-hidden">
+                <div class="bar-fill h-full bg-brand-500 rounded-full" style="width:12%"></div>
+              </div>
+            </div>
+            <!-- Other -->
+            <div>
+              <div class="flex items-center justify-between mb-1.5">
+                <div class="flex items-center gap-2">
+                  <div class="w-2.5 h-2.5 rounded-full bg-gray-400"></div>
+                  <span class="text-sm font-medium text-gray-700">Other</span>
+                </div>
+                <div class="flex items-center gap-2">
+                  <span class="text-sm font-bold text-gray-900">8%</span>
+                  <span class="text-xs text-gray-400">5 cases</span>
+                </div>
+              </div>
+              <div class="w-full h-3 bg-gray-100 rounded-full overflow-hidden">
+                <div class="bar-fill h-full bg-gray-400 rounded-full" style="width:8%"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- SLA Tracker -->
+        <div class="bg-gradient-to-r from-blue-50 to-white rounded-xl border border-blue-200 p-6">
+          <div class="mb-5">
+            <p class="text-xs font-semibold text-blue-600 uppercase tracking-wide">SLA Performance</p>
+            <p class="text-sm text-gray-500 mt-1">Target: Resolve within 5 days</p>
+          </div>
+          <div class="grid grid-cols-3 gap-6 mb-6">
+            <div class="text-center">
+              <p class="text-2xl font-bold text-gray-900">3.2 days</p>
+              <p class="text-xs text-gray-500 mt-1">Avg Resolution Time</p>
+            </div>
+            <div class="text-center">
+              <p class="text-2xl font-bold text-green-600">92%</p>
+              <p class="text-xs text-gray-500 mt-1">Within SLA</p>
+            </div>
+            <div class="text-center">
+              <p class="text-2xl font-bold text-red-600">4</p>
+              <p class="text-xs text-gray-500 mt-1">SLA Breaches</p>
+            </div>
+          </div>
+          <!-- SLA breakdown by resolution type -->
+          <div class="space-y-3">
+            <div class="flex items-center justify-between text-sm">
+              <span class="text-gray-600">Refund to Customer</span>
+              <div class="flex items-center gap-2">
+                <div class="w-24 h-1.5 bg-blue-100 rounded-full overflow-hidden"><div class="h-full bg-blue-500 rounded-full" style="width:40%"></div></div>
+                <span class="text-xs font-semibold text-gray-700">2.1 days</span>
+              </div>
+            </div>
+            <div class="flex items-center justify-between text-sm">
+              <span class="text-gray-600">Sided with Seller</span>
+              <div class="flex items-center gap-2">
+                <div class="w-24 h-1.5 bg-blue-100 rounded-full overflow-hidden"><div class="h-full bg-green-500 rounded-full" style="width:55%"></div></div>
+                <span class="text-xs font-semibold text-gray-700">2.8 days</span>
+              </div>
+            </div>
+            <div class="flex items-center justify-between text-sm">
+              <span class="text-gray-600">Partial Refund</span>
+              <div class="flex items-center gap-2">
+                <div class="w-24 h-1.5 bg-blue-100 rounded-full overflow-hidden"><div class="h-full bg-yellow-500 rounded-full" style="width:70%"></div></div>
+                <span class="text-xs font-semibold text-gray-700">3.5 days</span>
+              </div>
+            </div>
+            <div class="flex items-center justify-between text-sm">
+              <span class="text-gray-600">Escalated / Legal</span>
+              <div class="flex items-center gap-2">
+                <div class="w-24 h-1.5 bg-blue-100 rounded-full overflow-hidden"><div class="h-full bg-red-500 rounded-full" style="width:95%"></div></div>
+                <span class="text-xs font-semibold text-gray-700">4.8 days</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Bulk Actions Bar (shown when checkboxes selected) -->
+      <div id="bulkActionBar" class="bulk-bar hidden bg-navy-800 rounded-xl p-4 mb-4 flex items-center justify-between">
+        <div class="flex items-center gap-3">
+          <span id="selectedCount" class="text-sm font-semibold text-white">0 disputes selected</span>
+          <button onclick="clearSelection()" class="text-xs text-gray-400 hover:text-white transition underline">Clear selection</button>
+        </div>
+        <div class="flex items-center gap-2">
+          <button onclick="bulkAction('approve')" class="flex items-center gap-1.5 px-4 py-2 bg-green-600 hover:bg-green-700 text-white text-sm font-semibold rounded-lg transition">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+            Approve Selected
+          </button>
+          <button onclick="bulkAction('reject')" class="flex items-center gap-1.5 px-4 py-2 bg-red-600 hover:bg-red-700 text-white text-sm font-semibold rounded-lg transition">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9.75 9.75l4.5 4.5m0-4.5l-4.5 4.5M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+            Reject Selected
+          </button>
+          <button onclick="bulkAction('escalate')" class="flex items-center gap-1.5 px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white text-sm font-semibold rounded-lg transition">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 9v3.75m0-10.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z"/></svg>
+            Escalate to Legal
+          </button>
+        </div>
+      </div>
+
+      <!-- Filter Tabs + Table -->
+      <div class="bg-white rounded-xl border border-gray-200 overflow-hidden">
+        <!-- Filter Tabs -->
+        <div class="px-6 pt-4 border-b border-gray-100">
+          <div class="flex gap-6">
+            <button onclick="filterDisputes(this,'all')" class="filter-tab active pb-3 text-sm font-semibold border-b-2 border-brand-500 text-brand-600">All <span class="text-xs text-gray-400 ml-1">60</span></button>
+            <button onclick="filterDisputes(this,'open')" class="filter-tab pb-3 text-sm font-semibold border-b-2 border-transparent text-gray-500">Open <span class="text-xs text-gray-400 ml-1">8</span></button>
+            <button onclick="filterDisputes(this,'review')" class="filter-tab pb-3 text-sm font-semibold border-b-2 border-transparent text-gray-500">Under Review <span class="text-xs text-gray-400 ml-1">5</span></button>
+            <button onclick="filterDisputes(this,'resolved')" class="filter-tab pb-3 text-sm font-semibold border-b-2 border-transparent text-gray-500">Resolved <span class="text-xs text-gray-400 ml-1">45</span></button>
+            <button onclick="filterDisputes(this,'escalated')" class="filter-tab pb-3 text-sm font-semibold border-b-2 border-transparent text-gray-500">Escalated <span class="text-xs text-red-500 font-bold ml-1">2</span></button>
+          </div>
+        </div>
+
+        <!-- Table -->
+        <div class="overflow-x-auto">
+          <table class="w-full text-sm text-left">
+            <thead>
+              <tr class="bg-gray-50 text-xs text-gray-500 uppercase tracking-wider">
+                <th class="px-6 py-3 font-semibold w-10">
+                  <input type="checkbox" id="selectAll" onchange="toggleSelectAll(this)" class="w-4 h-4 rounded border-gray-300 text-brand-500 focus:ring-brand-400 cursor-pointer">
+                </th>
+                <th class="px-6 py-3 font-semibold">Case ID</th>
+                <th class="px-6 py-3 font-semibold">Order ID</th>
+                <th class="px-6 py-3 font-semibold">Customer</th>
+                <th class="px-6 py-3 font-semibold">Seller</th>
+                <th class="px-6 py-3 font-semibold">Issue Type</th>
+                <th class="px-6 py-3 font-semibold text-right">Amount</th>
+                <th class="px-6 py-3 font-semibold text-center">Status</th>
+                <th class="px-6 py-3 font-semibold">Opened</th>
+                <th class="px-6 py-3 font-semibold text-center">Actions</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-100">
+              <!-- Escalated row -->
+              <tr class="escalated-row cursor-pointer" onclick="openDisputeModal('DSP-2045')">
+                <td class="px-6 py-3.5" onclick="event.stopPropagation()">
+                  <input type="checkbox" value="DSP-2045" onchange="updateBulkBar()" class="dispute-checkbox w-4 h-4 rounded border-gray-300 text-brand-500 focus:ring-brand-400 cursor-pointer">
+                </td>
+                <td class="px-6 py-3.5 font-medium text-red-600">DSP-2045</td>
+                <td class="px-6 py-3.5 text-gray-700">#HB-78102</td>
+                <td class="px-6 py-3.5">Rajesh Kumar</td>
+                <td class="px-6 py-3.5">Sharma Electronics</td>
+                <td class="px-6 py-3.5"><span class="px-2 py-0.5 text-xs font-medium rounded bg-red-50 text-red-700">Not Received</span></td>
+                <td class="px-6 py-3.5 text-right font-medium">&#8377;45,000</td>
+                <td class="px-6 py-3.5 text-center"><span class="px-2 py-1 text-xs font-semibold rounded-full bg-red-100 text-red-700">Escalated</span></td>
+                <td class="px-6 py-3.5 text-xs text-gray-500">15 Mar 2026</td>
+                <td class="px-6 py-3.5 text-center"><button onclick="event.stopPropagation();openDisputeModal('DSP-2045')" class="text-xs text-red-500 hover:text-red-600 font-semibold">Urgent</button></td>
+              </tr>
+              <!-- Escalated row -->
+              <tr class="escalated-row cursor-pointer" onclick="openDisputeModal('DSP-2042')">
+                <td class="px-6 py-3.5" onclick="event.stopPropagation()">
+                  <input type="checkbox" value="DSP-2042" onchange="updateBulkBar()" class="dispute-checkbox w-4 h-4 rounded border-gray-300 text-brand-500 focus:ring-brand-400 cursor-pointer">
+                </td>
+                <td class="px-6 py-3.5 font-medium text-red-600">DSP-2042</td>
+                <td class="px-6 py-3.5 text-gray-700">#HB-78056</td>
+                <td class="px-6 py-3.5">Anish Joshi</td>
+                <td class="px-6 py-3.5">Patel Home Goods</td>
+                <td class="px-6 py-3.5"><span class="px-2 py-0.5 text-xs font-medium rounded bg-purple-50 text-purple-700">Damaged</span></td>
+                <td class="px-6 py-3.5 text-right font-medium">&#8377;78,500</td>
+                <td class="px-6 py-3.5 text-center"><span class="px-2 py-1 text-xs font-semibold rounded-full bg-red-100 text-red-700">Escalated</span></td>
+                <td class="px-6 py-3.5 text-xs text-gray-500">12 Mar 2026</td>
+                <td class="px-6 py-3.5 text-center"><button onclick="event.stopPropagation();openDisputeModal('DSP-2042')" class="text-xs text-red-500 hover:text-red-600 font-semibold">Urgent</button></td>
+              </tr>
+              <!-- Open -->
+              <tr class="table-row cursor-pointer" onclick="openDisputeModal('DSP-2050')">
+                <td class="px-6 py-3.5" onclick="event.stopPropagation()">
+                  <input type="checkbox" value="DSP-2050" onchange="updateBulkBar()" class="dispute-checkbox w-4 h-4 rounded border-gray-300 text-brand-500 focus:ring-brand-400 cursor-pointer">
+                </td>
+                <td class="px-6 py-3.5 font-medium text-brand-600">DSP-2050</td>
+                <td class="px-6 py-3.5 text-gray-700">#HB-78390</td>
+                <td class="px-6 py-3.5">Priya Sharma</td>
+                <td class="px-6 py-3.5">GreenLeaf Organics</td>
+                <td class="px-6 py-3.5"><span class="px-2 py-0.5 text-xs font-medium rounded bg-yellow-50 text-yellow-700">Quality</span></td>
+                <td class="px-6 py-3.5 text-right font-medium">&#8377;3,200</td>
+                <td class="px-6 py-3.5 text-center"><span class="px-2 py-1 text-xs font-semibold rounded-full bg-blue-50 text-blue-700">Open</span></td>
+                <td class="px-6 py-3.5 text-xs text-gray-500">27 Mar 2026</td>
+                <td class="px-6 py-3.5 text-center"><button onclick="event.stopPropagation();openDisputeModal('DSP-2050')" class="text-xs text-brand-500 hover:text-brand-600 font-semibold">Review</button></td>
+              </tr>
+              <!-- Under Review -->
+              <tr class="table-row cursor-pointer" onclick="openDisputeModal('DSP-2048')">
+                <td class="px-6 py-3.5" onclick="event.stopPropagation()">
+                  <input type="checkbox" value="DSP-2048" onchange="updateBulkBar()" class="dispute-checkbox w-4 h-4 rounded border-gray-300 text-brand-500 focus:ring-brand-400 cursor-pointer">
+                </td>
+                <td class="px-6 py-3.5 font-medium text-brand-600">DSP-2048</td>
+                <td class="px-6 py-3.5 text-gray-700">#HB-78345</td>
+                <td class="px-6 py-3.5">Amit Patel</td>
+                <td class="px-6 py-3.5">TechZone India</td>
+                <td class="px-6 py-3.5"><span class="px-2 py-0.5 text-xs font-medium rounded bg-blue-50 text-blue-700">Wrong Item</span></td>
+                <td class="px-6 py-3.5 text-right font-medium">&#8377;18,900</td>
+                <td class="px-6 py-3.5 text-center"><span class="px-2 py-1 text-xs font-semibold rounded-full bg-yellow-50 text-yellow-700">Under Review</span></td>
+                <td class="px-6 py-3.5 text-xs text-gray-500">25 Mar 2026</td>
+                <td class="px-6 py-3.5 text-center"><button onclick="event.stopPropagation();openDisputeModal('DSP-2048')" class="text-xs text-brand-500 hover:text-brand-600 font-semibold">Review</button></td>
+              </tr>
+              <!-- Open -->
+              <tr class="table-row cursor-pointer" onclick="openDisputeModal('DSP-2049')">
+                <td class="px-6 py-3.5" onclick="event.stopPropagation()">
+                  <input type="checkbox" value="DSP-2049" onchange="updateBulkBar()" class="dispute-checkbox w-4 h-4 rounded border-gray-300 text-brand-500 focus:ring-brand-400 cursor-pointer">
+                </td>
+                <td class="px-6 py-3.5 font-medium text-brand-600">DSP-2049</td>
+                <td class="px-6 py-3.5 text-gray-700">#HB-78378</td>
+                <td class="px-6 py-3.5">Sunita Reddy</td>
+                <td class="px-6 py-3.5">Sharma Electronics</td>
+                <td class="px-6 py-3.5"><span class="px-2 py-0.5 text-xs font-medium rounded bg-gray-100 text-gray-700">Delivery</span></td>
+                <td class="px-6 py-3.5 text-right font-medium">&#8377;12,400</td>
+                <td class="px-6 py-3.5 text-center"><span class="px-2 py-1 text-xs font-semibold rounded-full bg-blue-50 text-blue-700">Open</span></td>
+                <td class="px-6 py-3.5 text-xs text-gray-500">26 Mar 2026</td>
+                <td class="px-6 py-3.5 text-center"><button onclick="event.stopPropagation();openDisputeModal('DSP-2049')" class="text-xs text-brand-500 hover:text-brand-600 font-semibold">Review</button></td>
+              </tr>
+              <!-- Resolved -->
+              <tr class="table-row cursor-pointer" onclick="openDisputeModal('DSP-2040')">
+                <td class="px-6 py-3.5" onclick="event.stopPropagation()">
+                  <input type="checkbox" value="DSP-2040" onchange="updateBulkBar()" class="dispute-checkbox w-4 h-4 rounded border-gray-300 text-brand-500 focus:ring-brand-400 cursor-pointer">
+                </td>
+                <td class="px-6 py-3.5 font-medium text-brand-600">DSP-2040</td>
+                <td class="px-6 py-3.5 text-gray-700">#HB-78210</td>
+                <td class="px-6 py-3.5">Vikram Singh</td>
+                <td class="px-6 py-3.5">HomeStyle Decor</td>
+                <td class="px-6 py-3.5"><span class="px-2 py-0.5 text-xs font-medium rounded bg-purple-50 text-purple-700">Damaged</span></td>
+                <td class="px-6 py-3.5 text-right font-medium">&#8377;8,750</td>
+                <td class="px-6 py-3.5 text-center"><span class="px-2 py-1 text-xs font-semibold rounded-full bg-green-50 text-green-700">Resolved</span></td>
+                <td class="px-6 py-3.5 text-xs text-gray-500">18 Mar 2026</td>
+                <td class="px-6 py-3.5 text-center"><button onclick="event.stopPropagation();openDisputeModal('DSP-2040')" class="text-xs text-brand-500 hover:text-brand-600 font-semibold">View</button></td>
+              </tr>
+              <!-- Under Review -->
+              <tr class="table-row cursor-pointer" onclick="openDisputeModal('DSP-2047')">
+                <td class="px-6 py-3.5" onclick="event.stopPropagation()">
+                  <input type="checkbox" value="DSP-2047" onchange="updateBulkBar()" class="dispute-checkbox w-4 h-4 rounded border-gray-300 text-brand-500 focus:ring-brand-400 cursor-pointer">
+                </td>
+                <td class="px-6 py-3.5 font-medium text-brand-600">DSP-2047</td>
+                <td class="px-6 py-3.5 text-gray-700">#HB-78320</td>
+                <td class="px-6 py-3.5">Meena Gupta</td>
+                <td class="px-6 py-3.5">FreshMart Daily</td>
+                <td class="px-6 py-3.5"><span class="px-2 py-0.5 text-xs font-medium rounded bg-yellow-50 text-yellow-700">Quality</span></td>
+                <td class="px-6 py-3.5 text-right font-medium">&#8377;2,100</td>
+                <td class="px-6 py-3.5 text-center"><span class="px-2 py-1 text-xs font-semibold rounded-full bg-yellow-50 text-yellow-700">Under Review</span></td>
+                <td class="px-6 py-3.5 text-xs text-gray-500">24 Mar 2026</td>
+                <td class="px-6 py-3.5 text-center"><button onclick="event.stopPropagation();openDisputeModal('DSP-2047')" class="text-xs text-brand-500 hover:text-brand-600 font-semibold">Review</button></td>
+              </tr>
+              <!-- Resolved -->
+              <tr class="table-row cursor-pointer" onclick="openDisputeModal('DSP-2038')">
+                <td class="px-6 py-3.5" onclick="event.stopPropagation()">
+                  <input type="checkbox" value="DSP-2038" onchange="updateBulkBar()" class="dispute-checkbox w-4 h-4 rounded border-gray-300 text-brand-500 focus:ring-brand-400 cursor-pointer">
+                </td>
+                <td class="px-6 py-3.5 font-medium text-brand-600">DSP-2038</td>
+                <td class="px-6 py-3.5 text-gray-700">#HB-78180</td>
+                <td class="px-6 py-3.5">Kavita Nair</td>
+                <td class="px-6 py-3.5">BuildRight Supplies</td>
+                <td class="px-6 py-3.5"><span class="px-2 py-0.5 text-xs font-medium rounded bg-red-50 text-red-700">Not Received</span></td>
+                <td class="px-6 py-3.5 text-right font-medium">&#8377;34,600</td>
+                <td class="px-6 py-3.5 text-center"><span class="px-2 py-1 text-xs font-semibold rounded-full bg-green-50 text-green-700">Resolved</span></td>
+                <td class="px-6 py-3.5 text-xs text-gray-500">14 Mar 2026</td>
+                <td class="px-6 py-3.5 text-center"><button onclick="event.stopPropagation();openDisputeModal('DSP-2038')" class="text-xs text-brand-500 hover:text-brand-600 font-semibold">View</button></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Table Footer / Pagination -->
+        <div class="px-6 py-3 border-t border-gray-100 flex items-center justify-between">
+          <p class="text-xs text-gray-500">Showing 8 of 60 disputes</p>
+          <div class="flex items-center gap-1">
+            <button class="px-3 py-1.5 text-xs font-medium text-gray-500 bg-gray-50 border border-gray-200 rounded-lg hover:bg-gray-100 transition" disabled>Previous</button>
+            <button class="px-3 py-1.5 text-xs font-semibold text-white bg-brand-500 border border-brand-500 rounded-lg">1</button>
+            <button class="px-3 py-1.5 text-xs font-medium text-gray-500 bg-gray-50 border border-gray-200 rounded-lg hover:bg-gray-100 transition">2</button>
+            <button class="px-3 py-1.5 text-xs font-medium text-gray-500 bg-gray-50 border border-gray-200 rounded-lg hover:bg-gray-100 transition">3</button>
+            <span class="px-2 text-xs text-gray-400">...</span>
+            <button class="px-3 py-1.5 text-xs font-medium text-gray-500 bg-gray-50 border border-gray-200 rounded-lg hover:bg-gray-100 transition">8</button>
+            <button class="px-3 py-1.5 text-xs font-medium text-gray-500 bg-gray-50 border border-gray-200 rounded-lg hover:bg-gray-100 transition">Next</button>
+          </div>
+        </div>
+      </div>
+
+    </main>
+  </div>
+
+  <!-- Dispute Detail Modal -->
+  <div id="disputeModal" class="fixed inset-0 z-[60] hidden">
+    <div class="absolute inset-0 bg-black/40" onclick="closeDisputeModal()"></div>
+    <div class="absolute right-0 top-0 bottom-0 w-full max-w-2xl bg-white shadow-2xl overflow-y-auto">
+      <div class="sticky top-0 bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between z-10">
+        <h3 class="text-lg font-bold text-gray-900">Dispute Details - DSP-2050</h3>
+        <button onclick="closeDisputeModal()" class="p-1 hover:bg-gray-100 rounded-lg transition">
+          <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M6 18L18 6M6 6l12 12"/></svg>
+        </button>
+      </div>
+      <div class="p-6 space-y-6">
+
+        <!-- Modal Resolution Workflow Stepper -->
+        <div class="bg-gray-50 rounded-lg p-4 border border-gray-100">
+          <p class="text-xs font-bold text-gray-900 uppercase tracking-wide mb-4">Resolution Progress</p>
+          <div class="relative flex items-center justify-between">
+            <div class="absolute top-4 left-[calc(12.5%)] right-[calc(12.5%)] h-[3px] bg-gray-200 z-0"></div>
+            <div class="absolute top-4 left-[calc(12.5%)] h-[3px] bg-green-500 z-0" style="width:16.67%"></div>
+            <div class="stepper-step completed relative z-10 flex flex-col items-center" style="width:25%">
+              <div class="w-7 h-7 rounded-full bg-green-500 border-2 border-green-500 flex items-center justify-center">
+                <svg class="w-3.5 h-3.5 text-white" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M4.5 12.75l6 6 9-13.5"/></svg>
+              </div>
+              <p class="text-[10px] font-semibold text-green-600 mt-1.5">Received</p>
+            </div>
+            <div class="stepper-step active relative z-10 flex flex-col items-center" style="width:25%">
+              <div class="w-7 h-7 rounded-full bg-brand-500 border-2 border-brand-500 flex items-center justify-center" style="box-shadow:0 0 0 4px rgba(249,115,22,0.2)">
+                <span class="text-white text-[10px] font-bold">2</span>
+              </div>
+              <p class="text-[10px] font-bold text-brand-600 mt-1.5">Under Review</p>
+            </div>
+            <div class="stepper-step pending relative z-10 flex flex-col items-center" style="width:25%">
+              <div class="w-7 h-7 rounded-full bg-gray-200 border-2 border-gray-300 flex items-center justify-center">
+                <span class="text-gray-400 text-[10px] font-bold">3</span>
+              </div>
+              <p class="text-[10px] font-semibold text-gray-400 mt-1.5">Mediation</p>
+            </div>
+            <div class="stepper-step pending relative z-10 flex flex-col items-center" style="width:25%">
+              <div class="w-7 h-7 rounded-full bg-gray-200 border-2 border-gray-300 flex items-center justify-center">
+                <span class="text-gray-400 text-[10px] font-bold">4</span>
+              </div>
+              <p class="text-[10px] font-semibold text-gray-400 mt-1.5">Resolved</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Case Overview -->
+        <div class="grid grid-cols-2 gap-4 text-sm">
+          <div>
+            <p class="text-xs text-gray-500">Order ID</p>
+            <a href="detail.html" class="text-brand-600 font-medium hover:underline">#HB-78390</a>
+          </div>
+          <div>
+            <p class="text-xs text-gray-500">Amount in Dispute</p>
+            <p class="font-semibold">&#8377;3,200</p>
+          </div>
+          <div>
+            <p class="text-xs text-gray-500">Customer</p>
+            <p class="font-medium">Priya Sharma</p>
+          </div>
+          <div>
+            <p class="text-xs text-gray-500">Seller</p>
+            <p class="font-medium">GreenLeaf Organics</p>
+          </div>
+          <div>
+            <p class="text-xs text-gray-500">Issue Type</p>
+            <span class="px-2 py-0.5 text-xs font-medium rounded bg-yellow-50 text-yellow-700">Quality Issue</span>
+          </div>
+          <div>
+            <p class="text-xs text-gray-500">Opened</p>
+            <p class="font-medium">27 Mar 2026</p>
+          </div>
+        </div>
+
+        <!-- Customer's Complaint -->
+        <div>
+          <h4 class="text-sm font-semibold text-gray-900 mb-3">Customer's Complaint</h4>
+          <div class="bg-blue-50 rounded-lg p-4 border border-blue-100">
+            <p class="text-sm text-gray-700">"I received the organic spice set but the turmeric powder has a very different color and smell compared to what was shown in the product images. I believe this is not the organic quality that was advertised. The packaging was also damaged and the seal was broken."</p>
+            <div class="flex gap-2 mt-3">
+              <div class="evidence-thumb w-16 h-16 rounded-lg bg-blue-100 flex items-center justify-center text-xs text-blue-500 border border-blue-200 cursor-pointer" onclick="alert('View: Product color comparison')">Photo 1</div>
+              <div class="evidence-thumb w-16 h-16 rounded-lg bg-blue-100 flex items-center justify-center text-xs text-blue-500 border border-blue-200 cursor-pointer" onclick="alert('View: Broken seal close-up')">Photo 2</div>
+              <div class="evidence-thumb w-16 h-16 rounded-lg bg-blue-100 flex items-center justify-center text-xs text-blue-500 border border-blue-200 cursor-pointer" onclick="alert('View: Damaged packaging')">Photo 3</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Seller's Response -->
+        <div>
+          <h4 class="text-sm font-semibold text-gray-900 mb-3">Seller's Response</h4>
+          <div class="bg-green-50 rounded-lg p-4 border border-green-100">
+            <p class="text-sm text-gray-700">"Our turmeric is sourced directly from certified organic farms in Erode. Color variations are natural in organic produce and do not indicate quality issues. We can provide the FSSAI certification and farm-origin documents. The packaging damage might have occurred during shipping."</p>
+            <div class="flex gap-2 mt-3">
+              <div class="evidence-thumb w-16 h-16 rounded-lg bg-green-100 flex items-center justify-center text-xs text-green-600 border border-green-200 cursor-pointer" onclick="alert('View: FSSAI certification')">Cert 1</div>
+              <div class="evidence-thumb w-16 h-16 rounded-lg bg-green-100 flex items-center justify-center text-xs text-green-600 border border-green-200 cursor-pointer" onclick="alert('View: Farm origin document')">Cert 2</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Communication Thread -->
+        <div>
+          <h4 class="text-sm font-semibold text-gray-900 mb-3">Communication Thread</h4>
+          <div class="space-y-3 max-h-48 overflow-y-auto border border-gray-200 rounded-lg p-4">
+            <div class="flex gap-3">
+              <div class="w-7 h-7 rounded-full bg-blue-500 flex items-center justify-center text-white text-[10px] font-bold shrink-0">PS</div>
+              <div class="bg-blue-50 rounded-lg p-2.5 flex-1">
+                <p class="text-xs font-semibold text-blue-700">Priya Sharma <span class="font-normal text-gray-400 ml-2">27 Mar, 10:30 AM</span></p>
+                <p class="text-xs text-gray-600 mt-1">The product quality is clearly not what was advertised. I want a full refund.</p>
+              </div>
+            </div>
+            <div class="flex gap-3">
+              <div class="w-7 h-7 rounded-full bg-green-500 flex items-center justify-center text-white text-[10px] font-bold shrink-0">GL</div>
+              <div class="bg-green-50 rounded-lg p-2.5 flex-1">
+                <p class="text-xs font-semibold text-green-700">GreenLeaf Organics <span class="font-normal text-gray-400 ml-2">27 Mar, 2:15 PM</span></p>
+                <p class="text-xs text-gray-600 mt-1">We stand by our product quality. Happy to share lab reports. The packaging issue is a shipping problem and we can offer a partial refund for that.</p>
+              </div>
+            </div>
+            <div class="flex gap-3">
+              <div class="w-7 h-7 rounded-full bg-blue-500 flex items-center justify-center text-white text-[10px] font-bold shrink-0">PS</div>
+              <div class="bg-blue-50 rounded-lg p-2.5 flex-1">
+                <p class="text-xs font-semibold text-blue-700">Priya Sharma <span class="font-normal text-gray-400 ml-2">28 Mar, 9:00 AM</span></p>
+                <p class="text-xs text-gray-600 mt-1">A partial refund is not acceptable. The broken seal means the product could be contaminated.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Admin Notes -->
+        <div>
+          <h4 class="text-sm font-semibold text-gray-900 mb-2">Admin Notes</h4>
+          <textarea rows="3" placeholder="Add internal notes about this dispute..." class="w-full border border-gray-200 rounded-lg p-3 text-sm outline-none focus:border-brand-400 focus:ring-2 focus:ring-brand-100 resize-none"></textarea>
+        </div>
+
+        <!-- Resolution Options -->
+        <div>
+          <h4 class="text-sm font-semibold text-gray-900 mb-3">Resolution Options</h4>
+          <div class="grid grid-cols-2 gap-3">
+            <button onclick="alert('Refunding customer full amount')" class="flex items-center justify-center gap-2 py-3 px-4 border-2 border-blue-200 bg-blue-50 rounded-lg text-sm font-semibold text-blue-700 hover:bg-blue-100 transition">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 15L3 9m0 0l6-6M3 9h12a6 6 0 010 12h-3"/></svg>
+              Refund Customer
+            </button>
+            <button onclick="alert('Siding with seller')" class="flex items-center justify-center gap-2 py-3 px-4 border-2 border-green-200 bg-green-50 rounded-lg text-sm font-semibold text-green-700 hover:bg-green-100 transition">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+              Side with Seller
+            </button>
+            <button onclick="alert('Issuing partial refund')" class="flex items-center justify-center gap-2 py-3 px-4 border-2 border-yellow-200 bg-yellow-50 rounded-lg text-sm font-semibold text-yellow-700 hover:bg-yellow-100 transition">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 6v12m-3-2.818l.879.659c1.171.879 3.07.879 4.242 0 1.172-.879 1.172-2.303 0-3.182C13.536 12.219 12.768 12 12 12c-.725 0-1.45-.22-2.003-.659-1.106-.879-1.106-2.303 0-3.182s2.9-.879 4.006 0l.415.33M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+              Partial Refund
+            </button>
+            <button onclick="alert('Splitting decision')" class="flex items-center justify-center gap-2 py-3 px-4 border-2 border-purple-200 bg-purple-50 rounded-lg text-sm font-semibold text-purple-700 hover:bg-purple-100 transition">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M7.5 21L3 16.5m0 0L7.5 12M3 16.5h13.5m0-13.5L21 7.5m0 0L16.5 12M21 7.5H7.5"/></svg>
+              Split Decision
+            </button>
+          </div>
+        </div>
+
+        <!-- Similar Case Resolution History -->
+        <div>
+          <h4 class="text-sm font-semibold text-gray-900 mb-3">Similar Case Resolutions</h4>
+          <div class="space-y-2">
+            <div class="flex items-center justify-between bg-gray-50 rounded-lg p-3 text-xs">
+              <div>
+                <span class="font-medium text-gray-700">DSP-1985 - Quality Issue</span>
+                <span class="text-gray-400 ml-2">Partial refund (50%)</span>
+              </div>
+              <span class="text-green-600 font-semibold">Resolved</span>
+            </div>
+            <div class="flex items-center justify-between bg-gray-50 rounded-lg p-3 text-xs">
+              <div>
+                <span class="font-medium text-gray-700">DSP-1923 - Quality Issue</span>
+                <span class="text-gray-400 ml-2">Full refund to customer</span>
+              </div>
+              <span class="text-green-600 font-semibold">Resolved</span>
+            </div>
+            <div class="flex items-center justify-between bg-gray-50 rounded-lg p-3 text-xs">
+              <div>
+                <span class="font-medium text-gray-700">DSP-1901 - Quality Issue</span>
+                <span class="text-gray-400 ml-2">Sided with seller</span>
+              </div>
+              <span class="text-green-600 font-semibold">Resolved</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="../shared-layout.js"></script>
+  <script>
+    renderAdminLayout('disputes', '../');
+
+    function filterDisputes(btn, type) {
+      btn.parentElement.querySelectorAll('button').forEach(function(b) {
+        b.classList.remove('active','text-brand-600','border-brand-500');
+        b.classList.add('text-gray-500','border-transparent');
+      });
+      btn.classList.add('active','text-brand-600','border-brand-500');
+      btn.classList.remove('text-gray-500','border-transparent');
+    }
+
+    function openDisputeModal(id) {
+      document.getElementById('disputeModal').classList.remove('hidden');
+    }
+
+    function closeDisputeModal() {
+      document.getElementById('disputeModal').classList.add('hidden');
+    }
+
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape') closeDisputeModal();
+    });
+
+    // Bulk action logic
+    function updateBulkBar() {
+      var checkboxes = document.querySelectorAll('.dispute-checkbox:checked');
+      var bar = document.getElementById('bulkActionBar');
+      var count = document.getElementById('selectedCount');
+      if (checkboxes.length > 0) {
+        bar.classList.remove('hidden');
+        count.textContent = checkboxes.length + ' dispute' + (checkboxes.length > 1 ? 's' : '') + ' selected';
+      } else {
+        bar.classList.add('hidden');
+        document.getElementById('selectAll').checked = false;
+      }
+    }
+
+    function toggleSelectAll(masterCheckbox) {
+      var checkboxes = document.querySelectorAll('.dispute-checkbox');
+      checkboxes.forEach(function(cb) {
+        cb.checked = masterCheckbox.checked;
+      });
+      updateBulkBar();
+    }
+
+    function clearSelection() {
+      document.querySelectorAll('.dispute-checkbox').forEach(function(cb) {
+        cb.checked = false;
+      });
+      document.getElementById('selectAll').checked = false;
+      updateBulkBar();
+    }
+
+    function bulkAction(action) {
+      var selected = [];
+      document.querySelectorAll('.dispute-checkbox:checked').forEach(function(cb) {
+        selected.push(cb.value);
+      });
+      var actionLabels = {
+        'approve': 'Approve',
+        'reject': 'Reject',
+        'escalate': 'Escalate to Legal'
+      };
+      alert(actionLabels[action] + ' ' + selected.length + ' dispute(s): ' + selected.join(', '));
+      clearSelection();
+    }
+  </script>
+</body>
+</html>

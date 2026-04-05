@@ -1,0 +1,1184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HomeBase — Payment Reconciliation</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              50: '#FFF7ED',
+              100: '#FFEDD5',
+              200: '#FED7AA',
+              300: '#FDBA74',
+              400: '#FB923C',
+              500: '#F97316',
+              600: '#EA580C',
+              700: '#C2410C',
+            },
+            navy: {
+              700: '#1E3A5F',
+              800: '#0F1E30',
+              900: '#0A1628',
+            },
+            success: '#16A34A',
+            warning: '#EAB308',
+            danger: '#DC2626',
+          },
+          fontFamily: {
+            sans: ['Inter', 'system-ui', 'sans-serif'],
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+    .scrollbar-hide::-webkit-scrollbar { display: none; }
+    .sidebar-link { transition: all 0.15s ease; }
+    .sidebar-link:hover { background: rgba(255,255,255,0.06); }
+    .sidebar-link.active { background: rgba(249,115,22,0.15); border-right: 3px solid #F97316; }
+    .stat-card { transition: all 0.2s ease; }
+    .stat-card:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,0.1); }
+    .table-row { transition: background 0.15s ease; }
+    .table-row:hover { background: #FFF7ED; }
+    .dropdown-menu { display: none; }
+    .dropdown:hover .dropdown-menu { display: block; }
+    .filter-tab { transition: all 0.15s ease; }
+    .filter-tab:hover { color: #F97316; }
+    .filter-tab.active { color: #F97316; border-bottom-color: #F97316; }
+    .mismatch-expand { display: none; }
+    .mismatch-expand.open { display: table-row; }
+    .mismatch-trigger { cursor: pointer; }
+    .mismatch-trigger .chevron { transition: transform 0.2s ease; }
+    .mismatch-trigger.expanded .chevron { transform: rotate(90deg); }
+    .toggle-track { transition: background-color 0.2s ease; }
+    .toggle-thumb { transition: transform 0.2s ease; }
+    .toggle-on .toggle-track { background-color: #16A34A; }
+    .toggle-on .toggle-thumb { transform: translateX(16px); }
+  </style>
+</head>
+<body class="font-sans bg-gray-50 text-gray-900">
+
+  <!-- ===== TOP HEADER BAR ===== -->
+  <header id="admin-header" class="fixed top-0 left-0 right-0 z-50 bg-white border-b border-gray-200 h-16"></header>
+
+  <!-- ===== LAYOUT: SIDEBAR + MAIN ===== -->
+  <div class="flex pt-16 min-h-screen">
+
+    <!-- ===== LEFT SIDEBAR ===== -->
+    <aside id="admin-sidebar" class="fixed left-0 top-16 bottom-0 w-60 z-40 flex flex-col overflow-y-auto" style="background:#0A1628;"></aside>
+
+    <!-- ===== MAIN CONTENT ===== -->
+    <main class="flex-1 ml-60 p-6 lg:p-8">
+
+      <!-- Page Header -->
+      <div class="mb-8">
+        <div class="flex items-center justify-between">
+          <div>
+            <h1 class="text-2xl font-bold text-gray-900">Reconciliation</h1>
+            <p class="text-sm text-gray-500 mt-1">Match payment gateway transactions with system records.</p>
+          </div>
+          <div class="flex items-center gap-3">
+            <button onclick="runReconciliation()" class="flex items-center gap-2 bg-brand-500 text-white rounded-lg px-4 py-2.5 text-sm font-semibold hover:bg-brand-600 transition shadow-sm">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182"/></svg>
+              Run Reconciliation
+            </button>
+            <button onclick="alert('Downloading reconciliation report as CSV...')" class="flex items-center gap-2 bg-white border border-gray-200 rounded-lg px-4 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50 transition shadow-sm">
+              <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3"/></svg>
+              Download Report
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== 4 STATS CARDS ===== -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 mb-8">
+        <!-- Total Batches -->
+        <div class="stat-card bg-white rounded-xl border border-gray-100 p-5 shadow-sm">
+          <div class="flex items-center justify-between mb-3">
+            <div class="w-10 h-10 rounded-lg bg-blue-50 flex items-center justify-center">
+              <svg class="w-5 h-5 text-blue-500" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M6.429 9.75L2.25 12l4.179 2.25m0-4.5l5.571 3 5.571-3m-11.142 0L2.25 7.5 12 2.25l9.75 5.25-4.179 2.25m0 0L12 12.75 6.429 9.75m11.142 0l4.179 2.25-4.179 2.25m0 0L12 17.25l-5.571-3m11.142 0l4.179 2.25L12 21.75l-9.75-5.25 4.179-2.25"/></svg>
+            </div>
+          </div>
+          <p class="text-2xl font-bold text-gray-900">156</p>
+          <p class="text-xs text-gray-500 mt-1">Total Batches</p>
+          <div class="mt-3 h-1 bg-gray-100 rounded-full overflow-hidden">
+            <div class="h-full bg-blue-500 rounded-full" style="width: 100%"></div>
+          </div>
+        </div>
+
+        <!-- Match Rate -->
+        <div class="stat-card bg-white rounded-xl border border-gray-100 p-5 shadow-sm">
+          <div class="flex items-center justify-between mb-3">
+            <div class="w-10 h-10 rounded-lg bg-green-50 flex items-center justify-center">
+              <svg class="w-5 h-5 text-green-500" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+            </div>
+            <span class="text-xs font-medium text-success bg-green-50 px-2 py-1 rounded-full">Healthy</span>
+          </div>
+          <p class="text-2xl font-bold text-gray-900">97.8%</p>
+          <p class="text-xs text-gray-500 mt-1">Match Rate</p>
+          <div class="mt-3 h-1 bg-gray-100 rounded-full overflow-hidden">
+            <div class="h-full bg-green-500 rounded-full" style="width: 97.8%"></div>
+          </div>
+        </div>
+
+        <!-- Mismatches -->
+        <div class="stat-card bg-white rounded-xl border border-gray-100 p-5 shadow-sm">
+          <div class="flex items-center justify-between mb-3">
+            <div class="w-10 h-10 rounded-lg bg-red-50 flex items-center justify-center">
+              <svg class="w-5 h-5 text-red-500" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z"/></svg>
+            </div>
+            <span class="text-xs font-medium text-danger bg-red-50 px-2 py-1 rounded-full">Alert</span>
+          </div>
+          <p class="text-2xl font-bold text-gray-900">34</p>
+          <p class="text-xs text-gray-500 mt-1">Mismatches</p>
+          <div class="mt-3 h-1 bg-gray-100 rounded-full overflow-hidden">
+            <div class="h-full bg-red-500 rounded-full" style="width: 22%"></div>
+          </div>
+        </div>
+
+        <!-- Pending Review -->
+        <div class="stat-card bg-white rounded-xl border border-gray-100 p-5 shadow-sm">
+          <div class="flex items-center justify-between mb-3">
+            <div class="w-10 h-10 rounded-lg bg-yellow-50 flex items-center justify-center">
+              <svg class="w-5 h-5 text-yellow-500" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+            </div>
+            <span class="text-xs font-medium text-warning bg-yellow-50 px-2 py-1 rounded-full">Awaiting</span>
+          </div>
+          <p class="text-2xl font-bold text-gray-900">8</p>
+          <p class="text-xs text-gray-500 mt-1">Pending Review</p>
+          <div class="mt-3 h-1 bg-gray-100 rounded-full overflow-hidden">
+            <div class="h-full bg-yellow-400 rounded-full" style="width: 5%"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== GATEWAY SYNC STATUS + AUTO-RECONCILIATION RULES (side by side) ===== -->
+      <div class="grid grid-cols-1 xl:grid-cols-2 gap-6 mb-8">
+
+        <!-- Gateway Sync Status -->
+        <div class="bg-white rounded-xl border border-gray-100 shadow-sm p-6">
+          <div class="flex items-center justify-between mb-5">
+            <div>
+              <h2 class="text-lg font-semibold text-gray-900">Gateway Sync Status</h2>
+              <p class="text-xs text-gray-500 mt-0.5">Real-time connection status with payment gateways</p>
+            </div>
+          </div>
+          <div class="space-y-4">
+            <!-- Razorpay - Green -->
+            <div class="flex items-center justify-between bg-green-50/50 border border-green-100 rounded-lg px-4 py-3.5">
+              <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-lg bg-blue-100 flex items-center justify-center">
+                  <span class="text-xs font-bold text-blue-700">RP</span>
+                </div>
+                <div>
+                  <p class="text-sm font-semibold text-gray-800">Razorpay</p>
+                  <p class="text-[11px] text-gray-500">Last sync: <span class="font-medium text-green-600">5 min ago</span></p>
+                </div>
+              </div>
+              <div class="flex items-center gap-3">
+                <div class="flex items-center gap-1.5">
+                  <span class="w-2.5 h-2.5 rounded-full bg-green-500 animate-pulse"></span>
+                  <span class="text-xs font-semibold text-green-700">Connected</span>
+                </div>
+                <button onclick="forceSync('Razorpay')" class="text-xs font-semibold text-brand-600 hover:text-brand-700 bg-white border border-brand-200 px-3 py-1.5 rounded-lg hover:bg-brand-50 transition">Force Sync</button>
+              </div>
+            </div>
+            <!-- Paytm - Amber -->
+            <div class="flex items-center justify-between bg-yellow-50/50 border border-yellow-100 rounded-lg px-4 py-3.5">
+              <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-lg bg-cyan-100 flex items-center justify-center">
+                  <span class="text-xs font-bold text-cyan-700">PT</span>
+                </div>
+                <div>
+                  <p class="text-sm font-semibold text-gray-800">Paytm</p>
+                  <p class="text-[11px] text-gray-500">Last sync: <span class="font-medium text-yellow-600">2 hrs ago</span></p>
+                </div>
+              </div>
+              <div class="flex items-center gap-3">
+                <div class="flex items-center gap-1.5">
+                  <span class="w-2.5 h-2.5 rounded-full bg-yellow-500"></span>
+                  <span class="text-xs font-semibold text-yellow-700">Delayed</span>
+                </div>
+                <button onclick="forceSync('Paytm')" class="text-xs font-semibold text-brand-600 hover:text-brand-700 bg-white border border-brand-200 px-3 py-1.5 rounded-lg hover:bg-brand-50 transition">Force Sync</button>
+              </div>
+            </div>
+            <!-- PhonePe - Red -->
+            <div class="flex items-center justify-between bg-red-50/50 border border-red-100 rounded-lg px-4 py-3.5">
+              <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-lg bg-purple-100 flex items-center justify-center">
+                  <span class="text-xs font-bold text-purple-700">PP</span>
+                </div>
+                <div>
+                  <p class="text-sm font-semibold text-gray-800">PhonePe</p>
+                  <p class="text-[11px] text-gray-500">Last sync: <span class="font-medium text-red-600">Failed 4 hrs ago</span></p>
+                </div>
+              </div>
+              <div class="flex items-center gap-3">
+                <div class="flex items-center gap-1.5">
+                  <span class="w-2.5 h-2.5 rounded-full bg-red-500"></span>
+                  <span class="text-xs font-semibold text-red-700">Failed</span>
+                </div>
+                <button onclick="forceSync('PhonePe')" class="text-xs font-semibold text-white bg-red-500 border border-red-500 px-3 py-1.5 rounded-lg hover:bg-red-600 transition">Force Sync</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Auto-Reconciliation Rules -->
+        <div class="bg-white rounded-xl border border-gray-100 shadow-sm p-6">
+          <div class="flex items-center justify-between mb-5">
+            <div>
+              <h2 class="text-lg font-semibold text-gray-900">Auto-Reconciliation Rules</h2>
+              <p class="text-xs text-gray-500 mt-0.5">Configure automatic approval criteria for transaction matching</p>
+            </div>
+          </div>
+          <div class="space-y-4">
+            <!-- Rule 1 - Variance Threshold -->
+            <div class="flex items-center justify-between bg-gray-50 border border-gray-200 rounded-lg px-4 py-3.5">
+              <div class="flex-1">
+                <p class="text-sm font-medium text-gray-800">Variance within &#8377;10</p>
+                <p class="text-[11px] text-gray-500 mt-0.5">Auto-approve transactions where gateway-system variance is within &#8377;10</p>
+              </div>
+              <button onclick="toggleRule(this)" class="toggle-on shrink-0 ml-4">
+                <div class="toggle-track w-10 h-6 rounded-full bg-green-500 flex items-center px-0.5">
+                  <div class="toggle-thumb w-5 h-5 rounded-full bg-white shadow-sm transform translate-x-4"></div>
+                </div>
+              </button>
+            </div>
+            <!-- Rule 2 - Timing Mismatch -->
+            <div class="flex items-center justify-between bg-gray-50 border border-gray-200 rounded-lg px-4 py-3.5">
+              <div class="flex-1">
+                <p class="text-sm font-medium text-gray-800">Timing mismatch &lt; 24 hrs</p>
+                <p class="text-[11px] text-gray-500 mt-0.5">Auto-approve when amounts match but timestamps differ by less than 24 hours</p>
+              </div>
+              <button onclick="toggleRule(this)" class="toggle-on shrink-0 ml-4">
+                <div class="toggle-track w-10 h-6 rounded-full bg-green-500 flex items-center px-0.5">
+                  <div class="toggle-thumb w-5 h-5 rounded-full bg-white shadow-sm transform translate-x-4"></div>
+                </div>
+              </button>
+            </div>
+            <!-- Rule 3 - Exact Match -->
+            <div class="flex items-center justify-between bg-gray-50 border border-gray-200 rounded-lg px-4 py-3.5">
+              <div class="flex-1">
+                <p class="text-sm font-medium text-gray-800">Exact amount match</p>
+                <p class="text-[11px] text-gray-500 mt-0.5">Auto-approve when gateway and system amounts match exactly (&#8377;0 variance)</p>
+              </div>
+              <button onclick="toggleRule(this)" class="toggle-on shrink-0 ml-4">
+                <div class="toggle-track w-10 h-6 rounded-full bg-green-500 flex items-center px-0.5">
+                  <div class="toggle-thumb w-5 h-5 rounded-full bg-white shadow-sm transform translate-x-4"></div>
+                </div>
+              </button>
+            </div>
+          </div>
+          <!-- Rules stats -->
+          <div class="mt-4 pt-4 border-t border-gray-100 flex items-center justify-between">
+            <p class="text-xs text-gray-500">Auto-approved today: <span class="font-bold text-gray-700">1,186</span> transactions</p>
+            <p class="text-xs text-gray-500">Manual review: <span class="font-bold text-red-600">48</span> transactions</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== AUTO-MATCH RATE PROGRESS BAR ===== -->
+      <div class="bg-white rounded-xl border border-gray-100 shadow-sm p-6 mb-8">
+        <div class="flex items-center justify-between mb-4">
+          <div>
+            <h2 class="text-lg font-semibold text-gray-900">Auto-Match Rate</h2>
+            <p class="text-xs text-gray-500 mt-0.5">Transaction matching summary across all batches</p>
+          </div>
+          <div class="text-right">
+            <p class="text-2xl font-bold text-green-600">97.8%</p>
+            <p class="text-xs text-gray-500">Overall match rate</p>
+          </div>
+        </div>
+        <!-- Progress Bar -->
+        <div class="w-full h-4 bg-gray-100 rounded-full overflow-hidden flex">
+          <div class="h-full bg-green-500 transition-all" style="width: 97.26%" title="Matched: 14,234"></div>
+          <div class="h-full bg-red-500 transition-all" style="width: 2.13%" title="Mismatched: 312"></div>
+          <div class="h-full bg-yellow-400 transition-all" style="width: 0.61%" title="Unmatched: 89"></div>
+        </div>
+        <!-- Legend -->
+        <div class="flex items-center gap-6 mt-3">
+          <div class="flex items-center gap-2">
+            <span class="w-3 h-3 rounded-full bg-green-500"></span>
+            <span class="text-sm text-gray-700"><span class="font-semibold">14,234</span> Matched</span>
+          </div>
+          <div class="flex items-center gap-2">
+            <span class="w-3 h-3 rounded-full bg-red-500"></span>
+            <span class="text-sm text-gray-700"><span class="font-semibold">312</span> Mismatched</span>
+          </div>
+          <div class="flex items-center gap-2">
+            <span class="w-3 h-3 rounded-full bg-yellow-400"></span>
+            <span class="text-sm text-gray-700"><span class="font-semibold">89</span> Unmatched</span>
+          </div>
+          <div class="ml-auto text-sm text-gray-500">
+            Total: <span class="font-semibold text-gray-700">14,635</span> transactions
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== TRANSACTION-LEVEL MISMATCH VIEWER ===== -->
+      <div class="bg-white rounded-xl border border-gray-100 shadow-sm mb-6 overflow-hidden">
+        <div class="px-6 py-4 border-b border-gray-100">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-3">
+              <h2 class="text-lg font-semibold text-gray-900">Transaction-Level Mismatch Viewer</h2>
+              <span class="text-xs font-semibold text-red-600 bg-red-50 px-2.5 py-1 rounded-full">6 Pending Resolution</span>
+            </div>
+            <button onclick="toggleMismatchViewer()" id="mismatch-viewer-toggle" class="text-sm text-brand-500 font-medium hover:text-brand-600 transition flex items-center gap-1">
+              <span id="mismatch-viewer-label">Collapse</span>
+              <svg id="mismatch-viewer-chevron" class="w-4 h-4 transition-transform" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4.5 15.75l7.5-7.5 7.5 7.5"/></svg>
+            </button>
+          </div>
+        </div>
+        <div id="mismatch-viewer-body">
+          <div class="overflow-x-auto">
+            <table class="w-full" id="mismatch-table">
+              <thead>
+                <tr class="bg-red-50/40">
+                  <th class="text-left text-[10px] font-semibold text-gray-500 uppercase tracking-wider px-3 py-3 w-8"></th>
+                  <th class="text-left text-[10px] font-semibold text-gray-500 uppercase tracking-wider px-3 py-3">Txn ID</th>
+                  <th class="text-left text-[10px] font-semibold text-gray-500 uppercase tracking-wider px-3 py-3">Order ID</th>
+                  <th class="text-left text-[10px] font-semibold text-gray-500 uppercase tracking-wider px-3 py-3">Gateway</th>
+                  <th class="text-right text-[10px] font-semibold text-gray-500 uppercase tracking-wider px-3 py-3">Gateway Amount</th>
+                  <th class="text-right text-[10px] font-semibold text-gray-500 uppercase tracking-wider px-3 py-3">System Amount</th>
+                  <th class="text-right text-[10px] font-semibold text-gray-500 uppercase tracking-wider px-3 py-3">Variance</th>
+                  <th class="text-center text-[10px] font-semibold text-gray-500 uppercase tracking-wider px-3 py-3">Status</th>
+                  <th class="text-center text-[10px] font-semibold text-gray-500 uppercase tracking-wider px-6 py-3">Actions</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-gray-50">
+                <!-- Mismatch 1 -->
+                <tr class="table-row mismatch-trigger" onclick="toggleMismatchDetail(this)" data-txn="TXN-89234">
+                  <td class="px-3 py-3.5 text-center">
+                    <svg class="w-4 h-4 text-gray-400 chevron" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M8.25 4.5l7.5 7.5-7.5 7.5"/></svg>
+                  </td>
+                  <td class="px-3 py-3.5"><span class="text-sm font-semibold text-brand-600">TXN-89234</span></td>
+                  <td class="px-3 py-3.5 text-sm text-gray-700 font-medium">HB-10567</td>
+                  <td class="px-3 py-3.5">
+                    <div class="flex items-center gap-1.5">
+                      <div class="w-5 h-5 rounded bg-blue-100 flex items-center justify-center"><span class="text-[8px] font-bold text-blue-700">RP</span></div>
+                      <span class="text-sm text-gray-700">Razorpay</span>
+                    </div>
+                  </td>
+                  <td class="px-3 py-3.5 text-right text-sm font-medium text-gray-800">&#8377;3,500.00</td>
+                  <td class="px-3 py-3.5 text-right text-sm font-medium text-gray-800">&#8377;3,450.00</td>
+                  <td class="px-3 py-3.5 text-right text-sm font-bold text-red-600">&#8377;50.00</td>
+                  <td class="px-3 py-3.5 text-center">
+                    <span class="inline-flex items-center gap-1 text-[11px] font-semibold text-yellow-700 bg-yellow-50 border border-yellow-200 px-2.5 py-1 rounded-full">
+                      <span class="w-1.5 h-1.5 rounded-full bg-yellow-500"></span>Pending
+                    </span>
+                  </td>
+                  <td class="px-6 py-3.5 text-center" onclick="event.stopPropagation()">
+                    <div class="flex items-center justify-center gap-1">
+                      <button onclick="resolveMismatch('TXN-89234','gateway')" class="text-[10px] font-semibold text-blue-600 bg-blue-50 border border-blue-200 px-2 py-1 rounded hover:bg-blue-100 transition" title="Accept Gateway Amount">Gateway</button>
+                      <button onclick="resolveMismatch('TXN-89234','system')" class="text-[10px] font-semibold text-green-600 bg-green-50 border border-green-200 px-2 py-1 rounded hover:bg-green-100 transition" title="Accept System Amount">System</button>
+                      <button onclick="resolveMismatch('TXN-89234','flag')" class="text-[10px] font-semibold text-red-600 bg-red-50 border border-red-200 px-2 py-1 rounded hover:bg-red-100 transition" title="Flag for Review">Flag</button>
+                    </div>
+                  </td>
+                </tr>
+                <!-- Expandable detail for TXN-89234 -->
+                <tr class="mismatch-expand" id="detail-TXN-89234">
+                  <td colspan="9" class="px-0 py-0">
+                    <div class="bg-gray-50 border-t border-b border-gray-100 px-8 py-4">
+                      <div class="grid grid-cols-3 gap-4">
+                        <div class="bg-blue-50 rounded-lg p-3 border border-blue-100">
+                          <p class="text-[10px] font-semibold text-blue-600 uppercase">Gateway Says</p>
+                          <p class="text-lg font-bold text-blue-800 mt-1">&#8377;3,500.00</p>
+                          <p class="text-[11px] text-blue-600 mt-1">Razorpay | pay_NxR7abc123</p>
+                          <p class="text-[11px] text-blue-500">02 Apr 2026, 14:32 IST</p>
+                        </div>
+                        <div class="bg-green-50 rounded-lg p-3 border border-green-100">
+                          <p class="text-[10px] font-semibold text-green-600 uppercase">System Says</p>
+                          <p class="text-lg font-bold text-green-800 mt-1">&#8377;3,450.00</p>
+                          <p class="text-[11px] text-green-600 mt-1">Order HB-10567 | Cart total</p>
+                          <p class="text-[11px] text-green-500">02 Apr 2026, 14:30 IST</p>
+                        </div>
+                        <div class="bg-red-50 rounded-lg p-3 border border-red-100">
+                          <p class="text-[10px] font-semibold text-red-600 uppercase">Variance Analysis</p>
+                          <p class="text-lg font-bold text-red-700 mt-1">&#8377;50.00 excess</p>
+                          <p class="text-[11px] text-red-600 mt-1">Possible reason: <span class="font-semibold">Rounding difference</span></p>
+                          <p class="text-[11px] text-red-500">Convenience fee applied at gateway</p>
+                        </div>
+                      </div>
+                    </div>
+                  </td>
+                </tr>
+
+                <!-- Mismatch 2 -->
+                <tr class="table-row mismatch-trigger" onclick="toggleMismatchDetail(this)" data-txn="TXN-89238">
+                  <td class="px-3 py-3.5 text-center">
+                    <svg class="w-4 h-4 text-gray-400 chevron" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M8.25 4.5l7.5 7.5-7.5 7.5"/></svg>
+                  </td>
+                  <td class="px-3 py-3.5"><span class="text-sm font-semibold text-brand-600">TXN-89238</span></td>
+                  <td class="px-3 py-3.5 text-sm text-gray-700 font-medium">HB-10582</td>
+                  <td class="px-3 py-3.5">
+                    <div class="flex items-center gap-1.5">
+                      <div class="w-5 h-5 rounded bg-cyan-100 flex items-center justify-center"><span class="text-[8px] font-bold text-cyan-700">PT</span></div>
+                      <span class="text-sm text-gray-700">Paytm</span>
+                    </div>
+                  </td>
+                  <td class="px-3 py-3.5 text-right text-sm font-medium text-gray-800">&#8377;12,999.00</td>
+                  <td class="px-3 py-3.5 text-right text-sm font-medium text-gray-800">&#8377;12,499.00</td>
+                  <td class="px-3 py-3.5 text-right text-sm font-bold text-red-600">&#8377;500.00</td>
+                  <td class="px-3 py-3.5 text-center">
+                    <span class="inline-flex items-center gap-1 text-[11px] font-semibold text-yellow-700 bg-yellow-50 border border-yellow-200 px-2.5 py-1 rounded-full">
+                      <span class="w-1.5 h-1.5 rounded-full bg-yellow-500"></span>Pending
+                    </span>
+                  </td>
+                  <td class="px-6 py-3.5 text-center" onclick="event.stopPropagation()">
+                    <div class="flex items-center justify-center gap-1">
+                      <button onclick="resolveMismatch('TXN-89238','gateway')" class="text-[10px] font-semibold text-blue-600 bg-blue-50 border border-blue-200 px-2 py-1 rounded hover:bg-blue-100 transition">Gateway</button>
+                      <button onclick="resolveMismatch('TXN-89238','system')" class="text-[10px] font-semibold text-green-600 bg-green-50 border border-green-200 px-2 py-1 rounded hover:bg-green-100 transition">System</button>
+                      <button onclick="resolveMismatch('TXN-89238','flag')" class="text-[10px] font-semibold text-red-600 bg-red-50 border border-red-200 px-2 py-1 rounded hover:bg-red-100 transition">Flag</button>
+                    </div>
+                  </td>
+                </tr>
+                <tr class="mismatch-expand" id="detail-TXN-89238">
+                  <td colspan="9" class="px-0 py-0">
+                    <div class="bg-gray-50 border-t border-b border-gray-100 px-8 py-4">
+                      <div class="grid grid-cols-3 gap-4">
+                        <div class="bg-blue-50 rounded-lg p-3 border border-blue-100">
+                          <p class="text-[10px] font-semibold text-blue-600 uppercase">Gateway Says</p>
+                          <p class="text-lg font-bold text-blue-800 mt-1">&#8377;12,999.00</p>
+                          <p class="text-[11px] text-blue-600 mt-1">Paytm | txn_9812kqw</p>
+                          <p class="text-[11px] text-blue-500">01 Apr 2026, 18:45 IST</p>
+                        </div>
+                        <div class="bg-green-50 rounded-lg p-3 border border-green-100">
+                          <p class="text-[10px] font-semibold text-green-600 uppercase">System Says</p>
+                          <p class="text-lg font-bold text-green-800 mt-1">&#8377;12,499.00</p>
+                          <p class="text-[11px] text-green-600 mt-1">Order HB-10582 | Cart total</p>
+                          <p class="text-[11px] text-green-500">01 Apr 2026, 18:44 IST</p>
+                        </div>
+                        <div class="bg-red-50 rounded-lg p-3 border border-red-100">
+                          <p class="text-[10px] font-semibold text-red-600 uppercase">Variance Analysis</p>
+                          <p class="text-lg font-bold text-red-700 mt-1">&#8377;500.00 excess</p>
+                          <p class="text-[11px] text-red-600 mt-1">Possible reason: <span class="font-semibold">Promo code not applied</span></p>
+                          <p class="text-[11px] text-red-500">Customer applied SAVE500 at checkout</p>
+                        </div>
+                      </div>
+                    </div>
+                  </td>
+                </tr>
+
+                <!-- Mismatch 3 -->
+                <tr class="table-row mismatch-trigger" onclick="toggleMismatchDetail(this)" data-txn="TXN-89240">
+                  <td class="px-3 py-3.5 text-center">
+                    <svg class="w-4 h-4 text-gray-400 chevron" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M8.25 4.5l7.5 7.5-7.5 7.5"/></svg>
+                  </td>
+                  <td class="px-3 py-3.5"><span class="text-sm font-semibold text-brand-600">TXN-89240</span></td>
+                  <td class="px-3 py-3.5 text-sm text-gray-700 font-medium">HB-10601</td>
+                  <td class="px-3 py-3.5">
+                    <div class="flex items-center gap-1.5">
+                      <div class="w-5 h-5 rounded bg-purple-100 flex items-center justify-center"><span class="text-[8px] font-bold text-purple-700">PP</span></div>
+                      <span class="text-sm text-gray-700">PhonePe</span>
+                    </div>
+                  </td>
+                  <td class="px-3 py-3.5 text-right text-sm font-medium text-gray-800">&#8377;4,599.00</td>
+                  <td class="px-3 py-3.5 text-right text-sm text-gray-400">&mdash;</td>
+                  <td class="px-3 py-3.5 text-right text-sm font-bold text-red-600">&#8377;4,599.00</td>
+                  <td class="px-3 py-3.5 text-center">
+                    <span class="inline-flex items-center gap-1 text-[11px] font-semibold text-red-700 bg-red-50 border border-red-200 px-2.5 py-1 rounded-full">
+                      <span class="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse"></span>Escalated
+                    </span>
+                  </td>
+                  <td class="px-6 py-3.5 text-center" onclick="event.stopPropagation()">
+                    <div class="flex items-center justify-center gap-1">
+                      <button onclick="resolveMismatch('TXN-89240','gateway')" class="text-[10px] font-semibold text-blue-600 bg-blue-50 border border-blue-200 px-2 py-1 rounded hover:bg-blue-100 transition">Gateway</button>
+                      <button onclick="resolveMismatch('TXN-89240','system')" class="text-[10px] font-semibold text-green-600 bg-green-50 border border-green-200 px-2 py-1 rounded hover:bg-green-100 transition">System</button>
+                      <button onclick="resolveMismatch('TXN-89240','flag')" class="text-[10px] font-semibold text-red-600 bg-red-50 border border-red-200 px-2 py-1 rounded hover:bg-red-100 transition">Flag</button>
+                    </div>
+                  </td>
+                </tr>
+                <tr class="mismatch-expand" id="detail-TXN-89240">
+                  <td colspan="9" class="px-0 py-0">
+                    <div class="bg-gray-50 border-t border-b border-gray-100 px-8 py-4">
+                      <div class="grid grid-cols-3 gap-4">
+                        <div class="bg-blue-50 rounded-lg p-3 border border-blue-100">
+                          <p class="text-[10px] font-semibold text-blue-600 uppercase">Gateway Says</p>
+                          <p class="text-lg font-bold text-blue-800 mt-1">&#8377;4,599.00</p>
+                          <p class="text-[11px] text-blue-600 mt-1">PhonePe | pp_txn_456def</p>
+                          <p class="text-[11px] text-blue-500">01 Apr 2026, 21:12 IST</p>
+                        </div>
+                        <div class="bg-gray-100 rounded-lg p-3 border border-gray-200">
+                          <p class="text-[10px] font-semibold text-gray-500 uppercase">System Says</p>
+                          <p class="text-lg font-bold text-gray-400 mt-1">Not Found</p>
+                          <p class="text-[11px] text-gray-500 mt-1">No matching order in system</p>
+                          <p class="text-[11px] text-gray-400">Missing in system records</p>
+                        </div>
+                        <div class="bg-red-50 rounded-lg p-3 border border-red-100">
+                          <p class="text-[10px] font-semibold text-red-600 uppercase">Variance Analysis</p>
+                          <p class="text-lg font-bold text-red-700 mt-1">&#8377;4,599.00 missing</p>
+                          <p class="text-[11px] text-red-600 mt-1">Possible reason: <span class="font-semibold">Webhook failure</span></p>
+                          <p class="text-[11px] text-red-500">Payment captured but callback missed</p>
+                        </div>
+                      </div>
+                    </div>
+                  </td>
+                </tr>
+
+                <!-- Mismatch 4 -->
+                <tr class="table-row mismatch-trigger" onclick="toggleMismatchDetail(this)" data-txn="TXN-89242">
+                  <td class="px-3 py-3.5 text-center">
+                    <svg class="w-4 h-4 text-gray-400 chevron" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M8.25 4.5l7.5 7.5-7.5 7.5"/></svg>
+                  </td>
+                  <td class="px-3 py-3.5"><span class="text-sm font-semibold text-brand-600">TXN-89242</span></td>
+                  <td class="px-3 py-3.5 text-sm text-gray-700 font-medium">HB-10612</td>
+                  <td class="px-3 py-3.5">
+                    <div class="flex items-center gap-1.5">
+                      <div class="w-5 h-5 rounded bg-blue-100 flex items-center justify-center"><span class="text-[8px] font-bold text-blue-700">RP</span></div>
+                      <span class="text-sm text-gray-700">Razorpay</span>
+                    </div>
+                  </td>
+                  <td class="px-3 py-3.5 text-right text-sm text-gray-400">&mdash;</td>
+                  <td class="px-3 py-3.5 text-right text-sm font-medium text-gray-800">&#8377;899.00</td>
+                  <td class="px-3 py-3.5 text-right text-sm font-bold text-red-600">&#8377;899.00</td>
+                  <td class="px-3 py-3.5 text-center">
+                    <span class="inline-flex items-center gap-1 text-[11px] font-semibold text-yellow-700 bg-yellow-50 border border-yellow-200 px-2.5 py-1 rounded-full">
+                      <span class="w-1.5 h-1.5 rounded-full bg-yellow-500"></span>Pending
+                    </span>
+                  </td>
+                  <td class="px-6 py-3.5 text-center" onclick="event.stopPropagation()">
+                    <div class="flex items-center justify-center gap-1">
+                      <button onclick="resolveMismatch('TXN-89242','gateway')" class="text-[10px] font-semibold text-blue-600 bg-blue-50 border border-blue-200 px-2 py-1 rounded hover:bg-blue-100 transition">Gateway</button>
+                      <button onclick="resolveMismatch('TXN-89242','system')" class="text-[10px] font-semibold text-green-600 bg-green-50 border border-green-200 px-2 py-1 rounded hover:bg-green-100 transition">System</button>
+                      <button onclick="resolveMismatch('TXN-89242','flag')" class="text-[10px] font-semibold text-red-600 bg-red-50 border border-red-200 px-2 py-1 rounded hover:bg-red-100 transition">Flag</button>
+                    </div>
+                  </td>
+                </tr>
+                <tr class="mismatch-expand" id="detail-TXN-89242">
+                  <td colspan="9" class="px-0 py-0">
+                    <div class="bg-gray-50 border-t border-b border-gray-100 px-8 py-4">
+                      <div class="grid grid-cols-3 gap-4">
+                        <div class="bg-gray-100 rounded-lg p-3 border border-gray-200">
+                          <p class="text-[10px] font-semibold text-gray-500 uppercase">Gateway Says</p>
+                          <p class="text-lg font-bold text-gray-400 mt-1">Not Found</p>
+                          <p class="text-[11px] text-gray-500 mt-1">No matching transaction at Razorpay</p>
+                          <p class="text-[11px] text-gray-400">Missing in gateway records</p>
+                        </div>
+                        <div class="bg-green-50 rounded-lg p-3 border border-green-100">
+                          <p class="text-[10px] font-semibold text-green-600 uppercase">System Says</p>
+                          <p class="text-lg font-bold text-green-800 mt-1">&#8377;899.00</p>
+                          <p class="text-[11px] text-green-600 mt-1">Order HB-10612 | Payment pending</p>
+                          <p class="text-[11px] text-green-500">31 Mar 2026, 09:15 IST</p>
+                        </div>
+                        <div class="bg-red-50 rounded-lg p-3 border border-red-100">
+                          <p class="text-[10px] font-semibold text-red-600 uppercase">Variance Analysis</p>
+                          <p class="text-lg font-bold text-red-700 mt-1">&#8377;899.00 missing</p>
+                          <p class="text-[11px] text-red-600 mt-1">Possible reason: <span class="font-semibold">Payment timeout</span></p>
+                          <p class="text-[11px] text-red-500">User abandoned, system didn't update</p>
+                        </div>
+                      </div>
+                    </div>
+                  </td>
+                </tr>
+
+                <!-- Mismatch 5 -->
+                <tr class="table-row mismatch-trigger" onclick="toggleMismatchDetail(this)" data-txn="TXN-89245">
+                  <td class="px-3 py-3.5 text-center">
+                    <svg class="w-4 h-4 text-gray-400 chevron" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M8.25 4.5l7.5 7.5-7.5 7.5"/></svg>
+                  </td>
+                  <td class="px-3 py-3.5"><span class="text-sm font-semibold text-brand-600">TXN-89245</span></td>
+                  <td class="px-3 py-3.5 text-sm text-gray-700 font-medium">HB-10620</td>
+                  <td class="px-3 py-3.5">
+                    <div class="flex items-center gap-1.5">
+                      <div class="w-5 h-5 rounded bg-blue-100 flex items-center justify-center"><span class="text-[8px] font-bold text-blue-700">RP</span></div>
+                      <span class="text-sm text-gray-700">Razorpay</span>
+                    </div>
+                  </td>
+                  <td class="px-3 py-3.5 text-right text-sm font-medium text-gray-800">&#8377;7,250.00</td>
+                  <td class="px-3 py-3.5 text-right text-sm font-medium text-gray-800">&#8377;7,250.00</td>
+                  <td class="px-3 py-3.5 text-right text-sm font-medium text-gray-400">&#8377;0.00</td>
+                  <td class="px-3 py-3.5 text-center">
+                    <span class="inline-flex items-center gap-1 text-[11px] font-semibold text-blue-700 bg-blue-50 border border-blue-200 px-2.5 py-1 rounded-full">Duplicate</span>
+                  </td>
+                  <td class="px-6 py-3.5 text-center" onclick="event.stopPropagation()">
+                    <div class="flex items-center justify-center gap-1">
+                      <button onclick="resolveMismatch('TXN-89245','gateway')" class="text-[10px] font-semibold text-blue-600 bg-blue-50 border border-blue-200 px-2 py-1 rounded hover:bg-blue-100 transition">Gateway</button>
+                      <button onclick="resolveMismatch('TXN-89245','system')" class="text-[10px] font-semibold text-green-600 bg-green-50 border border-green-200 px-2 py-1 rounded hover:bg-green-100 transition">System</button>
+                      <button onclick="resolveMismatch('TXN-89245','flag')" class="text-[10px] font-semibold text-red-600 bg-red-50 border border-red-200 px-2 py-1 rounded hover:bg-red-100 transition">Flag</button>
+                    </div>
+                  </td>
+                </tr>
+                <tr class="mismatch-expand" id="detail-TXN-89245">
+                  <td colspan="9" class="px-0 py-0">
+                    <div class="bg-gray-50 border-t border-b border-gray-100 px-8 py-4">
+                      <div class="grid grid-cols-3 gap-4">
+                        <div class="bg-blue-50 rounded-lg p-3 border border-blue-100">
+                          <p class="text-[10px] font-semibold text-blue-600 uppercase">Gateway Says</p>
+                          <p class="text-lg font-bold text-blue-800 mt-1">&#8377;7,250.00</p>
+                          <p class="text-[11px] text-blue-600 mt-1">Razorpay | pay_dupA + pay_dupB</p>
+                          <p class="text-[11px] text-blue-500">02 Apr 2026, 10:20 IST</p>
+                        </div>
+                        <div class="bg-green-50 rounded-lg p-3 border border-green-100">
+                          <p class="text-[10px] font-semibold text-green-600 uppercase">System Says</p>
+                          <p class="text-lg font-bold text-green-800 mt-1">&#8377;7,250.00</p>
+                          <p class="text-[11px] text-green-600 mt-1">Order HB-10620 | Single payment</p>
+                          <p class="text-[11px] text-green-500">02 Apr 2026, 10:19 IST</p>
+                        </div>
+                        <div class="bg-yellow-50 rounded-lg p-3 border border-yellow-100">
+                          <p class="text-[10px] font-semibold text-yellow-600 uppercase">Variance Analysis</p>
+                          <p class="text-lg font-bold text-yellow-700 mt-1">Duplicate detected</p>
+                          <p class="text-[11px] text-yellow-600 mt-1">Possible reason: <span class="font-semibold">Double charge</span></p>
+                          <p class="text-[11px] text-yellow-500">Customer charged twice, refund needed</p>
+                        </div>
+                      </div>
+                    </div>
+                  </td>
+                </tr>
+
+                <!-- Mismatch 6 -->
+                <tr class="table-row mismatch-trigger" onclick="toggleMismatchDetail(this)" data-txn="TXN-89248">
+                  <td class="px-3 py-3.5 text-center">
+                    <svg class="w-4 h-4 text-gray-400 chevron" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M8.25 4.5l7.5 7.5-7.5 7.5"/></svg>
+                  </td>
+                  <td class="px-3 py-3.5"><span class="text-sm font-semibold text-brand-600">TXN-89248</span></td>
+                  <td class="px-3 py-3.5 text-sm text-gray-700 font-medium">HB-10635</td>
+                  <td class="px-3 py-3.5">
+                    <div class="flex items-center gap-1.5">
+                      <div class="w-5 h-5 rounded bg-cyan-100 flex items-center justify-center"><span class="text-[8px] font-bold text-cyan-700">PT</span></div>
+                      <span class="text-sm text-gray-700">Paytm</span>
+                    </div>
+                  </td>
+                  <td class="px-3 py-3.5 text-right text-sm font-medium text-gray-800">&#8377;1,850.00</td>
+                  <td class="px-3 py-3.5 text-right text-sm font-medium text-gray-800">&#8377;1,999.00</td>
+                  <td class="px-3 py-3.5 text-right text-sm font-bold text-red-600">-&#8377;149.00</td>
+                  <td class="px-3 py-3.5 text-center">
+                    <span class="inline-flex items-center gap-1 text-[11px] font-semibold text-yellow-700 bg-yellow-50 border border-yellow-200 px-2.5 py-1 rounded-full">
+                      <span class="w-1.5 h-1.5 rounded-full bg-yellow-500"></span>Pending
+                    </span>
+                  </td>
+                  <td class="px-6 py-3.5 text-center" onclick="event.stopPropagation()">
+                    <div class="flex items-center justify-center gap-1">
+                      <button onclick="resolveMismatch('TXN-89248','gateway')" class="text-[10px] font-semibold text-blue-600 bg-blue-50 border border-blue-200 px-2 py-1 rounded hover:bg-blue-100 transition">Gateway</button>
+                      <button onclick="resolveMismatch('TXN-89248','system')" class="text-[10px] font-semibold text-green-600 bg-green-50 border border-green-200 px-2 py-1 rounded hover:bg-green-100 transition">System</button>
+                      <button onclick="resolveMismatch('TXN-89248','flag')" class="text-[10px] font-semibold text-red-600 bg-red-50 border border-red-200 px-2 py-1 rounded hover:bg-red-100 transition">Flag</button>
+                    </div>
+                  </td>
+                </tr>
+                <tr class="mismatch-expand" id="detail-TXN-89248">
+                  <td colspan="9" class="px-0 py-0">
+                    <div class="bg-gray-50 border-t border-b border-gray-100 px-8 py-4">
+                      <div class="grid grid-cols-3 gap-4">
+                        <div class="bg-blue-50 rounded-lg p-3 border border-blue-100">
+                          <p class="text-[10px] font-semibold text-blue-600 uppercase">Gateway Says</p>
+                          <p class="text-lg font-bold text-blue-800 mt-1">&#8377;1,850.00</p>
+                          <p class="text-[11px] text-blue-600 mt-1">Paytm | txn_pt8812mn</p>
+                          <p class="text-[11px] text-blue-500">02 Apr 2026, 08:55 IST</p>
+                        </div>
+                        <div class="bg-green-50 rounded-lg p-3 border border-green-100">
+                          <p class="text-[10px] font-semibold text-green-600 uppercase">System Says</p>
+                          <p class="text-lg font-bold text-green-800 mt-1">&#8377;1,999.00</p>
+                          <p class="text-[11px] text-green-600 mt-1">Order HB-10635 | Cart total</p>
+                          <p class="text-[11px] text-green-500">02 Apr 2026, 08:54 IST</p>
+                        </div>
+                        <div class="bg-red-50 rounded-lg p-3 border border-red-100">
+                          <p class="text-[10px] font-semibold text-red-600 uppercase">Variance Analysis</p>
+                          <p class="text-lg font-bold text-red-700 mt-1">-&#8377;149.00 short</p>
+                          <p class="text-[11px] text-red-600 mt-1">Possible reason: <span class="font-semibold">Partial payment</span></p>
+                          <p class="text-[11px] text-red-500">Wallet deducted &#8377;149, gateway charged less</p>
+                        </div>
+                      </div>
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== FILTER TABS + SEARCH ===== -->
+      <div class="bg-white rounded-xl border border-gray-100 shadow-sm mb-6">
+        <div class="border-b border-gray-100 px-6 overflow-x-auto scrollbar-hide">
+          <div class="flex gap-0 min-w-max">
+            <button class="filter-tab active text-sm font-medium px-4 py-3.5 border-b-2 border-brand-500 text-brand-500">All (156)</button>
+            <button class="filter-tab text-sm font-medium px-4 py-3.5 border-b-2 border-transparent text-gray-500 hover:text-gray-700">Completed (134)</button>
+            <button class="filter-tab text-sm font-medium px-4 py-3.5 border-b-2 border-transparent text-gray-500 hover:text-gray-700">Mismatched (14)</button>
+            <button class="filter-tab text-sm font-medium px-4 py-3.5 border-b-2 border-transparent text-gray-500 hover:text-gray-700">Pending (8)</button>
+          </div>
+        </div>
+
+        <!-- Search & Filters -->
+        <div class="p-4 flex flex-wrap items-center gap-3">
+          <div class="relative flex-1 min-w-[240px]">
+            <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+            <input type="text" placeholder="Search by batch ID, gateway..." class="w-full bg-gray-50 border border-gray-200 rounded-lg py-2.5 pl-10 pr-4 text-sm outline-none focus:border-brand-400 focus:ring-2 focus:ring-brand-100 transition">
+          </div>
+          <!-- Gateway Filter -->
+          <select class="bg-gray-50 border border-gray-200 rounded-lg px-3 py-2.5 text-sm text-gray-600 outline-none focus:border-brand-400 focus:ring-2 focus:ring-brand-100">
+            <option>All Gateways</option>
+            <option>Razorpay</option>
+            <option>PayU</option>
+            <option>Cashfree</option>
+          </select>
+          <!-- Date Range -->
+          <div class="flex items-center gap-2 bg-gray-50 border border-gray-200 rounded-lg px-3 py-2.5">
+            <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5"/></svg>
+            <span class="text-sm text-gray-600">Mar 29 - Apr 2, 2026</span>
+            <svg class="w-3.5 h-3.5 text-gray-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M19.5 8.25l-7.5 7.5-7.5-7.5"/></svg>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== RECONCILIATION BATCH TABLE ===== -->
+      <div class="bg-white rounded-xl border border-gray-100 shadow-sm mb-6 overflow-hidden">
+        <div class="overflow-x-auto">
+          <table class="w-full" id="batch-table">
+            <thead>
+              <tr class="bg-gray-50/80">
+                <th class="text-left text-[10px] font-semibold text-gray-500 uppercase tracking-wider px-6 py-3">Batch ID</th>
+                <th class="text-left text-[10px] font-semibold text-gray-500 uppercase tracking-wider px-3 py-3">Date</th>
+                <th class="text-left text-[10px] font-semibold text-gray-500 uppercase tracking-wider px-3 py-3">Gateway</th>
+                <th class="text-right text-[10px] font-semibold text-gray-500 uppercase tracking-wider px-3 py-3">Total Txns</th>
+                <th class="text-right text-[10px] font-semibold text-gray-500 uppercase tracking-wider px-3 py-3">Matched</th>
+                <th class="text-right text-[10px] font-semibold text-gray-500 uppercase tracking-wider px-3 py-3">Mismatched</th>
+                <th class="text-right text-[10px] font-semibold text-gray-500 uppercase tracking-wider px-3 py-3">Unmatched</th>
+                <th class="text-center text-[10px] font-semibold text-gray-500 uppercase tracking-wider px-3 py-3">Status</th>
+                <th class="text-center text-[10px] font-semibold text-gray-500 uppercase tracking-wider px-6 py-3">Actions</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-50">
+              <!-- Row 1 - Completed -->
+              <tr class="table-row" data-id="REC-2026-0402" data-gateway="Razorpay" data-status="Completed">
+                <td class="px-6 py-3.5"><span class="text-sm font-semibold text-brand-600">REC-2026-0402</span></td>
+                <td class="px-3 py-3.5 text-sm text-gray-600">02 Apr 2026</td>
+                <td class="px-3 py-3.5">
+                  <div class="flex items-center gap-2">
+                    <div class="w-6 h-6 rounded bg-blue-100 flex items-center justify-center">
+                      <span class="text-[9px] font-bold text-blue-700">RP</span>
+                    </div>
+                    <span class="text-sm text-gray-800 font-medium">Razorpay</span>
+                  </div>
+                </td>
+                <td class="px-3 py-3.5 text-right text-sm font-medium text-gray-800">1,234</td>
+                <td class="px-3 py-3.5 text-right text-sm font-medium text-green-600">1,210</td>
+                <td class="px-3 py-3.5 text-right text-sm font-medium text-red-500">18</td>
+                <td class="px-3 py-3.5 text-right text-sm font-medium text-yellow-600">6</td>
+                <td class="px-3 py-3.5 text-center">
+                  <span class="inline-flex items-center gap-1 text-[11px] font-semibold text-green-700 bg-green-50 border border-green-200 px-2.5 py-1 rounded-full">
+                    <span class="w-1.5 h-1.5 rounded-full bg-green-500"></span>Completed
+                  </span>
+                </td>
+                <td class="px-6 py-3.5 text-center">
+                  <div class="flex items-center justify-center gap-1.5">
+                    <button onclick="viewBatch(this)" class="p-1.5 text-gray-400 hover:bg-gray-100 rounded-lg transition" title="View Details">
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z"/><path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                    </button>
+                    <button onclick="downloadBatchReport(this)" class="p-1.5 text-gray-400 hover:bg-gray-100 rounded-lg transition" title="Download">
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3"/></svg>
+                    </button>
+                  </div>
+                </td>
+              </tr>
+
+              <!-- Row 2 - Completed -->
+              <tr class="table-row" data-id="REC-2026-0401" data-gateway="Razorpay" data-status="Completed">
+                <td class="px-6 py-3.5"><span class="text-sm font-semibold text-brand-600">REC-2026-0401</span></td>
+                <td class="px-3 py-3.5 text-sm text-gray-600">01 Apr 2026</td>
+                <td class="px-3 py-3.5">
+                  <div class="flex items-center gap-2">
+                    <div class="w-6 h-6 rounded bg-blue-100 flex items-center justify-center">
+                      <span class="text-[9px] font-bold text-blue-700">RP</span>
+                    </div>
+                    <span class="text-sm text-gray-800 font-medium">Razorpay</span>
+                  </div>
+                </td>
+                <td class="px-3 py-3.5 text-right text-sm font-medium text-gray-800">1,456</td>
+                <td class="px-3 py-3.5 text-right text-sm font-medium text-green-600">1,430</td>
+                <td class="px-3 py-3.5 text-right text-sm font-medium text-red-500">22</td>
+                <td class="px-3 py-3.5 text-right text-sm font-medium text-yellow-600">4</td>
+                <td class="px-3 py-3.5 text-center">
+                  <span class="inline-flex items-center gap-1 text-[11px] font-semibold text-green-700 bg-green-50 border border-green-200 px-2.5 py-1 rounded-full">
+                    <span class="w-1.5 h-1.5 rounded-full bg-green-500"></span>Completed
+                  </span>
+                </td>
+                <td class="px-6 py-3.5 text-center">
+                  <div class="flex items-center justify-center gap-1.5">
+                    <button onclick="viewBatch(this)" class="p-1.5 text-gray-400 hover:bg-gray-100 rounded-lg transition" title="View Details">
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z"/><path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                    </button>
+                    <button onclick="downloadBatchReport(this)" class="p-1.5 text-gray-400 hover:bg-gray-100 rounded-lg transition" title="Download">
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3"/></svg>
+                    </button>
+                  </div>
+                </td>
+              </tr>
+
+              <!-- Row 3 - Completed (PayU) -->
+              <tr class="table-row" data-id="REC-2026-0401-PU" data-gateway="PayU" data-status="Completed">
+                <td class="px-6 py-3.5"><span class="text-sm font-semibold text-brand-600">REC-2026-0401</span></td>
+                <td class="px-3 py-3.5 text-sm text-gray-600">01 Apr 2026</td>
+                <td class="px-3 py-3.5">
+                  <div class="flex items-center gap-2">
+                    <div class="w-6 h-6 rounded bg-green-100 flex items-center justify-center">
+                      <span class="text-[9px] font-bold text-green-700">PU</span>
+                    </div>
+                    <span class="text-sm text-gray-800 font-medium">PayU</span>
+                  </div>
+                </td>
+                <td class="px-3 py-3.5 text-right text-sm font-medium text-gray-800">876</td>
+                <td class="px-3 py-3.5 text-right text-sm font-medium text-green-600">865</td>
+                <td class="px-3 py-3.5 text-right text-sm font-medium text-red-500">8</td>
+                <td class="px-3 py-3.5 text-right text-sm font-medium text-yellow-600">3</td>
+                <td class="px-3 py-3.5 text-center">
+                  <span class="inline-flex items-center gap-1 text-[11px] font-semibold text-green-700 bg-green-50 border border-green-200 px-2.5 py-1 rounded-full">
+                    <span class="w-1.5 h-1.5 rounded-full bg-green-500"></span>Completed
+                  </span>
+                </td>
+                <td class="px-6 py-3.5 text-center">
+                  <div class="flex items-center justify-center gap-1.5">
+                    <button onclick="viewBatch(this)" class="p-1.5 text-gray-400 hover:bg-gray-100 rounded-lg transition" title="View Details">
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z"/><path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                    </button>
+                    <button onclick="downloadBatchReport(this)" class="p-1.5 text-gray-400 hover:bg-gray-100 rounded-lg transition" title="Download">
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3"/></svg>
+                    </button>
+                  </div>
+                </td>
+              </tr>
+
+              <!-- Row 4 - Mismatched (Cashfree) -->
+              <tr class="table-row" data-id="REC-2026-0331-CF" data-gateway="Cashfree" data-status="Mismatched">
+                <td class="px-6 py-3.5"><span class="text-sm font-semibold text-brand-600">REC-2026-0331</span></td>
+                <td class="px-3 py-3.5 text-sm text-gray-600">31 Mar 2026</td>
+                <td class="px-3 py-3.5">
+                  <div class="flex items-center gap-2">
+                    <div class="w-6 h-6 rounded bg-purple-100 flex items-center justify-center">
+                      <span class="text-[9px] font-bold text-purple-700">CF</span>
+                    </div>
+                    <span class="text-sm text-gray-800 font-medium">Cashfree</span>
+                  </div>
+                </td>
+                <td class="px-3 py-3.5 text-right text-sm font-medium text-gray-800">543</td>
+                <td class="px-3 py-3.5 text-right text-sm font-medium text-green-600">521</td>
+                <td class="px-3 py-3.5 text-right text-sm font-medium text-red-500">15</td>
+                <td class="px-3 py-3.5 text-right text-sm font-medium text-yellow-600">7</td>
+                <td class="px-3 py-3.5 text-center">
+                  <span class="inline-flex items-center gap-1 text-[11px] font-semibold text-red-700 bg-red-50 border border-red-200 px-2.5 py-1 rounded-full">
+                    <span class="w-1.5 h-1.5 rounded-full bg-red-500"></span>Mismatched
+                  </span>
+                </td>
+                <td class="px-6 py-3.5 text-center">
+                  <div class="flex items-center justify-center gap-1.5">
+                    <button onclick="investigateBatch(this)" class="p-1.5 text-red-500 hover:bg-red-50 rounded-lg transition" title="Investigate">
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z"/></svg>
+                    </button>
+                    <button onclick="viewBatch(this)" class="p-1.5 text-gray-400 hover:bg-gray-100 rounded-lg transition" title="View Details">
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z"/><path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                    </button>
+                  </div>
+                </td>
+              </tr>
+
+              <!-- Row 5 - Pending Review -->
+              <tr class="table-row" data-id="REC-2026-0329" data-gateway="Razorpay" data-status="Pending">
+                <td class="px-6 py-3.5"><span class="text-sm font-semibold text-brand-600">REC-2026-0329</span></td>
+                <td class="px-3 py-3.5 text-sm text-gray-600">29 Mar 2026</td>
+                <td class="px-3 py-3.5">
+                  <div class="flex items-center gap-2">
+                    <div class="w-6 h-6 rounded bg-blue-100 flex items-center justify-center">
+                      <span class="text-[9px] font-bold text-blue-700">RP</span>
+                    </div>
+                    <span class="text-sm text-gray-800 font-medium">Razorpay</span>
+                  </div>
+                </td>
+                <td class="px-3 py-3.5 text-right text-sm font-medium text-gray-800">1,567</td>
+                <td class="px-3 py-3.5 text-right text-sm font-medium text-green-600">1,490</td>
+                <td class="px-3 py-3.5 text-right text-sm font-medium text-red-500">45</td>
+                <td class="px-3 py-3.5 text-right text-sm font-medium text-yellow-600">32</td>
+                <td class="px-3 py-3.5 text-center">
+                  <span class="inline-flex items-center gap-1 text-[11px] font-semibold text-yellow-700 bg-yellow-50 border border-yellow-200 px-2.5 py-1 rounded-full">
+                    <span class="w-1.5 h-1.5 rounded-full bg-yellow-500 animate-pulse"></span>Pending Review
+                  </span>
+                </td>
+                <td class="px-6 py-3.5 text-center">
+                  <div class="flex items-center justify-center gap-1.5">
+                    <button onclick="reviewBatch(this)" class="p-1.5 text-yellow-600 hover:bg-yellow-50 rounded-lg transition" title="Review">
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M11.35 3.836c-.065.21-.1.433-.1.664 0 .414.336.75.75.75h4.5a.75.75 0 00.75-.75 2.25 2.25 0 00-.1-.664m-5.8 0A2.251 2.251 0 0113.5 2.25H15c1.012 0 1.867.668 2.15 1.586m-5.8 0c-.376.023-.75.05-1.124.08C9.095 4.01 8.25 4.973 8.25 6.108V8.25m8.9-4.414c.376.023.75.05 1.124.08 1.131.094 1.976 1.057 1.976 2.192V16.5A2.25 2.25 0 0118 18.75h-2.25m-7.5-10.5H4.875c-.621 0-1.125.504-1.125 1.125v11.25c0 .621.504 1.125 1.125 1.125h9.75c.621 0 1.125-.504 1.125-1.125V18.75m-7.5-10.5h6.375c.621 0 1.125.504 1.125 1.125v9.375m-8.25-3l1.5 1.5 3-3.75"/></svg>
+                    </button>
+                    <button onclick="viewBatch(this)" class="p-1.5 text-gray-400 hover:bg-gray-100 rounded-lg transition" title="View Details">
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z"/><path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- ===== RECONCILIATION AUDIT TRAIL ===== -->
+      <div class="bg-white rounded-xl border border-gray-100 shadow-sm mb-6 p-6">
+        <div class="flex items-center justify-between mb-5">
+          <div>
+            <h2 class="text-lg font-semibold text-gray-900">Reconciliation Audit Trail</h2>
+            <p class="text-xs text-gray-500 mt-0.5">Last 5 reviewed batches with approver details and outcomes</p>
+          </div>
+        </div>
+        <div class="space-y-3">
+          <!-- Audit 1 -->
+          <div class="flex items-center justify-between bg-gray-50 border border-gray-100 rounded-lg px-5 py-3.5">
+            <div class="flex items-center gap-4">
+              <div class="w-9 h-9 rounded-full bg-gradient-to-br from-brand-400 to-brand-600 flex items-center justify-center text-white text-[10px] font-bold shrink-0">PK</div>
+              <div>
+                <p class="text-sm font-medium text-gray-800">REC-2026-0402 <span class="text-gray-400 font-normal">&mdash;</span> Razorpay</p>
+                <p class="text-[11px] text-gray-500">Reviewed by <span class="font-semibold text-gray-700">Prem Kumar</span> on 02 Apr 2026, 16:45 IST</p>
+              </div>
+            </div>
+            <div class="flex items-center gap-4 text-xs">
+              <span class="font-semibold text-green-600 bg-green-50 border border-green-200 px-2.5 py-1 rounded-full">1,210 Approved</span>
+              <span class="font-semibold text-red-600 bg-red-50 border border-red-200 px-2.5 py-1 rounded-full">18 Flagged</span>
+              <span class="font-semibold text-yellow-600 bg-yellow-50 border border-yellow-200 px-2.5 py-1 rounded-full">6 Pending</span>
+            </div>
+          </div>
+          <!-- Audit 2 -->
+          <div class="flex items-center justify-between bg-gray-50 border border-gray-100 rounded-lg px-5 py-3.5">
+            <div class="flex items-center gap-4">
+              <div class="w-9 h-9 rounded-full bg-gradient-to-br from-blue-400 to-blue-600 flex items-center justify-center text-white text-[10px] font-bold shrink-0">AR</div>
+              <div>
+                <p class="text-sm font-medium text-gray-800">REC-2026-0401 <span class="text-gray-400 font-normal">&mdash;</span> Razorpay</p>
+                <p class="text-[11px] text-gray-500">Reviewed by <span class="font-semibold text-gray-700">Arun Reddy</span> on 01 Apr 2026, 18:20 IST</p>
+              </div>
+            </div>
+            <div class="flex items-center gap-4 text-xs">
+              <span class="font-semibold text-green-600 bg-green-50 border border-green-200 px-2.5 py-1 rounded-full">1,430 Approved</span>
+              <span class="font-semibold text-red-600 bg-red-50 border border-red-200 px-2.5 py-1 rounded-full">22 Flagged</span>
+              <span class="font-semibold text-yellow-600 bg-yellow-50 border border-yellow-200 px-2.5 py-1 rounded-full">4 Pending</span>
+            </div>
+          </div>
+          <!-- Audit 3 -->
+          <div class="flex items-center justify-between bg-gray-50 border border-gray-100 rounded-lg px-5 py-3.5">
+            <div class="flex items-center gap-4">
+              <div class="w-9 h-9 rounded-full bg-gradient-to-br from-emerald-400 to-emerald-600 flex items-center justify-center text-white text-[10px] font-bold shrink-0">SM</div>
+              <div>
+                <p class="text-sm font-medium text-gray-800">REC-2026-0401-PU <span class="text-gray-400 font-normal">&mdash;</span> PayU</p>
+                <p class="text-[11px] text-gray-500">Reviewed by <span class="font-semibold text-gray-700">Sneha Menon</span> on 01 Apr 2026, 17:05 IST</p>
+              </div>
+            </div>
+            <div class="flex items-center gap-4 text-xs">
+              <span class="font-semibold text-green-600 bg-green-50 border border-green-200 px-2.5 py-1 rounded-full">865 Approved</span>
+              <span class="font-semibold text-red-600 bg-red-50 border border-red-200 px-2.5 py-1 rounded-full">8 Rejected</span>
+              <span class="font-semibold text-green-600 bg-green-50 border border-green-200 px-2.5 py-1 rounded-full">3 Resolved</span>
+            </div>
+          </div>
+          <!-- Audit 4 -->
+          <div class="flex items-center justify-between bg-gray-50 border border-gray-100 rounded-lg px-5 py-3.5">
+            <div class="flex items-center gap-4">
+              <div class="w-9 h-9 rounded-full bg-gradient-to-br from-brand-400 to-brand-600 flex items-center justify-center text-white text-[10px] font-bold shrink-0">PK</div>
+              <div>
+                <p class="text-sm font-medium text-gray-800">REC-2026-0331 <span class="text-gray-400 font-normal">&mdash;</span> Razorpay</p>
+                <p class="text-[11px] text-gray-500">Reviewed by <span class="font-semibold text-gray-700">Prem Kumar</span> on 31 Mar 2026, 19:30 IST</p>
+              </div>
+            </div>
+            <div class="flex items-center gap-4 text-xs">
+              <span class="font-semibold text-green-600 bg-green-50 border border-green-200 px-2.5 py-1 rounded-full">1,089 Approved</span>
+              <span class="font-semibold text-red-600 bg-red-50 border border-red-200 px-2.5 py-1 rounded-full">11 Flagged</span>
+              <span class="font-semibold text-green-600 bg-green-50 border border-green-200 px-2.5 py-1 rounded-full">2 Resolved</span>
+            </div>
+          </div>
+          <!-- Audit 5 -->
+          <div class="flex items-center justify-between bg-gray-50 border border-gray-100 rounded-lg px-5 py-3.5">
+            <div class="flex items-center gap-4">
+              <div class="w-9 h-9 rounded-full bg-gradient-to-br from-violet-400 to-violet-600 flex items-center justify-center text-white text-[10px] font-bold shrink-0">RJ</div>
+              <div>
+                <p class="text-sm font-medium text-gray-800">REC-2026-0331-CF <span class="text-gray-400 font-normal">&mdash;</span> Cashfree</p>
+                <p class="text-[11px] text-gray-500">Reviewed by <span class="font-semibold text-gray-700">Rahul Joshi</span> on 31 Mar 2026, 15:15 IST</p>
+              </div>
+            </div>
+            <div class="flex items-center gap-4 text-xs">
+              <span class="font-semibold text-green-600 bg-green-50 border border-green-200 px-2.5 py-1 rounded-full">521 Approved</span>
+              <span class="font-semibold text-red-600 bg-red-50 border border-red-200 px-2.5 py-1 rounded-full">15 Rejected</span>
+              <span class="font-semibold text-yellow-600 bg-yellow-50 border border-yellow-200 px-2.5 py-1 rounded-full">7 Under Review</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== PAGINATION ===== -->
+      <div class="bg-white rounded-xl border border-gray-100 shadow-sm px-6 py-4">
+        <div class="flex items-center justify-between">
+          <p class="text-sm text-gray-500">Showing <span class="font-medium text-gray-700">1 - 5</span> of <span class="font-medium text-gray-700">156</span> batches</p>
+          <div class="flex items-center gap-1.5">
+            <button class="w-9 h-9 flex items-center justify-center rounded-lg border border-gray-200 text-gray-400 hover:bg-gray-50 transition" disabled>
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M15.75 19.5L8.25 12l7.5-7.5"/></svg>
+            </button>
+            <button class="w-9 h-9 flex items-center justify-center rounded-lg bg-brand-500 text-white text-sm font-semibold">1</button>
+            <button class="w-9 h-9 flex items-center justify-center rounded-lg border border-gray-200 text-gray-600 text-sm font-medium hover:bg-gray-50 transition">2</button>
+            <button class="w-9 h-9 flex items-center justify-center rounded-lg border border-gray-200 text-gray-600 text-sm font-medium hover:bg-gray-50 transition">3</button>
+            <span class="w-9 h-9 flex items-center justify-center text-gray-400 text-sm">...</span>
+            <button class="w-9 h-9 flex items-center justify-center rounded-lg border border-gray-200 text-gray-600 text-sm font-medium hover:bg-gray-50 transition">19</button>
+            <button class="w-9 h-9 flex items-center justify-center rounded-lg border border-gray-200 text-gray-600 text-sm font-medium hover:bg-gray-50 transition">20</button>
+            <button class="w-9 h-9 flex items-center justify-center rounded-lg border border-gray-200 text-gray-600 hover:bg-gray-50 transition">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M8.25 4.5l7.5 7.5-7.5 7.5"/></svg>
+            </button>
+          </div>
+        </div>
+      </div>
+
+    </main>
+  </div>
+
+  <script>
+    function toggleMismatchDetail(trigger) {
+      var txn = trigger.dataset.txn;
+      var expandRow = document.getElementById('detail-' + txn);
+      if (!expandRow) return;
+      var isOpen = expandRow.classList.contains('open');
+      // Close all
+      document.querySelectorAll('.mismatch-expand').forEach(function(r) { r.classList.remove('open'); });
+      document.querySelectorAll('.mismatch-trigger').forEach(function(t) { t.classList.remove('expanded'); });
+      // Toggle current
+      if (!isOpen) {
+        expandRow.classList.add('open');
+        trigger.classList.add('expanded');
+      }
+    }
+
+    function resolveMismatch(txnId, resolution) {
+      var labels = { gateway: 'Accept Gateway Amount', system: 'Accept System Amount', flag: 'Flag for Review' };
+      if (confirm('Resolve ' + txnId + ': ' + labels[resolution] + '?')) {
+        alert(txnId + ' resolved as "' + labels[resolution] + '". Action logged in audit trail.');
+      }
+    }
+
+    function toggleMismatchViewer() {
+      var body = document.getElementById('mismatch-viewer-body');
+      var label = document.getElementById('mismatch-viewer-label');
+      var chevron = document.getElementById('mismatch-viewer-chevron');
+      if (body.style.display === 'none') {
+        body.style.display = '';
+        label.textContent = 'Collapse';
+        chevron.style.transform = '';
+      } else {
+        body.style.display = 'none';
+        label.textContent = 'Expand';
+        chevron.style.transform = 'rotate(180deg)';
+      }
+    }
+
+    function toggleRule(btn) {
+      var isOn = btn.classList.contains('toggle-on');
+      if (isOn) {
+        btn.classList.remove('toggle-on');
+        var track = btn.querySelector('.toggle-track');
+        var thumb = btn.querySelector('.toggle-thumb');
+        track.style.backgroundColor = '#D1D5DB';
+        thumb.style.transform = 'translateX(0)';
+      } else {
+        btn.classList.add('toggle-on');
+        var track = btn.querySelector('.toggle-track');
+        var thumb = btn.querySelector('.toggle-thumb');
+        track.style.backgroundColor = '#16A34A';
+        thumb.style.transform = 'translateX(16px)';
+      }
+    }
+
+    function forceSync(gateway) {
+      if (confirm('Force sync with ' + gateway + '?\n\nThis will fetch the latest transaction data from ' + gateway + ' API and re-match against system records.')) {
+        alert('Force sync initiated for ' + gateway + '.\nEstimated completion: 2-5 minutes.\nYou will be notified when sync is complete.');
+      }
+    }
+
+    function viewBatch(btn) {
+      var tr = btn.closest('tr');
+      var id = tr.dataset.id;
+      var gateway = tr.dataset.gateway;
+      var status = tr.dataset.status;
+      alert('Batch Details\n\nBatch ID: ' + id + '\nGateway: ' + gateway + '\nStatus: ' + status);
+    }
+
+    function downloadBatchReport(btn) {
+      var tr = btn.closest('tr');
+      var id = tr.dataset.id;
+      alert('Downloading reconciliation report for batch ' + id + '...');
+    }
+
+    function investigateBatch(btn) {
+      var tr = btn.closest('tr');
+      var id = tr.dataset.id;
+      var gateway = tr.dataset.gateway;
+      alert('Opening investigation panel for batch ' + id + ' (' + gateway + ').\n\n15 mismatches and 7 unmatched transactions require manual review.');
+    }
+
+    function reviewBatch(btn) {
+      var tr = btn.closest('tr');
+      var id = tr.dataset.id;
+      if (confirm('Start review for batch ' + id + '?\n\n45 mismatches and 32 unmatched transactions pending.')) {
+        alert('Review started for batch ' + id + '. Transactions loaded for manual matching.');
+      }
+    }
+
+    function runReconciliation() {
+      if (confirm('Run reconciliation for all gateways?\n\nThis will fetch latest transaction data from Razorpay, Paytm, and PhonePe and match against system records.')) {
+        alert('Reconciliation batch initiated.\n\nBatch ID: REC-2026-0402-NEW\nGateways: Razorpay, Paytm, PhonePe\nEstimated time: ~5 minutes');
+      }
+    }
+  </script>
+
+  <script>
+    /* ===== Filter Tabs ===== */
+    (function() {
+      var tabs = document.querySelectorAll('.filter-tab');
+      var tbody = document.querySelector('#batch-table tbody');
+      if (!tabs.length || !tbody) return;
+      var allRows = Array.from(tbody.querySelectorAll('tr.table-row'));
+
+      tabs.forEach(function(tab) {
+        tab.addEventListener('click', function() {
+          tabs.forEach(function(t) {
+            t.classList.remove('active', 'text-brand-500');
+            t.classList.add('text-gray-500');
+            t.style.borderBottomColor = 'transparent';
+          });
+          this.classList.add('active');
+          this.classList.remove('text-gray-500');
+          this.classList.add('text-brand-500');
+          this.style.borderBottomColor = '#F97316';
+
+          var label = this.textContent.trim().split(/\s/)[0].toLowerCase();
+          allRows.forEach(function(row) {
+            var status = (row.getAttribute('data-status') || '').toLowerCase();
+            if (label === 'all') {
+              row.style.display = '';
+            } else if (status.indexOf(label) !== -1) {
+              row.style.display = '';
+            } else {
+              row.style.display = 'none';
+            }
+          });
+        });
+      });
+
+      /* Search */
+      var searchInput = document.querySelector('input[type="text"][placeholder*="Search"]');
+      var debounceTimer;
+      if (searchInput) {
+        searchInput.addEventListener('keyup', function() {
+          clearTimeout(debounceTimer);
+          var q = this.value.toLowerCase();
+          debounceTimer = setTimeout(function() {
+            allRows.forEach(function(row) {
+              var text = row.textContent.toLowerCase();
+              if (!q || text.indexOf(q) !== -1) {
+                row.style.display = '';
+              } else {
+                row.style.display = 'none';
+              }
+            });
+          }, 250);
+        });
+      }
+    })();
+  </script>
+
+  <script src="../shared-layout.js"></script>
+  <script>renderAdminLayout('reconciliation', '../');</script>
+</body>
+</html>

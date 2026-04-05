@@ -1,0 +1,886 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HomeBase — Add New Product</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              50: '#FFF7ED',
+              100: '#FFEDD5',
+              200: '#FED7AA',
+              300: '#FDBA74',
+              400: '#FB923C',
+              500: '#F97316',
+              600: '#EA580C',
+              700: '#C2410C',
+            },
+            navy: {
+              700: '#1E3A5F',
+              800: '#1A2E4A',
+              900: '#0F1B2D',
+            },
+            success: '#16A34A',
+            warning: '#EAB308',
+            danger: '#DC2626',
+          },
+          fontFamily: {
+            sans: ['Inter', 'system-ui', 'sans-serif'],
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+    .scrollbar-hide::-webkit-scrollbar { display: none; }
+    .sidebar-link { transition: all 0.15s ease; }
+    .sidebar-link:hover { background: rgba(255,255,255,0.08); }
+    .sidebar-link.active { background: rgba(249,115,22,0.15); border-right: 3px solid #F97316; }
+    .dropdown-menu { display: none; }
+    .dropdown:hover .dropdown-menu { display: block; }
+    .sidebar-scroll::-webkit-scrollbar { width: 4px; }
+    .sidebar-scroll::-webkit-scrollbar-track { background: transparent; }
+    .sidebar-scroll::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); border-radius: 2px; }
+
+    /* Form styles */
+    .form-input {
+      @apply w-full bg-white border border-gray-200 rounded-lg py-2.5 px-3.5 text-sm outline-none transition;
+    }
+    .form-input:focus {
+      border-color: #FB923C;
+      box-shadow: 0 0 0 3px rgba(249,115,22,0.1);
+    }
+    .form-input::placeholder {
+      @apply text-gray-400;
+    }
+    .form-label {
+      @apply block text-sm font-medium text-gray-700 mb-1.5;
+    }
+    .form-label .required {
+      @apply text-danger ml-0.5;
+    }
+    .card-section {
+      @apply bg-white rounded-xl border border-gray-100 shadow-sm mb-6;
+    }
+    .card-header {
+      @apply px-6 py-4 border-b border-gray-100;
+    }
+    .card-body {
+      @apply px-6 py-5;
+    }
+    .upload-zone {
+      border: 2px dashed #D1D5DB;
+      transition: all 0.2s ease;
+    }
+    .upload-zone:hover {
+      border-color: #FB923C;
+      background: #FFF7ED;
+    }
+    .tag-pill {
+      @apply inline-flex items-center gap-1.5 bg-brand-50 text-brand-700 text-xs font-medium px-2.5 py-1 rounded-full;
+    }
+    .toggle-track {
+      @apply relative inline-flex h-6 w-11 items-center rounded-full transition-colors cursor-pointer;
+    }
+    .toggle-thumb {
+      @apply inline-block h-4 w-4 transform rounded-full bg-white transition shadow-sm;
+    }
+  </style>
+</head>
+<body class="font-sans bg-gray-50 text-gray-900">
+
+  <!-- ===== TOP HEADER BAR ===== -->
+  <header id="seller-header" class="fixed top-0 left-0 right-0 z-50 bg-white border-b border-gray-200 h-16"></header>
+
+  <!-- ===== LAYOUT: SIDEBAR + MAIN ===== -->
+  <div class="flex pt-16 min-h-screen">
+
+    <!-- ===== LEFT SIDEBAR ===== -->
+    <aside id="seller-sidebar" class="fixed left-0 top-16 bottom-0 w-60 z-40 flex flex-col overflow-y-auto" style="background:#0F1B2D;"></aside>
+
+    <!-- ===== MAIN CONTENT ===== -->
+    <main class="flex-1 ml-60 p-6 pb-28">
+
+      <!-- Breadcrumb -->
+      <nav class="flex items-center gap-2 text-sm mb-5">
+        <a href="seller-products.html" class="text-gray-400 hover:text-brand-500 transition">Products</a>
+        <svg class="w-3.5 h-3.5 text-gray-300" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M8.25 4.5l7.5 7.5-7.5 7.5"/></svg>
+        <span class="text-gray-700 font-medium">Add New Product</span>
+      </nav>
+
+      <!-- Page Title Row -->
+      <div class="flex items-center justify-between mb-6">
+        <div>
+          <h1 class="text-2xl font-bold text-navy-900">Add New Product</h1>
+          <p class="text-sm text-gray-400 mt-1">Fill in the details below to list a new product on your store</p>
+        </div>
+        <div class="flex items-center gap-3">
+          <button class="flex items-center gap-2 border border-gray-200 text-gray-600 text-sm font-medium px-4 py-2.5 rounded-lg hover:bg-gray-50 transition">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M17.593 3.322c1.1.128 1.907 1.077 1.907 2.185V21L12 17.25 4.5 21V5.507c0-1.108.806-2.057 1.907-2.185a48.507 48.507 0 0111.186 0z"/></svg>
+            Save as Draft
+          </button>
+          <button class="flex items-center gap-2 bg-brand-500 hover:bg-brand-600 text-white text-sm font-semibold px-5 py-2.5 rounded-lg transition shadow-sm">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 16.5V9.75m0 0l3 3m-3-3l-3 3M6.75 19.5a4.5 4.5 0 01-1.41-8.775 5.25 5.25 0 0110.233-2.33 3 3 0 013.758 3.848A3.752 3.752 0 0118 19.5H6.75z"/></svg>
+            Publish
+          </button>
+        </div>
+      </div>
+
+      <!-- ===== FORM CONTENT (Two-column layout) ===== -->
+      <div class="flex gap-6">
+
+        <!-- LEFT COLUMN -->
+        <div class="flex-1 min-w-0 space-y-6">
+
+          <!-- ===== BASIC INFORMATION ===== -->
+          <div class="card-section">
+            <div class="card-header">
+              <div class="flex items-center gap-2.5">
+                <div class="w-8 h-8 rounded-lg bg-brand-50 flex items-center justify-center">
+                  <svg class="w-4 h-4 text-brand-500" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M11.25 11.25l.041-.02a.75.75 0 011.063.852l-.708 2.836a.75.75 0 001.063.853l.041-.021M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9-3.75h.008v.008H12V8.25z"/></svg>
+                </div>
+                <div>
+                  <h2 class="text-base font-semibold text-navy-900">Basic Information</h2>
+                  <p class="text-xs text-gray-400 mt-0.5">Product name, brand, category, and descriptions</p>
+                </div>
+              </div>
+            </div>
+            <div class="card-body space-y-5">
+              <!-- Product Name -->
+              <div>
+                <label class="form-label">Product Name <span class="required">*</span></label>
+                <input type="text" class="form-input" placeholder="e.g., Sony WH-1000XM5 Wireless Noise Cancelling Headphones">
+                <p class="text-xs text-gray-400 mt-1.5">Use a clear, descriptive name that customers would search for</p>
+              </div>
+
+              <!-- Brand + Category Row -->
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                <div>
+                  <label class="form-label">Brand <span class="required">*</span></label>
+                  <input type="text" class="form-input" placeholder="e.g., Sony, Samsung, Nike">
+                </div>
+                <div>
+                  <label class="form-label">Category <span class="required">*</span></label>
+                  <div class="relative">
+                    <select class="form-input appearance-none pr-10 cursor-pointer">
+                      <option value="">Select category</option>
+                      <optgroup label="Electronics">
+                        <option value="headphones" selected>Electronics &gt; Headphones</option>
+                        <option value="speakers">Electronics &gt; Speakers</option>
+                        <option value="mobiles">Electronics &gt; Mobile Phones</option>
+                        <option value="laptops">Electronics &gt; Laptops</option>
+                        <option value="cameras">Electronics &gt; Cameras</option>
+                        <option value="wearables">Electronics &gt; Wearables</option>
+                      </optgroup>
+                      <optgroup label="Fashion">
+                        <option value="men-clothing">Fashion &gt; Men's Clothing</option>
+                        <option value="women-clothing">Fashion &gt; Women's Clothing</option>
+                        <option value="footwear">Fashion &gt; Footwear</option>
+                      </optgroup>
+                      <optgroup label="Home & Living">
+                        <option value="furniture">Home &gt; Furniture</option>
+                        <option value="decor">Home &gt; Decor</option>
+                        <option value="kitchen">Home &gt; Kitchen</option>
+                      </optgroup>
+                    </select>
+                    <svg class="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M19.5 8.25l-7.5 7.5-7.5-7.5"/></svg>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Sub-category -->
+              <div class="md:w-1/2">
+                <label class="form-label">Sub-category</label>
+                <div class="relative">
+                  <select class="form-input appearance-none pr-10 cursor-pointer">
+                    <option value="">Select sub-category</option>
+                    <option value="over-ear">Over-ear Headphones</option>
+                    <option value="in-ear" selected>In-ear Headphones</option>
+                    <option value="on-ear">On-ear Headphones</option>
+                    <option value="true-wireless">True Wireless Earbuds</option>
+                    <option value="gaming">Gaming Headsets</option>
+                    <option value="noise-cancelling">Noise Cancelling</option>
+                  </select>
+                  <svg class="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M19.5 8.25l-7.5 7.5-7.5-7.5"/></svg>
+                </div>
+              </div>
+
+              <!-- Short Description -->
+              <div>
+                <label class="form-label">Short Description <span class="required">*</span></label>
+                <textarea class="form-input resize-none" rows="3" placeholder="Brief product description for search results and product cards (max 200 characters)"></textarea>
+                <div class="flex items-center justify-between mt-1.5">
+                  <p class="text-xs text-gray-400">Appears in search results and product listings</p>
+                  <span class="text-xs text-gray-400">0 / 200</span>
+                </div>
+              </div>
+
+              <!-- Long Description with Rich Text Toolbar -->
+              <div>
+                <label class="form-label">Long Description</label>
+                <!-- Rich Text Toolbar -->
+                <div class="border border-gray-200 rounded-t-lg border-b-0 bg-gray-50 px-3 py-2 flex items-center gap-1">
+                  <button class="p-1.5 rounded hover:bg-white hover:shadow-sm transition text-gray-600" title="Bold">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M6 4h8a4 4 0 014 4 4 4 0 01-4 4H6z"/><path d="M6 12h9a4 4 0 014 4 4 4 0 01-4 4H6z"/></svg>
+                  </button>
+                  <button class="p-1.5 rounded hover:bg-white hover:shadow-sm transition text-gray-600" title="Italic">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M10 4h4m-2 0l-4 16m0 0h4m-8 0h4"/></svg>
+                  </button>
+                  <button class="p-1.5 rounded hover:bg-white hover:shadow-sm transition text-gray-600" title="Underline">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M6 4v6a6 6 0 0012 0V4M4 20h16"/></svg>
+                  </button>
+                  <div class="w-px h-5 bg-gray-300 mx-1"></div>
+                  <button class="p-1.5 rounded hover:bg-white hover:shadow-sm transition text-gray-600" title="Bullet List">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M8.25 6.75h12M8.25 12h12m-12 5.25h12M3.75 6.75h.007v.008H3.75V6.75zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zM3.75 12h.007v.008H3.75V12zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm-.375 5.25h.007v.008H3.75v-.008zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z"/></svg>
+                  </button>
+                  <button class="p-1.5 rounded hover:bg-white hover:shadow-sm transition text-gray-600" title="Numbered List">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M8.25 6.75h12M8.25 12h12m-12 5.25h12"/><text x="2.5" y="8" font-size="6" fill="currentColor" font-weight="bold" font-family="Inter">1</text><text x="2.5" y="13.5" font-size="6" fill="currentColor" font-weight="bold" font-family="Inter">2</text><text x="2.5" y="19" font-size="6" fill="currentColor" font-weight="bold" font-family="Inter">3</text></svg>
+                  </button>
+                  <div class="w-px h-5 bg-gray-300 mx-1"></div>
+                  <button class="p-1.5 rounded hover:bg-white hover:shadow-sm transition text-gray-600" title="Insert Link">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M13.19 8.688a4.5 4.5 0 011.242 7.244l-4.5 4.5a4.5 4.5 0 01-6.364-6.364l1.757-1.757m9.86-2.54a4.5 4.5 0 00-6.364-6.364L4.5 8.25"/></svg>
+                  </button>
+                  <button class="p-1.5 rounded hover:bg-white hover:shadow-sm transition text-gray-600" title="Insert Image">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.409a2.25 2.25 0 013.182 0l2.909 2.909M2.25 18V6a2.25 2.25 0 012.25-2.25h15A2.25 2.25 0 0121.75 6v12A2.25 2.25 0 0119.5 20.25h-15A2.25 2.25 0 012.25 18z"/></svg>
+                  </button>
+                </div>
+                <textarea class="form-input rounded-t-none resize-none border-t-0 focus:border-t" rows="6" placeholder="Write a detailed product description. Include features, specifications, what's in the box, and any other details that would help customers make a purchase decision..."></textarea>
+              </div>
+            </div>
+          </div>
+
+          <!-- ===== MEDIA ===== -->
+          <div class="card-section">
+            <div class="card-header">
+              <div class="flex items-center gap-2.5">
+                <div class="w-8 h-8 rounded-lg bg-purple-50 flex items-center justify-center">
+                  <svg class="w-4 h-4 text-purple-500" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.409a2.25 2.25 0 013.182 0l2.909 2.909M2.25 18V6a2.25 2.25 0 012.25-2.25h15A2.25 2.25 0 0121.75 6v12A2.25 2.25 0 0119.5 20.25h-15A2.25 2.25 0 012.25 18z"/></svg>
+                </div>
+                <div>
+                  <h2 class="text-base font-semibold text-navy-900">Media</h2>
+                  <p class="text-xs text-gray-400 mt-0.5">Upload product images (JPEG, PNG, WebP. Max 5MB each)</p>
+                </div>
+              </div>
+            </div>
+            <div class="card-body">
+              <!-- Drag & Drop Upload Zone -->
+              <div class="upload-zone rounded-xl p-8 text-center cursor-pointer" id="uploadZone">
+                <div class="flex flex-col items-center">
+                  <div class="w-14 h-14 rounded-full bg-brand-50 flex items-center justify-center mb-4">
+                    <svg class="w-7 h-7 text-brand-500" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M12 16.5V9.75m0 0l3 3m-3-3l-3 3M6.75 19.5a4.5 4.5 0 01-1.41-8.775 5.25 5.25 0 0110.233-2.33 3 3 0 013.758 3.848A3.752 3.752 0 0118 19.5H6.75z"/></svg>
+                  </div>
+                  <p class="text-sm font-medium text-gray-700 mb-1">Drag & drop images here, or <span class="text-brand-500 font-semibold cursor-pointer hover:underline">browse files</span></p>
+                  <p class="text-xs text-gray-400">Recommended: 1000x1000px, max 5MB per image, up to 8 images</p>
+                </div>
+              </div>
+
+              <!-- Thumbnail Preview Slots -->
+              <div class="mt-5">
+                <div class="flex items-center gap-2 mb-3">
+                  <p class="text-sm font-medium text-gray-700">Uploaded Images</p>
+                  <span class="text-xs text-gray-400">(2 / 8)</span>
+                </div>
+                <div class="grid grid-cols-4 gap-3">
+                  <!-- Slot 1: Has image -->
+                  <div class="relative group aspect-square rounded-xl border-2 border-brand-200 bg-brand-50 flex items-center justify-center overflow-hidden">
+                    <div class="text-4xl">&#127911;</div>
+                    <div class="absolute top-1.5 left-1.5">
+                      <span class="bg-brand-500 text-white text-[9px] font-bold px-1.5 py-0.5 rounded">MAIN</span>
+                    </div>
+                    <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition flex items-center justify-center gap-2">
+                      <button class="w-7 h-7 rounded-full bg-white/90 flex items-center justify-center hover:bg-white transition">
+                        <svg class="w-3.5 h-3.5 text-gray-700" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z"/><path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                      </button>
+                      <button class="w-7 h-7 rounded-full bg-white/90 flex items-center justify-center hover:bg-white transition">
+                        <svg class="w-3.5 h-3.5 text-danger" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0"/></svg>
+                      </button>
+                    </div>
+                  </div>
+                  <!-- Slot 2: Has image -->
+                  <div class="relative group aspect-square rounded-xl border-2 border-gray-200 bg-gray-50 flex items-center justify-center overflow-hidden">
+                    <div class="text-4xl">&#128247;</div>
+                    <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition flex items-center justify-center gap-2">
+                      <button class="w-7 h-7 rounded-full bg-white/90 flex items-center justify-center hover:bg-white transition">
+                        <svg class="w-3.5 h-3.5 text-gray-700" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z"/><path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                      </button>
+                      <button class="w-7 h-7 rounded-full bg-white/90 flex items-center justify-center hover:bg-white transition">
+                        <svg class="w-3.5 h-3.5 text-danger" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0"/></svg>
+                      </button>
+                    </div>
+                  </div>
+                  <!-- Slot 3: Empty -->
+                  <div class="aspect-square rounded-xl border-2 border-dashed border-gray-200 bg-gray-50/50 flex flex-col items-center justify-center cursor-pointer hover:border-brand-300 hover:bg-brand-50/50 transition">
+                    <svg class="w-6 h-6 text-gray-300 mb-1" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M12 4.5v15m7.5-7.5h-15"/></svg>
+                    <span class="text-[10px] text-gray-400">Add image</span>
+                  </div>
+                  <!-- Slot 4: Empty -->
+                  <div class="aspect-square rounded-xl border-2 border-dashed border-gray-200 bg-gray-50/50 flex flex-col items-center justify-center cursor-pointer hover:border-brand-300 hover:bg-brand-50/50 transition">
+                    <svg class="w-6 h-6 text-gray-300 mb-1" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M12 4.5v15m7.5-7.5h-15"/></svg>
+                    <span class="text-[10px] text-gray-400">Add image</span>
+                  </div>
+                </div>
+                <div class="flex items-center gap-2 mt-3 text-xs text-gray-400">
+                  <svg class="w-3.5 h-3.5 text-gray-400" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M11.25 11.25l.041-.02a.75.75 0 011.063.852l-.708 2.836a.75.75 0 001.063.853l.041-.021M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9-3.75h.008v.008H12V8.25z"/></svg>
+                  <span>Main image will be used as the product thumbnail in listings and search results</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- ===== PRICING ===== -->
+          <div class="card-section">
+            <div class="card-header">
+              <div class="flex items-center gap-2.5">
+                <div class="w-8 h-8 rounded-lg bg-green-50 flex items-center justify-center">
+                  <svg class="w-4 h-4 text-green-600" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M15 8.25H9m6 3H9m3 6l-3-3h1.5a3 3 0 100-6M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                </div>
+                <div>
+                  <h2 class="text-base font-semibold text-navy-900">Pricing</h2>
+                  <p class="text-xs text-gray-400 mt-0.5">Set your product pricing and tax information</p>
+                </div>
+              </div>
+            </div>
+            <div class="card-body">
+              <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
+                <!-- MRP -->
+                <div>
+                  <label class="form-label">MRP / Original Price <span class="required">*</span></label>
+                  <div class="relative">
+                    <span class="absolute left-3.5 top-1/2 -translate-y-1/2 text-sm text-gray-500 font-medium">&#8377;</span>
+                    <input type="number" class="form-input pl-8" placeholder="2,999" id="mrpInput" oninput="calculateDiscount()">
+                  </div>
+                </div>
+                <!-- Selling Price -->
+                <div>
+                  <label class="form-label">Selling Price <span class="required">*</span></label>
+                  <div class="relative">
+                    <span class="absolute left-3.5 top-1/2 -translate-y-1/2 text-sm text-gray-500 font-medium">&#8377;</span>
+                    <input type="number" class="form-input pl-8" placeholder="1,999" id="sellingInput" oninput="calculateDiscount()">
+                  </div>
+                </div>
+                <!-- Discount Display -->
+                <div>
+                  <label class="form-label">Discount</label>
+                  <div class="form-input bg-gray-50 flex items-center gap-2" id="discountDisplay">
+                    <div class="w-6 h-6 rounded-full bg-green-100 flex items-center justify-center">
+                      <svg class="w-3.5 h-3.5 text-green-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9.568 3H5.25A2.25 2.25 0 003 5.25v4.318c0 .597.237 1.17.659 1.591l9.581 9.581c.699.699 1.78.872 2.607.33a18.095 18.095 0 005.223-5.223c.542-.827.369-1.908-.33-2.607L11.16 3.66A2.25 2.25 0 009.568 3z"/><path d="M6 6h.008v.008H6V6z"/></svg>
+                    </div>
+                    <span class="text-sm font-semibold text-green-600" id="discountValue">-- %</span>
+                    <span class="text-xs text-gray-400 ml-1">auto-calculated</span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-5 mt-5">
+                <!-- GST / Tax Category -->
+                <div>
+                  <label class="form-label">GST / Tax Category <span class="required">*</span></label>
+                  <div class="relative">
+                    <select class="form-input appearance-none pr-10 cursor-pointer">
+                      <option value="">Select GST rate</option>
+                      <option value="0">GST @ 0%</option>
+                      <option value="5">GST @ 5%</option>
+                      <option value="12">GST @ 12%</option>
+                      <option value="18" selected>GST @ 18%</option>
+                      <option value="28">GST @ 28%</option>
+                    </select>
+                    <svg class="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M19.5 8.25l-7.5 7.5-7.5-7.5"/></svg>
+                  </div>
+                </div>
+                <!-- HSN Code -->
+                <div>
+                  <label class="form-label">HSN Code <span class="required">*</span></label>
+                  <input type="text" class="form-input" placeholder="e.g., 8518 3000">
+                  <p class="text-xs text-gray-400 mt-1.5">Harmonized System Nomenclature code for tax classification</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- ===== VARIANTS ===== -->
+          <div class="card-section">
+            <div class="card-header">
+              <div class="flex items-center justify-between">
+                <div class="flex items-center gap-2.5">
+                  <div class="w-8 h-8 rounded-lg bg-indigo-50 flex items-center justify-center">
+                    <svg class="w-4 h-4 text-indigo-500" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M3.75 6A2.25 2.25 0 016 3.75h2.25A2.25 2.25 0 0110.5 6v2.25a2.25 2.25 0 01-2.25 2.25H6a2.25 2.25 0 01-2.25-2.25V6zM3.75 15.75A2.25 2.25 0 016 13.5h2.25a2.25 2.25 0 012.25 2.25V18a2.25 2.25 0 01-2.25 2.25H6A2.25 2.25 0 013.75 18v-2.25zM13.5 6a2.25 2.25 0 012.25-2.25H18A2.25 2.25 0 0120.25 6v2.25A2.25 2.25 0 0118 10.5h-2.25a2.25 2.25 0 01-2.25-2.25V6z"/></svg>
+                  </div>
+                  <div>
+                    <h2 class="text-base font-semibold text-navy-900">Variants</h2>
+                    <p class="text-xs text-gray-400 mt-0.5">Add product variations like color, size, etc.</p>
+                  </div>
+                </div>
+                <button class="flex items-center gap-1.5 text-sm font-medium text-brand-500 hover:text-brand-600 transition" onclick="addVariantRow()">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 4.5v15m7.5-7.5h-15"/></svg>
+                  Add Variant
+                </button>
+              </div>
+            </div>
+            <div class="card-body p-0">
+              <!-- Variant Table -->
+              <div class="overflow-x-auto">
+                <table class="w-full text-sm">
+                  <thead>
+                    <tr class="bg-gray-50 border-b border-gray-100">
+                      <th class="text-left text-xs font-semibold text-gray-500 uppercase tracking-wider px-6 py-3">Color</th>
+                      <th class="text-left text-xs font-semibold text-gray-500 uppercase tracking-wider px-6 py-3">Size</th>
+                      <th class="text-left text-xs font-semibold text-gray-500 uppercase tracking-wider px-6 py-3">Stock</th>
+                      <th class="text-left text-xs font-semibold text-gray-500 uppercase tracking-wider px-6 py-3">Price (&#8377;)</th>
+                      <th class="text-center text-xs font-semibold text-gray-500 uppercase tracking-wider px-6 py-3 w-16">Action</th>
+                    </tr>
+                  </thead>
+                  <tbody id="variantTableBody">
+                    <!-- Sample Row 1 -->
+                    <tr class="border-b border-gray-100 hover:bg-gray-50/50 transition">
+                      <td class="px-6 py-3">
+                        <div class="flex items-center gap-2">
+                          <div class="w-5 h-5 rounded-full bg-gray-900 border border-gray-200 shrink-0"></div>
+                          <input type="text" class="form-input py-1.5 text-sm" value="Black" style="max-width:120px">
+                        </div>
+                      </td>
+                      <td class="px-6 py-3">
+                        <input type="text" class="form-input py-1.5 text-sm" value="Free Size" style="max-width:120px">
+                      </td>
+                      <td class="px-6 py-3">
+                        <input type="number" class="form-input py-1.5 text-sm" value="150" style="max-width:100px">
+                      </td>
+                      <td class="px-6 py-3">
+                        <input type="number" class="form-input py-1.5 text-sm" value="1999" style="max-width:120px">
+                      </td>
+                      <td class="px-6 py-3 text-center">
+                        <button class="p-1.5 text-gray-400 hover:text-danger rounded-lg hover:bg-red-50 transition">
+                          <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0"/></svg>
+                        </button>
+                      </td>
+                    </tr>
+                    <!-- Sample Row 2 -->
+                    <tr class="border-b border-gray-100 hover:bg-gray-50/50 transition">
+                      <td class="px-6 py-3">
+                        <div class="flex items-center gap-2">
+                          <div class="w-5 h-5 rounded-full bg-blue-500 border border-gray-200 shrink-0"></div>
+                          <input type="text" class="form-input py-1.5 text-sm" value="Midnight Blue" style="max-width:120px">
+                        </div>
+                      </td>
+                      <td class="px-6 py-3">
+                        <input type="text" class="form-input py-1.5 text-sm" value="Free Size" style="max-width:120px">
+                      </td>
+                      <td class="px-6 py-3">
+                        <input type="number" class="form-input py-1.5 text-sm" value="85" style="max-width:100px">
+                      </td>
+                      <td class="px-6 py-3">
+                        <input type="number" class="form-input py-1.5 text-sm" value="1999" style="max-width:120px">
+                      </td>
+                      <td class="px-6 py-3 text-center">
+                        <button class="p-1.5 text-gray-400 hover:text-danger rounded-lg hover:bg-red-50 transition">
+                          <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0"/></svg>
+                        </button>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+              <!-- Add Row Button -->
+              <div class="px-6 py-4 border-t border-gray-100">
+                <button class="flex items-center gap-2 text-sm font-medium text-gray-500 hover:text-brand-500 transition" onclick="addVariantRow()">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 4.5v15m7.5-7.5h-15"/></svg>
+                  Add Row
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- ===== SEO ===== -->
+          <div class="card-section">
+            <div class="card-header">
+              <div class="flex items-center gap-2.5">
+                <div class="w-8 h-8 rounded-lg bg-cyan-50 flex items-center justify-center">
+                  <svg class="w-4 h-4 text-cyan-600" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z"/></svg>
+                </div>
+                <div>
+                  <h2 class="text-base font-semibold text-navy-900">SEO</h2>
+                  <p class="text-xs text-gray-400 mt-0.5">Optimize your product for search engines and discoverability</p>
+                </div>
+              </div>
+            </div>
+            <div class="card-body space-y-5">
+              <!-- Meta Title -->
+              <div>
+                <label class="form-label">Meta Title</label>
+                <input type="text" class="form-input" placeholder="e.g., Sony WH-1000XM5 - Best Noise Cancelling Headphones | HomeBase">
+                <div class="flex items-center justify-between mt-1.5">
+                  <p class="text-xs text-gray-400">Recommended: 50-60 characters</p>
+                  <span class="text-xs text-gray-400">0 / 60</span>
+                </div>
+              </div>
+
+              <!-- Meta Description -->
+              <div>
+                <label class="form-label">Meta Description</label>
+                <textarea class="form-input resize-none" rows="3" placeholder="Write a compelling meta description that summarizes the product and encourages clicks from search results..."></textarea>
+                <div class="flex items-center justify-between mt-1.5">
+                  <p class="text-xs text-gray-400">Recommended: 150-160 characters</p>
+                  <span class="text-xs text-gray-400">0 / 160</span>
+                </div>
+              </div>
+
+              <!-- Tags / Keywords -->
+              <div>
+                <label class="form-label">Tags / Keywords</label>
+                <div class="form-input flex flex-wrap items-center gap-2 min-h-[42px] cursor-text" onclick="document.getElementById('tagInput').focus()">
+                  <!-- Existing Tags -->
+                  <span class="tag-pill">
+                    headphones
+                    <button class="text-brand-400 hover:text-brand-600" onclick="this.parentElement.remove()">
+                      <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M6 18L18 6M6 6l12 12"/></svg>
+                    </button>
+                  </span>
+                  <span class="tag-pill">
+                    wireless
+                    <button class="text-brand-400 hover:text-brand-600" onclick="this.parentElement.remove()">
+                      <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M6 18L18 6M6 6l12 12"/></svg>
+                    </button>
+                  </span>
+                  <span class="tag-pill">
+                    noise-cancelling
+                    <button class="text-brand-400 hover:text-brand-600" onclick="this.parentElement.remove()">
+                      <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M6 18L18 6M6 6l12 12"/></svg>
+                    </button>
+                  </span>
+                  <span class="tag-pill">
+                    sony
+                    <button class="text-brand-400 hover:text-brand-600" onclick="this.parentElement.remove()">
+                      <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M6 18L18 6M6 6l12 12"/></svg>
+                    </button>
+                  </span>
+                  <input type="text" id="tagInput" class="outline-none text-sm flex-1 min-w-[100px] bg-transparent" placeholder="Type and press Enter to add tag" onkeydown="addTag(event)">
+                </div>
+                <p class="text-xs text-gray-400 mt-1.5">Press Enter to add a tag. These help customers find your product.</p>
+              </div>
+
+              <!-- Search Preview -->
+              <div class="bg-gray-50 rounded-xl p-4 border border-gray-100">
+                <p class="text-[10px] font-semibold text-gray-400 uppercase tracking-wider mb-3">Search Preview</p>
+                <div>
+                  <p class="text-blue-700 text-base font-medium hover:underline cursor-pointer">Sony WH-1000XM5 - Best Noise Cancelling Headphones | HomeBase</p>
+                  <p class="text-green-700 text-xs mt-0.5">www.homebase.in/product/sony-wh-1000xm5</p>
+                  <p class="text-gray-600 text-sm mt-1">Buy Sony WH-1000XM5 wireless noise cancelling headphones at the best price. Premium sound quality, 30-hour battery life. Free delivery on HomeBase.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- RIGHT COLUMN -->
+        <div class="w-80 shrink-0 space-y-6">
+
+          <!-- ===== INVENTORY ===== -->
+          <div class="card-section">
+            <div class="card-header">
+              <div class="flex items-center gap-2.5">
+                <div class="w-8 h-8 rounded-lg bg-blue-50 flex items-center justify-center">
+                  <svg class="w-4 h-4 text-blue-500" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M6.429 9.75L2.25 12l4.179 2.25m0-4.5l5.571 3 5.571-3m-11.142 0L2.25 7.5 12 2.25l9.75 5.25-4.179 2.25m0 0L21.75 12l-4.179 2.25m0 0l4.179 2.25L12 21.75 2.25 16.5l4.179-2.25m11.142 0l-5.571 3-5.571-3"/></svg>
+                </div>
+                <div>
+                  <h2 class="text-base font-semibold text-navy-900">Inventory</h2>
+                  <p class="text-xs text-gray-400 mt-0.5">Stock and fulfillment details</p>
+                </div>
+              </div>
+            </div>
+            <div class="card-body space-y-4">
+              <!-- SKU -->
+              <div>
+                <label class="form-label">SKU <span class="required">*</span></label>
+                <input type="text" class="form-input" placeholder="e.g., SNY-WH1000XM5-BLK">
+                <p class="text-xs text-gray-400 mt-1">Unique stock keeping unit identifier</p>
+              </div>
+
+              <!-- Stock Quantity -->
+              <div>
+                <label class="form-label">Stock Quantity <span class="required">*</span></label>
+                <input type="number" class="form-input" placeholder="e.g., 250">
+              </div>
+
+              <!-- Low Stock Alert -->
+              <div>
+                <label class="form-label">Low Stock Alert Threshold</label>
+                <input type="number" class="form-input" placeholder="e.g., 10">
+                <p class="text-xs text-gray-400 mt-1">Get notified when stock drops below this level</p>
+              </div>
+
+              <div class="border-t border-gray-100 pt-4">
+                <p class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3">Physical Details</p>
+
+                <!-- Weight -->
+                <div class="mb-4">
+                  <label class="form-label">Weight (kg)</label>
+                  <input type="number" step="0.01" class="form-input" placeholder="e.g., 0.25">
+                </div>
+
+                <!-- Dimensions -->
+                <label class="form-label mb-2">Dimensions (cm)</label>
+                <div class="grid grid-cols-3 gap-2">
+                  <div>
+                    <input type="number" step="0.1" class="form-input text-center" placeholder="L">
+                    <p class="text-[10px] text-gray-400 text-center mt-1">Length</p>
+                  </div>
+                  <div>
+                    <input type="number" step="0.1" class="form-input text-center" placeholder="W">
+                    <p class="text-[10px] text-gray-400 text-center mt-1">Width</p>
+                  </div>
+                  <div>
+                    <input type="number" step="0.1" class="form-input text-center" placeholder="H">
+                    <p class="text-[10px] text-gray-400 text-center mt-1">Height</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- ===== SHIPPING ===== -->
+          <div class="card-section">
+            <div class="card-header">
+              <div class="flex items-center gap-2.5">
+                <div class="w-8 h-8 rounded-lg bg-amber-50 flex items-center justify-center">
+                  <svg class="w-4 h-4 text-amber-600" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M8.25 18.75a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m3 0h6m-9 0H3.375a1.125 1.125 0 01-1.125-1.125V14.25m17.25 4.5a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m3 0h1.125c.621 0 1.129-.504 1.09-1.124a17.902 17.902 0 00-3.213-9.193 2.056 2.056 0 00-1.58-.86H14.25M16.5 18.75h-2.25m0-11.177v-.958c0-.568-.422-1.048-.987-1.106a48.554 48.554 0 00-10.026 0 1.106 1.106 0 00-.987 1.106v7.635m12-6.677v6.677m0 4.5v-4.5m0 0h-12"/></svg>
+                </div>
+                <div>
+                  <h2 class="text-base font-semibold text-navy-900">Shipping</h2>
+                  <p class="text-xs text-gray-400 mt-0.5">Delivery and shipping configuration</p>
+                </div>
+              </div>
+            </div>
+            <div class="card-body space-y-4">
+              <!-- Shipping Weight -->
+              <div>
+                <label class="form-label">Shipping Weight (kg)</label>
+                <input type="number" step="0.01" class="form-input" placeholder="e.g., 0.35">
+                <p class="text-xs text-gray-400 mt-1">Includes packaging weight</p>
+              </div>
+
+              <!-- Free Shipping Toggle -->
+              <div class="flex items-center justify-between py-3 border-t border-b border-gray-100">
+                <div>
+                  <p class="text-sm font-medium text-gray-700">Free Shipping</p>
+                  <p class="text-xs text-gray-400 mt-0.5">Offer free delivery for this product</p>
+                </div>
+                <button type="button" class="toggle-track bg-brand-500" id="freeShippingToggle" onclick="toggleSwitch(this)">
+                  <span class="toggle-thumb translate-x-5"></span>
+                </button>
+              </div>
+
+              <!-- Estimated Delivery -->
+              <div>
+                <label class="form-label">Estimated Delivery (days)</label>
+                <div class="flex items-center gap-3">
+                  <input type="number" class="form-input" placeholder="Min" value="3" style="max-width:80px">
+                  <span class="text-gray-400 text-sm">to</span>
+                  <input type="number" class="form-input" placeholder="Max" value="7" style="max-width:80px">
+                  <span class="text-xs text-gray-400">business days</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- ===== PRODUCT STATUS ===== -->
+          <div class="card-section">
+            <div class="card-header">
+              <div class="flex items-center gap-2.5">
+                <div class="w-8 h-8 rounded-lg bg-gray-100 flex items-center justify-center">
+                  <svg class="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                </div>
+                <div>
+                  <h2 class="text-base font-semibold text-navy-900">Status</h2>
+                </div>
+              </div>
+            </div>
+            <div class="card-body space-y-4">
+              <!-- Product Status -->
+              <div>
+                <label class="form-label">Product Status</label>
+                <div class="relative">
+                  <select class="form-input appearance-none pr-10 cursor-pointer">
+                    <option value="draft" selected>Draft</option>
+                    <option value="active">Active</option>
+                    <option value="inactive">Inactive</option>
+                    <option value="archived">Archived</option>
+                  </select>
+                  <svg class="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M19.5 8.25l-7.5 7.5-7.5-7.5"/></svg>
+                </div>
+              </div>
+
+              <!-- Visibility -->
+              <div class="flex items-center justify-between py-3 border-t border-gray-100">
+                <div>
+                  <p class="text-sm font-medium text-gray-700">Visible on Store</p>
+                  <p class="text-xs text-gray-400 mt-0.5">Show this product to customers</p>
+                </div>
+                <button type="button" class="toggle-track bg-gray-300" id="visibilityToggle" onclick="toggleSwitch(this)">
+                  <span class="toggle-thumb translate-x-1"></span>
+                </button>
+              </div>
+
+              <!-- Featured -->
+              <div class="flex items-center justify-between py-3 border-t border-gray-100">
+                <div>
+                  <p class="text-sm font-medium text-gray-700">Featured Product</p>
+                  <p class="text-xs text-gray-400 mt-0.5">Show in featured section on homepage</p>
+                </div>
+                <button type="button" class="toggle-track bg-gray-300" id="featuredToggle" onclick="toggleSwitch(this)">
+                  <span class="toggle-thumb translate-x-1"></span>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </main>
+  </div>
+
+  <!-- ===== BOTTOM ACTION BAR (Fixed) ===== -->
+  <div class="fixed bottom-0 left-60 right-0 z-40 bg-white border-t border-gray-200 shadow-[0_-4px_16px_rgba(0,0,0,0.06)]">
+    <div class="flex items-center justify-between px-6 py-3.5">
+      <div class="flex items-center gap-3 text-sm text-gray-400">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M11.25 11.25l.041-.02a.75.75 0 011.063.852l-.708 2.836a.75.75 0 001.063.853l.041-.021M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9-3.75h.008v.008H12V8.25z"/></svg>
+        <span>All fields marked with <span class="text-danger font-medium">*</span> are required</span>
+      </div>
+      <div class="flex items-center gap-3">
+        <button class="px-5 py-2.5 text-sm font-medium text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded-lg transition">
+          Cancel
+        </button>
+        <button class="flex items-center gap-2 border border-gray-200 text-gray-600 text-sm font-medium px-5 py-2.5 rounded-lg hover:bg-gray-50 transition">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M17.593 3.322c1.1.128 1.907 1.077 1.907 2.185V21L12 17.25 4.5 21V5.507c0-1.108.806-2.057 1.907-2.185a48.507 48.507 0 0111.186 0z"/></svg>
+          Save as Draft
+        </button>
+        <button class="flex items-center gap-2 bg-brand-500 hover:bg-brand-600 text-white text-sm font-semibold px-6 py-2.5 rounded-lg transition shadow-sm">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 16.5V9.75m0 0l3 3m-3-3l-3 3M6.75 19.5a4.5 4.5 0 01-1.41-8.775 5.25 5.25 0 0110.233-2.33 3 3 0 013.758 3.848A3.752 3.752 0 0118 19.5H6.75z"/></svg>
+          Publish
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== SCRIPTS ===== -->
+  <script>
+    // Discount auto-calculation
+    function calculateDiscount() {
+      const mrp = parseFloat(document.getElementById('mrpInput').value);
+      const selling = parseFloat(document.getElementById('sellingInput').value);
+      const discountEl = document.getElementById('discountValue');
+
+      if (mrp > 0 && selling > 0 && selling <= mrp) {
+        const discount = ((mrp - selling) / mrp * 100).toFixed(1);
+        discountEl.textContent = discount + '% off';
+        discountEl.className = 'text-sm font-semibold text-green-600';
+      } else if (selling > mrp) {
+        discountEl.textContent = 'Selling > MRP';
+        discountEl.className = 'text-sm font-semibold text-danger';
+      } else {
+        discountEl.textContent = '-- %';
+        discountEl.className = 'text-sm font-semibold text-green-600';
+      }
+    }
+
+    // Toggle switch
+    function toggleSwitch(el) {
+      const thumb = el.querySelector('.toggle-thumb');
+      const isOn = el.classList.contains('bg-brand-500');
+
+      if (isOn) {
+        el.classList.remove('bg-brand-500');
+        el.classList.add('bg-gray-300');
+        thumb.classList.remove('translate-x-5');
+        thumb.classList.add('translate-x-1');
+      } else {
+        el.classList.remove('bg-gray-300');
+        el.classList.add('bg-brand-500');
+        thumb.classList.remove('translate-x-1');
+        thumb.classList.add('translate-x-5');
+      }
+    }
+
+    // Add variant row
+    function addVariantRow() {
+      const tbody = document.getElementById('variantTableBody');
+      const colors = ['#EF4444', '#8B5CF6', '#10B981', '#F59E0B', '#EC4899', '#6366F1'];
+      const randomColor = colors[Math.floor(Math.random() * colors.length)];
+
+      const tr = document.createElement('tr');
+      tr.className = 'border-b border-gray-100 hover:bg-gray-50/50 transition';
+      tr.innerHTML = `
+        <td class="px-6 py-3">
+          <div class="flex items-center gap-2">
+            <div class="w-5 h-5 rounded-full border border-gray-200 shrink-0" style="background:${randomColor}"></div>
+            <input type="text" class="form-input py-1.5 text-sm" placeholder="Color" style="max-width:120px">
+          </div>
+        </td>
+        <td class="px-6 py-3">
+          <input type="text" class="form-input py-1.5 text-sm" placeholder="Size" style="max-width:120px">
+        </td>
+        <td class="px-6 py-3">
+          <input type="number" class="form-input py-1.5 text-sm" placeholder="0" style="max-width:100px">
+        </td>
+        <td class="px-6 py-3">
+          <input type="number" class="form-input py-1.5 text-sm" placeholder="0" style="max-width:120px">
+        </td>
+        <td class="px-6 py-3 text-center">
+          <button class="p-1.5 text-gray-400 hover:text-danger rounded-lg hover:bg-red-50 transition" onclick="this.closest('tr').remove()">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0"/></svg>
+          </button>
+        </td>
+      `;
+      tbody.appendChild(tr);
+    }
+
+    // Tag input
+    function addTag(event) {
+      if (event.key === 'Enter') {
+        event.preventDefault();
+        const input = event.target;
+        const value = input.value.trim();
+        if (!value) return;
+
+        const pill = document.createElement('span');
+        pill.className = 'tag-pill';
+        pill.innerHTML = `
+          ${value}
+          <button class="text-brand-400 hover:text-brand-600" onclick="this.parentElement.remove()">
+            <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M6 18L18 6M6 6l12 12"/></svg>
+          </button>
+        `;
+        input.parentElement.insertBefore(pill, input);
+        input.value = '';
+      }
+    }
+
+    // Drag & drop visual feedback
+    const uploadZone = document.getElementById('uploadZone');
+    if (uploadZone) {
+      uploadZone.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        uploadZone.style.borderColor = '#F97316';
+        uploadZone.style.background = '#FFF7ED';
+      });
+      uploadZone.addEventListener('dragleave', () => {
+        uploadZone.style.borderColor = '#D1D5DB';
+        uploadZone.style.background = '';
+      });
+      uploadZone.addEventListener('drop', (e) => {
+        e.preventDefault();
+        uploadZone.style.borderColor = '#D1D5DB';
+        uploadZone.style.background = '';
+      });
+    }
+  </script>
+
+  <script src="shared-layout.js"></script>
+  <script>renderSellerLayout('add-product');</script>
+</body>
+</html>

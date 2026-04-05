@@ -1,11 +1,13 @@
 export { HttpClient, ApiError, createHttpClient, type RequestOptions } from './http';
 export { getApiClient, createApiClient } from './client';
+export { platformDashboardApi } from './platform-dashboard';
 export { productsApi } from './products';
 export { ordersApi } from './orders';
 export { cartApi } from './cart';
 export { checkoutApi } from './checkout';
 export { usersApi } from './users';
 export { catalogApi } from './catalog';
+export type { CategoryTreeRow, CategoryRuleRow, CategoryStatRow, CategoryAttributeRow, CategorySummaryRow, CreateCategoryDto } from './catalog';
 export { inventoryApi } from './inventory';
 export { suppliersApi } from './suppliers';
 export { promosApi } from './promos';

@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HomeBase — Advertising</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              50: '#FFF7ED',
+              100: '#FFEDD5',
+              200: '#FED7AA',
+              300: '#FDBA74',
+              400: '#FB923C',
+              500: '#F97316',
+              600: '#EA580C',
+              700: '#C2410C',
+            },
+            navy: {
+              700: '#1E3A5F',
+              800: '#1A2E4A',
+              900: '#0F1B2D',
+            },
+            success: '#16A34A',
+            warning: '#EAB308',
+            danger: '#DC2626',
+          },
+          fontFamily: {
+            sans: ['Inter', 'system-ui', 'sans-serif'],
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+    .scrollbar-hide::-webkit-scrollbar { display: none; }
+    .sidebar-link { transition: all 0.15s ease; }
+    .sidebar-link:hover { background: rgba(255,255,255,0.08); }
+    .sidebar-link.active { background: rgba(249,115,22,0.15); border-right: 3px solid #F97316; }
+    .stat-card { transition: all 0.2s ease; }
+    .stat-card:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,0.08); }
+    .table-row { transition: background 0.15s ease; }
+    .table-row:hover { background: #FFF7ED; }
+    .dropdown-menu { display: none; }
+    .dropdown:hover .dropdown-menu { display: block; }
+    .sidebar-scroll::-webkit-scrollbar { width: 4px; }
+    .sidebar-scroll::-webkit-scrollbar-track { background: transparent; }
+    .sidebar-scroll::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); border-radius: 2px; }
+    .chart-bar { transition: all 0.3s ease; }
+    .chart-bar:hover { opacity: 0.85; }
+  </style>
+</head>
+<body class="font-sans bg-gray-50 text-gray-900">
+
+  <!-- ===== TOP HEADER BAR ===== -->
+  <header id="seller-header" class="fixed top-0 left-0 right-0 z-50 bg-white border-b border-gray-200 h-16"></header>
+
+  <!-- ===== LAYOUT: SIDEBAR + MAIN ===== -->
+  <div class="flex pt-16 min-h-screen">
+
+    <!-- ===== LEFT SIDEBAR ===== -->
+    <aside id="seller-sidebar" class="fixed left-0 top-16 bottom-0 w-60 z-40 flex flex-col overflow-y-auto" style="background:#0F1B2D;"></aside>
+
+    <!-- ===== MAIN CONTENT ===== -->
+    <main class="flex-1 ml-60 p-6">
+
+      <!-- Page Header -->
+      <div class="flex items-center justify-between mb-6">
+        <div>
+          <h1 class="text-2xl font-bold text-navy-900">Advertising</h1>
+          <p class="text-sm text-gray-400 mt-1">Manage promoted products and ad campaigns</p>
+        </div>
+        <button onclick="alert('Create new ad campaign')" class="flex items-center gap-2 bg-brand-500 hover:bg-brand-600 text-white text-sm font-semibold px-5 py-2.5 rounded-lg transition shadow-sm">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 4.5v15m7.5-7.5h-15"/></svg>
+          Create Ad
+        </button>
+      </div>
+
+      <!-- Stats Cards Row -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-5 mb-6">
+        <!-- Active Ads -->
+        <div class="stat-card bg-white rounded-xl p-5 border border-gray-100 shadow-sm">
+          <div class="flex items-center justify-between mb-3">
+            <div class="w-10 h-10 rounded-lg bg-brand-50 flex items-center justify-center">
+              <svg class="w-5 h-5 text-brand-500" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M3.75 3v11.25A2.25 2.25 0 006 16.5h2.25M3.75 3h-1.5m1.5 0h16.5m0 0h1.5m-1.5 0v11.25A2.25 2.25 0 0118 16.5h-2.25m-7.5 0h7.5m-7.5 0l-1 3m8.5-3l1 3m0 0l.5 1.5m-.5-1.5h-9.5m0 0l-.5 1.5m.75-9l3-3 2.148 2.148A12.061 12.061 0 0116.5 7.605"/></svg>
+            </div>
+            <span class="flex items-center gap-1 text-xs font-semibold text-brand-600 bg-brand-50 px-2 py-1 rounded-full">Active</span>
+          </div>
+          <p class="text-2xl font-bold text-navy-900">5</p>
+          <p class="text-xs text-gray-400 mt-1">Active Ads</p>
+        </div>
+
+        <!-- Total Spend -->
+        <div class="stat-card bg-white rounded-xl p-5 border border-gray-100 shadow-sm">
+          <div class="flex items-center justify-between mb-3">
+            <div class="w-10 h-10 rounded-lg bg-red-50 flex items-center justify-center">
+              <svg class="w-5 h-5 text-danger" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M2.25 18.75a60.07 60.07 0 0115.797 2.101c.727.198 1.453-.342 1.453-1.096V18.75M3.75 4.5v.75A.75.75 0 013 6h-.75m0 0v-.375c0-.621.504-1.125 1.125-1.125H20.25M2.25 6v9m18-10.5v.75c0 .414.336.75.75.75h.75m-1.5-1.5h.375c.621 0 1.125.504 1.125 1.125v9.75c0 .621-.504 1.125-1.125 1.125h-.375m1.5-1.5H21a.75.75 0 00-.75.75v.75m0 0H3.75m0 0h-.375a1.125 1.125 0 01-1.125-1.125V15m1.5 1.5v-.75A.75.75 0 003 15h-.75M15 10.5a3 3 0 11-6 0 3 3 0 016 0zm3 0h.008v.008H18V10.5zm-12 0h.008v.008H6V10.5z"/></svg>
+            </div>
+          </div>
+          <p class="text-2xl font-bold text-navy-900">&#8377;12,450</p>
+          <p class="text-xs text-gray-400 mt-1">Total Spend</p>
+        </div>
+
+        <!-- Impressions -->
+        <div class="stat-card bg-white rounded-xl p-5 border border-gray-100 shadow-sm">
+          <div class="flex items-center justify-between mb-3">
+            <div class="w-10 h-10 rounded-lg bg-blue-50 flex items-center justify-center">
+              <svg class="w-5 h-5 text-blue-500" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z"/><path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+            </div>
+            <span class="flex items-center gap-1 text-xs font-semibold text-success bg-green-50 px-2 py-1 rounded-full">
+              <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M4.5 19.5l15-15m0 0H8.25m11.25 0v11.25"/></svg>
+              +12%
+            </span>
+          </div>
+          <p class="text-2xl font-bold text-navy-900">45K</p>
+          <p class="text-xs text-gray-400 mt-1">Impressions</p>
+        </div>
+
+        <!-- Clicks -->
+        <div class="stat-card bg-white rounded-xl p-5 border border-gray-100 shadow-sm">
+          <div class="flex items-center justify-between mb-3">
+            <div class="w-10 h-10 rounded-lg bg-purple-50 flex items-center justify-center">
+              <svg class="w-5 h-5 text-purple-500" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M15.042 21.672L13.684 16.6m0 0l-2.51 2.225.569-9.47 5.227 7.917-3.286-.672zM12 2.25V4.5m5.834.166l-1.591 1.591M20.25 10.5H18M7.757 14.743l-1.59 1.59M6 10.5H3.75m4.007-4.243l-1.59-1.59"/></svg>
+            </div>
+            <span class="flex items-center gap-1 text-xs font-semibold text-success bg-green-50 px-2 py-1 rounded-full">
+              <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M4.5 19.5l15-15m0 0H8.25m11.25 0v11.25"/></svg>
+              +8%
+            </span>
+          </div>
+          <p class="text-2xl font-bold text-navy-900">2,340</p>
+          <p class="text-xs text-gray-400 mt-1">Clicks</p>
+        </div>
+
+        <!-- ROI -->
+        <div class="stat-card bg-white rounded-xl p-5 border border-gray-100 shadow-sm">
+          <div class="flex items-center justify-between mb-3">
+            <div class="w-10 h-10 rounded-lg bg-green-50 flex items-center justify-center">
+              <svg class="w-5 h-5 text-success" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M2.25 18L9 11.25l4.306 4.307a11.95 11.95 0 015.814-5.519l2.74-1.22m0 0l-5.94-2.28m5.94 2.28l-2.28 5.941"/></svg>
+            </div>
+            <span class="flex items-center gap-1 text-xs font-semibold text-success bg-green-50 px-2 py-1 rounded-full">Good</span>
+          </div>
+          <p class="text-2xl font-bold text-navy-900">3.2x</p>
+          <p class="text-xs text-gray-400 mt-1">ROI</p>
+        </div>
+      </div>
+
+      <!-- Ad Performance Chart -->
+      <div class="bg-white rounded-xl border border-gray-100 shadow-sm p-6 mb-6">
+        <div class="flex items-center justify-between mb-6">
+          <div>
+            <h2 class="text-lg font-bold text-navy-900">Ad Performance</h2>
+            <p class="text-xs text-gray-400 mt-0.5">Daily impressions and clicks over the last 7 days</p>
+          </div>
+          <div class="flex items-center gap-4">
+            <div class="flex items-center gap-1.5">
+              <span class="w-3 h-3 rounded-full bg-blue-400"></span>
+              <span class="text-xs text-gray-500">Impressions</span>
+            </div>
+            <div class="flex items-center gap-1.5">
+              <span class="w-3 h-3 rounded-full bg-brand-500"></span>
+              <span class="text-xs text-gray-500">Clicks</span>
+            </div>
+          </div>
+        </div>
+        <div class="flex items-end gap-4 h-48">
+          <!-- Mon -->
+          <div class="flex-1 flex flex-col items-center gap-2">
+            <div class="w-full flex gap-1 items-end justify-center" style="height:180px">
+              <div class="chart-bar w-5 bg-blue-400 rounded-t" style="height:65%" title="Impressions: 5,800"></div>
+              <div class="chart-bar w-5 bg-brand-500 rounded-t" style="height:22%" title="Clicks: 290"></div>
+            </div>
+            <span class="text-xs text-gray-400">Mon</span>
+          </div>
+          <!-- Tue -->
+          <div class="flex-1 flex flex-col items-center gap-2">
+            <div class="w-full flex gap-1 items-end justify-center" style="height:180px">
+              <div class="chart-bar w-5 bg-blue-400 rounded-t" style="height:72%" title="Impressions: 6,400"></div>
+              <div class="chart-bar w-5 bg-brand-500 rounded-t" style="height:28%" title="Clicks: 370"></div>
+            </div>
+            <span class="text-xs text-gray-400">Tue</span>
+          </div>
+          <!-- Wed -->
+          <div class="flex-1 flex flex-col items-center gap-2">
+            <div class="w-full flex gap-1 items-end justify-center" style="height:180px">
+              <div class="chart-bar w-5 bg-blue-400 rounded-t" style="height:58%" title="Impressions: 5,200"></div>
+              <div class="chart-bar w-5 bg-brand-500 rounded-t" style="height:20%" title="Clicks: 260"></div>
+            </div>
+            <span class="text-xs text-gray-400">Wed</span>
+          </div>
+          <!-- Thu -->
+          <div class="flex-1 flex flex-col items-center gap-2">
+            <div class="w-full flex gap-1 items-end justify-center" style="height:180px">
+              <div class="chart-bar w-5 bg-blue-400 rounded-t" style="height:85%" title="Impressions: 7,600"></div>
+              <div class="chart-bar w-5 bg-brand-500 rounded-t" style="height:35%" title="Clicks: 450"></div>
+            </div>
+            <span class="text-xs text-gray-400">Thu</span>
+          </div>
+          <!-- Fri -->
+          <div class="flex-1 flex flex-col items-center gap-2">
+            <div class="w-full flex gap-1 items-end justify-center" style="height:180px">
+              <div class="chart-bar w-5 bg-blue-400 rounded-t" style="height:92%" title="Impressions: 8,200"></div>
+              <div class="chart-bar w-5 bg-brand-500 rounded-t" style="height:38%" title="Clicks: 490"></div>
+            </div>
+            <span class="text-xs text-gray-400">Fri</span>
+          </div>
+          <!-- Sat -->
+          <div class="flex-1 flex flex-col items-center gap-2">
+            <div class="w-full flex gap-1 items-end justify-center" style="height:180px">
+              <div class="chart-bar w-5 bg-blue-400 rounded-t" style="height:100%" title="Impressions: 8,900"></div>
+              <div class="chart-bar w-5 bg-brand-500 rounded-t" style="height:40%" title="Clicks: 520"></div>
+            </div>
+            <span class="text-xs text-gray-400">Sat</span>
+          </div>
+          <!-- Sun -->
+          <div class="flex-1 flex flex-col items-center gap-2">
+            <div class="w-full flex gap-1 items-end justify-center" style="height:180px">
+              <div class="chart-bar w-5 bg-blue-400 rounded-t" style="height:78%" title="Impressions: 6,900"></div>
+              <div class="chart-bar w-5 bg-brand-500 rounded-t" style="height:30%" title="Clicks: 390"></div>
+            </div>
+            <span class="text-xs text-gray-400">Sun</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Promoted Products Table -->
+      <div class="bg-white rounded-xl border border-gray-100 shadow-sm">
+        <div class="flex items-center justify-between p-5 border-b border-gray-100">
+          <h2 class="text-lg font-bold text-navy-900">Promoted Products</h2>
+          <div class="relative">
+            <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+            <input type="text" placeholder="Search ads..." class="bg-gray-50 border border-gray-200 rounded-lg py-2 pl-10 pr-4 text-sm outline-none focus:border-brand-400 focus:ring-2 focus:ring-brand-100 transition w-56">
+          </div>
+        </div>
+
+        <div class="overflow-x-auto">
+          <table class="w-full text-sm">
+            <thead>
+              <tr class="text-left text-xs font-semibold text-gray-400 uppercase tracking-wider border-b border-gray-100">
+                <th class="px-5 py-3">Product</th>
+                <th class="px-5 py-3">Daily Budget</th>
+                <th class="px-5 py-3">Impressions</th>
+                <th class="px-5 py-3">Clicks</th>
+                <th class="px-5 py-3">CTR</th>
+                <th class="px-5 py-3">Conversions</th>
+                <th class="px-5 py-3">Spend</th>
+                <th class="px-5 py-3">Status</th>
+                <th class="px-5 py-3">Actions</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-50">
+              <!-- Row 1 -->
+              <tr class="table-row">
+                <td class="px-5 py-4">
+                  <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-lg bg-gray-100 flex items-center justify-center">
+                      <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.409a2.25 2.25 0 013.182 0l2.909 2.909M3.75 21h16.5"/></svg>
+                    </div>
+                    <div>
+                      <p class="font-semibold text-gray-800">Samsung 55" 4K Smart TV</p>
+                      <p class="text-xs text-gray-400">SKU: TV-SAM-55-4K</p>
+                    </div>
+                  </div>
+                </td>
+                <td class="px-5 py-4 font-medium text-gray-700">&#8377;500</td>
+                <td class="px-5 py-4 text-gray-600">12,450</td>
+                <td class="px-5 py-4 text-gray-600">680</td>
+                <td class="px-5 py-4 font-medium text-gray-700">5.46%</td>
+                <td class="px-5 py-4 text-gray-600">42</td>
+                <td class="px-5 py-4 font-semibold text-gray-800">&#8377;3,200</td>
+                <td class="px-5 py-4">
+                  <span class="inline-flex items-center px-2.5 py-1 rounded-full text-[11px] font-bold bg-green-50 text-success">Active</span>
+                </td>
+                <td class="px-5 py-4">
+                  <div class="flex items-center gap-2">
+                    <button onclick="alert('Edit ad')" class="p-1.5 hover:bg-gray-100 rounded-lg transition" title="Edit">
+                      <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931z"/></svg>
+                    </button>
+                    <button onclick="alert('Pause ad')" class="p-1.5 hover:bg-gray-100 rounded-lg transition" title="Pause">
+                      <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M15.75 5.25v13.5m-7.5-13.5v13.5"/></svg>
+                    </button>
+                  </div>
+                </td>
+              </tr>
+
+              <!-- Row 2 -->
+              <tr class="table-row">
+                <td class="px-5 py-4">
+                  <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-lg bg-gray-100 flex items-center justify-center">
+                      <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.409a2.25 2.25 0 013.182 0l2.909 2.909M3.75 21h16.5"/></svg>
+                    </div>
+                    <div>
+                      <p class="font-semibold text-gray-800">Bosch Washing Machine 7kg</p>
+                      <p class="text-xs text-gray-400">SKU: WM-BSH-7KG</p>
+                    </div>
+                  </div>
+                </td>
+                <td class="px-5 py-4 font-medium text-gray-700">&#8377;350</td>
+                <td class="px-5 py-4 text-gray-600">9,800</td>
+                <td class="px-5 py-4 text-gray-600">520</td>
+                <td class="px-5 py-4 font-medium text-gray-700">5.31%</td>
+                <td class="px-5 py-4 text-gray-600">28</td>
+                <td class="px-5 py-4 font-semibold text-gray-800">&#8377;2,800</td>
+                <td class="px-5 py-4">
+                  <span class="inline-flex items-center px-2.5 py-1 rounded-full text-[11px] font-bold bg-green-50 text-success">Active</span>
+                </td>
+                <td class="px-5 py-4">
+                  <div class="flex items-center gap-2">
+                    <button onclick="alert('Edit ad')" class="p-1.5 hover:bg-gray-100 rounded-lg transition" title="Edit">
+                      <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931z"/></svg>
+                    </button>
+                    <button onclick="alert('Pause ad')" class="p-1.5 hover:bg-gray-100 rounded-lg transition" title="Pause">
+                      <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M15.75 5.25v13.5m-7.5-13.5v13.5"/></svg>
+                    </button>
+                  </div>
+                </td>
+              </tr>
+
+              <!-- Row 3 -->
+              <tr class="table-row">
+                <td class="px-5 py-4">
+                  <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-lg bg-gray-100 flex items-center justify-center">
+                      <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.409a2.25 2.25 0 013.182 0l2.909 2.909M3.75 21h16.5"/></svg>
+                    </div>
+                    <div>
+                      <p class="font-semibold text-gray-800">Sony WH-1000XM5 Headphones</p>
+                      <p class="text-xs text-gray-400">SKU: HP-SNY-XM5</p>
+                    </div>
+                  </div>
+                </td>
+                <td class="px-5 py-4 font-medium text-gray-700">&#8377;250</td>
+                <td class="px-5 py-4 text-gray-600">8,200</td>
+                <td class="px-5 py-4 text-gray-600">410</td>
+                <td class="px-5 py-4 font-medium text-gray-700">5.00%</td>
+                <td class="px-5 py-4 text-gray-600">22</td>
+                <td class="px-5 py-4 font-semibold text-gray-800">&#8377;2,100</td>
+                <td class="px-5 py-4">
+                  <span class="inline-flex items-center px-2.5 py-1 rounded-full text-[11px] font-bold bg-green-50 text-success">Active</span>
+                </td>
+                <td class="px-5 py-4">
+                  <div class="flex items-center gap-2">
+                    <button onclick="alert('Edit ad')" class="p-1.5 hover:bg-gray-100 rounded-lg transition" title="Edit">
+                      <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931z"/></svg>
+                    </button>
+                    <button onclick="alert('Pause ad')" class="p-1.5 hover:bg-gray-100 rounded-lg transition" title="Pause">
+                      <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M15.75 5.25v13.5m-7.5-13.5v13.5"/></svg>
+                    </button>
+                  </div>
+                </td>
+              </tr>
+
+              <!-- Row 4 -->
+              <tr class="table-row">
+                <td class="px-5 py-4">
+                  <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-lg bg-gray-100 flex items-center justify-center">
+                      <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.409a2.25 2.25 0 013.182 0l2.909 2.909M3.75 21h16.5"/></svg>
+                    </div>
+                    <div>
+                      <p class="font-semibold text-gray-800">Dyson V15 Detect Vacuum</p>
+                      <p class="text-xs text-gray-400">SKU: VC-DYS-V15</p>
+                    </div>
+                  </div>
+                </td>
+                <td class="px-5 py-4 font-medium text-gray-700">&#8377;400</td>
+                <td class="px-5 py-4 text-gray-600">10,100</td>
+                <td class="px-5 py-4 text-gray-600">490</td>
+                <td class="px-5 py-4 font-medium text-gray-700">4.85%</td>
+                <td class="px-5 py-4 text-gray-600">18</td>
+                <td class="px-5 py-4 font-semibold text-gray-800">&#8377;2,650</td>
+                <td class="px-5 py-4">
+                  <span class="inline-flex items-center px-2.5 py-1 rounded-full text-[11px] font-bold bg-yellow-50 text-yellow-600">Paused</span>
+                </td>
+                <td class="px-5 py-4">
+                  <div class="flex items-center gap-2">
+                    <button onclick="alert('Edit ad')" class="p-1.5 hover:bg-gray-100 rounded-lg transition" title="Edit">
+                      <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931z"/></svg>
+                    </button>
+                    <button onclick="alert('Resume ad')" class="p-1.5 hover:bg-gray-100 rounded-lg transition" title="Resume">
+                      <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M5.25 5.653c0-.856.917-1.398 1.667-.986l11.54 6.348a1.125 1.125 0 010 1.971l-11.54 6.347a1.125 1.125 0 01-1.667-.985V5.653z"/></svg>
+                    </button>
+                  </div>
+                </td>
+              </tr>
+
+              <!-- Row 5 -->
+              <tr class="table-row">
+                <td class="px-5 py-4">
+                  <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-lg bg-gray-100 flex items-center justify-center">
+                      <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.409a2.25 2.25 0 013.182 0l2.909 2.909M3.75 21h16.5"/></svg>
+                    </div>
+                    <div>
+                      <p class="font-semibold text-gray-800">LG Frost-Free Refrigerator</p>
+                      <p class="text-xs text-gray-400">SKU: RF-LG-260L</p>
+                    </div>
+                  </div>
+                </td>
+                <td class="px-5 py-4 font-medium text-gray-700">&#8377;300</td>
+                <td class="px-5 py-4 text-gray-600">4,450</td>
+                <td class="px-5 py-4 text-gray-600">240</td>
+                <td class="px-5 py-4 font-medium text-gray-700">5.39%</td>
+                <td class="px-5 py-4 text-gray-600">15</td>
+                <td class="px-5 py-4 font-semibold text-gray-800">&#8377;1,700</td>
+                <td class="px-5 py-4">
+                  <span class="inline-flex items-center px-2.5 py-1 rounded-full text-[11px] font-bold bg-green-50 text-success">Active</span>
+                </td>
+                <td class="px-5 py-4">
+                  <div class="flex items-center gap-2">
+                    <button onclick="alert('Edit ad')" class="p-1.5 hover:bg-gray-100 rounded-lg transition" title="Edit">
+                      <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931z"/></svg>
+                    </button>
+                    <button onclick="alert('Pause ad')" class="p-1.5 hover:bg-gray-100 rounded-lg transition" title="Pause">
+                      <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M15.75 5.25v13.5m-7.5-13.5v13.5"/></svg>
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Pagination -->
+        <div class="flex items-center justify-between px-5 py-4 border-t border-gray-100">
+          <p class="text-sm text-gray-400">Showing 1 - 5 of 5 ads</p>
+          <div class="flex items-center gap-1">
+            <button class="px-3 py-1.5 text-sm font-medium text-white bg-brand-500 rounded-lg">1</button>
+          </div>
+        </div>
+      </div>
+
+    </main>
+  </div>
+
+  <script src="shared-layout.js"></script>
+  <script>renderSellerLayout('products');</script>
+
+</body>
+</html>

@@ -35,3 +35,18 @@ export * from './display';
 
 // Generic components
 export * from './generic';
+
+// Storefront layout components
+export * from './storefront';
+
+// Commerce components
+export * from './commerce';
+
+// Dashboard components
+export * from './dashboard';
+
+// Chart components
+export * from './charts';
+
+// Form components
+export * from './forms';

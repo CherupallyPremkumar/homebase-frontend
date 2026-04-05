@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HomeBase — Return Detail</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      theme: { extend: { colors: { brand: { 50:'#FFF7ED',100:'#FFEDD5',200:'#FED7AA',300:'#FDBA74',400:'#FB923C',500:'#F97316',600:'#EA580C',700:'#C2410C' }, navy: { 700:'#1E3A5F',800:'#1A2E4A',900:'#0F1B2D' }, success:'#16A34A', warning:'#EAB308', danger:'#DC2626' }, fontFamily: { sans:['Inter','system-ui','sans-serif'] } } }
+    }
+  </script>
+  <style>
+    .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+    .scrollbar-hide::-webkit-scrollbar { display: none; }
+    .sidebar-link { transition: all 0.15s ease; }
+    .sidebar-link:hover { background: rgba(255,255,255,0.06); }
+    .sidebar-link.active { background: rgba(249,115,22,0.15); border-right: 3px solid #F97316; }
+    .dropdown-menu { display: none; }
+    .dropdown:hover .dropdown-menu { display: block; }
+    .health-pulse { animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite; }
+  </style>
+</head>
+<body class="font-sans bg-gray-50 text-gray-900">
+
+  <!-- ===== TOP HEADER BAR (copied from admin-dashboard) ===== -->
+  <header id="admin-header" class="fixed top-0 left-0 right-0 z-50 bg-white border-b border-gray-200 h-16"></header>
+
+  <!-- ===== LEFT SIDEBAR (copied from admin-dashboard) ===== -->
+  <aside id="admin-sidebar" class="fixed left-0 top-16 bottom-0 w-60 z-40 flex flex-col overflow-y-auto" style="background:#0A1628;"></aside>
+
+  <!-- MAIN CONTENT -->
+  <main class="ml-60 pt-16 p-6 min-h-screen">
+
+    <!-- Breadcrumb -->
+    <nav class="flex items-center gap-2 text-sm mb-5">
+      <a href="returns.html" class="text-gray-400 hover:text-brand-500">Returns</a>
+      <svg class="w-3.5 h-3.5 text-gray-300" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M8.25 4.5l7.5 7.5-7.5 7.5"/></svg>
+      <span class="text-gray-700 font-medium">RET-00456</span>
+    </nav>
+
+    <!-- Header Row -->
+    <div class="flex items-center justify-between mb-6">
+      <div class="flex items-center gap-3">
+        <a href="returns.html" class="p-2 border border-gray-200 rounded-lg hover:bg-gray-50">
+          <svg class="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18"/></svg>
+        </a>
+        <h1 class="text-2xl font-bold">Return RET-00456</h1>
+        <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium bg-yellow-50 text-yellow-700">
+          <span class="w-1.5 h-1.5 rounded-full bg-yellow-500"></span> Pickup Scheduled
+        </span>
+      </div>
+      <div class="flex items-center gap-3">
+        <button onclick="if(confirm('Approve this return request?')) alert('Return approved')" class="flex items-center gap-2 bg-green-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-green-700">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4.5 12.75l6 6 9-13.5"/></svg>
+          Approve
+        </button>
+        <button onclick="if(confirm('Reject this return request?')) alert('Return rejected')" class="flex items-center gap-2 border border-red-200 text-red-600 px-4 py-2 rounded-lg text-sm font-medium hover:bg-red-50">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M6 18L18 6M6 6l12 12"/></svg>
+          Reject
+        </button>
+      </div>
+    </div>
+
+    <!-- Return Timeline (Vertical) -->
+    <div class="bg-white rounded-xl border border-gray-100 p-6 mb-6">
+      <h3 class="font-semibold text-gray-900 mb-4">Return Progress</h3>
+      <div class="relative pl-8">
+        <div class="absolute left-3 top-2 bottom-2 w-0.5 bg-gray-200"></div>
+        <!-- Step 1: Requested -->
+        <div class="relative flex gap-4 mb-6">
+          <div class="absolute -left-5 w-6 h-6 rounded-full bg-green-500 flex items-center justify-center z-10">
+            <svg class="w-3.5 h-3.5 text-white" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M4.5 12.75l6 6 9-13.5"/></svg>
+          </div>
+          <div>
+            <p class="text-sm font-semibold text-gray-900">Return Requested</p>
+            <p class="text-xs text-gray-400">22 Mar 2026, 11:00 AM &middot; By customer</p>
+          </div>
+        </div>
+        <!-- Step 2: Approved -->
+        <div class="relative flex gap-4 mb-6">
+          <div class="absolute -left-5 w-6 h-6 rounded-full bg-green-500 flex items-center justify-center z-10">
+            <svg class="w-3.5 h-3.5 text-white" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M4.5 12.75l6 6 9-13.5"/></svg>
+          </div>
+          <div>
+            <p class="text-sm font-semibold text-gray-900">Approved</p>
+            <p class="text-xs text-gray-400">23 Mar 2026, 9:30 AM &middot; By Super Admin</p>
+          </div>
+        </div>
+        <!-- Step 3: Pickup Scheduled (current) -->
+        <div class="relative flex gap-4 mb-6">
+          <div class="absolute -left-5 w-6 h-6 rounded-full bg-yellow-500 flex items-center justify-center z-10">
+            <svg class="w-3.5 h-3.5 text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M8.25 18.75a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m3 0h6m-9 0H3.375a1.125 1.125 0 01-1.125-1.125V14.25m17.25 4.5a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m3 0H21M3.375 14.25h2.25m0 0v-3.375c0-.621.504-1.125 1.125-1.125h3.026a1.5 1.5 0 011.061.44l1.414 1.414a1.5 1.5 0 001.06.44H18A1.125 1.125 0 0119.125 13v1.25"/></svg>
+          </div>
+          <div>
+            <p class="text-sm font-semibold text-yellow-700">Pickup Scheduled</p>
+            <p class="text-xs text-gray-400">Scheduled for 29 Mar 2026</p>
+          </div>
+        </div>
+        <!-- Step 4: Received -->
+        <div class="relative flex gap-4 mb-6">
+          <div class="absolute -left-5 w-6 h-6 rounded-full bg-gray-200 flex items-center justify-center z-10">
+            <span class="w-2 h-2 rounded-full bg-gray-400"></span>
+          </div>
+          <div>
+            <p class="text-sm text-gray-400">Received at Warehouse</p>
+            <p class="text-xs text-gray-300">Pending</p>
+          </div>
+        </div>
+        <!-- Step 5: Refunded -->
+        <div class="relative flex gap-4">
+          <div class="absolute -left-5 w-6 h-6 rounded-full bg-gray-200 flex items-center justify-center z-10">
+            <span class="w-2 h-2 rounded-full bg-gray-400"></span>
+          </div>
+          <div>
+            <p class="text-sm text-gray-400">Refunded</p>
+            <p class="text-xs text-gray-300">Pending</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <!-- Left Column (2/3) -->
+      <div class="lg:col-span-2 space-y-6">
+
+        <!-- Return Items -->
+        <div class="bg-white rounded-xl border border-gray-100 p-6">
+          <h3 class="font-semibold text-gray-900 mb-4">Return Items</h3>
+          <div class="flex gap-4 p-4 bg-gray-50 rounded-lg cursor-pointer hover:bg-gray-100" onclick="window.location='admin-product-detail.html'">
+            <div class="w-20 h-20 bg-white rounded-lg border border-gray-200 flex items-center justify-center text-3xl shrink-0">&#128715;</div>
+            <div class="flex-1">
+              <p class="text-sm font-semibold text-gray-900">Modern Velvet Sofa</p>
+              <p class="text-xs text-gray-400 mt-0.5">SKU: HB-FUR-00142</p>
+              <div class="flex items-center gap-4 mt-2">
+                <span class="text-xs text-gray-500">Qty: <span class="font-medium text-gray-900">1</span></span>
+                <span class="text-xs text-gray-500">Price: <span class="font-medium text-gray-900">&#8377;1,29,900</span></span>
+              </div>
+              <div class="mt-2 flex items-center gap-4">
+                <div><p class="text-xs text-gray-400">Reason</p><p class="text-xs font-medium text-red-600">Product damaged on delivery</p></div>
+                <div><p class="text-xs text-gray-400">Condition</p><p class="text-xs font-medium text-yellow-600">Damaged - Tear on left arm</p></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Return Cost Calculator -->
+        <div class="bg-white rounded-xl border border-gray-100 p-6">
+          <h3 class="font-semibold text-gray-900 mb-4">Return Cost Analysis</h3>
+          <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <!-- Cost Breakdown -->
+            <div>
+              <p class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3">Processing Cost</p>
+              <div class="space-y-2.5 text-sm">
+                <div class="flex justify-between">
+                  <span class="text-gray-500">Reverse shipping cost</span>
+                  <span class="font-medium">&#8377;120</span>
+                </div>
+                <div class="flex justify-between">
+                  <span class="text-gray-500">Inspection &amp; QC cost</span>
+                  <span class="font-medium">&#8377;50</span>
+                </div>
+                <div class="flex justify-between">
+                  <span class="text-gray-500">Restocking fee</span>
+                  <span class="font-medium text-green-600">&#8377;0 (waived)</span>
+                </div>
+                <div class="flex justify-between pt-2.5 border-t border-gray-100">
+                  <span class="text-gray-900 font-bold">Total Return Cost</span>
+                  <span class="font-bold text-red-600">&#8377;170</span>
+                </div>
+              </div>
+            </div>
+            <!-- Cost vs Value -->
+            <div>
+              <p class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3">Cost vs Value</p>
+              <div class="bg-gray-50 rounded-lg p-4">
+                <div class="flex items-center justify-between mb-3">
+                  <span class="text-sm text-gray-500">Item Value</span>
+                  <span class="text-sm font-bold text-gray-900">&#8377;3,500</span>
+                </div>
+                <div class="flex items-center justify-between mb-3">
+                  <span class="text-sm text-gray-500">Return Cost</span>
+                  <span class="text-sm font-bold text-red-600">&#8377;170</span>
+                </div>
+                <div class="flex items-center justify-between pt-3 border-t border-gray-200">
+                  <span class="text-sm text-gray-500">Cost Ratio</span>
+                  <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-green-100 text-green-700">4.9% — Low</span>
+                </div>
+              </div>
+              <p class="text-xs text-gray-400 mt-2">Return processing cost is well below the 15% threshold.</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Original Order -->
+        <div class="bg-white rounded-xl border border-gray-100 p-6">
+          <h3 class="font-semibold text-gray-900 mb-4">Original Order</h3>
+          <div class="flex items-center justify-between p-4 bg-gray-50 rounded-lg cursor-pointer hover:bg-gray-100" onclick="window.location='admin-order-detail.html'">
+            <div>
+              <p class="text-sm font-medium text-gray-900">Order <span class="font-mono text-brand-600">#HB-10234</span></p>
+              <p class="text-xs text-gray-400 mt-0.5">Placed: 25 Mar 2026 &middot; Delivered: 27 Mar 2026</p>
+            </div>
+            <div class="text-right">
+              <p class="text-sm font-bold text-gray-900">&#8377;1,46,429</p>
+              <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-green-50 text-green-700"><span class="w-1.5 h-1.5 rounded-full bg-green-500"></span>Delivered</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Refund Breakdown + Refund Preference -->
+        <div class="bg-white rounded-xl border border-gray-100 p-6">
+          <h3 class="font-semibold text-gray-900 mb-4">Refund Breakdown</h3>
+          <div class="space-y-2.5 text-sm">
+            <div class="flex justify-between"><span class="text-gray-500">Item Value</span><span class="font-medium">&#8377;1,29,900</span></div>
+            <div class="flex justify-between"><span class="text-gray-500">Shipping Refund</span><span class="font-medium">&#8377;0 (Free shipping)</span></div>
+            <div class="flex justify-between"><span class="text-gray-500">Discount Adjustment</span><span class="font-medium text-red-500">-&#8377;12,990</span></div>
+            <div class="flex justify-between pt-3 border-t border-gray-100">
+              <span class="text-gray-900 font-bold">Total Refund</span>
+              <span class="text-lg font-bold text-green-600">&#8377;1,16,910</span>
+            </div>
+            <div class="flex justify-between"><span class="text-gray-500">Refund Method</span><span class="font-medium">Original Payment (UPI)</span></div>
+          </div>
+
+          <!-- Refund Preference -->
+          <div class="mt-5 pt-5 border-t border-gray-100">
+            <p class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3">Refund Preference</p>
+            <div class="flex items-center gap-3 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+              <div class="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center shrink-0">
+                <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M2.25 8.25h19.5M2.25 9h19.5m-16.5 5.25h6m-6 2.25h3m-3.75 3h15a2.25 2.25 0 002.25-2.25V6.75A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25v10.5A2.25 2.25 0 004.5 19.5z"/></svg>
+              </div>
+              <div class="flex-1">
+                <p class="text-sm font-semibold text-blue-900">Customer prefers: Original payment method (UPI)</p>
+                <p class="text-xs text-blue-600 mt-0.5">Processing time: 5-7 business days after item received</p>
+              </div>
+            </div>
+            <div class="mt-3 flex items-center gap-3 p-4 bg-green-50 border border-green-200 rounded-lg">
+              <div class="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center shrink-0">
+                <svg class="w-5 h-5 text-green-600" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M21 11.25v8.25a1.5 1.5 0 01-1.5 1.5H5.25a1.5 1.5 0 01-1.5-1.5v-8.25M12 4.875A2.625 2.625 0 109.375 7.5H12m0-2.625V7.5m0-2.625A2.625 2.625 0 1114.625 7.5H12m0 0V21m-8.625-9.75h18c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125h-18c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125z"/></svg>
+              </div>
+              <div class="flex-1">
+                <p class="text-sm font-medium text-green-900">Offer store credit at 110% (&#8377;1,28,601)</p>
+                <p class="text-xs text-green-600 mt-0.5">Instant credit, saves processing time. &#8377;11,691 bonus for customer.</p>
+              </div>
+              <button onclick="alert('Store credit offer of ₹1,28,601 sent to customer')" class="shrink-0 bg-green-600 hover:bg-green-700 text-white px-3 py-1.5 rounded-lg text-xs font-medium transition">Offer Credit</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Customer Comments & Evidence -->
+        <div class="bg-white rounded-xl border border-gray-100 p-6">
+          <h3 class="font-semibold text-gray-900 mb-4">Customer Comments &amp; Evidence</h3>
+          <div class="bg-gray-50 rounded-lg p-4 mb-4">
+            <p class="text-sm text-gray-700 leading-relaxed">"The sofa arrived with a noticeable tear on the left armrest. The packaging seemed fine from the outside but the damage was clearly there when I unpacked it. I've attached photos showing the tear and the condition of the packaging."</p>
+            <p class="text-xs text-gray-400 mt-2">Submitted on 22 Mar 2026, 11:00 AM</p>
+          </div>
+          <div class="grid grid-cols-3 gap-3">
+            <div class="aspect-square bg-gray-200 rounded-lg flex items-center justify-center text-gray-400 text-xs border border-gray-300">
+              <div class="text-center">
+                <svg class="w-8 h-8 mx-auto mb-1 text-gray-300" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.409a2.25 2.25 0 013.182 0l2.909 2.909M3.75 21h16.5a2.25 2.25 0 002.25-2.25V5.25A2.25 2.25 0 0020.25 3H3.75A2.25 2.25 0 001.5 5.25v13.5A2.25 2.25 0 003.75 21z"/></svg>
+                damage_1.jpg
+              </div>
+            </div>
+            <div class="aspect-square bg-gray-200 rounded-lg flex items-center justify-center text-gray-400 text-xs border border-gray-300">
+              <div class="text-center">
+                <svg class="w-8 h-8 mx-auto mb-1 text-gray-300" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.409a2.25 2.25 0 013.182 0l2.909 2.909M3.75 21h16.5a2.25 2.25 0 002.25-2.25V5.25A2.25 2.25 0 0020.25 3H3.75A2.25 2.25 0 001.5 5.25v13.5A2.25 2.25 0 003.75 21z"/></svg>
+                damage_2.jpg
+              </div>
+            </div>
+            <div class="aspect-square bg-gray-200 rounded-lg flex items-center justify-center text-gray-400 text-xs border border-gray-300">
+              <div class="text-center">
+                <svg class="w-8 h-8 mx-auto mb-1 text-gray-300" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.409a2.25 2.25 0 013.182 0l2.909 2.909M3.75 21h16.5a2.25 2.25 0 002.25-2.25V5.25A2.25 2.25 0 0020.25 3H3.75A2.25 2.25 0 001.5 5.25v13.5A2.25 2.25 0 003.75 21z"/></svg>
+                packaging.jpg
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Resale Readiness -->
+        <div class="bg-white rounded-xl border border-gray-100 p-6">
+          <h3 class="font-semibold text-gray-900 mb-4">Resale Readiness Assessment</h3>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div class="bg-green-50 border border-green-200 rounded-lg p-4">
+              <div class="flex items-center gap-3 mb-3">
+                <div class="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center">
+                  <svg class="w-4 h-4 text-green-600" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.857-9.809a.75.75 0 00-1.214-.882l-3.483 4.79-1.88-1.88a.75.75 0 10-1.06 1.061l2.5 2.5a.75.75 0 001.137-.089l4-5.5z" clip-rule="evenodd"/></svg>
+                </div>
+                <div>
+                  <p class="text-sm font-semibold text-green-800">Condition: Like New</p>
+                  <p class="text-xs text-green-600 mt-0.5">Minor cosmetic issue only, fully functional</p>
+                </div>
+              </div>
+              <div class="space-y-2 text-sm">
+                <div class="flex justify-between"><span class="text-green-700">Original price</span><span class="font-medium text-green-900">&#8377;3,500</span></div>
+                <div class="flex justify-between"><span class="text-green-700">Resale price (95%)</span><span class="font-bold text-green-900">&#8377;3,325</span></div>
+                <div class="flex justify-between"><span class="text-green-700">Recovery rate</span><span class="font-bold text-green-900">95%</span></div>
+              </div>
+            </div>
+            <div class="space-y-3">
+              <p class="text-xs font-semibold text-gray-500 uppercase tracking-wider">Inspection Checklist</p>
+              <div class="space-y-2">
+                <div class="flex items-center gap-2 text-sm">
+                  <svg class="w-4 h-4 text-green-500 shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.857-9.809a.75.75 0 00-1.214-.882l-3.483 4.79-1.88-1.88a.75.75 0 10-1.06 1.061l2.5 2.5a.75.75 0 001.137-.089l4-5.5z" clip-rule="evenodd"/></svg>
+                  <span class="text-gray-700">Structural integrity intact</span>
+                </div>
+                <div class="flex items-center gap-2 text-sm">
+                  <svg class="w-4 h-4 text-green-500 shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.857-9.809a.75.75 0 00-1.214-.882l-3.483 4.79-1.88-1.88a.75.75 0 10-1.06 1.061l2.5 2.5a.75.75 0 001.137-.089l4-5.5z" clip-rule="evenodd"/></svg>
+                  <span class="text-gray-700">All components present</span>
+                </div>
+                <div class="flex items-center gap-2 text-sm">
+                  <svg class="w-4 h-4 text-yellow-500 shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-8-5a.75.75 0 01.75.75v4.5a.75.75 0 01-1.5 0v-4.5A.75.75 0 0110 5zm0 10a1 1 0 100-2 1 1 0 000 2z" clip-rule="evenodd"/></svg>
+                  <span class="text-gray-700">Minor scratch on left arm</span>
+                </div>
+                <div class="flex items-center gap-2 text-sm">
+                  <svg class="w-4 h-4 text-green-500 shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.857-9.809a.75.75 0 00-1.214-.882l-3.483 4.79-1.88-1.88a.75.75 0 10-1.06 1.061l2.5 2.5a.75.75 0 001.137-.089l4-5.5z" clip-rule="evenodd"/></svg>
+                  <span class="text-gray-700">Original packaging available</span>
+                </div>
+              </div>
+              <button onclick="alert('Item listed in refurbished inventory at ₹3,325')" class="w-full mt-2 bg-brand-500 hover:bg-brand-600 text-white px-4 py-2 rounded-lg text-sm font-medium transition">List as Refurbished</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right Column (1/3) -->
+      <div class="space-y-6">
+
+        <!-- Customer Info -->
+        <div class="bg-white rounded-xl border border-gray-100 p-5">
+          <h3 class="font-semibold text-gray-900 text-sm mb-3">Customer</h3>
+          <div class="flex items-center gap-3 mb-3">
+            <div class="w-10 h-10 rounded-full bg-purple-100 flex items-center justify-center text-purple-600 text-sm font-bold">AK</div>
+            <div>
+              <a href="../users/detail.html" class="text-sm font-medium text-brand-600 hover:underline">Ankit Kumar</a>
+              <p class="text-xs text-gray-400">ankit.kumar@email.com</p>
+            </div>
+          </div>
+          <div class="space-y-2 text-sm">
+            <div class="flex justify-between"><span class="text-gray-500">Phone</span><span>+91 99876 54321</span></div>
+            <div class="flex justify-between"><span class="text-gray-500">Total Returns</span><span class="font-medium">2</span></div>
+          </div>
+        </div>
+
+        <!-- Customer Return History -->
+        <div class="bg-white rounded-xl border border-gray-100 p-5">
+          <h3 class="font-semibold text-gray-900 text-sm mb-3">Customer Return History</h3>
+          <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-3 mb-3">
+            <div class="flex items-center gap-2">
+              <svg class="w-4 h-4 text-yellow-600 shrink-0" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z"/></svg>
+              <p class="text-xs font-semibold text-yellow-800">3 returns in last 6 months</p>
+            </div>
+          </div>
+          <div class="space-y-3">
+            <div class="flex items-start gap-3 pb-3 border-b border-gray-100">
+              <div class="w-6 h-6 rounded-full bg-green-100 flex items-center justify-center shrink-0 mt-0.5">
+                <svg class="w-3 h-3 text-green-600" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.857-9.809a.75.75 0 00-1.214-.882l-3.483 4.79-1.88-1.88a.75.75 0 10-1.06 1.061l2.5 2.5a.75.75 0 001.137-.089l4-5.5z" clip-rule="evenodd"/></svg>
+              </div>
+              <div>
+                <p class="text-xs font-medium text-gray-900">Defective power tool motor</p>
+                <p class="text-xs text-gray-400">Jan 2026 &middot; &#8377;4,200 &middot; <span class="text-green-600 font-medium">Legitimate</span></p>
+              </div>
+            </div>
+            <div class="flex items-start gap-3 pb-3 border-b border-gray-100">
+              <div class="w-6 h-6 rounded-full bg-green-100 flex items-center justify-center shrink-0 mt-0.5">
+                <svg class="w-3 h-3 text-green-600" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.857-9.809a.75.75 0 00-1.214-.882l-3.483 4.79-1.88-1.88a.75.75 0 10-1.06 1.061l2.5 2.5a.75.75 0 001.137-.089l4-5.5z" clip-rule="evenodd"/></svg>
+              </div>
+              <div>
+                <p class="text-xs font-medium text-gray-900">Wrong colour paint delivered</p>
+                <p class="text-xs text-gray-400">Dec 2025 &middot; &#8377;1,800 &middot; <span class="text-green-600 font-medium">Legitimate</span></p>
+              </div>
+            </div>
+            <div class="flex items-start gap-3">
+              <div class="w-6 h-6 rounded-full bg-red-100 flex items-center justify-center shrink-0 mt-0.5">
+                <svg class="w-3 h-3 text-red-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z"/></svg>
+              </div>
+              <div>
+                <p class="text-xs font-medium text-gray-900">Changed mind after delivery</p>
+                <p class="text-xs text-gray-400">Nov 2025 &middot; &#8377;2,500 &middot; <span class="text-red-600 font-medium">Flagged</span></p>
+              </div>
+            </div>
+          </div>
+          <div class="mt-3 pt-3 border-t border-gray-100">
+            <div class="flex justify-between text-xs">
+              <span class="text-gray-500">Abuse risk score</span>
+              <span class="inline-flex items-center px-2 py-0.5 rounded-full font-semibold bg-yellow-100 text-yellow-700">Medium</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Seller Info -->
+        <div class="bg-white rounded-xl border border-gray-100 p-5">
+          <h3 class="font-semibold text-gray-900 text-sm mb-3">Seller</h3>
+          <div class="flex items-center gap-3 mb-3">
+            <div class="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 text-sm font-bold">RS</div>
+            <div>
+              <a href="../sellers/detail.html" class="text-sm font-medium text-brand-600 hover:underline">Rajesh Store</a>
+              <p class="text-xs text-gray-400">Premium Seller</p>
+            </div>
+          </div>
+          <div class="space-y-2 text-sm">
+            <div class="flex justify-between">
+              <span class="text-gray-500">Response Status</span>
+              <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-green-50 text-green-700"><span class="w-1.5 h-1.5 rounded-full bg-green-500"></span>Accepted</span>
+            </div>
+            <div class="flex justify-between"><span class="text-gray-500">Response Date</span><span>22 Mar 2026, 3:00 PM</span></div>
+          </div>
+        </div>
+
+        <!-- Return Policy Compliance -->
+        <div class="bg-white rounded-xl border border-gray-100 p-5">
+          <h3 class="font-semibold text-gray-900 text-sm mb-3">Return Policy Check</h3>
+          <div class="space-y-2.5 text-sm">
+            <div class="flex justify-between items-center">
+              <span class="text-gray-500">Within 30 days</span>
+              <span class="text-green-600 font-medium flex items-center gap-1">
+                <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.857-9.809a.75.75 0 00-1.214-.882l-3.483 4.79-1.88-1.88a.75.75 0 10-1.06 1.061l2.5 2.5a.75.75 0 001.137-.089l4-5.5z" clip-rule="evenodd"/></svg> Yes (5 days)
+              </span>
+            </div>
+            <div class="flex justify-between items-center">
+              <span class="text-gray-500">Product unused</span>
+              <span class="text-green-600 font-medium flex items-center gap-1">
+                <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.857-9.809a.75.75 0 00-1.214-.882l-3.483 4.79-1.88-1.88a.75.75 0 10-1.06 1.061l2.5 2.5a.75.75 0 001.137-.089l4-5.5z" clip-rule="evenodd"/></svg> Yes
+              </span>
+            </div>
+            <div class="flex justify-between items-center">
+              <span class="text-gray-500">Original packaging</span>
+              <span class="text-green-600 font-medium flex items-center gap-1">
+                <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.857-9.809a.75.75 0 00-1.214-.882l-3.483 4.79-1.88-1.88a.75.75 0 10-1.06 1.061l2.5 2.5a.75.75 0 001.137-.089l4-5.5z" clip-rule="evenodd"/></svg> Yes
+              </span>
+            </div>
+            <div class="flex justify-between items-center">
+              <span class="text-gray-500">Evidence provided</span>
+              <span class="text-green-600 font-medium flex items-center gap-1">
+                <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.857-9.809a.75.75 0 00-1.214-.882l-3.483 4.79-1.88-1.88a.75.75 0 10-1.06 1.061l2.5 2.5a.75.75 0 001.137-.089l4-5.5z" clip-rule="evenodd"/></svg> 3 photos
+              </span>
+            </div>
+            <div class="flex justify-between items-center">
+              <span class="text-gray-500">Returnable category</span>
+              <span class="text-green-600 font-medium flex items-center gap-1">
+                <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.857-9.809a.75.75 0 00-1.214-.882l-3.483 4.79-1.88-1.88a.75.75 0 10-1.06 1.061l2.5 2.5a.75.75 0 001.137-.089l4-5.5z" clip-rule="evenodd"/></svg> Yes
+              </span>
+            </div>
+            <div class="mt-3 pt-3 border-t border-gray-100 flex justify-between items-center">
+              <span class="text-gray-700 font-semibold">Verdict</span>
+              <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-green-50 text-green-700"><span class="w-1.5 h-1.5 rounded-full bg-green-500"></span>Eligible</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Pickup Details -->
+        <div class="bg-white rounded-xl border border-gray-100 p-5">
+          <h3 class="font-semibold text-gray-900 text-sm mb-3">Pickup Details</h3>
+          <div class="space-y-2.5 text-sm">
+            <div class="flex justify-between"><span class="text-gray-500">Scheduled Date</span><span class="font-medium">29 Mar 2026</span></div>
+            <div class="flex justify-between"><span class="text-gray-500">Time Slot</span><span class="font-medium">10:00 AM - 1:00 PM</span></div>
+            <div class="flex justify-between"><span class="text-gray-500">Carrier</span><span class="font-medium">Delhivery Express</span></div>
+            <div class="flex justify-between"><span class="text-gray-500">Pickup Address</span></div>
+            <p class="text-sm text-gray-600">Flat 402, Prestige Towers, MG Road, Koramangala, Bangalore 560034</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+<script src="../shared-layout.js"></script>
+<script>renderAdminLayout('returns', '../');</script>
+</body>
+</html>

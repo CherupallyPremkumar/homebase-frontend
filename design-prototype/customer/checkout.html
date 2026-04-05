@@ -1,0 +1,756 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HomeBase — Checkout</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              50: '#FFF7ED',
+              100: '#FFEDD5',
+              200: '#FED7AA',
+              300: '#FDBA74',
+              400: '#FB923C',
+              500: '#F97316',
+              600: '#EA580C',
+              700: '#C2410C',
+            },
+            navy: {
+              700: '#1E3A5F',
+              800: '#1A2E4A',
+              900: '#0F1B2D',
+            },
+            success: '#16A34A',
+            warning: '#EAB308',
+            danger: '#DC2626',
+          },
+          fontFamily: {
+            sans: ['Inter', 'system-ui', 'sans-serif'],
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    .btn-brand { background: #F97316; transition: all 0.2s; }
+    .btn-brand:hover { background: #EA580C; }
+    .radio-card { transition: all 0.15s ease; }
+    .radio-card:hover { border-color: #FDBA74; }
+    .radio-card.selected { border-color: #F97316; background: #FFF7ED; }
+    .payment-section { display: none; }
+    .payment-section.active { display: block; }
+    .address-card { transition: all 0.15s ease; cursor: pointer; }
+    .address-card:hover { border-color: #FDBA74; }
+    .address-card.selected { border-color: #F97316; background: #FFF7ED; }
+    input:focus, select:focus, textarea:focus {
+      border-color: #FB923C;
+      box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.1);
+    }
+    .step-connector { height: 2px; }
+  </style>
+</head>
+<body class="font-sans bg-gray-50 text-gray-900">
+
+  <!-- ===== SIMPLIFIED HEADER ===== -->
+  <header class="bg-white border-b border-gray-100 sticky top-0 z-50 shadow-sm">
+    <div class="max-w-7xl mx-auto px-4 flex items-center justify-between h-16">
+      <!-- Logo -->
+      <a href="storefront.html" class="flex items-center gap-2">
+        <div class="w-9 h-9 rounded-lg bg-brand-500 flex items-center justify-center">
+          <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-4 0a1 1 0 01-1-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 01-1 1"/></svg>
+        </div>
+        <span class="text-xl font-extrabold tracking-tight text-navy-900">Home<span class="text-brand-500">Base</span></span>
+      </a>
+
+      <!-- Checkout Steps Indicator -->
+      <div class="hidden md:flex items-center gap-0">
+        <!-- Step 1: Shipping (Active) -->
+        <div class="flex items-center">
+          <div class="flex items-center gap-2">
+            <div class="w-8 h-8 rounded-full bg-brand-500 text-white text-sm font-bold flex items-center justify-center">1</div>
+            <span class="text-sm font-semibold text-brand-600">Shipping</span>
+          </div>
+          <div class="w-16 mx-3 step-connector bg-gray-200 rounded-full">
+            <div class="h-full w-0 bg-brand-500 rounded-full"></div>
+          </div>
+        </div>
+        <!-- Step 2: Payment -->
+        <div class="flex items-center">
+          <div class="flex items-center gap-2">
+            <div class="w-8 h-8 rounded-full bg-gray-200 text-gray-400 text-sm font-bold flex items-center justify-center">2</div>
+            <span class="text-sm font-medium text-gray-400">Payment</span>
+          </div>
+          <div class="w-16 mx-3 step-connector bg-gray-200 rounded-full"></div>
+        </div>
+        <!-- Step 3: Review -->
+        <div class="flex items-center gap-2">
+          <div class="w-8 h-8 rounded-full bg-gray-200 text-gray-400 text-sm font-bold flex items-center justify-center">3</div>
+          <span class="text-sm font-medium text-gray-400">Review</span>
+        </div>
+      </div>
+
+      <!-- Secure Badge -->
+      <div class="flex items-center gap-2 text-gray-500">
+        <svg class="w-4 h-4 text-success" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z"/></svg>
+        <span class="text-xs font-medium text-success">Secure Checkout</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- ===== MOBILE STEPS (visible on small screens) ===== -->
+  <div class="md:hidden bg-white border-b border-gray-100 px-4 py-3">
+    <div class="flex items-center justify-center gap-0">
+      <div class="flex items-center">
+        <div class="flex items-center gap-1.5">
+          <div class="w-7 h-7 rounded-full bg-brand-500 text-white text-xs font-bold flex items-center justify-center">1</div>
+          <span class="text-xs font-semibold text-brand-600">Shipping</span>
+        </div>
+        <div class="w-8 mx-2 step-connector bg-gray-200 rounded-full"></div>
+      </div>
+      <div class="flex items-center">
+        <div class="flex items-center gap-1.5">
+          <div class="w-7 h-7 rounded-full bg-gray-200 text-gray-400 text-xs font-bold flex items-center justify-center">2</div>
+          <span class="text-xs font-medium text-gray-400">Payment</span>
+        </div>
+        <div class="w-8 mx-2 step-connector bg-gray-200 rounded-full"></div>
+      </div>
+      <div class="flex items-center gap-1.5">
+        <div class="w-7 h-7 rounded-full bg-gray-200 text-gray-400 text-xs font-bold flex items-center justify-center">3</div>
+        <span class="text-xs font-medium text-gray-400">Review</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== MAIN CONTENT ===== -->
+  <main class="max-w-7xl mx-auto px-4 py-8">
+    <div class="flex flex-col lg:flex-row gap-8">
+
+      <!-- ===== LEFT COLUMN: CHECKOUT FORM ===== -->
+      <div class="flex-1 min-w-0">
+
+        <!-- === SECTION 1: SHIPPING ADDRESS === -->
+        <section class="bg-white rounded-xl border border-gray-200 shadow-sm mb-6">
+          <div class="px-6 py-4 border-b border-gray-100">
+            <div class="flex items-center gap-3">
+              <div class="w-7 h-7 rounded-full bg-brand-50 flex items-center justify-center">
+                <svg class="w-4 h-4 text-brand-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z"/><path d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z"/></svg>
+              </div>
+              <h2 class="text-lg font-bold text-navy-900">Shipping Address</h2>
+            </div>
+          </div>
+
+          <div class="p-6">
+            <!-- Saved Addresses -->
+            <div class="mb-6">
+              <p class="text-sm font-semibold text-gray-700 mb-3">Saved Addresses</p>
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <!-- Address Card 1 (selected) -->
+                <label class="address-card selected border-2 rounded-xl p-4 relative block">
+                  <input type="radio" name="saved_address" value="addr1" checked class="sr-only">
+                  <div class="flex items-start justify-between">
+                    <div>
+                      <div class="flex items-center gap-2 mb-1">
+                        <span class="text-sm font-semibold text-navy-900">Rahul Sharma</span>
+                        <span class="text-[10px] font-bold text-brand-600 bg-brand-50 px-2 py-0.5 rounded-full uppercase">Home</span>
+                      </div>
+                      <p class="text-sm text-gray-600 leading-relaxed">Flat 402, Sunshine Towers,<br>MG Road, Koramangala,<br>Bengaluru, Karnataka - 560034</p>
+                      <p class="text-xs text-gray-400 mt-1">Phone: +91 98765 43210</p>
+                    </div>
+                    <div class="w-5 h-5 rounded-full border-2 border-brand-500 flex items-center justify-center shrink-0 mt-0.5">
+                      <div class="w-2.5 h-2.5 rounded-full bg-brand-500"></div>
+                    </div>
+                  </div>
+                </label>
+
+                <!-- Address Card 2 -->
+                <label class="address-card border-2 border-gray-200 rounded-xl p-4 relative block">
+                  <input type="radio" name="saved_address" value="addr2" class="sr-only">
+                  <div class="flex items-start justify-between">
+                    <div>
+                      <div class="flex items-center gap-2 mb-1">
+                        <span class="text-sm font-semibold text-navy-900">Rahul Sharma</span>
+                        <span class="text-[10px] font-bold text-gray-500 bg-gray-100 px-2 py-0.5 rounded-full uppercase">Office</span>
+                      </div>
+                      <p class="text-sm text-gray-600 leading-relaxed">3rd Floor, WeWork Galaxy,<br>Residency Road,<br>Bengaluru, Karnataka - 560025</p>
+                      <p class="text-xs text-gray-400 mt-1">Phone: +91 98765 43210</p>
+                    </div>
+                    <div class="w-5 h-5 rounded-full border-2 border-gray-300 flex items-center justify-center shrink-0 mt-0.5">
+                    </div>
+                  </div>
+                </label>
+              </div>
+            </div>
+
+            <!-- Divider with "or" -->
+            <div class="flex items-center gap-4 mb-6">
+              <div class="flex-1 h-px bg-gray-200"></div>
+              <span class="text-xs font-medium text-gray-400 uppercase tracking-wider">or add new address</span>
+              <div class="flex-1 h-px bg-gray-200"></div>
+            </div>
+
+            <!-- New Address Form -->
+            <div class="space-y-4">
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 mb-1.5">Full Name <span class="text-danger">*</span></label>
+                  <input type="text" placeholder="Enter full name" class="w-full border border-gray-200 rounded-lg px-4 py-2.5 text-sm outline-none">
+                </div>
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 mb-1.5">Phone Number <span class="text-danger">*</span></label>
+                  <div class="flex">
+                    <span class="inline-flex items-center px-3 bg-gray-50 border border-r-0 border-gray-200 rounded-l-lg text-sm text-gray-500">+91</span>
+                    <input type="tel" placeholder="10-digit mobile number" class="w-full border border-gray-200 rounded-r-lg px-4 py-2.5 text-sm outline-none">
+                  </div>
+                </div>
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1.5">Address Line 1 <span class="text-danger">*</span></label>
+                <input type="text" placeholder="House/Flat no., Building name, Street" class="w-full border border-gray-200 rounded-lg px-4 py-2.5 text-sm outline-none">
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1.5">Address Line 2</label>
+                <input type="text" placeholder="Area, Colony, Landmark (optional)" class="w-full border border-gray-200 rounded-lg px-4 py-2.5 text-sm outline-none">
+              </div>
+              <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 mb-1.5">City <span class="text-danger">*</span></label>
+                  <input type="text" placeholder="City" class="w-full border border-gray-200 rounded-lg px-4 py-2.5 text-sm outline-none">
+                </div>
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 mb-1.5">State <span class="text-danger">*</span></label>
+                  <select class="w-full border border-gray-200 rounded-lg px-4 py-2.5 text-sm outline-none text-gray-500 bg-white">
+                    <option value="">Select State</option>
+                    <option>Andhra Pradesh</option>
+                    <option>Delhi</option>
+                    <option>Gujarat</option>
+                    <option selected>Karnataka</option>
+                    <option>Kerala</option>
+                    <option>Maharashtra</option>
+                    <option>Tamil Nadu</option>
+                    <option>Telangana</option>
+                    <option>Uttar Pradesh</option>
+                    <option>West Bengal</option>
+                  </select>
+                </div>
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 mb-1.5">PIN Code <span class="text-danger">*</span></label>
+                  <input type="text" placeholder="6-digit PIN" maxlength="6" class="w-full border border-gray-200 rounded-lg px-4 py-2.5 text-sm outline-none">
+                </div>
+              </div>
+              <label class="flex items-center gap-2 cursor-pointer select-none">
+                <input type="checkbox" class="w-4 h-4 rounded border-gray-300 text-brand-500 focus:ring-brand-400">
+                <span class="text-sm text-gray-600">Save this address for future orders</span>
+              </label>
+            </div>
+          </div>
+        </section>
+
+        <!-- === SECTION 2: SHIPPING METHOD === -->
+        <section class="bg-white rounded-xl border border-gray-200 shadow-sm mb-6">
+          <div class="px-6 py-4 border-b border-gray-100">
+            <div class="flex items-center gap-3">
+              <div class="w-7 h-7 rounded-full bg-brand-50 flex items-center justify-center">
+                <svg class="w-4 h-4 text-brand-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M8.25 18.75a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m3 0h6m-9 0H3.375a1.125 1.125 0 01-1.125-1.125V14.25m17.25 4.5a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m3 0H6.375m11.25 3V7.5a.375.375 0 00-.375-.375H14.25m0 0V3h4.5a.375.375 0 01.375.375v3.75m-4.875 0h4.875"/></svg>
+              </div>
+              <h2 class="text-lg font-bold text-navy-900">Shipping Method</h2>
+            </div>
+          </div>
+
+          <div class="p-6 space-y-3">
+            <!-- Standard -->
+            <label class="radio-card selected flex items-center justify-between border-2 rounded-xl p-4 cursor-pointer">
+              <div class="flex items-center gap-4">
+                <div class="w-5 h-5 rounded-full border-2 border-brand-500 flex items-center justify-center shrink-0">
+                  <div class="w-2.5 h-2.5 rounded-full bg-brand-500"></div>
+                </div>
+                <div>
+                  <p class="text-sm font-semibold text-navy-900">Standard Delivery</p>
+                  <p class="text-xs text-gray-400 mt-0.5">Estimated delivery: 5-7 business days</p>
+                </div>
+              </div>
+              <div class="text-right shrink-0">
+                <span class="text-sm font-bold text-success">FREE</span>
+                <p class="text-[10px] text-gray-400 mt-0.5">By Apr 2 - Apr 4</p>
+              </div>
+              <input type="radio" name="shipping_method" value="standard" checked class="sr-only">
+            </label>
+
+            <!-- Express -->
+            <label class="radio-card flex items-center justify-between border-2 border-gray-200 rounded-xl p-4 cursor-pointer">
+              <div class="flex items-center gap-4">
+                <div class="w-5 h-5 rounded-full border-2 border-gray-300 flex items-center justify-center shrink-0">
+                </div>
+                <div>
+                  <p class="text-sm font-semibold text-navy-900">Express Delivery</p>
+                  <p class="text-xs text-gray-400 mt-0.5">Estimated delivery: 2-3 business days</p>
+                </div>
+              </div>
+              <div class="text-right shrink-0">
+                <span class="text-sm font-bold text-navy-900">&#8377;149</span>
+                <p class="text-[10px] text-gray-400 mt-0.5">By Mar 30 - Mar 31</p>
+              </div>
+              <input type="radio" name="shipping_method" value="express" class="sr-only">
+            </label>
+
+            <!-- Same Day -->
+            <label class="radio-card flex items-center justify-between border-2 border-gray-200 rounded-xl p-4 cursor-pointer">
+              <div class="flex items-center gap-4">
+                <div class="w-5 h-5 rounded-full border-2 border-gray-300 flex items-center justify-center shrink-0">
+                </div>
+                <div>
+                  <div class="flex items-center gap-2">
+                    <p class="text-sm font-semibold text-navy-900">Same Day Delivery</p>
+                    <span class="text-[10px] font-bold text-brand-600 bg-brand-50 px-2 py-0.5 rounded-full">FASTEST</span>
+                  </div>
+                  <p class="text-xs text-gray-400 mt-0.5">Order within 2 hrs for same-day delivery</p>
+                </div>
+              </div>
+              <div class="text-right shrink-0">
+                <span class="text-sm font-bold text-navy-900">&#8377;299</span>
+                <p class="text-[10px] text-gray-400 mt-0.5">Today, by 9 PM</p>
+              </div>
+              <input type="radio" name="shipping_method" value="sameday" class="sr-only">
+            </label>
+          </div>
+        </section>
+
+        <!-- === SECTION 3: PAYMENT METHOD === -->
+        <section class="bg-white rounded-xl border border-gray-200 shadow-sm mb-6">
+          <div class="px-6 py-4 border-b border-gray-100">
+            <div class="flex items-center gap-3">
+              <div class="w-7 h-7 rounded-full bg-brand-50 flex items-center justify-center">
+                <svg class="w-4 h-4 text-brand-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M2.25 8.25h19.5M2.25 9h19.5m-16.5 5.25h6m-6 2.25h3m-3.75 3h15a2.25 2.25 0 002.25-2.25V6.75A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25v10.5A2.25 2.25 0 004.5 19.5z"/></svg>
+              </div>
+              <h2 class="text-lg font-bold text-navy-900">Payment Method</h2>
+            </div>
+          </div>
+
+          <div class="p-6 space-y-3">
+            <!-- UPI -->
+            <div class="border-2 rounded-xl overflow-hidden" id="payment-upi-wrapper">
+              <label class="flex items-center justify-between p-4 cursor-pointer" onclick="selectPayment('upi')">
+                <div class="flex items-center gap-4">
+                  <div class="w-5 h-5 rounded-full border-2 border-brand-500 flex items-center justify-center shrink-0" id="radio-upi">
+                    <div class="w-2.5 h-2.5 rounded-full bg-brand-500"></div>
+                  </div>
+                  <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 bg-green-50 rounded-lg flex items-center justify-center">
+                      <span class="text-lg font-bold text-green-600">U</span>
+                    </div>
+                    <div>
+                      <p class="text-sm font-semibold text-navy-900">UPI</p>
+                      <p class="text-xs text-gray-400">Google Pay, PhonePe, Paytm & more</p>
+                    </div>
+                  </div>
+                </div>
+                <input type="radio" name="payment_method" value="upi" checked class="sr-only">
+              </label>
+              <div class="payment-section active px-4 pb-4" id="payment-upi">
+                <div class="bg-gray-50 rounded-lg p-4">
+                  <label class="block text-sm font-medium text-gray-700 mb-1.5">UPI ID</label>
+                  <div class="flex gap-2">
+                    <input type="text" placeholder="yourname@upi" class="flex-1 border border-gray-200 rounded-lg px-4 py-2.5 text-sm outline-none bg-white">
+                    <button class="px-4 py-2.5 text-sm font-semibold text-brand-600 border border-brand-200 rounded-lg hover:bg-brand-50 transition">Verify</button>
+                  </div>
+                  <p class="text-xs text-gray-400 mt-2">You will receive a payment request on your UPI app</p>
+                </div>
+              </div>
+            </div>
+
+            <!-- Credit/Debit Card -->
+            <div class="border-2 border-gray-200 rounded-xl overflow-hidden" id="payment-card-wrapper">
+              <label class="flex items-center justify-between p-4 cursor-pointer" onclick="selectPayment('card')">
+                <div class="flex items-center gap-4">
+                  <div class="w-5 h-5 rounded-full border-2 border-gray-300 flex items-center justify-center shrink-0" id="radio-card">
+                  </div>
+                  <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 bg-blue-50 rounded-lg flex items-center justify-center">
+                      <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M2.25 8.25h19.5M2.25 9h19.5m-16.5 5.25h6m-6 2.25h3m-3.75 3h15a2.25 2.25 0 002.25-2.25V6.75A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25v10.5A2.25 2.25 0 004.5 19.5z"/></svg>
+                    </div>
+                    <div>
+                      <p class="text-sm font-semibold text-navy-900">Credit / Debit Card</p>
+                      <p class="text-xs text-gray-400">Visa, Mastercard, RuPay & Amex</p>
+                    </div>
+                  </div>
+                </div>
+                <div class="flex items-center gap-1.5">
+                  <span class="bg-white border border-gray-200 text-[10px] text-gray-500 px-1.5 py-0.5 rounded font-medium">VISA</span>
+                  <span class="bg-white border border-gray-200 text-[10px] text-gray-500 px-1.5 py-0.5 rounded font-medium">MC</span>
+                  <span class="bg-white border border-gray-200 text-[10px] text-gray-500 px-1.5 py-0.5 rounded font-medium">RuPay</span>
+                </div>
+                <input type="radio" name="payment_method" value="card" class="sr-only">
+              </label>
+              <div class="payment-section px-4 pb-4" id="payment-card">
+                <div class="bg-gray-50 rounded-lg p-4 space-y-4">
+                  <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1.5">Card Number</label>
+                    <input type="text" placeholder="1234 5678 9012 3456" maxlength="19" class="w-full border border-gray-200 rounded-lg px-4 py-2.5 text-sm outline-none bg-white">
+                  </div>
+                  <div class="grid grid-cols-2 gap-4">
+                    <div>
+                      <label class="block text-sm font-medium text-gray-700 mb-1.5">Expiry Date</label>
+                      <input type="text" placeholder="MM / YY" maxlength="7" class="w-full border border-gray-200 rounded-lg px-4 py-2.5 text-sm outline-none bg-white">
+                    </div>
+                    <div>
+                      <label class="block text-sm font-medium text-gray-700 mb-1.5">CVV</label>
+                      <input type="password" placeholder="***" maxlength="4" class="w-full border border-gray-200 rounded-lg px-4 py-2.5 text-sm outline-none bg-white">
+                    </div>
+                  </div>
+                  <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1.5">Name on Card</label>
+                    <input type="text" placeholder="As printed on card" class="w-full border border-gray-200 rounded-lg px-4 py-2.5 text-sm outline-none bg-white">
+                  </div>
+                  <label class="flex items-center gap-2 cursor-pointer select-none">
+                    <input type="checkbox" class="w-4 h-4 rounded border-gray-300 text-brand-500 focus:ring-brand-400">
+                    <span class="text-sm text-gray-600">Save this card for faster payments</span>
+                  </label>
+                </div>
+              </div>
+            </div>
+
+            <!-- Net Banking -->
+            <div class="border-2 border-gray-200 rounded-xl overflow-hidden" id="payment-netbanking-wrapper">
+              <label class="flex items-center justify-between p-4 cursor-pointer" onclick="selectPayment('netbanking')">
+                <div class="flex items-center gap-4">
+                  <div class="w-5 h-5 rounded-full border-2 border-gray-300 flex items-center justify-center shrink-0" id="radio-netbanking">
+                  </div>
+                  <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 bg-purple-50 rounded-lg flex items-center justify-center">
+                      <svg class="w-5 h-5 text-purple-600" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M12 21v-8.25M15.75 21v-8.25M8.25 21v-8.25M3 9l9-6 9 6m-1.5 12V10.332A48.36 48.36 0 0012 9.75c-2.551 0-5.056.2-7.5.582V21M3 21h18M12 6.75h.008v.008H12V6.75z"/></svg>
+                    </div>
+                    <div>
+                      <p class="text-sm font-semibold text-navy-900">Net Banking</p>
+                      <p class="text-xs text-gray-400">All major Indian banks</p>
+                    </div>
+                  </div>
+                </div>
+                <input type="radio" name="payment_method" value="netbanking" class="sr-only">
+              </label>
+              <div class="payment-section px-4 pb-4" id="payment-netbanking">
+                <div class="bg-gray-50 rounded-lg p-4">
+                  <label class="block text-sm font-medium text-gray-700 mb-1.5">Select Your Bank</label>
+                  <select class="w-full border border-gray-200 rounded-lg px-4 py-2.5 text-sm outline-none bg-white text-gray-600">
+                    <option value="">Choose a bank</option>
+                    <option>State Bank of India (SBI)</option>
+                    <option>HDFC Bank</option>
+                    <option>ICICI Bank</option>
+                    <option>Axis Bank</option>
+                    <option>Kotak Mahindra Bank</option>
+                    <option>Bank of Baroda</option>
+                    <option>Punjab National Bank</option>
+                    <option>Yes Bank</option>
+                    <option>IndusInd Bank</option>
+                    <option>Canara Bank</option>
+                  </select>
+                  <p class="text-xs text-gray-400 mt-2">You will be redirected to your bank's website to complete the payment</p>
+                </div>
+              </div>
+            </div>
+
+            <!-- Cash on Delivery -->
+            <div class="border-2 border-gray-200 rounded-xl overflow-hidden" id="payment-cod-wrapper">
+              <label class="flex items-center justify-between p-4 cursor-pointer" onclick="selectPayment('cod')">
+                <div class="flex items-center gap-4">
+                  <div class="w-5 h-5 rounded-full border-2 border-gray-300 flex items-center justify-center shrink-0" id="radio-cod">
+                  </div>
+                  <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 bg-yellow-50 rounded-lg flex items-center justify-center">
+                      <svg class="w-5 h-5 text-yellow-600" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M2.25 18.75a60.07 60.07 0 0115.797 2.101c.727.198 1.453-.342 1.453-1.096V18.75M3.75 4.5v.75A.75.75 0 013 6h-.75m0 0v-.375c0-.621.504-1.125 1.125-1.125H20.25M2.25 6v9m18-10.5v.75c0 .414.336.75.75.75h.75m-1.5-1.5h.375c.621 0 1.125.504 1.125 1.125v9.75c0 .621-.504 1.125-1.125 1.125h-.375m1.5-1.5H21a.75.75 0 00-.75.75v.75m0 0H3.75m0 0h-.375a1.125 1.125 0 01-1.125-1.125V15m1.5 1.5v-.75A.75.75 0 003 15h-.75M15 10.5a3 3 0 11-6 0 3 3 0 016 0zm3 0h.008v.008H18V10.5zm-12 0h.008v.008H6V10.5z"/></svg>
+                    </div>
+                    <div>
+                      <p class="text-sm font-semibold text-navy-900">Cash on Delivery</p>
+                      <p class="text-xs text-gray-400">Pay when you receive your order</p>
+                    </div>
+                  </div>
+                </div>
+                <span class="text-[10px] font-bold text-yellow-600 bg-yellow-50 px-2 py-0.5 rounded-full border border-yellow-200">+&#8377;29 fee</span>
+                <input type="radio" name="payment_method" value="cod" class="sr-only">
+              </label>
+              <div class="payment-section px-4 pb-4" id="payment-cod">
+                <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+                  <div class="flex items-start gap-2">
+                    <svg class="w-4 h-4 text-yellow-600 shrink-0 mt-0.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z"/></svg>
+                    <div>
+                      <p class="text-sm font-medium text-yellow-800">COD Handling Fee: &#8377;29</p>
+                      <p class="text-xs text-yellow-600 mt-0.5">A nominal fee is applicable for Cash on Delivery orders. Please keep exact change ready at the time of delivery.</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+      </div>
+
+      <!-- ===== RIGHT COLUMN: ORDER SUMMARY (STICKY) ===== -->
+      <div class="lg:w-[400px] shrink-0">
+        <div class="lg:sticky lg:top-24">
+
+          <!-- Order Summary Card -->
+          <section class="bg-white rounded-xl border border-gray-200 shadow-sm">
+            <div class="px-6 py-4 border-b border-gray-100">
+              <div class="flex items-center justify-between">
+                <h2 class="text-lg font-bold text-navy-900">Order Summary</h2>
+                <span class="text-xs text-gray-400">3 items</span>
+              </div>
+            </div>
+
+            <div class="p-6">
+              <!-- Order Items -->
+              <div class="space-y-4 mb-6">
+                <!-- Item 1 -->
+                <div class="flex items-start gap-3">
+                  <div class="w-16 h-16 bg-gray-50 rounded-lg flex items-center justify-center text-2xl shrink-0 border border-gray-100">&#127911;</div>
+                  <div class="flex-1 min-w-0">
+                    <p class="text-sm font-medium text-gray-800 line-clamp-1">Sony WH-1000XM5 Wireless</p>
+                    <p class="text-xs text-gray-400 mt-0.5">Color: Black | Qty: 1</p>
+                    <div class="flex items-center gap-2 mt-1">
+                      <span class="text-sm font-bold text-navy-900">&#8377;22,490</span>
+                      <span class="text-xs text-gray-400 line-through">&#8377;29,990</span>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Item 2 -->
+                <div class="flex items-start gap-3">
+                  <div class="w-16 h-16 bg-gray-50 rounded-lg flex items-center justify-center text-2xl shrink-0 border border-gray-100">&#8986;</div>
+                  <div class="flex-1 min-w-0">
+                    <p class="text-sm font-medium text-gray-800 line-clamp-1">Apple Watch Ultra 2 GPS</p>
+                    <p class="text-xs text-gray-400 mt-0.5">Size: 49mm | Qty: 1</p>
+                    <div class="flex items-center gap-2 mt-1">
+                      <span class="text-sm font-bold text-navy-900">&#8377;89,900</span>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Item 3 -->
+                <div class="flex items-start gap-3">
+                  <div class="w-16 h-16 bg-gray-50 rounded-lg flex items-center justify-center text-2xl shrink-0 border border-gray-100">&#128084;</div>
+                  <div class="flex-1 min-w-0">
+                    <p class="text-sm font-medium text-gray-800 line-clamp-1">Nike Air Max 270 React</p>
+                    <p class="text-xs text-gray-400 mt-0.5">Size: UK 9 | Qty: 1</p>
+                    <div class="flex items-center gap-2 mt-1">
+                      <span class="text-sm font-bold text-navy-900">&#8377;8,995</span>
+                      <span class="text-xs text-gray-400 line-through">&#8377;12,995</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Coupon Code -->
+              <div class="mb-6">
+                <div class="flex gap-2">
+                  <div class="relative flex-1">
+                    <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9.568 3H5.25A2.25 2.25 0 003 5.25v4.318c0 .597.237 1.17.659 1.591l9.581 9.581c.699.699 1.78.872 2.607.33a18.095 18.095 0 005.223-5.223c.542-.827.369-1.908-.33-2.607L11.16 3.66A2.25 2.25 0 009.568 3z"/><path d="M6 6h.008v.008H6V6z"/></svg>
+                    <input type="text" placeholder="Enter coupon code" class="w-full border border-gray-200 rounded-lg pl-9 pr-4 py-2.5 text-sm outline-none">
+                  </div>
+                  <button class="px-5 py-2.5 text-sm font-semibold text-brand-600 border-2 border-brand-200 rounded-lg hover:bg-brand-50 hover:border-brand-300 transition">Apply</button>
+                </div>
+                <div class="flex items-center gap-1.5 mt-2">
+                  <svg class="w-3.5 h-3.5 text-success" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.857-9.809a.75.75 0 00-1.214-.882l-3.483 4.79-1.88-1.88a.75.75 0 10-1.06 1.061l2.5 2.5a.75.75 0 001.137-.089l4-5.5z" clip-rule="evenodd"/></svg>
+                  <span class="text-xs text-success font-medium">Coupon SAVE10 applied - &#8377;1,000 off</span>
+                </div>
+              </div>
+
+              <!-- Price Breakdown -->
+              <div class="border-t border-gray-100 pt-4 space-y-3">
+                <div class="flex items-center justify-between">
+                  <span class="text-sm text-gray-500">Subtotal</span>
+                  <span class="text-sm font-medium text-gray-800">&#8377;1,21,385</span>
+                </div>
+                <div class="flex items-center justify-between">
+                  <span class="text-sm text-gray-500">Shipping</span>
+                  <span class="text-sm font-medium text-success">FREE</span>
+                </div>
+                <div class="flex items-center justify-between">
+                  <span class="text-sm text-gray-500">Coupon Discount</span>
+                  <span class="text-sm font-medium text-success">-&#8377;1,000</span>
+                </div>
+                <div class="flex items-center justify-between">
+                  <span class="text-sm text-gray-500">GST (18%)</span>
+                  <span class="text-sm font-medium text-gray-800">&#8377;21,649</span>
+                </div>
+                <div class="border-t border-gray-200 pt-3 flex items-center justify-between">
+                  <span class="text-base font-bold text-navy-900">Total</span>
+                  <span class="text-xl font-extrabold text-navy-900">&#8377;1,42,034</span>
+                </div>
+                <div class="flex items-center justify-end gap-1">
+                  <span class="text-xs text-success font-medium">You save &#8377;11,500 on this order</span>
+                </div>
+              </div>
+
+              <!-- Place Order Button -->
+              <button class="w-full mt-6 btn-brand text-white font-bold py-4 rounded-xl text-base flex items-center justify-center gap-2 shadow-lg shadow-orange-200">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z"/></svg>
+                Place Order
+              </button>
+
+              <!-- Security Badges -->
+              <div class="mt-4 flex items-center justify-center gap-4 py-3 bg-gray-50 rounded-lg border border-gray-100">
+                <div class="flex items-center gap-1.5">
+                  <svg class="w-4 h-4 text-success" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z"/></svg>
+                  <span class="text-[10px] font-medium text-gray-500">SSL Secure</span>
+                </div>
+                <div class="w-px h-4 bg-gray-200"></div>
+                <div class="flex items-center gap-1.5">
+                  <svg class="w-4 h-4 text-success" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z"/></svg>
+                  <span class="text-[10px] font-medium text-gray-500">256-bit Encryption</span>
+                </div>
+                <div class="w-px h-4 bg-gray-200"></div>
+                <div class="flex items-center gap-1.5">
+                  <svg class="w-4 h-4 text-success" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                  <span class="text-[10px] font-medium text-gray-500">PCI Compliant</span>
+                </div>
+              </div>
+
+              <!-- Payment Icons -->
+              <div class="mt-3 flex items-center justify-center gap-2">
+                <span class="bg-gray-100 text-[10px] text-gray-500 px-2 py-1 rounded font-medium">VISA</span>
+                <span class="bg-gray-100 text-[10px] text-gray-500 px-2 py-1 rounded font-medium">MasterCard</span>
+                <span class="bg-gray-100 text-[10px] text-gray-500 px-2 py-1 rounded font-medium">UPI</span>
+                <span class="bg-gray-100 text-[10px] text-gray-500 px-2 py-1 rounded font-medium">RuPay</span>
+                <span class="bg-gray-100 text-[10px] text-gray-500 px-2 py-1 rounded font-medium">COD</span>
+              </div>
+            </div>
+          </section>
+
+          <!-- Need Help -->
+          <div class="mt-4 bg-white rounded-xl border border-gray-200 p-4">
+            <div class="flex items-center gap-3">
+              <div class="w-9 h-9 rounded-full bg-blue-50 flex items-center justify-center shrink-0">
+                <svg class="w-4 h-4 text-blue-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M20.25 8.511c.884.284 1.5 1.128 1.5 2.097v4.286c0 1.136-.847 2.1-1.98 2.193-.34.027-.68.052-1.02.072v3.091l-3-3c-1.354 0-2.694-.055-4.02-.163a2.115 2.115 0 01-.825-.242m9.345-8.334a2.126 2.126 0 00-.476-.095 48.64 48.64 0 00-8.048 0c-1.131.094-1.976 1.057-1.976 2.192v4.286c0 .837.46 1.58 1.155 1.951m9.345-8.334V6.637c0-1.621-1.152-3.026-2.76-3.235A48.455 48.455 0 0011.25 3c-2.115 0-4.198.137-6.24.402-1.608.209-2.76 1.614-2.76 3.235v6.226c0 1.621 1.152 3.026 2.76 3.235.577.075 1.157.14 1.74.194V21l4.155-4.155"/></svg>
+              </div>
+              <div>
+                <p class="text-sm font-semibold text-navy-900">Need Help?</p>
+                <p class="text-xs text-gray-400">Call us at <a href="tel:+912538862516" class="text-brand-500 font-medium">(025) 3886 2516</a></p>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <!-- ===== MINIMAL FOOTER ===== -->
+  <footer class="bg-navy-900 text-gray-400 py-6 mt-8">
+    <div class="max-w-7xl mx-auto px-4">
+      <div class="flex flex-col md:flex-row items-center justify-between gap-4">
+        <div class="flex items-center gap-2">
+          <div class="w-7 h-7 rounded-lg bg-brand-500 flex items-center justify-center">
+            <svg class="w-3.5 h-3.5 text-white" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-4 0a1 1 0 01-1-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 01-1 1"/></svg>
+          </div>
+          <span class="text-sm font-extrabold text-white">Home<span class="text-brand-500">Base</span></span>
+          <span class="text-xs text-gray-500 ml-2">&copy; 2026 HomeBase. All rights reserved.</span>
+        </div>
+        <div class="flex items-center gap-6 text-xs">
+          <a href="#" class="hover:text-brand-400 transition">Privacy Policy</a>
+          <a href="#" class="hover:text-brand-400 transition">Terms of Service</a>
+          <a href="returns.html" class="hover:text-brand-400 transition">Returns & Refunds</a>
+          <a href="#" class="hover:text-brand-400 transition">Contact Us</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- ===== JAVASCRIPT ===== -->
+  <script>
+    // === Payment Method Accordion ===
+    function selectPayment(method) {
+      const methods = ['upi', 'card', 'netbanking', 'cod'];
+
+      methods.forEach(m => {
+        const wrapper = document.getElementById('payment-' + m + '-wrapper');
+        const section = document.getElementById('payment-' + m);
+        const radio = document.getElementById('radio-' + m);
+
+        if (m === method) {
+          wrapper.classList.remove('border-gray-200');
+          wrapper.classList.add('border-brand-500');
+          section.classList.add('active');
+          radio.innerHTML = '<div class="w-2.5 h-2.5 rounded-full bg-brand-500"></div>';
+          radio.classList.remove('border-gray-300');
+          radio.classList.add('border-brand-500');
+        } else {
+          wrapper.classList.add('border-gray-200');
+          wrapper.classList.remove('border-brand-500');
+          section.classList.remove('active');
+          radio.innerHTML = '';
+          radio.classList.add('border-gray-300');
+          radio.classList.remove('border-brand-500');
+        }
+      });
+    }
+
+    // Initialize UPI as selected
+    selectPayment('upi');
+
+    // === Address Card Selection ===
+    document.querySelectorAll('.address-card').forEach(card => {
+      card.addEventListener('click', function() {
+        document.querySelectorAll('.address-card').forEach(c => {
+          c.classList.remove('selected');
+          const radioIndicator = c.querySelector('.w-5.h-5');
+        });
+        this.classList.add('selected');
+
+        // Update radio indicators visually
+        document.querySelectorAll('.address-card').forEach(c => {
+          const indicator = c.querySelector('.w-5');
+          if (indicator) {
+            if (c.classList.contains('selected')) {
+              indicator.classList.remove('border-gray-300');
+              indicator.classList.add('border-brand-500');
+              indicator.innerHTML = '<div class="w-2.5 h-2.5 rounded-full bg-brand-500"></div>';
+            } else {
+              indicator.classList.add('border-gray-300');
+              indicator.classList.remove('border-brand-500');
+              indicator.innerHTML = '';
+            }
+          }
+        });
+      });
+    });
+
+    // === Shipping Method Selection ===
+    document.querySelectorAll('.radio-card').forEach(card => {
+      card.addEventListener('click', function() {
+        // Only handle shipping method radio cards
+        const input = this.querySelector('input[name="shipping_method"]');
+        if (!input) return;
+
+        document.querySelectorAll('.radio-card').forEach(c => {
+          const cInput = c.querySelector('input[name="shipping_method"]');
+          if (!cInput) return;
+          c.classList.remove('selected');
+          c.classList.add('border-gray-200');
+          const indicator = c.querySelector('.w-5');
+          if (indicator) {
+            indicator.classList.remove('border-brand-500');
+            indicator.classList.add('border-gray-300');
+            indicator.innerHTML = '';
+          }
+        });
+
+        this.classList.add('selected');
+        this.classList.remove('border-gray-200');
+        const indicator = this.querySelector('.w-5');
+        if (indicator) {
+          indicator.classList.remove('border-gray-300');
+          indicator.classList.add('border-brand-500');
+          indicator.innerHTML = '<div class="w-2.5 h-2.5 rounded-full bg-brand-500"></div>';
+        }
+      });
+    });
+  </script>
+
+</body>
+</html>

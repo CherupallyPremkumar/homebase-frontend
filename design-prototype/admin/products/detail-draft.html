@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HomeBase — Product Draft</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      theme: { extend: { colors: { brand: { 50:'#FFF7ED',100:'#FFEDD5',200:'#FED7AA',300:'#FDBA74',400:'#FB923C',500:'#F97316',600:'#EA580C',700:'#C2410C' }, navy: { 700:'#1E3A5F',800:'#1A2E4A',900:'#0F1B2D' }, success:'#16A34A', warning:'#EAB308', danger:'#DC2626' }, fontFamily: { sans:['Inter','system-ui','sans-serif'] } } }
+    }
+  </script>
+  <style>
+    .sidebar-link { transition: all 0.15s ease; }
+    .sidebar-link:hover { background: rgba(255,255,255,0.06); }
+    .sidebar-link.active { background: rgba(249,115,22,0.15); border-right: 3px solid #F97316; }
+  </style>
+</head>
+<body class="font-sans bg-gray-50 text-gray-900">
+
+  <header id="admin-header" class="fixed top-0 left-0 right-0 z-50 bg-white border-b border-gray-200 h-16"></header>
+  <aside id="admin-sidebar" class="fixed left-0 top-16 bottom-0 w-60 z-40 flex flex-col overflow-y-auto" style="background:#0A1628;"></aside>
+
+  <main class="ml-60 pt-16 p-6 lg:p-8 min-h-screen">
+
+    <nav class="flex items-center gap-2 text-sm mb-5">
+      <a href="index.html" class="text-gray-400 hover:text-brand-500">Products</a>
+      <svg class="w-3.5 h-3.5 text-gray-300" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M8.25 4.5l7.5 7.5-7.5 7.5"/></svg>
+      <span class="text-gray-700 font-medium">Havells Reo 5L Water Heater</span>
+    </nav>
+
+    <!-- ===== DRAFT BANNER ===== -->
+    <div class="rounded-xl border border-gray-300 bg-gray-100 p-4 mb-6 flex items-start gap-3">
+      <svg class="w-6 h-6 text-gray-500 shrink-0 mt-0.5" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z"/></svg>
+      <div class="flex-1">
+        <p class="text-sm font-semibold text-gray-700">This product is still in draft</p>
+        <p class="text-xs text-gray-500 mt-0.5">The seller has not submitted this for review yet. Created 2 days ago by Rajesh Store. Not visible to customers.</p>
+      </div>
+      <div class="flex items-center gap-2 shrink-0">
+        <button onclick="alert('Reminder sent to Rajesh Store')" class="flex items-center gap-1.5 bg-white border border-gray-300 text-gray-700 px-4 py-2 rounded-lg text-sm font-medium hover:bg-gray-50 transition">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0L3.32 8.91a2.25 2.25 0 01-1.07-1.916V6.75"/></svg>Remind Seller
+        </button>
+        <button onclick="if(confirm('Delete this draft permanently?')) alert('Draft deleted')" class="flex items-center gap-1.5 bg-white border border-red-200 text-red-600 px-4 py-2 rounded-lg text-sm font-medium hover:bg-red-50 transition">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0"/></svg>Delete Draft
+        </button>
+      </div>
+    </div>
+
+    <!-- ===== PRODUCT HEADER (greyed out — draft) ===== -->
+    <div class="bg-white rounded-xl border border-dashed border-gray-300 shadow-sm p-6 mb-6">
+      <div class="flex flex-col lg:flex-row gap-6">
+        <div class="shrink-0">
+          <div class="w-48 h-48 rounded-xl bg-gray-50 border-2 border-dashed border-gray-300 flex flex-col items-center justify-center mb-3">
+            <svg class="w-12 h-12 text-gray-300" fill="none" stroke="currentColor" stroke-width="0.5" viewBox="0 0 24 24"><path d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.409a2.25 2.25 0 013.182 0l2.909 2.909M6.75 19.5h10.5a2.25 2.25 0 002.25-2.25V6.75a2.25 2.25 0 00-2.25-2.25H6.75A2.25 2.25 0 004.5 6.75v10.5a2.25 2.25 0 002.25 2.25z"/></svg>
+            <p class="text-xs text-gray-400 mt-2">No images uploaded</p>
+          </div>
+        </div>
+        <div class="flex-1 min-w-0">
+          <div class="flex items-start justify-between gap-4">
+            <div>
+              <div class="flex items-center gap-2 mb-1">
+                <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold bg-gray-100 text-gray-600"><span class="w-1.5 h-1.5 rounded-full bg-gray-400"></span>Draft</span>
+                <span class="text-xs text-gray-400">Created 30 Mar 2026</span>
+              </div>
+              <h1 class="text-xl font-bold text-gray-500">Havells Reo 5L Water Heater</h1>
+              <p class="text-sm text-gray-400 mt-0.5">Bathroom &rsaquo; Water Heaters &rsaquo; Instant</p>
+              <div class="flex items-center gap-3 mt-2">
+                <span class="text-xs font-mono bg-gray-100 text-gray-500 px-2 py-0.5 rounded">SKU: HAV-REO-5L</span>
+                <span class="text-xs text-gray-400">No HSN code yet</span>
+              </div>
+              <div class="flex items-center gap-2 mt-3">
+                <div class="w-7 h-7 rounded-full bg-gradient-to-br from-brand-400 to-brand-600 flex items-center justify-center text-white text-[10px] font-bold">RS</div>
+                <div>
+                  <a href="../sellers/detail.html" class="text-sm font-medium text-brand-600 hover:underline">Rajesh Store</a>
+                  <span class="text-xs text-gray-400 ml-1">Premium Seller</span>
+                </div>
+              </div>
+            </div>
+            <div class="text-right shrink-0">
+              <p class="text-2xl font-bold text-gray-400">&#8377;3,500</p>
+              <p class="text-xs text-gray-400">MRP not set</p>
+              <p class="text-xs text-gray-400">GST not configured</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== PRE-FLIGHT COMPLIANCE CHECKLIST ===== -->
+    <div class="bg-white rounded-xl border border-gray-100 shadow-sm p-6 mb-6">
+      <div class="flex items-center justify-between mb-4">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center">
+            <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+          </div>
+          <div>
+            <h3 class="text-sm font-semibold text-gray-900">Pre-flight Compliance Checklist</h3>
+            <p class="text-xs text-gray-500">All items must be green before this listing can be submitted for review</p>
+          </div>
+        </div>
+        <div class="flex items-center gap-3">
+          <div class="flex items-center gap-1.5 text-xs">
+            <span class="w-2 h-2 rounded-full bg-green-500"></span><span class="text-gray-500">3 Ready</span>
+          </div>
+          <div class="flex items-center gap-1.5 text-xs">
+            <span class="w-2 h-2 rounded-full bg-amber-500"></span><span class="text-gray-500">1 Partial</span>
+          </div>
+          <div class="flex items-center gap-1.5 text-xs">
+            <span class="w-2 h-2 rounded-full bg-red-500"></span><span class="text-gray-500">2 Missing</span>
+          </div>
+        </div>
+      </div>
+      <div class="space-y-2">
+        <!-- Title — GREEN -->
+        <div class="flex items-center gap-3 p-3 rounded-lg bg-green-50/60 border border-green-100">
+          <span class="w-3 h-3 rounded-full bg-green-500 shrink-0"></span>
+          <div class="flex-1 min-w-0">
+            <p class="text-sm font-medium text-gray-800">Product Title</p>
+            <p class="text-xs text-gray-500">"Havells Reo 5L Water Heater"</p>
+          </div>
+          <div class="shrink-0 text-right">
+            <p class="text-xs font-semibold text-green-700">42 / 200 chars</p>
+            <div class="w-24 h-1.5 bg-green-100 rounded-full mt-1 overflow-hidden"><div class="h-full bg-green-500 rounded-full" style="width:21%"></div></div>
+          </div>
+        </div>
+        <!-- Description — RED -->
+        <div class="flex items-center gap-3 p-3 rounded-lg bg-red-50/60 border border-red-200">
+          <span class="w-3 h-3 rounded-full bg-red-500 shrink-0"></span>
+          <div class="flex-1 min-w-0">
+            <p class="text-sm font-medium text-gray-800">Product Description</p>
+            <p class="text-xs text-red-600">Not provided — minimum 100 characters required</p>
+          </div>
+          <div class="shrink-0 text-right">
+            <p class="text-xs font-semibold text-red-600">0 / 100+ chars</p>
+            <div class="w-24 h-1.5 bg-red-100 rounded-full mt-1 overflow-hidden"><div class="h-full bg-red-500 rounded-full" style="width:0%"></div></div>
+          </div>
+        </div>
+        <!-- Images — AMBER -->
+        <div class="flex items-center gap-3 p-3 rounded-lg bg-amber-50/60 border border-amber-200">
+          <span class="w-3 h-3 rounded-full bg-amber-500 shrink-0"></span>
+          <div class="flex-1 min-w-0">
+            <p class="text-sm font-medium text-gray-800">Product Images</p>
+            <p class="text-xs text-amber-700">2 uploaded — minimum 3 required for this category</p>
+          </div>
+          <div class="shrink-0 text-right">
+            <p class="text-xs font-semibold text-amber-700">2 of 3 minimum</p>
+            <div class="w-24 h-1.5 bg-amber-100 rounded-full mt-1 overflow-hidden"><div class="h-full bg-amber-500 rounded-full" style="width:66%"></div></div>
+          </div>
+        </div>
+        <!-- HSN Code — GREEN -->
+        <div class="flex items-center gap-3 p-3 rounded-lg bg-green-50/60 border border-green-100">
+          <span class="w-3 h-3 rounded-full bg-green-500 shrink-0"></span>
+          <div class="flex-1 min-w-0">
+            <p class="text-sm font-medium text-gray-800">HSN Code</p>
+            <p class="text-xs text-gray-500">85161000 — Electric water heaters</p>
+          </div>
+          <div class="shrink-0">
+            <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-semibold bg-green-100 text-green-700">
+              <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4.5 12.75l6 6 9-13.5"/></svg>Valid
+            </span>
+          </div>
+        </div>
+        <!-- Brand Authorization — RED -->
+        <div class="flex items-center gap-3 p-3 rounded-lg bg-red-50/60 border border-red-200">
+          <span class="w-3 h-3 rounded-full bg-red-500 shrink-0"></span>
+          <div class="flex-1 min-w-0">
+            <p class="text-sm font-medium text-gray-800">Brand Authorization</p>
+            <p class="text-xs text-red-600">Havells requires authorized dealer certificate — not uploaded</p>
+          </div>
+          <div class="shrink-0">
+            <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-semibold bg-red-100 text-red-700">
+              <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M6 18L18 6M6 6l12 12"/></svg>Not Uploaded
+            </span>
+          </div>
+        </div>
+        <!-- GST Category — GREEN -->
+        <div class="flex items-center gap-3 p-3 rounded-lg bg-green-50/60 border border-green-100">
+          <span class="w-3 h-3 rounded-full bg-green-500 shrink-0"></span>
+          <div class="flex-1 min-w-0">
+            <p class="text-sm font-medium text-gray-800">GST Category</p>
+            <p class="text-xs text-gray-500">18% GST — Correctly mapped to Water Heaters</p>
+          </div>
+          <div class="shrink-0">
+            <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-semibold bg-green-100 text-green-700">
+              <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4.5 12.75l6 6 9-13.5"/></svg>Configured
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== CATEGORY REQUIREMENTS & SCHEDULING ===== -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+      <!-- Category Requirements Hint -->
+      <div class="bg-white rounded-xl border border-gray-100 shadow-sm p-6">
+        <div class="flex items-center gap-2 mb-3">
+          <svg class="w-5 h-5 text-blue-500" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M11.25 11.25l.041-.02a.75.75 0 011.063.852l-.708 2.836a.75.75 0 001.063.853l.041-.021M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9-3.75h.008v.008H12V8.25z"/></svg>
+          <h3 class="text-sm font-semibold text-gray-900">Category Requirements</h3>
+        </div>
+        <div class="bg-blue-50 rounded-lg border border-blue-100 p-4">
+          <p class="text-xs font-semibold text-blue-800 uppercase tracking-wider mb-2">Bathroom > Water Heaters > Instant</p>
+          <ul class="space-y-1.5">
+            <li class="flex items-center gap-2 text-sm text-blue-900">
+              <svg class="w-4 h-4 text-blue-400 shrink-0" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M8.25 4.5l7.5 7.5-7.5 7.5"/></svg>
+              Minimum 3 images (main + installation + dimensions)
+            </li>
+            <li class="flex items-center gap-2 text-sm text-blue-900">
+              <svg class="w-4 h-4 text-blue-400 shrink-0" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M8.25 4.5l7.5 7.5-7.5 7.5"/></svg>
+              ISI/BIS certification number
+            </li>
+            <li class="flex items-center gap-2 text-sm text-blue-900">
+              <svg class="w-4 h-4 text-blue-400 shrink-0" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M8.25 4.5l7.5 7.5-7.5 7.5"/></svg>
+              Warranty information (min 1 year for electrical)
+            </li>
+            <li class="flex items-center gap-2 text-sm text-blue-900">
+              <svg class="w-4 h-4 text-blue-400 shrink-0" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M8.25 4.5l7.5 7.5-7.5 7.5"/></svg>
+              MRP and wattage specifications
+            </li>
+            <li class="flex items-center gap-2 text-sm text-blue-900">
+              <svg class="w-4 h-4 text-blue-400 shrink-0" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M8.25 4.5l7.5 7.5-7.5 7.5"/></svg>
+              Brand authorization for branded products
+            </li>
+          </ul>
+        </div>
+        <div class="flex items-center gap-2 mt-3 px-1">
+          <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+          <p class="text-xs text-gray-500">Avg. approval time for this category: <span class="font-semibold text-gray-700">24 hours</span></p>
+        </div>
+      </div>
+
+      <!-- Scheduled Publish & Save as Template -->
+      <div class="bg-white rounded-xl border border-gray-100 shadow-sm p-6">
+        <h3 class="text-sm font-semibold text-gray-900 mb-4">Publish Options</h3>
+        <!-- Schedule Publish -->
+        <div class="mb-5">
+          <label class="text-xs font-semibold text-gray-500 uppercase tracking-wider block mb-2">Schedule Publish For</label>
+          <div class="flex items-center gap-3">
+            <div class="flex-1 relative">
+              <input type="datetime-local" value="2026-04-05T09:00" class="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-brand-500">
+            </div>
+            <button onclick="alert('Publish scheduled for 5 Apr 2026, 9:00 AM IST')" class="flex items-center gap-1.5 bg-brand-500 text-white px-4 py-2.5 rounded-lg text-sm font-semibold hover:bg-brand-600 transition shrink-0">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5"/></svg>Schedule
+            </button>
+          </div>
+          <p class="text-xs text-gray-400 mt-1.5">Product will be auto-submitted for review and published upon approval on the scheduled date.</p>
+        </div>
+        <hr class="border-gray-100 mb-5">
+        <!-- Save as Template -->
+        <div>
+          <label class="text-xs font-semibold text-gray-500 uppercase tracking-wider block mb-2">Listing Template</label>
+          <p class="text-xs text-gray-500 mb-3">Save this listing as a template for faster creation of similar products in this category.</p>
+          <button onclick="var n=prompt('Template name:','Water Heater - Havells'); if(n) alert('Template saved: '+n)" class="flex items-center gap-2 bg-white border border-gray-300 text-gray-700 px-4 py-2.5 rounded-lg text-sm font-medium hover:bg-gray-50 transition w-full justify-center">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m3.75 9v6m3-3H9m1.5-12H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z"/></svg>
+            Save as Template
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== COMPLETION STATUS ===== -->
+    <div class="bg-white rounded-xl border border-gray-100 shadow-sm p-6 mb-6">
+      <div class="flex items-center justify-between mb-4">
+        <h3 class="text-sm font-semibold text-gray-900">Listing Completion</h3>
+        <span class="text-sm font-bold text-amber-600">4 of 8 required fields</span>
+      </div>
+      <div class="h-2 bg-gray-100 rounded-full overflow-hidden mb-5">
+        <div class="h-full bg-amber-500 rounded-full" style="width: 50%"></div>
+      </div>
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+        <!-- Completed -->
+        <div class="flex items-center gap-3 p-3 rounded-lg bg-green-50/50 border border-green-100">
+          <svg class="w-5 h-5 text-green-500 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4.5 12.75l6 6 9-13.5"/></svg>
+          <div><p class="text-sm text-gray-700">Product title</p><p class="text-xs text-gray-400">Havells Reo 5L Water Heater</p></div>
+        </div>
+        <div class="flex items-center gap-3 p-3 rounded-lg bg-green-50/50 border border-green-100">
+          <svg class="w-5 h-5 text-green-500 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4.5 12.75l6 6 9-13.5"/></svg>
+          <div><p class="text-sm text-gray-700">Category selected</p><p class="text-xs text-gray-400">Bathroom > Water Heaters > Instant</p></div>
+        </div>
+        <div class="flex items-center gap-3 p-3 rounded-lg bg-green-50/50 border border-green-100">
+          <svg class="w-5 h-5 text-green-500 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4.5 12.75l6 6 9-13.5"/></svg>
+          <div><p class="text-sm text-gray-700">SKU assigned</p><p class="text-xs text-gray-400 font-mono">HAV-REO-5L</p></div>
+        </div>
+        <div class="flex items-center gap-3 p-3 rounded-lg bg-green-50/50 border border-green-100">
+          <svg class="w-5 h-5 text-green-500 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4.5 12.75l6 6 9-13.5"/></svg>
+          <div><p class="text-sm text-gray-700">Selling price set</p><p class="text-xs text-gray-400">&#8377;3,500</p></div>
+        </div>
+        <!-- Missing -->
+        <div class="flex items-center gap-3 p-3 rounded-lg bg-red-50/50 border border-red-100">
+          <svg class="w-5 h-5 text-red-400 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M6 18L18 6M6 6l12 12"/></svg>
+          <div><p class="text-sm text-gray-700">Product images</p><p class="text-xs text-red-500">No images uploaded — minimum 3 required</p></div>
+        </div>
+        <div class="flex items-center gap-3 p-3 rounded-lg bg-red-50/50 border border-red-100">
+          <svg class="w-5 h-5 text-red-400 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M6 18L18 6M6 6l12 12"/></svg>
+          <div><p class="text-sm text-gray-700">Product description</p><p class="text-xs text-red-500">Not provided — minimum 100 characters</p></div>
+        </div>
+        <div class="flex items-center gap-3 p-3 rounded-lg bg-red-50/50 border border-red-100">
+          <svg class="w-5 h-5 text-red-400 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M6 18L18 6M6 6l12 12"/></svg>
+          <div><p class="text-sm text-gray-700">HSN code</p><p class="text-xs text-red-500">Required for GST compliance</p></div>
+        </div>
+        <div class="flex items-center gap-3 p-3 rounded-lg bg-red-50/50 border border-red-100">
+          <svg class="w-5 h-5 text-red-400 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M6 18L18 6M6 6l12 12"/></svg>
+          <div><p class="text-sm text-gray-700">MRP</p><p class="text-xs text-red-500">Maximum retail price not set</p></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== ACTIVITY LOG ===== -->
+    <div class="bg-white rounded-xl border border-gray-100 shadow-sm p-6">
+      <h3 class="text-sm font-semibold text-gray-900 mb-4">Activity Log</h3>
+      <div class="relative pl-6 border-l-2 border-gray-200 space-y-6">
+        <div class="relative">
+          <div class="absolute -left-[25px] w-4 h-4 rounded-full bg-gray-400 border-2 border-white"></div>
+          <p class="text-sm font-medium text-gray-900">Draft Created</p>
+          <p class="text-xs text-gray-400">By Rajesh Store &middot; 30 Mar 2026, 5:20 PM</p>
+          <p class="text-xs text-gray-500 mt-1">Seller started listing. 4 of 8 fields completed.</p>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+<script src="../shared-layout.js"></script>
+<script>renderAdminLayout('products', '../');</script>
+</body>
+</html>

@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HomeBase — Notifications</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              50: '#FFF7ED',
+              100: '#FFEDD5',
+              200: '#FED7AA',
+              300: '#FDBA74',
+              400: '#FB923C',
+              500: '#F97316',
+              600: '#EA580C',
+              700: '#C2410C',
+            },
+            navy: {
+              700: '#1E3A5F',
+              800: '#0F1E30',
+              900: '#0A1628',
+            },
+            success: '#16A34A',
+            warning: '#EAB308',
+            danger: '#DC2626',
+          },
+          fontFamily: {
+            sans: ['Inter', 'system-ui', 'sans-serif'],
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+    .scrollbar-hide::-webkit-scrollbar { display: none; }
+    .sidebar-link { transition: all 0.15s ease; }
+    .sidebar-link:hover { background: rgba(255,255,255,0.06); }
+    .sidebar-link.active { background: rgba(249,115,22,0.15); border-right: 3px solid #F97316; color: #F97316; }
+    .stat-card { transition: all 0.2s ease; }
+    .stat-card:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,0.08); }
+    .table-row { transition: background 0.15s ease; }
+    .table-row:hover { background: #FFF7ED; }
+    .tab-btn { transition: all 0.15s ease; }
+    .tab-btn.active { color: #F97316; border-color: #F97316; background: #FFF7ED; }
+    .tab-btn:hover:not(.active) { color: #374151; background: #F9FAFB; }
+    .dropdown-menu { display: none; }
+    .dropdown:hover .dropdown-menu { display: block; }
+    .health-pulse { animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite; }
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.5; }
+    }
+    .sidebar-scroll::-webkit-scrollbar { width: 4px; }
+    .sidebar-scroll::-webkit-scrollbar-track { background: transparent; }
+    .sidebar-scroll::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.12); border-radius: 2px; }
+    .notif-item { transition: background 0.15s ease; }
+    .notif-item:hover { background: #F9FAFB; }
+    .notif-item.unread { border-left: 3px solid #F97316; }
+  </style>
+</head>
+<body class="font-sans bg-gray-50 text-gray-900">
+
+  <!-- ===== TOP HEADER BAR ===== -->
+  <header id="admin-header" class="fixed top-0 left-0 right-0 z-50 bg-white border-b border-gray-200 h-16"></header>
+
+  <!-- ===== LAYOUT: SIDEBAR + MAIN ===== -->
+  <div class="flex pt-16 min-h-screen">
+
+    <!-- ===== LEFT SIDEBAR ===== -->
+    <aside id="admin-sidebar" class="fixed left-0 top-16 bottom-0 w-60 z-40 flex flex-col overflow-y-auto" style="background:#0A1628;"></aside>
+
+    <!-- ===== MAIN CONTENT ===== -->
+    <main class="flex-1 ml-60 p-6 lg:p-8">
+
+      <!-- Page Header -->
+      <div class="flex items-center justify-between mb-6">
+        <div>
+          <h1 class="text-2xl font-bold text-gray-900">Notifications</h1>
+          <p class="text-sm text-gray-500 mt-1">Stay updated on platform activity</p>
+        </div>
+        <a href="#" onclick="alert('Open notification settings');return false" class="text-sm text-brand-500 hover:text-brand-600 font-medium flex items-center gap-1">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9.594 3.94c.09-.542.56-.94 1.11-.94h2.593c.55 0 1.02.398 1.11.94l.213 1.281c.063.374.313.686.645.87.074.04.147.083.22.127.324.196.72.257 1.075.124l1.217-.456a1.125 1.125 0 011.37.49l1.296 2.247a1.125 1.125 0 01-.26 1.431l-1.003.827c-.293.24-.438.613-.431.992a6.759 6.759 0 010 .255c-.007.378.138.75.43.99l1.005.828c.424.35.534.954.26 1.43l-1.298 2.247a1.125 1.125 0 01-1.369.491l-1.217-.456c-.355-.133-.75-.072-1.076.124a6.57 6.57 0 01-.22.128c-.331.183-.581.495-.644.869l-.213 1.28c-.09.543-.56.941-1.11.941h-2.594c-.55 0-1.02-.398-1.11-.94l-.213-1.281c-.062-.374-.312-.686-.644-.87a6.52 6.52 0 01-.22-.127c-.325-.196-.72-.257-1.076-.124l-1.217.456a1.125 1.125 0 01-1.369-.49l-1.297-2.247a1.125 1.125 0 01.26-1.431l1.004-.827c.292-.24.437-.613.43-.992a6.932 6.932 0 010-.255c.007-.378-.138-.75-.43-.99l-1.004-.828a1.125 1.125 0 01-.26-1.43l1.297-2.247a1.125 1.125 0 011.37-.491l1.216.456c.356.133.751.072 1.076-.124.072-.044.146-.087.22-.128.332-.183.582-.495.644-.869l.214-1.281z"/><path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+          Notification Settings
+        </a>
+      </div>
+
+      <!-- Stats -->
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
+        <div class="stat-card bg-white rounded-xl border border-gray-200 p-5 shadow-sm">
+          <div class="flex items-center justify-between">
+            <div>
+              <p class="text-xs font-semibold text-gray-500 uppercase tracking-wider">Total</p>
+              <p class="text-2xl font-bold text-gray-900 mt-1">142</p>
+            </div>
+            <div class="w-10 h-10 rounded-lg bg-blue-100 flex items-center justify-center">
+              <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M14.857 17.082a23.848 23.848 0 005.454-1.31A8.967 8.967 0 0118 9.75V9A6 6 0 006 9v.75a8.967 8.967 0 01-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 01-5.714 0m5.714 0a3 3 0 11-5.714 0"/></svg>
+            </div>
+          </div>
+        </div>
+        <div class="stat-card bg-white rounded-xl border border-gray-200 p-5 shadow-sm">
+          <div class="flex items-center justify-between">
+            <div>
+              <p class="text-xs font-semibold text-gray-500 uppercase tracking-wider">Unread</p>
+              <p class="text-2xl font-bold text-brand-500 mt-1">23</p>
+            </div>
+            <div class="w-10 h-10 rounded-lg bg-brand-100 flex items-center justify-center">
+              <svg class="w-5 h-5 text-brand-600" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0L3.32 8.91a2.25 2.25 0 01-1.07-1.916V6.75"/></svg>
+            </div>
+          </div>
+        </div>
+        <div class="stat-card bg-white rounded-xl border border-gray-200 p-5 shadow-sm">
+          <div class="flex items-center justify-between">
+            <div>
+              <p class="text-xs font-semibold text-gray-500 uppercase tracking-wider">Today</p>
+              <p class="text-2xl font-bold text-gray-900 mt-1">12</p>
+            </div>
+            <div class="w-10 h-10 rounded-lg bg-green-100 flex items-center justify-center">
+              <svg class="w-5 h-5 text-green-600" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5"/></svg>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Filters + Search + Bulk -->
+      <div class="bg-white rounded-xl border border-gray-200 shadow-sm mb-6">
+        <div class="flex items-center justify-between px-6 py-4 border-b border-gray-100">
+          <div class="flex gap-1 flex-wrap">
+            <button onclick="filterNotifs('all')" data-notif-filter="all" class="tab-btn active px-3 py-1.5 text-xs font-medium rounded-lg border border-transparent">All</button>
+            <button onclick="filterNotifs('unread')" data-notif-filter="unread" class="tab-btn px-3 py-1.5 text-xs font-medium rounded-lg border border-transparent text-gray-500">Unread</button>
+            <button onclick="filterNotifs('orders')" data-notif-filter="orders" class="tab-btn px-3 py-1.5 text-xs font-medium rounded-lg border border-transparent text-gray-500">Orders</button>
+            <button onclick="filterNotifs('sellers')" data-notif-filter="sellers" class="tab-btn px-3 py-1.5 text-xs font-medium rounded-lg border border-transparent text-gray-500">Sellers</button>
+            <button onclick="filterNotifs('products')" data-notif-filter="products" class="tab-btn px-3 py-1.5 text-xs font-medium rounded-lg border border-transparent text-gray-500">Products</button>
+            <button onclick="filterNotifs('system')" data-notif-filter="system" class="tab-btn px-3 py-1.5 text-xs font-medium rounded-lg border border-transparent text-gray-500">System</button>
+          </div>
+          <div class="flex items-center gap-2">
+            <button onclick="markAllRead()" class="px-3 py-1.5 text-xs font-medium text-brand-600 bg-brand-50 rounded-lg hover:bg-brand-100 transition">Mark All Read</button>
+            <button onclick="deleteSelected()" class="px-3 py-1.5 text-xs font-medium text-red-600 bg-red-50 rounded-lg hover:bg-red-100 transition">Delete Selected</button>
+          </div>
+        </div>
+
+        <!-- Search -->
+        <div class="px-6 py-3 border-b border-gray-100">
+          <div class="relative max-w-md">
+            <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+            <input type="text" placeholder="Search notifications..." class="w-full bg-gray-50 border border-gray-200 rounded-lg py-2 pl-10 pr-4 text-sm outline-none focus:border-brand-400 focus:ring-2 focus:ring-brand-100 transition" onkeydown="if(event.key==='Enter'){alert('Searching for: '+this.value)}">
+          </div>
+        </div>
+
+        <!-- Notification List -->
+        <div class="divide-y divide-gray-100" id="notif-list">
+
+          <!-- 1: New Seller (unread) -->
+          <div class="notif-item unread flex items-start gap-4 px-6 py-4 cursor-pointer" data-type="sellers" data-read="false" onclick="markRead(this)">
+            <input type="checkbox" class="mt-1.5 rounded border-gray-300 text-brand-500 focus:ring-brand-400" onclick="event.stopPropagation()">
+            <div class="w-9 h-9 rounded-full bg-green-100 flex items-center justify-center shrink-0">
+              <svg class="w-4 h-4 text-green-600" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M13.5 21v-7.5a.75.75 0 01.75-.75h3a.75.75 0 01.75.75V21m-4.5 0H2.36m11.14 0H18"/></svg>
+            </div>
+            <div class="flex-1 min-w-0">
+              <p class="text-sm text-gray-900"><span class="font-semibold">New Seller Registration</span> - Sharma Electronics has applied for onboarding</p>
+              <p class="text-xs text-gray-400 mt-1">8 minutes ago</p>
+            </div>
+            <span class="w-2.5 h-2.5 rounded-full bg-brand-500 shrink-0 mt-2 unread-dot"></span>
+            <button onclick="event.stopPropagation();deleteNotif(this.closest('.notif-item'))" class="p-1 text-gray-400 hover:text-red-500 transition shrink-0">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0"/></svg>
+            </button>
+          </div>
+
+          <!-- 2: Order Placed (unread) -->
+          <div class="notif-item unread flex items-start gap-4 px-6 py-4 cursor-pointer" data-type="orders" data-read="false" onclick="markRead(this)">
+            <input type="checkbox" class="mt-1.5 rounded border-gray-300 text-brand-500 focus:ring-brand-400" onclick="event.stopPropagation()">
+            <div class="w-9 h-9 rounded-full bg-blue-100 flex items-center justify-center shrink-0">
+              <svg class="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M15.75 10.5V6a3.75 3.75 0 10-7.5 0v4.5m11.356-1.993l1.263 12c.07.665-.45 1.243-1.119 1.243H4.25a1.125 1.125 0 01-1.12-1.243l1.264-12A1.125 1.125 0 015.513 7.5h12.974c.576 0 1.059.435 1.119 1.007z"/></svg>
+            </div>
+            <div class="flex-1 min-w-0">
+              <p class="text-sm text-gray-900"><span class="font-semibold">Bulk Order Placed</span> - Order #HB-78234 worth &#8377;1,24,500 from Priya Enterprises</p>
+              <p class="text-xs text-gray-400 mt-1">25 minutes ago</p>
+            </div>
+            <span class="w-2.5 h-2.5 rounded-full bg-brand-500 shrink-0 mt-2 unread-dot"></span>
+            <button onclick="event.stopPropagation();deleteNotif(this.closest('.notif-item'))" class="p-1 text-gray-400 hover:text-red-500 transition shrink-0">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0"/></svg>
+            </button>
+          </div>
+
+          <!-- 3: Product Flagged (unread) -->
+          <div class="notif-item unread flex items-start gap-4 px-6 py-4 cursor-pointer" data-type="products" data-read="false" onclick="markRead(this)">
+            <input type="checkbox" class="mt-1.5 rounded border-gray-300 text-brand-500 focus:ring-brand-400" onclick="event.stopPropagation()">
+            <div class="w-9 h-9 rounded-full bg-red-100 flex items-center justify-center shrink-0">
+              <svg class="w-4 h-4 text-red-600" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M3 3v1.5M3 21v-6m0 0l2.77-.693a9 9 0 016.208.682l.108.054a9 9 0 006.086.71l3.114-.732a48.524 48.524 0 01-.005-10.499l-3.11.732a9 9 0 01-6.085-.711l-.108-.054a9 9 0 00-6.208-.682L3 4.5M3 15V4.5"/></svg>
+            </div>
+            <div class="flex-1 min-w-0">
+              <p class="text-sm text-gray-900"><span class="font-semibold">Product Flagged</span> - "Premium LED Panel 40W" reported for misleading specifications</p>
+              <p class="text-xs text-gray-400 mt-1">45 minutes ago</p>
+            </div>
+            <span class="w-2.5 h-2.5 rounded-full bg-brand-500 shrink-0 mt-2 unread-dot"></span>
+            <button onclick="event.stopPropagation();deleteNotif(this.closest('.notif-item'))" class="p-1 text-gray-400 hover:text-red-500 transition shrink-0">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0"/></svg>
+            </button>
+          </div>
+
+          <!-- 4: Return Escalated (unread) -->
+          <div class="notif-item unread flex items-start gap-4 px-6 py-4 cursor-pointer" data-type="orders" data-read="false" onclick="markRead(this)">
+            <input type="checkbox" class="mt-1.5 rounded border-gray-300 text-brand-500 focus:ring-brand-400" onclick="event.stopPropagation()">
+            <div class="w-9 h-9 rounded-full bg-yellow-100 flex items-center justify-center shrink-0">
+              <svg class="w-4 h-4 text-yellow-600" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126z"/></svg>
+            </div>
+            <div class="flex-1 min-w-0">
+              <p class="text-sm text-gray-900"><span class="font-semibold">Return Escalated</span> - Return #RT-4521 escalated by customer Ananya Singh</p>
+              <p class="text-xs text-gray-400 mt-1">1 hour ago</p>
+            </div>
+            <span class="w-2.5 h-2.5 rounded-full bg-brand-500 shrink-0 mt-2 unread-dot"></span>
+            <button onclick="event.stopPropagation();deleteNotif(this.closest('.notif-item'))" class="p-1 text-gray-400 hover:text-red-500 transition shrink-0">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0"/></svg>
+            </button>
+          </div>
+
+          <!-- 5: Payment Processed (read) -->
+          <div class="notif-item flex items-start gap-4 px-6 py-4 cursor-pointer" data-type="orders" data-read="true" onclick="markRead(this)">
+            <input type="checkbox" class="mt-1.5 rounded border-gray-300 text-brand-500 focus:ring-brand-400" onclick="event.stopPropagation()">
+            <div class="w-9 h-9 rounded-full bg-green-100 flex items-center justify-center shrink-0">
+              <svg class="w-4 h-4 text-green-600" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M2.25 18.75a60.07 60.07 0 0115.797 2.101c.727.198 1.453-.342 1.453-1.096V18.75M3.75 4.5v.75A.75.75 0 013 6h-.75m0 0v-.375c0-.621.504-1.125 1.125-1.125H20.25M2.25 6v9m18-10.5v.75c0 .414.336.75.75.75h.75m-1.5-1.5h.375c.621 0 1.125.504 1.125 1.125v9.75c0 .621-.504 1.125-1.125 1.125h-.375m1.5-1.5H21a.75.75 0 00-.75.75v.75m0 0H3.75m0 0h-.375a1.125 1.125 0 01-1.125-1.125V15m1.5 1.5v-.75A.75.75 0 003 15h-.75M15 10.5a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+            </div>
+            <div class="flex-1 min-w-0">
+              <p class="text-sm text-gray-700"><span class="font-semibold">Payment Processed</span> - &#8377;45,200 settlement transferred to TechMart India</p>
+              <p class="text-xs text-gray-400 mt-1">2 hours ago</p>
+            </div>
+            <button onclick="event.stopPropagation();deleteNotif(this.closest('.notif-item'))" class="p-1 text-gray-400 hover:text-red-500 transition shrink-0">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0"/></svg>
+            </button>
+          </div>
+
+          <!-- 6: System Alert (read) -->
+          <div class="notif-item flex items-start gap-4 px-6 py-4 cursor-pointer" data-type="system" data-read="true" onclick="markRead(this)">
+            <input type="checkbox" class="mt-1.5 rounded border-gray-300 text-brand-500 focus:ring-brand-400" onclick="event.stopPropagation()">
+            <div class="w-9 h-9 rounded-full bg-purple-100 flex items-center justify-center shrink-0">
+              <svg class="w-4 h-4 text-purple-600" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M5.25 14.25h13.5m-13.5 0a3 3 0 01-3-3m3 3a3 3 0 100 6h13.5a3 3 0 100-6m-16.5-3a3 3 0 013-3h13.5a3 3 0 013 3m-19.5 0a4.5 4.5 0 01.9-2.7L5.737 5.1a3.375 3.375 0 012.7-1.35h7.126c1.062 0 2.062.5 2.7 1.35l2.587 3.45a4.5 4.5 0 01.9 2.7m0 0a3 3 0 01-3 3m0 3h.008v.008h-.008v-.008zm0-6h.008v.008h-.008v-.008zm-3 6h.008v.008h-.008v-.008zm0-6h.008v.008h-.008v-.008z"/></svg>
+            </div>
+            <div class="flex-1 min-w-0">
+              <p class="text-sm text-gray-700"><span class="font-semibold">System Alert</span> - Database backup completed successfully. Next scheduled: 28 Mar 2:00 AM</p>
+              <p class="text-xs text-gray-400 mt-1">3 hours ago</p>
+            </div>
+            <button onclick="event.stopPropagation();deleteNotif(this.closest('.notif-item'))" class="p-1 text-gray-400 hover:text-red-500 transition shrink-0">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0"/></svg>
+            </button>
+          </div>
+
+          <!-- 7: New Seller (unread) -->
+          <div class="notif-item unread flex items-start gap-4 px-6 py-4 cursor-pointer" data-type="sellers" data-read="false" onclick="markRead(this)">
+            <input type="checkbox" class="mt-1.5 rounded border-gray-300 text-brand-500 focus:ring-brand-400" onclick="event.stopPropagation()">
+            <div class="w-9 h-9 rounded-full bg-green-100 flex items-center justify-center shrink-0">
+              <svg class="w-4 h-4 text-green-600" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M18 7.5v3m0 0v3m0-3h3m-3 0h-3m-2.25-4.125a3.375 3.375 0 11-6.75 0 3.375 3.375 0 016.75 0zM3 19.235v-.11a6.375 6.375 0 0112.75 0v.109A12.318 12.318 0 019.374 21c-2.331 0-4.512-.645-6.374-1.766z"/></svg>
+            </div>
+            <div class="flex-1 min-w-0">
+              <p class="text-sm text-gray-900"><span class="font-semibold">Seller Verified</span> - GreenLeaf Organics has completed document verification</p>
+              <p class="text-xs text-gray-400 mt-1">4 hours ago</p>
+            </div>
+            <span class="w-2.5 h-2.5 rounded-full bg-brand-500 shrink-0 mt-2 unread-dot"></span>
+            <button onclick="event.stopPropagation();deleteNotif(this.closest('.notif-item'))" class="p-1 text-gray-400 hover:text-red-500 transition shrink-0">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0"/></svg>
+            </button>
+          </div>
+
+          <!-- 8: Order (read) -->
+          <div class="notif-item flex items-start gap-4 px-6 py-4 cursor-pointer" data-type="orders" data-read="true" onclick="markRead(this)">
+            <input type="checkbox" class="mt-1.5 rounded border-gray-300 text-brand-500 focus:ring-brand-400" onclick="event.stopPropagation()">
+            <div class="w-9 h-9 rounded-full bg-blue-100 flex items-center justify-center shrink-0">
+              <svg class="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M9 12h3.75M9 15h3.75M9 18h3.75m3 .75H18a2.25 2.25 0 002.25-2.25V6.108c0-1.135-.845-2.098-1.976-2.192a48.424 48.424 0 00-1.123-.08m-5.801 0c-.065.21-.1.433-.1.664 0 .414.336.75.75.75h4.5a.75.75 0 00.75-.75 2.25 2.25 0 00-.1-.664m-5.8 0A2.251 2.251 0 0113.5 2.25H15c1.012 0 1.867.668 2.15 1.586m-5.8 0c-.376.023-.75.05-1.124.08C9.095 4.01 8.25 4.973 8.25 6.108V8.25m0 0H4.875c-.621 0-1.125.504-1.125 1.125v11.25c0 .621.504 1.125 1.125 1.125h9.75c.621 0 1.125-.504 1.125-1.125V9.375c0-.621-.504-1.125-1.125-1.125H8.25z"/></svg>
+            </div>
+            <div class="flex-1 min-w-0">
+              <p class="text-sm text-gray-700"><span class="font-semibold">Order Cancelled</span> - Order #HB-78190 cancelled by customer. Refund initiated &#8377;3,450</p>
+              <p class="text-xs text-gray-400 mt-1">5 hours ago</p>
+            </div>
+            <button onclick="event.stopPropagation();deleteNotif(this.closest('.notif-item'))" class="p-1 text-gray-400 hover:text-red-500 transition shrink-0">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0"/></svg>
+            </button>
+          </div>
+
+          <!-- 9: Product (read) -->
+          <div class="notif-item flex items-start gap-4 px-6 py-4 cursor-pointer" data-type="products" data-read="true" onclick="markRead(this)">
+            <input type="checkbox" class="mt-1.5 rounded border-gray-300 text-brand-500 focus:ring-brand-400" onclick="event.stopPropagation()">
+            <div class="w-9 h-9 rounded-full bg-brand-100 flex items-center justify-center shrink-0">
+              <svg class="w-4 h-4 text-brand-600" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M20.25 7.5l-.625 10.632a2.25 2.25 0 01-2.247 2.118H6.622a2.25 2.25 0 01-2.247-2.118L3.75 7.5M10 11.25h4M3.375 7.5h17.25c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125z"/></svg>
+            </div>
+            <div class="flex-1 min-w-0">
+              <p class="text-sm text-gray-700"><span class="font-semibold">Low Stock Alert</span> - "Organic Turmeric Powder 500g" has only 3 units remaining</p>
+              <p class="text-xs text-gray-400 mt-1">6 hours ago</p>
+            </div>
+            <button onclick="event.stopPropagation();deleteNotif(this.closest('.notif-item'))" class="p-1 text-gray-400 hover:text-red-500 transition shrink-0">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0"/></svg>
+            </button>
+          </div>
+
+          <!-- 10: System (read) -->
+          <div class="notif-item flex items-start gap-4 px-6 py-4 cursor-pointer" data-type="system" data-read="true" onclick="markRead(this)">
+            <input type="checkbox" class="mt-1.5 rounded border-gray-300 text-brand-500 focus:ring-brand-400" onclick="event.stopPropagation()">
+            <div class="w-9 h-9 rounded-full bg-gray-100 flex items-center justify-center shrink-0">
+              <svg class="w-4 h-4 text-gray-600" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M9.594 3.94c.09-.542.56-.94 1.11-.94h2.593c.55 0 1.02.398 1.11.94l.213 1.281c.063.374.313.686.645.87.074.04.147.083.22.127.324.196.72.257 1.075.124l1.217-.456a1.125 1.125 0 011.37.49l1.296 2.247a1.125 1.125 0 01-.26 1.431l-1.003.827c-.293.24-.438.613-.431.992a6.759 6.759 0 010 .255c-.007.378.138.75.43.99l1.005.828c.424.35.534.954.26 1.43l-1.298 2.247a1.125 1.125 0 01-1.369.491l-1.217-.456c-.355-.133-.75-.072-1.076.124a6.57 6.57 0 01-.22.128c-.331.183-.581.495-.644.869l-.213 1.28c-.09.543-.56.941-1.11.941h-2.594c-.55 0-1.02-.398-1.11-.94l-.213-1.281c-.062-.374-.312-.686-.644-.87a6.52 6.52 0 01-.22-.127c-.325-.196-.72-.257-1.076-.124l-1.217.456a1.125 1.125 0 01-1.369-.49l-1.297-2.247a1.125 1.125 0 01.26-1.431l1.004-.827c.292-.24.437-.613.43-.992a6.932 6.932 0 010-.255c.007-.378-.138-.75-.43-.99l-1.004-.828a1.125 1.125 0 01-.26-1.43l1.297-2.247a1.125 1.125 0 011.37-.491l1.216.456c.356.133.751.072 1.076-.124.072-.044.146-.087.22-.128.332-.183.582-.495.644-.869l.214-1.281z"/><path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+            </div>
+            <div class="flex-1 min-w-0">
+              <p class="text-sm text-gray-700"><span class="font-semibold">Scheduled Maintenance</span> - Planned downtime on 30 Mar, 2:00 AM - 4:00 AM IST</p>
+              <p class="text-xs text-gray-400 mt-1">Yesterday</p>
+            </div>
+            <button onclick="event.stopPropagation();deleteNotif(this.closest('.notif-item'))" class="p-1 text-gray-400 hover:text-red-500 transition shrink-0">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0"/></svg>
+            </button>
+          </div>
+
+        </div>
+
+        <!-- Pagination -->
+        <div class="flex items-center justify-between px-6 py-4 border-t border-gray-100">
+          <p class="text-sm text-gray-500">Showing 1-10 of 142 notifications</p>
+          <div class="flex items-center gap-1">
+            <button onclick="alert('Previous page')" class="px-3 py-1.5 text-sm font-medium text-gray-500 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 transition">Prev</button>
+            <button class="px-3 py-1.5 text-sm font-medium text-white bg-brand-500 rounded-lg">1</button>
+            <button onclick="alert('Go to page 2')" class="px-3 py-1.5 text-sm font-medium text-gray-700 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 transition">2</button>
+            <button onclick="alert('Go to page 3')" class="px-3 py-1.5 text-sm font-medium text-gray-700 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 transition">3</button>
+            <span class="px-2 text-gray-400">...</span>
+            <button onclick="alert('Go to page 15')" class="px-3 py-1.5 text-sm font-medium text-gray-700 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 transition">15</button>
+            <button onclick="alert('Next page')" class="px-3 py-1.5 text-sm font-medium text-gray-500 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 transition">Next</button>
+          </div>
+        </div>
+      </div>
+
+    </main>
+  </div>
+
+<script>
+  /* ===== Filter Notifications ===== */
+  function filterNotifs(type) {
+    document.querySelectorAll('[data-notif-filter]').forEach(function(btn) {
+      if (btn.dataset.notifFilter === type) {
+        btn.classList.add('active');
+        btn.classList.remove('text-gray-500');
+      } else {
+        btn.classList.remove('active');
+        btn.classList.add('text-gray-500');
+      }
+    });
+    document.querySelectorAll('.notif-item').forEach(function(item) {
+      if (type === 'all') {
+        item.style.display = '';
+      } else if (type === 'unread') {
+        item.style.display = item.dataset.read === 'false' ? '' : 'none';
+      } else {
+        item.style.display = item.dataset.type === type ? '' : 'none';
+      }
+    });
+  }
+
+  /* ===== Mark Single as Read ===== */
+  function markRead(el) {
+    el.classList.remove('unread');
+    el.dataset.read = 'true';
+    var dot = el.querySelector('.unread-dot');
+    if (dot) dot.remove();
+    var p = el.querySelector('.flex-1 p:first-child');
+    if (p) { p.classList.remove('text-gray-900'); p.classList.add('text-gray-700'); }
+  }
+
+  /* ===== Mark All Read ===== */
+  function markAllRead() {
+    document.querySelectorAll('.notif-item').forEach(function(item) { markRead(item); });
+    alert('All notifications marked as read');
+  }
+
+  /* ===== Delete Single ===== */
+  function deleteNotif(el) {
+    el.style.opacity = '0';
+    el.style.transition = 'opacity 0.2s';
+    setTimeout(function() { el.remove(); }, 200);
+  }
+
+  /* ===== Delete Selected ===== */
+  function deleteSelected() {
+    var checked = document.querySelectorAll('.notif-item input[type="checkbox"]:checked');
+    if (checked.length === 0) { alert('No notifications selected'); return; }
+    checked.forEach(function(cb) { deleteNotif(cb.closest('.notif-item')); });
+    alert(checked.length + ' notification(s) deleted');
+  }
+</script>
+
+<script src="../shared-layout.js"></script>
+<script>renderAdminLayout('notifications', '../');</script>
+</body>
+</html>

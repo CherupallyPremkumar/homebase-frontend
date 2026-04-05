@@ -1,0 +1,722 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HomeBase — Warehouse Shipments</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              50: '#FFF7ED',
+              100: '#FFEDD5',
+              200: '#FED7AA',
+              300: '#FDBA74',
+              400: '#FB923C',
+              500: '#F97316',
+              600: '#EA580C',
+              700: '#C2410C',
+            },
+            teal: {
+              800: '#0F2027',
+              900: '#0B1A20',
+            },
+            success: '#16A34A',
+            warning: '#EAB308',
+            danger: '#DC2626',
+          },
+          fontFamily: {
+            sans: ['Inter', 'system-ui', 'sans-serif'],
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+    .scrollbar-hide::-webkit-scrollbar { display: none; }
+    .sidebar-link { transition: all 0.15s ease; }
+    .sidebar-link:hover { background: rgba(255,255,255,0.06); }
+    .sidebar-link.active { background: rgba(249,115,22,0.15); border-right: 3px solid #F97316; }
+    .stat-card { transition: all 0.2s ease; }
+    .stat-card:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,0.1); }
+    .table-row { transition: background 0.15s ease; }
+    .table-row:hover { background: #FFF7ED; }
+    .dropdown-menu { display: none; }
+    .dropdown:hover .dropdown-menu { display: block; }
+    .sidebar-scroll::-webkit-scrollbar { width: 4px; }
+    .sidebar-scroll::-webkit-scrollbar-track { background: transparent; }
+    .sidebar-scroll::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.12); border-radius: 2px; }
+    .filter-tab { transition: all 0.15s ease; }
+    .filter-tab:hover { color: #F97316; }
+    .filter-tab.active { color: #F97316; border-bottom: 2px solid #F97316; }
+    .pickup-slot { transition: all 0.15s ease; }
+    .pickup-slot:hover { border-color: #F97316; background: #FFF7ED; }
+  </style>
+</head>
+<body class="font-sans bg-gray-50 text-gray-900">
+
+  <!-- ===== TOP HEADER BAR ===== -->
+  <header id="warehouse-header" class="fixed top-0 left-0 right-0 z-50 bg-white border-b border-gray-200 h-16"></header>
+
+  <!-- ===== LAYOUT: SIDEBAR + MAIN ===== -->
+  <div class="flex pt-16 min-h-screen">
+
+    <!-- ===== LEFT SIDEBAR (Dark Teal #0F2027) ===== -->
+    <aside id="warehouse-sidebar" class="fixed left-0 top-16 bottom-0 w-60 z-40 flex flex-col overflow-y-auto" style="background:#0F2027;"></aside>
+
+    <!-- ===== MAIN CONTENT ===== -->
+    <main class="flex-1 ml-60 p-8">
+
+      <!-- Page Title + Actions -->
+      <div class="flex items-center justify-between mb-8">
+        <div>
+          <h1 class="text-2xl font-bold text-gray-900">Shipments</h1>
+          <p class="text-sm text-gray-500 mt-1">Track and manage all outbound shipments from Mumbai Hub</p>
+        </div>
+        <div class="flex items-center gap-3">
+          <button class="inline-flex items-center gap-2 px-4 py-2.5 bg-white border border-gray-200 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 transition shadow-sm">
+            <svg class="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5m-13.5-9L12 3m0 0l4.5 4.5M12 3v13.5"/></svg>
+            Export
+          </button>
+          <button class="inline-flex items-center gap-2 px-5 py-2.5 bg-brand-500 text-white rounded-lg text-sm font-semibold hover:bg-brand-600 transition shadow-sm shadow-brand-500/25">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M8.25 18.75a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m3 0h6m-9 0H3.375a1.125 1.125 0 01-1.125-1.125V14.25m17.25 4.5a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m3 0h1.125c.621 0 1.129-.504 1.09-1.124a17.902 17.902 0 00-3.213-9.193 2.056 2.056 0 00-1.58-.86H14.25M16.5 18.75h-2.25m0-11.177v-.958c0-.568-.422-1.048-.987-1.106a48.554 48.554 0 00-10.026 0 1.106 1.106 0 00-.987 1.106v7.635m12-6.677v6.677m0 4.5v-4.5m0 0h-12"/></svg>
+            Schedule Pickup
+          </button>
+        </div>
+      </div>
+
+      <!-- ===== STATS CARDS ===== -->
+      <div class="grid grid-cols-5 gap-4 mb-8">
+        <!-- Total Today -->
+        <div class="stat-card bg-white rounded-xl border border-gray-100 p-5 shadow-sm">
+          <div class="flex items-center justify-between mb-3">
+            <div class="w-10 h-10 rounded-lg bg-blue-50 flex items-center justify-center">
+              <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M20.25 7.5l-.625 10.632a2.25 2.25 0 01-2.247 2.118H6.622a2.25 2.25 0 01-2.247-2.118L3.75 7.5m16.5 0V5.625c0-.621-.504-1.125-1.125-1.125H4.875c-.621 0-1.125.504-1.125 1.125V7.5m16.5 0h-16.5"/></svg>
+            </div>
+            <span class="text-xs font-medium text-blue-600 bg-blue-50 px-2 py-0.5 rounded-full">Today</span>
+          </div>
+          <p class="text-2xl font-bold text-gray-900">89</p>
+          <p class="text-xs text-gray-500 mt-1">Total Shipments</p>
+        </div>
+
+        <!-- Picked Up -->
+        <div class="stat-card bg-white rounded-xl border border-gray-100 p-5 shadow-sm">
+          <div class="flex items-center justify-between mb-3">
+            <div class="w-10 h-10 rounded-lg bg-indigo-50 flex items-center justify-center">
+              <svg class="w-5 h-5 text-indigo-600" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M8.25 18.75a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m3 0h6m-9 0H3.375a1.125 1.125 0 01-1.125-1.125V14.25m17.25 4.5a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m3 0h1.125c.621 0 1.129-.504 1.09-1.124a17.902 17.902 0 00-3.213-9.193 2.056 2.056 0 00-1.58-.86H14.25M16.5 18.75h-2.25m0-11.177v-.958c0-.568-.422-1.048-.987-1.106a48.554 48.554 0 00-10.026 0 1.106 1.106 0 00-.987 1.106v7.635m12-6.677v6.677m0 4.5v-4.5m0 0h-12"/></svg>
+            </div>
+            <span class="text-xs font-medium text-indigo-600 bg-indigo-50 px-2 py-0.5 rounded-full">50.6%</span>
+          </div>
+          <p class="text-2xl font-bold text-gray-900">45</p>
+          <p class="text-xs text-gray-500 mt-1">Picked Up</p>
+        </div>
+
+        <!-- In Transit -->
+        <div class="stat-card bg-white rounded-xl border border-gray-100 p-5 shadow-sm">
+          <div class="flex items-center justify-between mb-3">
+            <div class="w-10 h-10 rounded-lg bg-amber-50 flex items-center justify-center">
+              <svg class="w-5 h-5 text-amber-600" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z"/><path d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z"/></svg>
+            </div>
+            <span class="text-xs font-medium text-amber-600 bg-amber-50 px-2 py-0.5 rounded-full">36.0%</span>
+          </div>
+          <p class="text-2xl font-bold text-gray-900">32</p>
+          <p class="text-xs text-gray-500 mt-1">In Transit</p>
+        </div>
+
+        <!-- Delivered -->
+        <div class="stat-card bg-white rounded-xl border border-gray-100 p-5 shadow-sm">
+          <div class="flex items-center justify-between mb-3">
+            <div class="w-10 h-10 rounded-lg bg-green-50 flex items-center justify-center">
+              <svg class="w-5 h-5 text-green-600" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+            </div>
+            <span class="text-xs font-medium text-green-600 bg-green-50 px-2 py-0.5 rounded-full">13.5%</span>
+          </div>
+          <p class="text-2xl font-bold text-gray-900">12</p>
+          <p class="text-xs text-gray-500 mt-1">Delivered</p>
+        </div>
+
+        <!-- Failed -->
+        <div class="stat-card bg-white rounded-xl border border-gray-100 p-5 shadow-sm">
+          <div class="flex items-center justify-between mb-3">
+            <div class="w-10 h-10 rounded-lg bg-red-50 flex items-center justify-center">
+              <svg class="w-5 h-5 text-red-500" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z"/></svg>
+            </div>
+            <span class="text-xs font-medium text-green-600 bg-green-50 px-2 py-0.5 rounded-full">0%</span>
+          </div>
+          <p class="text-2xl font-bold text-gray-900">0</p>
+          <p class="text-xs text-gray-500 mt-1">Failed</p>
+        </div>
+      </div>
+
+      <!-- ===== FILTER TABS + SEARCH ===== -->
+      <div class="bg-white rounded-xl border border-gray-100 shadow-sm mb-6">
+        <!-- Tabs -->
+        <div class="flex items-center border-b border-gray-100 px-6">
+          <button class="filter-tab active px-4 py-3.5 text-sm font-semibold border-b-2 -mb-px">All (89)</button>
+          <button class="filter-tab px-4 py-3.5 text-sm font-medium text-gray-500 border-b-2 border-transparent -mb-px">Ready for Pickup (12)</button>
+          <button class="filter-tab px-4 py-3.5 text-sm font-medium text-gray-500 border-b-2 border-transparent -mb-px">Picked Up (45)</button>
+          <button class="filter-tab px-4 py-3.5 text-sm font-medium text-gray-500 border-b-2 border-transparent -mb-px">In Transit (32)</button>
+          <button class="filter-tab px-4 py-3.5 text-sm font-medium text-gray-500 border-b-2 border-transparent -mb-px">Delivered (12)</button>
+          <button class="filter-tab px-4 py-3.5 text-sm font-medium text-gray-500 border-b-2 border-transparent -mb-px">Failed/RTO (0)</button>
+        </div>
+
+        <!-- Search + Filters Row -->
+        <div class="flex items-center gap-4 p-4 px-6">
+          <!-- Search -->
+          <div class="relative flex-1 max-w-sm">
+            <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+            <input type="text" placeholder="Search AWB, Order ID, Customer..." class="w-full bg-gray-50 border border-gray-200 rounded-lg py-2 pl-10 pr-4 text-sm outline-none focus:border-brand-400 focus:ring-2 focus:ring-brand-100 transition">
+          </div>
+
+          <!-- Carrier Filter -->
+          <select class="bg-gray-50 border border-gray-200 rounded-lg py-2 px-3 text-sm text-gray-700 outline-none focus:border-brand-400 focus:ring-2 focus:ring-brand-100 transition min-w-[160px]">
+            <option>All Carriers</option>
+            <option>Delhivery</option>
+            <option>BlueDart</option>
+            <option>DTDC</option>
+            <option>India Post</option>
+          </select>
+
+          <!-- Date Range -->
+          <div class="flex items-center gap-2">
+            <input type="date" value="2026-03-28" class="bg-gray-50 border border-gray-200 rounded-lg py-2 px-3 text-sm text-gray-700 outline-none focus:border-brand-400 focus:ring-2 focus:ring-brand-100 transition">
+            <span class="text-gray-400 text-sm">to</span>
+            <input type="date" value="2026-03-28" class="bg-gray-50 border border-gray-200 rounded-lg py-2 px-3 text-sm text-gray-700 outline-none focus:border-brand-400 focus:ring-2 focus:ring-brand-100 transition">
+          </div>
+        </div>
+
+        <!-- ===== SHIPMENTS TABLE ===== -->
+        <div class="overflow-x-auto">
+          <table class="w-full">
+            <thead>
+              <tr class="bg-gray-50/80 border-y border-gray-100">
+                <th class="text-left px-6 py-3 text-[11px] font-semibold text-gray-500 uppercase tracking-wider">AWB / Tracking</th>
+                <th class="text-left px-4 py-3 text-[11px] font-semibold text-gray-500 uppercase tracking-wider">Order ID</th>
+                <th class="text-left px-4 py-3 text-[11px] font-semibold text-gray-500 uppercase tracking-wider">Customer</th>
+                <th class="text-left px-4 py-3 text-[11px] font-semibold text-gray-500 uppercase tracking-wider">Carrier</th>
+                <th class="text-left px-4 py-3 text-[11px] font-semibold text-gray-500 uppercase tracking-wider">Weight</th>
+                <th class="text-left px-4 py-3 text-[11px] font-semibold text-gray-500 uppercase tracking-wider">Status</th>
+                <th class="text-left px-4 py-3 text-[11px] font-semibold text-gray-500 uppercase tracking-wider">Shipped</th>
+                <th class="text-left px-4 py-3 text-[11px] font-semibold text-gray-500 uppercase tracking-wider">Expected Delivery</th>
+                <th class="text-right px-6 py-3 text-[11px] font-semibold text-gray-500 uppercase tracking-wider">Actions</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-50">
+              <!-- Row 1 -->
+              <tr class="table-row">
+                <td class="px-6 py-3.5">
+                  <span class="text-sm font-semibold text-brand-600">DL284719305IN</span>
+                </td>
+                <td class="px-4 py-3.5">
+                  <span class="text-sm text-gray-700 font-medium">#HB-20260328-001</span>
+                </td>
+                <td class="px-4 py-3.5">
+                  <p class="text-sm font-medium text-gray-800">Rahul Sharma</p>
+                  <p class="text-xs text-gray-400">Delhi</p>
+                </td>
+                <td class="px-4 py-3.5">
+                  <span class="inline-flex items-center gap-1.5 text-sm text-gray-700">
+                    <span class="w-2 h-2 rounded-full bg-red-500"></span>
+                    Delhivery
+                  </span>
+                </td>
+                <td class="px-4 py-3.5 text-sm text-gray-600">1.2 kg</td>
+                <td class="px-4 py-3.5">
+                  <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-green-50 text-green-700 border border-green-100">Delivered</span>
+                </td>
+                <td class="px-4 py-3.5 text-sm text-gray-600">26 Mar</td>
+                <td class="px-4 py-3.5 text-sm text-gray-600">28 Mar</td>
+                <td class="px-6 py-3.5 text-right">
+                  <div class="flex items-center justify-end gap-2">
+                    <button class="inline-flex items-center gap-1 px-2.5 py-1.5 text-xs font-medium text-brand-600 bg-brand-50 hover:bg-brand-100 rounded-lg transition">
+                      <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z"/><path d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z"/></svg>
+                      Track
+                    </button>
+                    <button class="inline-flex items-center gap-1 px-2.5 py-1.5 text-xs font-medium text-gray-600 bg-gray-50 hover:bg-gray-100 rounded-lg transition">
+                      <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M6.72 13.829c-.24.03-.48.062-.72.096m.72-.096a42.415 42.415 0 0110.56 0m-10.56 0L6.34 18m10.94-4.171c.24.03.48.062.72.096m-.72-.096L17.66 18m0 0l.229 2.523a1.125 1.125 0 01-1.12 1.227H7.231c-.662 0-1.18-.568-1.12-1.227L6.34 18m11.318 0h1.091A2.25 2.25 0 0021 15.75V9.456c0-1.081-.768-2.015-1.837-2.175a48.055 48.055 0 00-1.913-.247M6.34 18H5.25A2.25 2.25 0 013 15.75V9.456c0-1.081.768-2.015 1.837-2.175a48.041 48.041 0 011.913-.247m10.5 0a48.536 48.536 0 00-10.5 0m10.5 0V3.375c0-.621-.504-1.125-1.125-1.125h-8.25c-.621 0-1.125.504-1.125 1.125v3.659M18 10.5h.008v.008H18V10.5zm-3 0h.008v.008H15V10.5z"/></svg>
+                      Label
+                    </button>
+                  </div>
+                </td>
+              </tr>
+
+              <!-- Row 2 -->
+              <tr class="table-row">
+                <td class="px-6 py-3.5">
+                  <span class="text-sm font-semibold text-brand-600">BD938271645IN</span>
+                </td>
+                <td class="px-4 py-3.5">
+                  <span class="text-sm text-gray-700 font-medium">#HB-20260328-002</span>
+                </td>
+                <td class="px-4 py-3.5">
+                  <p class="text-sm font-medium text-gray-800">Priya Nair</p>
+                  <p class="text-xs text-gray-400">Kochi</p>
+                </td>
+                <td class="px-4 py-3.5">
+                  <span class="inline-flex items-center gap-1.5 text-sm text-gray-700">
+                    <span class="w-2 h-2 rounded-full bg-blue-500"></span>
+                    BlueDart
+                  </span>
+                </td>
+                <td class="px-4 py-3.5 text-sm text-gray-600">0.8 kg</td>
+                <td class="px-4 py-3.5">
+                  <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-amber-50 text-amber-700 border border-amber-100">In Transit</span>
+                </td>
+                <td class="px-4 py-3.5 text-sm text-gray-600">27 Mar</td>
+                <td class="px-4 py-3.5 text-sm text-gray-600">30 Mar</td>
+                <td class="px-6 py-3.5 text-right">
+                  <div class="flex items-center justify-end gap-2">
+                    <button class="inline-flex items-center gap-1 px-2.5 py-1.5 text-xs font-medium text-brand-600 bg-brand-50 hover:bg-brand-100 rounded-lg transition">
+                      <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z"/><path d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z"/></svg>
+                      Track
+                    </button>
+                    <button class="inline-flex items-center gap-1 px-2.5 py-1.5 text-xs font-medium text-gray-600 bg-gray-50 hover:bg-gray-100 rounded-lg transition">
+                      <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M6.72 13.829c-.24.03-.48.062-.72.096m.72-.096a42.415 42.415 0 0110.56 0m-10.56 0L6.34 18m10.94-4.171c.24.03.48.062.72.096m-.72-.096L17.66 18m0 0l.229 2.523a1.125 1.125 0 01-1.12 1.227H7.231c-.662 0-1.18-.568-1.12-1.227L6.34 18m11.318 0h1.091A2.25 2.25 0 0021 15.75V9.456c0-1.081-.768-2.015-1.837-2.175a48.055 48.055 0 00-1.913-.247M6.34 18H5.25A2.25 2.25 0 013 15.75V9.456c0-1.081.768-2.015 1.837-2.175a48.041 48.041 0 011.913-.247m10.5 0a48.536 48.536 0 00-10.5 0m10.5 0V3.375c0-.621-.504-1.125-1.125-1.125h-8.25c-.621 0-1.125.504-1.125 1.125v3.659M18 10.5h.008v.008H18V10.5zm-3 0h.008v.008H15V10.5z"/></svg>
+                      Label
+                    </button>
+                  </div>
+                </td>
+              </tr>
+
+              <!-- Row 3 -->
+              <tr class="table-row">
+                <td class="px-6 py-3.5">
+                  <span class="text-sm font-semibold text-brand-600">DTDC50293847IN</span>
+                </td>
+                <td class="px-4 py-3.5">
+                  <span class="text-sm text-gray-700 font-medium">#HB-20260328-003</span>
+                </td>
+                <td class="px-4 py-3.5">
+                  <p class="text-sm font-medium text-gray-800">Amit Patel</p>
+                  <p class="text-xs text-gray-400">Ahmedabad</p>
+                </td>
+                <td class="px-4 py-3.5">
+                  <span class="inline-flex items-center gap-1.5 text-sm text-gray-700">
+                    <span class="w-2 h-2 rounded-full bg-purple-500"></span>
+                    DTDC
+                  </span>
+                </td>
+                <td class="px-4 py-3.5 text-sm text-gray-600">2.5 kg</td>
+                <td class="px-4 py-3.5">
+                  <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-indigo-50 text-indigo-700 border border-indigo-100">Picked Up</span>
+                </td>
+                <td class="px-4 py-3.5 text-sm text-gray-600">28 Mar</td>
+                <td class="px-4 py-3.5 text-sm text-gray-600">31 Mar</td>
+                <td class="px-6 py-3.5 text-right">
+                  <div class="flex items-center justify-end gap-2">
+                    <button class="inline-flex items-center gap-1 px-2.5 py-1.5 text-xs font-medium text-brand-600 bg-brand-50 hover:bg-brand-100 rounded-lg transition">
+                      <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z"/><path d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z"/></svg>
+                      Track
+                    </button>
+                    <button class="inline-flex items-center gap-1 px-2.5 py-1.5 text-xs font-medium text-gray-600 bg-gray-50 hover:bg-gray-100 rounded-lg transition">
+                      <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M6.72 13.829c-.24.03-.48.062-.72.096m.72-.096a42.415 42.415 0 0110.56 0m-10.56 0L6.34 18m10.94-4.171c.24.03.48.062.72.096m-.72-.096L17.66 18m0 0l.229 2.523a1.125 1.125 0 01-1.12 1.227H7.231c-.662 0-1.18-.568-1.12-1.227L6.34 18m11.318 0h1.091A2.25 2.25 0 0021 15.75V9.456c0-1.081-.768-2.015-1.837-2.175a48.055 48.055 0 00-1.913-.247M6.34 18H5.25A2.25 2.25 0 013 15.75V9.456c0-1.081.768-2.015 1.837-2.175a48.041 48.041 0 011.913-.247m10.5 0a48.536 48.536 0 00-10.5 0m10.5 0V3.375c0-.621-.504-1.125-1.125-1.125h-8.25c-.621 0-1.125.504-1.125 1.125v3.659M18 10.5h.008v.008H18V10.5zm-3 0h.008v.008H15V10.5z"/></svg>
+                      Label
+                    </button>
+                  </div>
+                </td>
+              </tr>
+
+              <!-- Row 4 -->
+              <tr class="table-row">
+                <td class="px-6 py-3.5">
+                  <span class="text-sm font-semibold text-brand-600">IP781234560IN</span>
+                </td>
+                <td class="px-4 py-3.5">
+                  <span class="text-sm text-gray-700 font-medium">#HB-20260328-004</span>
+                </td>
+                <td class="px-4 py-3.5">
+                  <p class="text-sm font-medium text-gray-800">Sunita Devi</p>
+                  <p class="text-xs text-gray-400">Patna</p>
+                </td>
+                <td class="px-4 py-3.5">
+                  <span class="inline-flex items-center gap-1.5 text-sm text-gray-700">
+                    <span class="w-2 h-2 rounded-full bg-green-600"></span>
+                    India Post
+                  </span>
+                </td>
+                <td class="px-4 py-3.5 text-sm text-gray-600">3.1 kg</td>
+                <td class="px-4 py-3.5">
+                  <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-amber-50 text-amber-700 border border-amber-100">In Transit</span>
+                </td>
+                <td class="px-4 py-3.5 text-sm text-gray-600">25 Mar</td>
+                <td class="px-4 py-3.5 text-sm text-gray-600">01 Apr</td>
+                <td class="px-6 py-3.5 text-right">
+                  <div class="flex items-center justify-end gap-2">
+                    <button class="inline-flex items-center gap-1 px-2.5 py-1.5 text-xs font-medium text-brand-600 bg-brand-50 hover:bg-brand-100 rounded-lg transition">
+                      <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z"/><path d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z"/></svg>
+                      Track
+                    </button>
+                    <button class="inline-flex items-center gap-1 px-2.5 py-1.5 text-xs font-medium text-gray-600 bg-gray-50 hover:bg-gray-100 rounded-lg transition">
+                      <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M6.72 13.829c-.24.03-.48.062-.72.096m.72-.096a42.415 42.415 0 0110.56 0m-10.56 0L6.34 18m10.94-4.171c.24.03.48.062.72.096m-.72-.096L17.66 18m0 0l.229 2.523a1.125 1.125 0 01-1.12 1.227H7.231c-.662 0-1.18-.568-1.12-1.227L6.34 18m11.318 0h1.091A2.25 2.25 0 0021 15.75V9.456c0-1.081-.768-2.015-1.837-2.175a48.055 48.055 0 00-1.913-.247M6.34 18H5.25A2.25 2.25 0 013 15.75V9.456c0-1.081.768-2.015 1.837-2.175a48.041 48.041 0 011.913-.247m10.5 0a48.536 48.536 0 00-10.5 0m10.5 0V3.375c0-.621-.504-1.125-1.125-1.125h-8.25c-.621 0-1.125.504-1.125 1.125v3.659M18 10.5h.008v.008H18V10.5zm-3 0h.008v.008H15V10.5z"/></svg>
+                      Label
+                    </button>
+                  </div>
+                </td>
+              </tr>
+
+              <!-- Row 5 -->
+              <tr class="table-row">
+                <td class="px-6 py-3.5">
+                  <span class="text-sm font-semibold text-brand-600">DL284719412IN</span>
+                </td>
+                <td class="px-4 py-3.5">
+                  <span class="text-sm text-gray-700 font-medium">#HB-20260328-005</span>
+                </td>
+                <td class="px-4 py-3.5">
+                  <p class="text-sm font-medium text-gray-800">Vikram Singh</p>
+                  <p class="text-xs text-gray-400">Jaipur</p>
+                </td>
+                <td class="px-4 py-3.5">
+                  <span class="inline-flex items-center gap-1.5 text-sm text-gray-700">
+                    <span class="w-2 h-2 rounded-full bg-red-500"></span>
+                    Delhivery
+                  </span>
+                </td>
+                <td class="px-4 py-3.5 text-sm text-gray-600">0.5 kg</td>
+                <td class="px-4 py-3.5">
+                  <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-sky-50 text-sky-700 border border-sky-100">Ready for Pickup</span>
+                </td>
+                <td class="px-4 py-3.5 text-sm text-gray-600">28 Mar</td>
+                <td class="px-4 py-3.5 text-sm text-gray-600">31 Mar</td>
+                <td class="px-6 py-3.5 text-right">
+                  <div class="flex items-center justify-end gap-2">
+                    <button class="inline-flex items-center gap-1 px-2.5 py-1.5 text-xs font-medium text-brand-600 bg-brand-50 hover:bg-brand-100 rounded-lg transition">
+                      <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z"/><path d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z"/></svg>
+                      Track
+                    </button>
+                    <button class="inline-flex items-center gap-1 px-2.5 py-1.5 text-xs font-medium text-gray-600 bg-gray-50 hover:bg-gray-100 rounded-lg transition">
+                      <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M6.72 13.829c-.24.03-.48.062-.72.096m.72-.096a42.415 42.415 0 0110.56 0m-10.56 0L6.34 18m10.94-4.171c.24.03.48.062.72.096m-.72-.096L17.66 18m0 0l.229 2.523a1.125 1.125 0 01-1.12 1.227H7.231c-.662 0-1.18-.568-1.12-1.227L6.34 18m11.318 0h1.091A2.25 2.25 0 0021 15.75V9.456c0-1.081-.768-2.015-1.837-2.175a48.055 48.055 0 00-1.913-.247M6.34 18H5.25A2.25 2.25 0 013 15.75V9.456c0-1.081.768-2.015 1.837-2.175a48.041 48.041 0 011.913-.247m10.5 0a48.536 48.536 0 00-10.5 0m10.5 0V3.375c0-.621-.504-1.125-1.125-1.125h-8.25c-.621 0-1.125.504-1.125 1.125v3.659M18 10.5h.008v.008H18V10.5zm-3 0h.008v.008H15V10.5z"/></svg>
+                      Label
+                    </button>
+                  </div>
+                </td>
+              </tr>
+
+              <!-- Row 6 -->
+              <tr class="table-row">
+                <td class="px-6 py-3.5">
+                  <span class="text-sm font-semibold text-brand-600">BD938271789IN</span>
+                </td>
+                <td class="px-4 py-3.5">
+                  <span class="text-sm text-gray-700 font-medium">#HB-20260327-046</span>
+                </td>
+                <td class="px-4 py-3.5">
+                  <p class="text-sm font-medium text-gray-800">Meena Kumari</p>
+                  <p class="text-xs text-gray-400">Chennai</p>
+                </td>
+                <td class="px-4 py-3.5">
+                  <span class="inline-flex items-center gap-1.5 text-sm text-gray-700">
+                    <span class="w-2 h-2 rounded-full bg-blue-500"></span>
+                    BlueDart
+                  </span>
+                </td>
+                <td class="px-4 py-3.5 text-sm text-gray-600">1.8 kg</td>
+                <td class="px-4 py-3.5">
+                  <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-green-50 text-green-700 border border-green-100">Delivered</span>
+                </td>
+                <td class="px-4 py-3.5 text-sm text-gray-600">25 Mar</td>
+                <td class="px-4 py-3.5 text-sm text-gray-600">27 Mar</td>
+                <td class="px-6 py-3.5 text-right">
+                  <div class="flex items-center justify-end gap-2">
+                    <button class="inline-flex items-center gap-1 px-2.5 py-1.5 text-xs font-medium text-brand-600 bg-brand-50 hover:bg-brand-100 rounded-lg transition">
+                      <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z"/><path d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z"/></svg>
+                      Track
+                    </button>
+                    <button class="inline-flex items-center gap-1 px-2.5 py-1.5 text-xs font-medium text-gray-600 bg-gray-50 hover:bg-gray-100 rounded-lg transition">
+                      <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M6.72 13.829c-.24.03-.48.062-.72.096m.72-.096a42.415 42.415 0 0110.56 0m-10.56 0L6.34 18m10.94-4.171c.24.03.48.062.72.096m-.72-.096L17.66 18m0 0l.229 2.523a1.125 1.125 0 01-1.12 1.227H7.231c-.662 0-1.18-.568-1.12-1.227L6.34 18m11.318 0h1.091A2.25 2.25 0 0021 15.75V9.456c0-1.081-.768-2.015-1.837-2.175a48.055 48.055 0 00-1.913-.247M6.34 18H5.25A2.25 2.25 0 013 15.75V9.456c0-1.081.768-2.015 1.837-2.175a48.041 48.041 0 011.913-.247m10.5 0a48.536 48.536 0 00-10.5 0m10.5 0V3.375c0-.621-.504-1.125-1.125-1.125h-8.25c-.621 0-1.125.504-1.125 1.125v3.659M18 10.5h.008v.008H18V10.5zm-3 0h.008v.008H15V10.5z"/></svg>
+                      Label
+                    </button>
+                  </div>
+                </td>
+              </tr>
+
+              <!-- Row 7 -->
+              <tr class="table-row">
+                <td class="px-6 py-3.5">
+                  <span class="text-sm font-semibold text-brand-600">DTDC50293991IN</span>
+                </td>
+                <td class="px-4 py-3.5">
+                  <span class="text-sm text-gray-700 font-medium">#HB-20260328-007</span>
+                </td>
+                <td class="px-4 py-3.5">
+                  <p class="text-sm font-medium text-gray-800">Arjun Reddy</p>
+                  <p class="text-xs text-gray-400">Hyderabad</p>
+                </td>
+                <td class="px-4 py-3.5">
+                  <span class="inline-flex items-center gap-1.5 text-sm text-gray-700">
+                    <span class="w-2 h-2 rounded-full bg-purple-500"></span>
+                    DTDC
+                  </span>
+                </td>
+                <td class="px-4 py-3.5 text-sm text-gray-600">4.2 kg</td>
+                <td class="px-4 py-3.5">
+                  <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-indigo-50 text-indigo-700 border border-indigo-100">Picked Up</span>
+                </td>
+                <td class="px-4 py-3.5 text-sm text-gray-600">28 Mar</td>
+                <td class="px-4 py-3.5 text-sm text-gray-600">01 Apr</td>
+                <td class="px-6 py-3.5 text-right">
+                  <div class="flex items-center justify-end gap-2">
+                    <button class="inline-flex items-center gap-1 px-2.5 py-1.5 text-xs font-medium text-brand-600 bg-brand-50 hover:bg-brand-100 rounded-lg transition">
+                      <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z"/><path d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z"/></svg>
+                      Track
+                    </button>
+                    <button class="inline-flex items-center gap-1 px-2.5 py-1.5 text-xs font-medium text-gray-600 bg-gray-50 hover:bg-gray-100 rounded-lg transition">
+                      <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M6.72 13.829c-.24.03-.48.062-.72.096m.72-.096a42.415 42.415 0 0110.56 0m-10.56 0L6.34 18m10.94-4.171c.24.03.48.062.72.096m-.72-.096L17.66 18m0 0l.229 2.523a1.125 1.125 0 01-1.12 1.227H7.231c-.662 0-1.18-.568-1.12-1.227L6.34 18m11.318 0h1.091A2.25 2.25 0 0021 15.75V9.456c0-1.081-.768-2.015-1.837-2.175a48.055 48.055 0 00-1.913-.247M6.34 18H5.25A2.25 2.25 0 013 15.75V9.456c0-1.081.768-2.015 1.837-2.175a48.041 48.041 0 011.913-.247m10.5 0a48.536 48.536 0 00-10.5 0m10.5 0V3.375c0-.621-.504-1.125-1.125-1.125h-8.25c-.621 0-1.125.504-1.125 1.125v3.659M18 10.5h.008v.008H18V10.5zm-3 0h.008v.008H15V10.5z"/></svg>
+                      Label
+                    </button>
+                  </div>
+                </td>
+              </tr>
+
+              <!-- Row 8 -->
+              <tr class="table-row">
+                <td class="px-6 py-3.5">
+                  <span class="text-sm font-semibold text-brand-600">DL284720001IN</span>
+                </td>
+                <td class="px-4 py-3.5">
+                  <span class="text-sm text-gray-700 font-medium">#HB-20260328-008</span>
+                </td>
+                <td class="px-4 py-3.5">
+                  <p class="text-sm font-medium text-gray-800">Kavita Joshi</p>
+                  <p class="text-xs text-gray-400">Pune</p>
+                </td>
+                <td class="px-4 py-3.5">
+                  <span class="inline-flex items-center gap-1.5 text-sm text-gray-700">
+                    <span class="w-2 h-2 rounded-full bg-red-500"></span>
+                    Delhivery
+                  </span>
+                </td>
+                <td class="px-4 py-3.5 text-sm text-gray-600">0.3 kg</td>
+                <td class="px-4 py-3.5">
+                  <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-sky-50 text-sky-700 border border-sky-100">Ready for Pickup</span>
+                </td>
+                <td class="px-4 py-3.5 text-sm text-gray-600">28 Mar</td>
+                <td class="px-4 py-3.5 text-sm text-gray-600">30 Mar</td>
+                <td class="px-6 py-3.5 text-right">
+                  <div class="flex items-center justify-end gap-2">
+                    <button class="inline-flex items-center gap-1 px-2.5 py-1.5 text-xs font-medium text-brand-600 bg-brand-50 hover:bg-brand-100 rounded-lg transition">
+                      <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z"/><path d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z"/></svg>
+                      Track
+                    </button>
+                    <button class="inline-flex items-center gap-1 px-2.5 py-1.5 text-xs font-medium text-gray-600 bg-gray-50 hover:bg-gray-100 rounded-lg transition">
+                      <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M6.72 13.829c-.24.03-.48.062-.72.096m.72-.096a42.415 42.415 0 0110.56 0m-10.56 0L6.34 18m10.94-4.171c.24.03.48.062.72.096m-.72-.096L17.66 18m0 0l.229 2.523a1.125 1.125 0 01-1.12 1.227H7.231c-.662 0-1.18-.568-1.12-1.227L6.34 18m11.318 0h1.091A2.25 2.25 0 0021 15.75V9.456c0-1.081-.768-2.015-1.837-2.175a48.055 48.055 0 00-1.913-.247M6.34 18H5.25A2.25 2.25 0 013 15.75V9.456c0-1.081.768-2.015 1.837-2.175a48.041 48.041 0 011.913-.247m10.5 0a48.536 48.536 0 00-10.5 0m10.5 0V3.375c0-.621-.504-1.125-1.125-1.125h-8.25c-.621 0-1.125.504-1.125 1.125v3.659M18 10.5h.008v.008H18V10.5zm-3 0h.008v.008H15V10.5z"/></svg>
+                      Label
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Pagination -->
+        <div class="flex items-center justify-between px-6 py-4 border-t border-gray-100">
+          <p class="text-sm text-gray-500">Showing <span class="font-medium text-gray-700">1-8</span> of <span class="font-medium text-gray-700">89</span> shipments</p>
+          <div class="flex items-center gap-1">
+            <button class="px-3 py-1.5 text-sm text-gray-400 bg-gray-50 rounded-lg cursor-not-allowed" disabled>Previous</button>
+            <button class="px-3 py-1.5 text-sm font-semibold text-white bg-brand-500 rounded-lg">1</button>
+            <button class="px-3 py-1.5 text-sm text-gray-600 hover:bg-gray-50 rounded-lg transition">2</button>
+            <button class="px-3 py-1.5 text-sm text-gray-600 hover:bg-gray-50 rounded-lg transition">3</button>
+            <button class="px-3 py-1.5 text-sm text-gray-600 hover:bg-gray-50 rounded-lg transition">...</button>
+            <button class="px-3 py-1.5 text-sm text-gray-600 hover:bg-gray-50 rounded-lg transition">12</button>
+            <button class="px-3 py-1.5 text-sm text-gray-600 hover:bg-gray-50 rounded-lg transition">Next</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== BOTTOM CARDS ROW ===== -->
+      <div class="grid grid-cols-2 gap-6">
+
+        <!-- Carrier Performance Card -->
+        <div class="bg-white rounded-xl border border-gray-100 shadow-sm">
+          <div class="flex items-center justify-between px-6 py-4 border-b border-gray-100">
+            <h3 class="text-base font-semibold text-gray-900">Carrier Performance</h3>
+            <span class="text-xs text-gray-400">Last 30 days</span>
+          </div>
+          <div class="p-6">
+            <div class="space-y-4">
+              <!-- Delhivery -->
+              <div class="flex items-center gap-4">
+                <div class="flex items-center gap-2 w-28 shrink-0">
+                  <span class="w-2.5 h-2.5 rounded-full bg-red-500"></span>
+                  <span class="text-sm font-medium text-gray-800">Delhivery</span>
+                </div>
+                <div class="flex-1">
+                  <div class="flex items-center justify-between mb-1.5">
+                    <span class="text-xs text-gray-500">Delivery Rate</span>
+                    <span class="text-xs font-bold text-green-600">96.2%</span>
+                  </div>
+                  <div class="w-full bg-gray-100 rounded-full h-2">
+                    <div class="bg-green-500 h-2 rounded-full" style="width: 96.2%"></div>
+                  </div>
+                </div>
+                <div class="text-right w-24 shrink-0">
+                  <p class="text-xs text-gray-500">Avg. Time</p>
+                  <p class="text-sm font-semibold text-gray-800">2.4 days</p>
+                </div>
+                <div class="text-right w-16 shrink-0">
+                  <p class="text-xs text-gray-500">Pending</p>
+                  <p class="text-sm font-semibold text-amber-600">18</p>
+                </div>
+              </div>
+
+              <!-- BlueDart -->
+              <div class="flex items-center gap-4">
+                <div class="flex items-center gap-2 w-28 shrink-0">
+                  <span class="w-2.5 h-2.5 rounded-full bg-blue-500"></span>
+                  <span class="text-sm font-medium text-gray-800">BlueDart</span>
+                </div>
+                <div class="flex-1">
+                  <div class="flex items-center justify-between mb-1.5">
+                    <span class="text-xs text-gray-500">Delivery Rate</span>
+                    <span class="text-xs font-bold text-green-600">98.1%</span>
+                  </div>
+                  <div class="w-full bg-gray-100 rounded-full h-2">
+                    <div class="bg-green-500 h-2 rounded-full" style="width: 98.1%"></div>
+                  </div>
+                </div>
+                <div class="text-right w-24 shrink-0">
+                  <p class="text-xs text-gray-500">Avg. Time</p>
+                  <p class="text-sm font-semibold text-gray-800">1.8 days</p>
+                </div>
+                <div class="text-right w-16 shrink-0">
+                  <p class="text-xs text-gray-500">Pending</p>
+                  <p class="text-sm font-semibold text-amber-600">12</p>
+                </div>
+              </div>
+
+              <!-- DTDC -->
+              <div class="flex items-center gap-4">
+                <div class="flex items-center gap-2 w-28 shrink-0">
+                  <span class="w-2.5 h-2.5 rounded-full bg-purple-500"></span>
+                  <span class="text-sm font-medium text-gray-800">DTDC</span>
+                </div>
+                <div class="flex-1">
+                  <div class="flex items-center justify-between mb-1.5">
+                    <span class="text-xs text-gray-500">Delivery Rate</span>
+                    <span class="text-xs font-bold text-amber-600">91.7%</span>
+                  </div>
+                  <div class="w-full bg-gray-100 rounded-full h-2">
+                    <div class="bg-amber-400 h-2 rounded-full" style="width: 91.7%"></div>
+                  </div>
+                </div>
+                <div class="text-right w-24 shrink-0">
+                  <p class="text-xs text-gray-500">Avg. Time</p>
+                  <p class="text-sm font-semibold text-gray-800">3.2 days</p>
+                </div>
+                <div class="text-right w-16 shrink-0">
+                  <p class="text-xs text-gray-500">Pending</p>
+                  <p class="text-sm font-semibold text-amber-600">24</p>
+                </div>
+              </div>
+
+              <!-- India Post -->
+              <div class="flex items-center gap-4">
+                <div class="flex items-center gap-2 w-28 shrink-0">
+                  <span class="w-2.5 h-2.5 rounded-full bg-green-600"></span>
+                  <span class="text-sm font-medium text-gray-800">India Post</span>
+                </div>
+                <div class="flex-1">
+                  <div class="flex items-center justify-between mb-1.5">
+                    <span class="text-xs text-gray-500">Delivery Rate</span>
+                    <span class="text-xs font-bold text-amber-600">87.3%</span>
+                  </div>
+                  <div class="w-full bg-gray-100 rounded-full h-2">
+                    <div class="bg-amber-400 h-2 rounded-full" style="width: 87.3%"></div>
+                  </div>
+                </div>
+                <div class="text-right w-24 shrink-0">
+                  <p class="text-xs text-gray-500">Avg. Time</p>
+                  <p class="text-sm font-semibold text-gray-800">5.1 days</p>
+                </div>
+                <div class="text-right w-16 shrink-0">
+                  <p class="text-xs text-gray-500">Pending</p>
+                  <p class="text-sm font-semibold text-amber-600">9</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Today's Pickup Schedule Card -->
+        <div class="bg-white rounded-xl border border-gray-100 shadow-sm">
+          <div class="flex items-center justify-between px-6 py-4 border-b border-gray-100">
+            <h3 class="text-base font-semibold text-gray-900">Today's Pickup Schedule</h3>
+            <span class="text-xs font-medium text-brand-600 bg-brand-50 px-2.5 py-1 rounded-full">28 Mar 2026</span>
+          </div>
+          <div class="p-6 space-y-4">
+            <!-- Slot 1: 10 AM -->
+            <div class="pickup-slot border border-gray-200 rounded-xl p-4 flex items-center gap-4">
+              <div class="w-14 h-14 rounded-xl bg-brand-50 flex flex-col items-center justify-center shrink-0">
+                <span class="text-lg font-bold text-brand-600 leading-none">10</span>
+                <span class="text-[10px] font-semibold text-brand-500 uppercase">AM</span>
+              </div>
+              <div class="flex-1 min-w-0">
+                <div class="flex items-center gap-2 mb-1">
+                  <span class="w-2 h-2 rounded-full bg-red-500"></span>
+                  <p class="text-sm font-semibold text-gray-800">Delhivery</p>
+                  <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold bg-green-50 text-green-700 border border-green-100">Completed</span>
+                </div>
+                <p class="text-xs text-gray-500">28 packages picked up successfully</p>
+              </div>
+              <div class="text-right shrink-0">
+                <p class="text-2xl font-bold text-gray-900">28</p>
+                <p class="text-[10px] text-gray-400 uppercase font-medium">Packages</p>
+              </div>
+            </div>
+
+            <!-- Slot 2: 2 PM -->
+            <div class="pickup-slot border border-brand-200 bg-brand-50/30 rounded-xl p-4 flex items-center gap-4">
+              <div class="w-14 h-14 rounded-xl bg-brand-100 flex flex-col items-center justify-center shrink-0">
+                <span class="text-lg font-bold text-brand-600 leading-none">2</span>
+                <span class="text-[10px] font-semibold text-brand-500 uppercase">PM</span>
+              </div>
+              <div class="flex-1 min-w-0">
+                <div class="flex items-center gap-2 mb-1">
+                  <span class="w-2 h-2 rounded-full bg-blue-500"></span>
+                  <p class="text-sm font-semibold text-gray-800">BlueDart</p>
+                  <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold bg-amber-50 text-amber-700 border border-amber-100">In Progress</span>
+                </div>
+                <p class="text-xs text-gray-500">Pickup agent on the way (ETA: 15 min)</p>
+              </div>
+              <div class="text-right shrink-0">
+                <p class="text-2xl font-bold text-gray-900">35</p>
+                <p class="text-[10px] text-gray-400 uppercase font-medium">Packages</p>
+              </div>
+            </div>
+
+            <!-- Slot 3: 6 PM -->
+            <div class="pickup-slot border border-gray-200 rounded-xl p-4 flex items-center gap-4">
+              <div class="w-14 h-14 rounded-xl bg-gray-50 flex flex-col items-center justify-center shrink-0">
+                <span class="text-lg font-bold text-gray-600 leading-none">6</span>
+                <span class="text-[10px] font-semibold text-gray-500 uppercase">PM</span>
+              </div>
+              <div class="flex-1 min-w-0">
+                <div class="flex items-center gap-2 mb-1">
+                  <span class="w-2 h-2 rounded-full bg-purple-500"></span>
+                  <p class="text-sm font-semibold text-gray-800">DTDC</p>
+                  <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold bg-gray-100 text-gray-600 border border-gray-200">Scheduled</span>
+                </div>
+                <p class="text-xs text-gray-500">26 packages ready for dispatch</p>
+              </div>
+              <div class="text-right shrink-0">
+                <p class="text-2xl font-bold text-gray-900">26</p>
+                <p class="text-[10px] text-gray-400 uppercase font-medium">Packages</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </main>
+  </div>
+
+  <script src="shared-layout.js"></script>
+  <script>renderWarehouseLayout('shipments');</script>
+</body>
+</html>

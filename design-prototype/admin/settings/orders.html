@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HomeBase — Order & Checkout Rules</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brand: { 50:'#FFF7ED',100:'#FFEDD5',200:'#FED7AA',300:'#FDBA74',400:'#FB923C',500:'#F97316',600:'#EA580C',700:'#C2410C' },
+            navy: { 700:'#1E3A5F',800:'#0F1E30',900:'#0A1628' },
+            success: '#16A34A', warning: '#EAB308', danger: '#DC2626',
+          },
+          fontFamily: { sans: ['Inter','system-ui','sans-serif'] }
+        }
+      }
+    }
+  </script>
+  <style>
+    .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+    .scrollbar-hide::-webkit-scrollbar { display: none; }
+    .sidebar-link { transition: all 0.15s ease; }
+    .sidebar-link:hover { background: rgba(255,255,255,0.06); }
+    .sidebar-link.active { background: rgba(249,115,22,0.15); border-right: 3px solid #F97316; color: #F97316; }
+    .table-row { transition: background 0.15s ease; }
+    .table-row:hover { background: #FFF7ED; }
+    .toggle-track { transition: background 0.2s ease; }
+    .toggle-knob { transition: transform 0.2s ease; }
+    .dropdown-menu { display: none; }
+    .dropdown:hover .dropdown-menu { display: block; }
+  </style>
+</head>
+<body class="font-sans bg-gray-50 text-gray-900">
+
+  <!-- ===== TOP HEADER BAR ===== -->
+  <header id="admin-header" class="fixed top-0 left-0 right-0 z-50 bg-white border-b border-gray-200 h-16"></header>
+
+  <!-- ===== LAYOUT: SIDEBAR + MAIN ===== -->
+  <div class="flex pt-16 min-h-screen">
+    <aside id="admin-sidebar" class="fixed left-0 top-16 bottom-0 w-60 z-40 flex flex-col overflow-y-auto" style="background:#0A1628;"></aside>
+
+    <!-- ===== MAIN CONTENT ===== -->
+    <main class="flex-1 ml-60 p-6 lg:p-8 overflow-x-hidden">
+
+      <!-- Breadcrumb -->
+      <nav class="flex items-center gap-2 text-sm text-gray-500 mb-4">
+        <a href="../dashboard.html" class="hover:text-brand-500 transition">Dashboard</a>
+        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"/></svg>
+        <a href="index.html" class="hover:text-brand-500 transition">Settings</a>
+        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"/></svg>
+        <span class="text-gray-900 font-medium">Order & Checkout Rules</span>
+      </nav>
+
+      <!-- Page Header -->
+      <div class="flex items-center justify-between mb-6">
+        <div class="min-w-0">
+          <h1 class="text-2xl font-bold text-gray-900">Order & Checkout Rules</h1>
+          <p class="text-sm text-gray-500 mt-1">Configure order numbering, auto-cancellation, cart limits, checkout flow, fraud prevention, and invoicing</p>
+        </div>
+        <div class="flex items-center gap-3 shrink-0">
+          <button onclick="if(confirm('Discard all unsaved changes?'))location.reload()" class="px-4 py-2.5 text-sm font-medium text-gray-600 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 transition">Discard</button>
+          <button onclick="saveConfig()" class="px-5 py-2.5 bg-brand-500 text-white text-sm font-semibold rounded-lg hover:bg-brand-600 transition shadow-sm flex items-center gap-2">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4.5 12.75l6 6 9-13.5"/></svg>
+            Save Changes
+          </button>
+        </div>
+      </div>
+
+      <!-- ===== SECTION 1: ORDER NUMBERING ===== -->
+      <div class="bg-white rounded-xl border border-gray-200 shadow-sm mb-6">
+        <div class="px-6 py-4 border-b border-gray-100">
+          <h2 class="text-lg font-bold text-gray-900">Order Numbering</h2>
+          <p class="text-sm text-gray-500 mt-0.5">Format and sequence configuration for order identifiers</p>
+        </div>
+        <div class="p-6 space-y-6">
+          <div class="grid grid-cols-3 gap-6">
+            <div>
+              <label class="text-sm font-medium text-gray-700 mb-1 block">Order Prefix</label>
+              <input type="text" value="HB-" class="w-full border border-gray-200 rounded-lg px-4 py-2.5 text-sm outline-none focus:border-brand-400 focus:ring-2 focus:ring-brand-100 transition font-mono">
+              <p class="text-xs text-gray-400 mt-1">Prepended to every order number</p>
+            </div>
+            <div>
+              <label class="text-sm font-medium text-gray-700 mb-1 block">Number Format</label>
+              <select class="w-full border border-gray-200 rounded-lg px-4 py-2.5 text-sm outline-none focus:border-brand-400 focus:ring-2 focus:ring-brand-100 transition bg-white">
+                <option selected>Sequential (HB-00001)</option>
+                <option>Date-based (HB-20260402-001)</option>
+                <option>Random (HB-A7X9K2)</option>
+              </select>
+              <p class="text-xs text-gray-400 mt-1">How the numeric part is generated</p>
+            </div>
+            <div>
+              <label class="text-sm font-medium text-gray-700 mb-1 block">Starting Number</label>
+              <input type="number" value="10001" class="w-full border border-gray-200 rounded-lg px-4 py-2.5 text-sm outline-none focus:border-brand-400 focus:ring-2 focus:ring-brand-100 transition">
+              <p class="text-xs text-gray-400 mt-1">Next order starts from this number</p>
+            </div>
+          </div>
+          <div class="bg-gray-50 rounded-lg p-4 border border-gray-100">
+            <p class="text-xs text-gray-500"><span class="font-semibold text-gray-600">Preview:</span> <span class="font-mono text-brand-600">HB-10001</span>, <span class="font-mono text-brand-600">HB-10002</span>, <span class="font-mono text-brand-600">HB-10003</span> ...</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== SECTION 2: AUTO-CANCEL RULES ===== -->
+      <div class="bg-white rounded-xl border border-gray-200 shadow-sm mb-6">
+        <div class="px-6 py-4 border-b border-gray-100">
+          <h2 class="text-lg font-bold text-gray-900">Auto-Cancellation Rules</h2>
+          <p class="text-sm text-gray-500 mt-0.5">Automated order cancellation triggers to prevent stale orders</p>
+        </div>
+        <div class="p-6 space-y-5">
+          <div class="flex items-center justify-between py-3 px-4 rounded-lg border border-gray-100">
+            <div class="flex items-center gap-3">
+              <div class="w-9 h-9 rounded-lg bg-red-50 flex items-center justify-center">
+                <svg class="w-4 h-4 text-red-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+              </div>
+              <div>
+                <p class="text-sm font-semibold text-gray-900">Cancel Unpaid Orders</p>
+                <p class="text-xs text-gray-500">Pending payment orders auto-cancelled after timeout</p>
+              </div>
+            </div>
+            <div class="flex items-center gap-3">
+              <input type="number" value="48" class="w-20 border border-gray-200 rounded-lg px-3 py-2 text-sm text-center">
+              <span class="text-sm text-gray-500">hours</span>
+              <button onclick="toggleSwitch(this)" class="relative inline-flex h-6 w-11 items-center rounded-full toggle-track bg-green-500" data-on="true">
+                <span class="toggle-knob inline-block h-4 w-4 rounded-full bg-white shadow translate-x-6"></span>
+              </button>
+            </div>
+          </div>
+          <div class="flex items-center justify-between py-3 px-4 rounded-lg border border-gray-100">
+            <div class="flex items-center gap-3">
+              <div class="w-9 h-9 rounded-lg bg-yellow-50 flex items-center justify-center">
+                <svg class="w-4 h-4 text-yellow-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M8.25 18.75a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m3 0h6m-9 0H3.375a1.125 1.125 0 01-1.125-1.125V14.25m17.25 4.5a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m3 0H6.375m11.25 3V7.5"/></svg>
+              </div>
+              <div>
+                <p class="text-sm font-semibold text-gray-900">Cancel Unshipped Orders</p>
+                <p class="text-xs text-gray-500">Confirmed but not shipped within deadline</p>
+              </div>
+            </div>
+            <div class="flex items-center gap-3">
+              <input type="number" value="5" class="w-20 border border-gray-200 rounded-lg px-3 py-2 text-sm text-center">
+              <span class="text-sm text-gray-500">days</span>
+              <button onclick="toggleSwitch(this)" class="relative inline-flex h-6 w-11 items-center rounded-full toggle-track bg-green-500" data-on="true">
+                <span class="toggle-knob inline-block h-4 w-4 rounded-full bg-white shadow translate-x-6"></span>
+              </button>
+            </div>
+          </div>
+          <div class="flex items-center justify-between py-3 px-4 rounded-lg border border-gray-100">
+            <div class="flex items-center gap-3">
+              <div class="w-9 h-9 rounded-lg bg-purple-50 flex items-center justify-center">
+                <svg class="w-4 h-4 text-purple-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M15.75 10.5V6a3.75 3.75 0 10-7.5 0v4.5m11.356-1.993l1.263 12c.07.665-.45 1.243-1.119 1.243H4.25a1.125 1.125 0 01-1.12-1.243l1.264-12A1.125 1.125 0 015.513 7.5h12.974c.576 0 1.059.435 1.119 1.007z"/></svg>
+              </div>
+              <div>
+                <p class="text-sm font-semibold text-gray-900">Seller Confirmation Deadline</p>
+                <p class="text-xs text-gray-500">Auto-cancel if seller does not confirm acceptance</p>
+              </div>
+            </div>
+            <div class="flex items-center gap-3">
+              <input type="number" value="24" class="w-20 border border-gray-200 rounded-lg px-3 py-2 text-sm text-center">
+              <span class="text-sm text-gray-500">hours</span>
+              <button onclick="toggleSwitch(this)" class="relative inline-flex h-6 w-11 items-center rounded-full toggle-track bg-green-500" data-on="true">
+                <span class="toggle-knob inline-block h-4 w-4 rounded-full bg-white shadow translate-x-6"></span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== SECTION 3: CART RULES ===== -->
+      <div class="bg-white rounded-xl border border-gray-200 shadow-sm mb-6">
+        <div class="px-6 py-4 border-b border-gray-100">
+          <h2 class="text-lg font-bold text-gray-900">Cart Rules</h2>
+          <p class="text-sm text-gray-500 mt-0.5">Shopping cart limits and constraints</p>
+        </div>
+        <div class="p-6 space-y-6">
+          <div class="grid grid-cols-3 gap-6">
+            <div>
+              <label class="text-sm font-medium text-gray-700 mb-1 block">Max Items in Cart</label>
+              <input type="number" value="50" class="w-full border border-gray-200 rounded-lg px-4 py-2.5 text-sm outline-none focus:border-brand-400 focus:ring-2 focus:ring-brand-100 transition">
+              <p class="text-xs text-gray-400 mt-1">Maximum unique products in cart</p>
+            </div>
+            <div>
+              <label class="text-sm font-medium text-gray-700 mb-1 block">Max Quantity per Item</label>
+              <input type="number" value="10" class="w-full border border-gray-200 rounded-lg px-4 py-2.5 text-sm outline-none focus:border-brand-400 focus:ring-2 focus:ring-brand-100 transition">
+              <p class="text-xs text-gray-400 mt-1">Max qty of single product per order</p>
+            </div>
+            <div>
+              <label class="text-sm font-medium text-gray-700 mb-1 block">Minimum Order Value</label>
+              <div class="flex items-center">
+                <span class="inline-flex items-center px-3 py-2.5 border border-r-0 border-gray-200 rounded-l-lg bg-gray-50 text-sm text-gray-500">&#8377;</span>
+                <input type="number" value="0" class="w-full border border-gray-200 rounded-r-lg px-4 py-2.5 text-sm outline-none focus:border-brand-400 focus:ring-2 focus:ring-brand-100 transition">
+              </div>
+              <p class="text-xs text-gray-400 mt-1">0 = no minimum required</p>
+            </div>
+          </div>
+          <div class="grid grid-cols-2 gap-6">
+            <div>
+              <label class="text-sm font-medium text-gray-700 mb-1 block">Cart Expiry</label>
+              <div class="flex items-center gap-2">
+                <input type="number" value="7" class="w-full border border-gray-200 rounded-lg px-4 py-2.5 text-sm outline-none focus:border-brand-400 focus:ring-2 focus:ring-brand-100 transition">
+                <span class="text-sm text-gray-500 whitespace-nowrap">days</span>
+              </div>
+              <p class="text-xs text-gray-400 mt-1">Inactive carts cleared after this period</p>
+            </div>
+            <div>
+              <label class="text-sm font-medium text-gray-700 mb-1 block">Stock Reservation Timeout</label>
+              <div class="flex items-center gap-2">
+                <input type="number" value="30" class="w-full border border-gray-200 rounded-lg px-4 py-2.5 text-sm outline-none focus:border-brand-400 focus:ring-2 focus:ring-brand-100 transition">
+                <span class="text-sm text-gray-500 whitespace-nowrap">minutes</span>
+              </div>
+              <p class="text-xs text-gray-400 mt-1">Reserved stock released if checkout not completed</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== SECTION 4: CHECKOUT SETTINGS ===== -->
+      <div class="bg-white rounded-xl border border-gray-200 shadow-sm mb-6">
+        <div class="px-6 py-4 border-b border-gray-100">
+          <h2 class="text-lg font-bold text-gray-900">Checkout Settings</h2>
+          <p class="text-sm text-gray-500 mt-0.5">Checkout flow configuration and verification requirements</p>
+        </div>
+        <div class="p-6 space-y-4">
+          <div class="flex items-center justify-between py-3 px-4 rounded-lg border border-gray-100">
+            <div>
+              <span class="text-sm font-medium text-gray-700">Guest Checkout</span>
+              <p class="text-xs text-gray-400 mt-0.5">Allow purchases without creating an account</p>
+            </div>
+            <button onclick="toggleSwitch(this)" class="relative inline-flex h-6 w-11 items-center rounded-full toggle-track bg-gray-200" data-on="false">
+              <span class="toggle-knob inline-block h-4 w-4 rounded-full bg-white shadow translate-x-1"></span>
+            </button>
+          </div>
+          <div class="flex items-center justify-between py-3 px-4 rounded-lg border border-gray-100">
+            <div>
+              <span class="text-sm font-medium text-gray-700">Address Verification Required</span>
+              <p class="text-xs text-gray-400 mt-0.5">Validate delivery address via pin code + city cross-check</p>
+            </div>
+            <button onclick="toggleSwitch(this)" class="relative inline-flex h-6 w-11 items-center rounded-full toggle-track bg-green-500" data-on="true">
+              <span class="toggle-knob inline-block h-4 w-4 rounded-full bg-white shadow translate-x-6"></span>
+            </button>
+          </div>
+          <div class="flex items-center justify-between py-3 px-4 rounded-lg border border-gray-100">
+            <div>
+              <span class="text-sm font-medium text-gray-700">OTP Verification for COD</span>
+              <p class="text-xs text-gray-400 mt-0.5">Send OTP to phone number before placing COD orders</p>
+            </div>
+            <button onclick="toggleSwitch(this)" class="relative inline-flex h-6 w-11 items-center rounded-full toggle-track bg-green-500" data-on="true">
+              <span class="toggle-knob inline-block h-4 w-4 rounded-full bg-white shadow translate-x-6"></span>
+            </button>
+          </div>
+          <div class="flex items-center justify-between py-3 px-4 rounded-lg border border-gray-100">
+            <div>
+              <span class="text-sm font-medium text-gray-700">Show Estimated Delivery</span>
+              <p class="text-xs text-gray-400 mt-0.5">Display delivery date estimate on checkout page</p>
+            </div>
+            <button onclick="toggleSwitch(this)" class="relative inline-flex h-6 w-11 items-center rounded-full toggle-track bg-green-500" data-on="true">
+              <span class="toggle-knob inline-block h-4 w-4 rounded-full bg-white shadow translate-x-6"></span>
+            </button>
+          </div>
+          <div class="flex items-center justify-between py-3 px-4 rounded-lg border border-gray-100">
+            <div>
+              <span class="text-sm font-medium text-gray-700">Allow Multiple Sellers in One Order</span>
+              <p class="text-xs text-gray-400 mt-0.5">Cart can contain products from different sellers</p>
+            </div>
+            <button onclick="toggleSwitch(this)" class="relative inline-flex h-6 w-11 items-center rounded-full toggle-track bg-green-500" data-on="true">
+              <span class="toggle-knob inline-block h-4 w-4 rounded-full bg-white shadow translate-x-6"></span>
+            </button>
+          </div>
+          <div class="flex items-center justify-between py-3 px-4 rounded-lg border border-gray-100">
+            <div>
+              <span class="text-sm font-medium text-gray-700">Require Phone Number</span>
+              <p class="text-xs text-gray-400 mt-0.5">Phone number mandatory for order placement</p>
+            </div>
+            <button onclick="toggleSwitch(this)" class="relative inline-flex h-6 w-11 items-center rounded-full toggle-track bg-green-500" data-on="true">
+              <span class="toggle-knob inline-block h-4 w-4 rounded-full bg-white shadow translate-x-6"></span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== SECTION 5: FRAUD PREVENTION RULES ===== -->
+      <div class="bg-white rounded-xl border border-gray-200 shadow-sm mb-6">
+        <div class="px-6 py-4 border-b border-gray-100">
+          <h2 class="text-lg font-bold text-gray-900">Fraud Prevention Rules</h2>
+          <p class="text-sm text-gray-500 mt-0.5">Automated fraud detection triggers to protect the platform</p>
+        </div>
+        <div class="p-6 space-y-5">
+          <!-- Rule 1: Failed Payments -->
+          <div class="py-3 px-4 rounded-lg border border-gray-100">
+            <div class="flex items-center justify-between mb-3">
+              <div class="flex items-center gap-3">
+                <div class="w-8 h-8 rounded-lg bg-red-50 flex items-center justify-center">
+                  <svg class="w-4 h-4 text-red-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z"/></svg>
+                </div>
+                <span class="text-sm font-semibold text-gray-900">Block on Failed Payments</span>
+              </div>
+              <button onclick="toggleSwitch(this)" class="relative inline-flex h-6 w-11 items-center rounded-full toggle-track bg-green-500" data-on="true">
+                <span class="toggle-knob inline-block h-4 w-4 rounded-full bg-white shadow translate-x-6"></span>
+              </button>
+            </div>
+            <div class="grid grid-cols-2 gap-4 ml-11">
+              <div>
+                <label class="text-xs text-gray-500 mb-1 block">Max Failed Attempts</label>
+                <input type="number" value="3" class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm">
+              </div>
+              <div>
+                <label class="text-xs text-gray-500 mb-1 block">Within Window</label>
+                <div class="flex items-center gap-2">
+                  <input type="number" value="1" class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm">
+                  <span class="text-xs text-gray-500">hour</span>
+                </div>
+              </div>
+            </div>
+            <p class="text-xs text-gray-400 mt-2 ml-11">Account temporarily blocked from placing orders</p>
+          </div>
+          <!-- Rule 2: COD RTO Block -->
+          <div class="py-3 px-4 rounded-lg border border-gray-100">
+            <div class="flex items-center justify-between mb-3">
+              <div class="flex items-center gap-3">
+                <div class="w-8 h-8 rounded-lg bg-yellow-50 flex items-center justify-center">
+                  <svg class="w-4 h-4 text-yellow-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 15L3 9m0 0l6-6M3 9h12a6 6 0 010 12h-3"/></svg>
+                </div>
+                <span class="text-sm font-semibold text-gray-900">Block COD on High RTO</span>
+              </div>
+              <button onclick="toggleSwitch(this)" class="relative inline-flex h-6 w-11 items-center rounded-full toggle-track bg-green-500" data-on="true">
+                <span class="toggle-knob inline-block h-4 w-4 rounded-full bg-white shadow translate-x-6"></span>
+              </button>
+            </div>
+            <div class="grid grid-cols-2 gap-4 ml-11">
+              <div>
+                <label class="text-xs text-gray-500 mb-1 block">Max RTO (Return to Origin)</label>
+                <input type="number" value="2" class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm">
+              </div>
+              <div>
+                <label class="text-xs text-gray-500 mb-1 block">Within Window</label>
+                <div class="flex items-center gap-2">
+                  <input type="number" value="30" class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm">
+                  <span class="text-xs text-gray-500">days</span>
+                </div>
+              </div>
+            </div>
+            <p class="text-xs text-gray-400 mt-2 ml-11">COD disabled for customer, prepaid-only enforced</p>
+          </div>
+          <!-- Rule 3: New Account Limit -->
+          <div class="py-3 px-4 rounded-lg border border-gray-100">
+            <div class="flex items-center justify-between mb-3">
+              <div class="flex items-center gap-3">
+                <div class="w-8 h-8 rounded-lg bg-blue-50 flex items-center justify-center">
+                  <svg class="w-4 h-4 text-blue-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0"/></svg>
+                </div>
+                <span class="text-sm font-semibold text-gray-900">New Account Order Limit</span>
+              </div>
+              <button onclick="toggleSwitch(this)" class="relative inline-flex h-6 w-11 items-center rounded-full toggle-track bg-green-500" data-on="true">
+                <span class="toggle-knob inline-block h-4 w-4 rounded-full bg-white shadow translate-x-6"></span>
+              </button>
+            </div>
+            <div class="grid grid-cols-2 gap-4 ml-11">
+              <div>
+                <label class="text-xs text-gray-500 mb-1 block">Max Order Value</label>
+                <div class="flex items-center">
+                  <span class="inline-flex items-center px-2 py-2 border border-r-0 border-gray-200 rounded-l-lg bg-gray-50 text-xs text-gray-500">&#8377;</span>
+                  <input type="number" value="25000" class="w-full border border-gray-200 rounded-r-lg px-3 py-2 text-sm">
+                </div>
+              </div>
+              <div>
+                <label class="text-xs text-gray-500 mb-1 block">New Account Period</label>
+                <div class="flex items-center gap-2">
+                  <input type="number" value="30" class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm">
+                  <span class="text-xs text-gray-500">days</span>
+                </div>
+              </div>
+            </div>
+            <p class="text-xs text-gray-400 mt-2 ml-11">Accounts less than 30 days old cannot exceed this order value</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== SECTION 6: INVOICE CONFIGURATION ===== -->
+      <div class="bg-white rounded-xl border border-gray-200 shadow-sm mb-6">
+        <div class="px-6 py-4 border-b border-gray-100">
+          <h2 class="text-lg font-bold text-gray-900">Invoice Configuration</h2>
+          <p class="text-sm text-gray-500 mt-0.5">Auto-generation, numbering, and tax display settings for invoices</p>
+        </div>
+        <div class="p-6 space-y-6">
+          <div class="space-y-4">
+            <div class="flex items-center justify-between">
+              <div>
+                <span class="text-sm font-medium text-gray-700">Auto-Generate Invoice</span>
+                <p class="text-xs text-gray-400 mt-0.5">Automatically create invoice when order is confirmed</p>
+              </div>
+              <button onclick="toggleSwitch(this)" class="relative inline-flex h-6 w-11 items-center rounded-full toggle-track bg-green-500" data-on="true">
+                <span class="toggle-knob inline-block h-4 w-4 rounded-full bg-white shadow translate-x-6"></span>
+              </button>
+            </div>
+            <div class="flex items-center justify-between">
+              <div>
+                <span class="text-sm font-medium text-gray-700">Show GST on Invoice</span>
+                <p class="text-xs text-gray-400 mt-0.5">Display CGST, SGST/IGST breakup on all invoices</p>
+              </div>
+              <button onclick="toggleSwitch(this)" class="relative inline-flex h-6 w-11 items-center rounded-full toggle-track bg-green-500" data-on="true">
+                <span class="toggle-knob inline-block h-4 w-4 rounded-full bg-white shadow translate-x-6"></span>
+              </button>
+            </div>
+            <div class="flex items-center justify-between">
+              <div>
+                <span class="text-sm font-medium text-gray-700">Show HSN Codes on Invoice</span>
+                <p class="text-xs text-gray-400 mt-0.5">Include Harmonized System Nomenclature codes per line item</p>
+              </div>
+              <button onclick="toggleSwitch(this)" class="relative inline-flex h-6 w-11 items-center rounded-full toggle-track bg-green-500" data-on="true">
+                <span class="toggle-knob inline-block h-4 w-4 rounded-full bg-white shadow translate-x-6"></span>
+              </button>
+            </div>
+          </div>
+          <div class="border-t border-gray-100 pt-5">
+            <div class="grid grid-cols-2 gap-6">
+              <div>
+                <label class="text-sm font-medium text-gray-700 mb-1 block">Invoice Prefix</label>
+                <input type="text" value="INV-" class="w-full border border-gray-200 rounded-lg px-4 py-2.5 text-sm outline-none focus:border-brand-400 focus:ring-2 focus:ring-brand-100 transition font-mono">
+                <p class="text-xs text-gray-400 mt-1">Prepended to every invoice number</p>
+              </div>
+              <div>
+                <label class="text-sm font-medium text-gray-700 mb-1 block">Invoice Starting Number</label>
+                <input type="number" value="100001" class="w-full border border-gray-200 rounded-lg px-4 py-2.5 text-sm outline-none focus:border-brand-400 focus:ring-2 focus:ring-brand-100 transition">
+                <p class="text-xs text-gray-400 mt-1">Next invoice starts from this number</p>
+              </div>
+            </div>
+          </div>
+          <div class="bg-gray-50 rounded-lg p-4 border border-gray-100">
+            <p class="text-xs text-gray-500"><span class="font-semibold text-gray-600">Preview:</span> <span class="font-mono text-brand-600">INV-100001</span> for order <span class="font-mono text-brand-600">HB-10001</span></p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Bottom Save -->
+      <div class="flex justify-end gap-3 mt-2 mb-4">
+        <button onclick="if(confirm('Discard all unsaved changes?'))location.reload()" class="px-4 py-2.5 text-sm font-medium text-gray-600 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 transition">Discard</button>
+        <button onclick="saveConfig()" class="px-5 py-2.5 bg-brand-500 text-white text-sm font-semibold rounded-lg hover:bg-brand-600 transition shadow-sm flex items-center gap-2">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4.5 12.75l6 6 9-13.5"/></svg>
+          Save Changes
+        </button>
+      </div>
+
+    </main>
+  </div>
+
+<script>
+  function toggleSwitch(btn) {
+    var isOn = btn.dataset.on === 'true';
+    if (isOn) {
+      btn.dataset.on = 'false';
+      btn.classList.remove('bg-green-500');
+      btn.classList.add('bg-gray-200');
+      btn.querySelector('.toggle-knob').classList.remove('translate-x-6');
+      btn.querySelector('.toggle-knob').classList.add('translate-x-1');
+    } else {
+      btn.dataset.on = 'true';
+      btn.classList.remove('bg-gray-200');
+      btn.classList.add('bg-green-500');
+      btn.querySelector('.toggle-knob').classList.remove('translate-x-1');
+      btn.querySelector('.toggle-knob').classList.add('translate-x-6');
+    }
+  }
+
+  function saveConfig() {
+    alert('Order & checkout rules saved successfully!');
+  }
+</script>
+
+<script src="../shared-layout.js"></script>
+<script>renderAdminLayout('settings', '../');</script>
+</body>
+</html>

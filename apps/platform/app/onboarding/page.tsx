@@ -1,7 +1,7 @@
 'use client';
 
-import { OnboardingList } from '@/features/supplier/ui';
+import { OnboardingPage } from '@/features/onboarding/components';
 
-export default function OnboardingPage() {
-  return <OnboardingList />;
+export default function OnboardingRoute() {
+  return <OnboardingPage />;
 }

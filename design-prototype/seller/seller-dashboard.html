@@ -1,0 +1,707 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HomeBase — Seller Dashboard</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              50: '#FFF7ED',
+              100: '#FFEDD5',
+              200: '#FED7AA',
+              300: '#FDBA74',
+              400: '#FB923C',
+              500: '#F97316',
+              600: '#EA580C',
+              700: '#C2410C',
+            },
+            navy: {
+              700: '#1E3A5F',
+              800: '#1A2E4A',
+              900: '#0F1B2D',
+            },
+            success: '#16A34A',
+            warning: '#EAB308',
+            danger: '#DC2626',
+          },
+          fontFamily: {
+            sans: ['Inter', 'system-ui', 'sans-serif'],
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+    .scrollbar-hide::-webkit-scrollbar { display: none; }
+    .sidebar-link { transition: all 0.15s ease; }
+    .sidebar-link:hover { background: rgba(255,255,255,0.08); }
+    .sidebar-link.active { background: rgba(249,115,22,0.15); border-right: 3px solid #F97316; }
+    .stat-card { transition: all 0.2s ease; }
+    .stat-card:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,0.08); }
+    .chart-gradient { background: linear-gradient(180deg, rgba(249,115,22,0.12) 0%, rgba(249,115,22,0.02) 100%); }
+    .revenue-gradient { background: linear-gradient(135deg, #F97316 0%, #EA580C 100%); }
+    .table-row { transition: background 0.15s ease; }
+    .table-row:hover { background: #FFF7ED; }
+    .product-card { transition: all 0.2s ease; }
+    .product-card:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(0,0,0,0.08); }
+    .action-card { transition: all 0.2s ease; }
+    .action-card:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(0,0,0,0.06); }
+    .dropdown-menu { display: none; }
+    .dropdown:hover .dropdown-menu { display: block; }
+
+    /* Custom scrollbar for sidebar */
+    .sidebar-scroll::-webkit-scrollbar { width: 4px; }
+    .sidebar-scroll::-webkit-scrollbar-track { background: transparent; }
+    .sidebar-scroll::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); border-radius: 2px; }
+  </style>
+</head>
+<body class="font-sans bg-gray-50 text-gray-900">
+
+  <!-- ===== TOP HEADER BAR ===== -->
+  <header id="seller-header" class="fixed top-0 left-0 right-0 z-50 bg-white border-b border-gray-200 h-16"></header>
+
+  <!-- ===== LAYOUT: SIDEBAR + MAIN ===== -->
+  <div class="flex pt-16 min-h-screen">
+
+    <!-- ===== LEFT SIDEBAR ===== -->
+    <aside id="seller-sidebar" class="fixed left-0 top-16 bottom-0 w-60 z-40 flex flex-col overflow-y-auto" style="background:#0F1B2D;"></aside>
+
+    <!-- ===== MAIN CONTENT ===== -->
+    <main class="flex-1 ml-60 p-6">
+
+      <!-- Welcome Banner -->
+      <div class="revenue-gradient rounded-2xl p-6 mb-6 relative overflow-hidden">
+        <div class="absolute right-0 top-0 w-72 h-72 bg-white/5 rounded-full -translate-y-1/2 translate-x-1/4"></div>
+        <div class="absolute right-32 bottom-0 w-48 h-48 bg-white/5 rounded-full translate-y-1/3"></div>
+        <div class="relative z-10">
+          <div class="flex items-center justify-between">
+            <div>
+              <p class="text-orange-200 text-sm">Friday, 28 March 2026</p>
+              <h1 class="text-2xl font-bold text-white mt-1">Good Morning, Rajesh!</h1>
+              <p class="text-orange-100 text-sm mt-1.5">Here's what's happening with your store today.</p>
+            </div>
+            <div class="hidden md:flex items-center gap-3">
+              <button class="bg-white/15 backdrop-blur-sm text-white text-sm font-medium px-4 py-2 rounded-lg hover:bg-white/25 transition border border-white/20">
+                Download Report
+              </button>
+              <button class="bg-white text-brand-600 text-sm font-semibold px-4 py-2 rounded-lg hover:bg-orange-50 transition">
+                View Analytics
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Stats Cards Row -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 mb-6">
+        <!-- Total Revenue -->
+        <div class="stat-card bg-white rounded-xl p-5 border border-gray-100 shadow-sm">
+          <div class="flex items-center justify-between mb-3">
+            <div class="w-10 h-10 rounded-lg bg-brand-50 flex items-center justify-center">
+              <svg class="w-5 h-5 text-brand-500" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M2.25 18.75a60.07 60.07 0 0115.797 2.101c.727.198 1.453-.342 1.453-1.096V18.75M3.75 4.5v.75A.75.75 0 013 6h-.75m0 0v-.375c0-.621.504-1.125 1.125-1.125H20.25M2.25 6v9m18-10.5v.75c0 .414.336.75.75.75h.75m-1.5-1.5h.375c.621 0 1.125.504 1.125 1.125v9.75c0 .621-.504 1.125-1.125 1.125h-.375m1.5-1.5H21a.75.75 0 00-.75.75v.75m0 0H3.75m0 0h-.375a1.125 1.125 0 01-1.125-1.125V15m1.5 1.5v-.75A.75.75 0 003 15h-.75M15 10.5a3 3 0 11-6 0 3 3 0 016 0zm3 0h.008v.008H18V10.5zm-12 0h.008v.008H6V10.5z"/></svg>
+            </div>
+            <span class="flex items-center gap-1 text-xs font-semibold text-success bg-green-50 px-2 py-1 rounded-full">
+              <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M4.5 19.5l15-15m0 0H8.25m11.25 0v11.25"/></svg>
+              +12.5%
+            </span>
+          </div>
+          <p class="text-2xl font-bold text-navy-900">&#8377;4,52,890</p>
+          <p class="text-xs text-gray-400 mt-1">Total Revenue</p>
+          <div class="mt-3 h-1 bg-gray-100 rounded-full overflow-hidden">
+            <div class="h-full bg-brand-500 rounded-full" style="width: 75%"></div>
+          </div>
+        </div>
+
+        <!-- Total Orders -->
+        <div class="stat-card bg-white rounded-xl p-5 border border-gray-100 shadow-sm">
+          <div class="flex items-center justify-between mb-3">
+            <div class="w-10 h-10 rounded-lg bg-blue-50 flex items-center justify-center">
+              <svg class="w-5 h-5 text-blue-500" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M15.75 10.5V6a3.75 3.75 0 10-7.5 0v4.5m11.356-1.993l1.263 12c.07.665-.45 1.243-1.119 1.243H4.25a1.125 1.125 0 01-1.12-1.243l1.264-12A1.125 1.125 0 015.513 7.5h12.974c.576 0 1.059.435 1.119 1.007zM8.625 10.5a.375.375 0 11-.75 0 .375.375 0 01.75 0zm7.5 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z"/></svg>
+            </div>
+            <span class="flex items-center gap-1 text-xs font-semibold text-success bg-green-50 px-2 py-1 rounded-full">
+              <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M4.5 19.5l15-15m0 0H8.25m11.25 0v11.25"/></svg>
+              +8.2%
+            </span>
+          </div>
+          <p class="text-2xl font-bold text-navy-900">1,234</p>
+          <p class="text-xs text-gray-400 mt-1">Total Orders</p>
+          <div class="mt-3 h-1 bg-gray-100 rounded-full overflow-hidden">
+            <div class="h-full bg-blue-500 rounded-full" style="width: 62%"></div>
+          </div>
+        </div>
+
+        <!-- Products Listed -->
+        <div class="stat-card bg-white rounded-xl p-5 border border-gray-100 shadow-sm">
+          <div class="flex items-center justify-between mb-3">
+            <div class="w-10 h-10 rounded-lg bg-purple-50 flex items-center justify-center">
+              <svg class="w-5 h-5 text-purple-500" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M20.25 7.5l-.625 10.632a2.25 2.25 0 01-2.247 2.118H6.622a2.25 2.25 0 01-2.247-2.118L3.75 7.5M10 11.25h4M3.375 7.5h17.25c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125z"/></svg>
+            </div>
+            <span class="text-xs font-medium text-gray-400 bg-gray-50 px-2 py-1 rounded-full">Active</span>
+          </div>
+          <p class="text-2xl font-bold text-navy-900">89</p>
+          <p class="text-xs text-gray-400 mt-1">Products Listed</p>
+          <div class="mt-3 h-1 bg-gray-100 rounded-full overflow-hidden">
+            <div class="h-full bg-purple-500 rounded-full" style="width: 45%"></div>
+          </div>
+        </div>
+
+        <!-- Customer Rating -->
+        <div class="stat-card bg-white rounded-xl p-5 border border-gray-100 shadow-sm">
+          <div class="flex items-center justify-between mb-3">
+            <div class="w-10 h-10 rounded-lg bg-yellow-50 flex items-center justify-center">
+              <svg class="w-5 h-5 text-yellow-500" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+            </div>
+            <div class="flex items-center gap-0.5 text-yellow-400 text-sm">
+              <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+              <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+              <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+              <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+              <svg class="w-3.5 h-3.5 text-gray-200" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+            </div>
+          </div>
+          <p class="text-2xl font-bold text-navy-900">4.6<span class="text-base font-normal text-gray-400">/5</span></p>
+          <p class="text-xs text-gray-400 mt-1">Customer Rating</p>
+          <div class="mt-3 h-1 bg-gray-100 rounded-full overflow-hidden">
+            <div class="h-full bg-yellow-400 rounded-full" style="width: 92%"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Revenue Chart + Pending Actions -->
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
+        <!-- Revenue Chart (Placeholder) -->
+        <div class="lg:col-span-2 bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden">
+          <div class="flex items-center justify-between p-5 border-b border-gray-100">
+            <div>
+              <h3 class="text-base font-semibold text-navy-900">Revenue Overview</h3>
+              <p class="text-xs text-gray-400 mt-0.5">Monthly revenue for the current year</p>
+            </div>
+            <div class="flex items-center gap-2">
+              <button class="text-xs font-medium text-gray-500 bg-gray-50 px-3 py-1.5 rounded-lg hover:bg-gray-100 transition">Weekly</button>
+              <button class="text-xs font-medium text-white bg-brand-500 px-3 py-1.5 rounded-lg">Monthly</button>
+              <button class="text-xs font-medium text-gray-500 bg-gray-50 px-3 py-1.5 rounded-lg hover:bg-gray-100 transition">Yearly</button>
+            </div>
+          </div>
+          <div class="p-5">
+            <!-- Chart Placeholder -->
+            <div class="chart-gradient rounded-xl h-64 relative flex items-end justify-between px-4 pb-4 pt-8">
+              <!-- Y-axis labels -->
+              <div class="absolute left-0 top-4 bottom-4 flex flex-col justify-between text-[10px] text-gray-400 pl-2">
+                <span>5L</span>
+                <span>4L</span>
+                <span>3L</span>
+                <span>2L</span>
+                <span>1L</span>
+                <span>0</span>
+              </div>
+              <!-- Bars -->
+              <div class="flex-1 flex items-end justify-between gap-2 ml-6">
+                <div class="flex flex-col items-center gap-1 flex-1">
+                  <div class="w-full bg-brand-200 rounded-t-md" style="height: 40%"></div>
+                  <span class="text-[10px] text-gray-400">Jan</span>
+                </div>
+                <div class="flex flex-col items-center gap-1 flex-1">
+                  <div class="w-full bg-brand-200 rounded-t-md" style="height: 55%"></div>
+                  <span class="text-[10px] text-gray-400">Feb</span>
+                </div>
+                <div class="flex flex-col items-center gap-1 flex-1">
+                  <div class="w-full bg-brand-300 rounded-t-md" style="height: 65%"></div>
+                  <span class="text-[10px] text-gray-400">Mar</span>
+                </div>
+                <div class="flex flex-col items-center gap-1 flex-1">
+                  <div class="w-full bg-brand-300 rounded-t-md" style="height: 50%"></div>
+                  <span class="text-[10px] text-gray-400">Apr</span>
+                </div>
+                <div class="flex flex-col items-center gap-1 flex-1">
+                  <div class="w-full bg-brand-300 rounded-t-md" style="height: 72%"></div>
+                  <span class="text-[10px] text-gray-400">May</span>
+                </div>
+                <div class="flex flex-col items-center gap-1 flex-1">
+                  <div class="w-full bg-brand-400 rounded-t-md" style="height: 60%"></div>
+                  <span class="text-[10px] text-gray-400">Jun</span>
+                </div>
+                <div class="flex flex-col items-center gap-1 flex-1">
+                  <div class="w-full bg-brand-400 rounded-t-md" style="height: 78%"></div>
+                  <span class="text-[10px] text-gray-400">Jul</span>
+                </div>
+                <div class="flex flex-col items-center gap-1 flex-1">
+                  <div class="w-full bg-brand-400 rounded-t-md" style="height: 68%"></div>
+                  <span class="text-[10px] text-gray-400">Aug</span>
+                </div>
+                <div class="flex flex-col items-center gap-1 flex-1">
+                  <div class="w-full bg-brand-500 rounded-t-md" style="height: 85%"></div>
+                  <span class="text-[10px] text-gray-400">Sep</span>
+                </div>
+                <div class="flex flex-col items-center gap-1 flex-1">
+                  <div class="w-full bg-brand-500 rounded-t-md" style="height: 90%"></div>
+                  <span class="text-[10px] text-gray-400">Oct</span>
+                </div>
+                <div class="flex flex-col items-center gap-1 flex-1">
+                  <div class="w-full bg-brand-500 rounded-t-md" style="height: 80%"></div>
+                  <span class="text-[10px] text-gray-400">Nov</span>
+                </div>
+                <div class="flex flex-col items-center gap-1 flex-1">
+                  <div class="w-full bg-brand-600 rounded-t-md" style="height: 95%"></div>
+                  <span class="text-[10px] text-gray-400">Dec</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Pending Actions -->
+        <div class="bg-white rounded-xl border border-gray-100 shadow-sm">
+          <div class="p-5 border-b border-gray-100">
+            <h3 class="text-base font-semibold text-navy-900">Pending Actions</h3>
+            <p class="text-xs text-gray-400 mt-0.5">Items requiring your attention</p>
+          </div>
+          <div class="p-4 space-y-3">
+            <!-- Orders to Ship -->
+            <div class="action-card flex items-center gap-3 p-3.5 bg-orange-50 rounded-xl border border-orange-100 cursor-pointer">
+              <div class="w-10 h-10 rounded-lg bg-brand-500 flex items-center justify-center shrink-0">
+                <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M8.25 18.75a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m3 0h6m-9 0H3.375a1.125 1.125 0 01-1.125-1.125V14.25m17.25 4.5a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m3 0H6.375m11.25 3V7.5a.375.375 0 00-.375-.375H14.25m0 0V3h4.5a.375.375 0 01.375.375v3.75m-4.875 0h4.875"/></svg>
+              </div>
+              <div class="flex-1 min-w-0">
+                <p class="text-sm font-semibold text-navy-900">3 Orders to Ship</p>
+                <p class="text-xs text-gray-500 mt-0.5">Dispatch before end of day</p>
+              </div>
+              <svg class="w-4 h-4 text-gray-400 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M8.25 4.5l7.5 7.5-7.5 7.5"/></svg>
+            </div>
+
+            <!-- Low Stock -->
+            <div class="action-card flex items-center gap-3 p-3.5 bg-red-50 rounded-xl border border-red-100 cursor-pointer">
+              <div class="w-10 h-10 rounded-lg bg-danger flex items-center justify-center shrink-0">
+                <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z"/></svg>
+              </div>
+              <div class="flex-1 min-w-0">
+                <p class="text-sm font-semibold text-navy-900">5 Products Low Stock</p>
+                <p class="text-xs text-gray-500 mt-0.5">Restock to avoid order cancellations</p>
+              </div>
+              <svg class="w-4 h-4 text-gray-400 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M8.25 4.5l7.5 7.5-7.5 7.5"/></svg>
+            </div>
+
+            <!-- Customer Queries -->
+            <div class="action-card flex items-center gap-3 p-3.5 bg-blue-50 rounded-xl border border-blue-100 cursor-pointer">
+              <div class="w-10 h-10 rounded-lg bg-blue-500 flex items-center justify-center shrink-0">
+                <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M20.25 8.511c.884.284 1.5 1.128 1.5 2.097v4.286c0 1.136-.847 2.1-1.98 2.193-.34.027-.68.052-1.02.072v3.091l-3-3c-1.354 0-2.694-.055-4.02-.163a2.115 2.115 0 01-.825-.242m9.345-8.334a2.126 2.126 0 00-.476-.095 48.64 48.64 0 00-8.048 0c-1.131.094-1.976 1.057-1.976 2.192v4.286c0 .837.46 1.58 1.155 1.951m9.345-8.334V6.637c0-1.621-1.152-3.026-2.76-3.235A48.455 48.455 0 0011.25 3c-2.115 0-4.198.137-6.24.402-1.608.209-2.76 1.614-2.76 3.235v6.226c0 1.621 1.152 3.026 2.76 3.235.577.075 1.157.14 1.74.194V21l4.155-4.155"/></svg>
+              </div>
+              <div class="flex-1 min-w-0">
+                <p class="text-sm font-semibold text-navy-900">2 Customer Queries</p>
+                <p class="text-xs text-gray-500 mt-0.5">Respond within 24 hours</p>
+              </div>
+              <svg class="w-4 h-4 text-gray-400 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M8.25 4.5l7.5 7.5-7.5 7.5"/></svg>
+            </div>
+
+            <!-- Quick Summary -->
+            <div class="mt-4 pt-4 border-t border-gray-100">
+              <div class="flex items-center justify-between text-xs">
+                <span class="text-gray-400">Response Rate</span>
+                <span class="font-semibold text-success">98.2%</span>
+              </div>
+              <div class="mt-2 h-1.5 bg-gray-100 rounded-full overflow-hidden">
+                <div class="h-full bg-success rounded-full" style="width: 98.2%"></div>
+              </div>
+              <div class="flex items-center justify-between text-xs mt-3">
+                <span class="text-gray-400">Dispatch SLA</span>
+                <span class="font-semibold text-brand-500">96.5%</span>
+              </div>
+              <div class="mt-2 h-1.5 bg-gray-100 rounded-full overflow-hidden">
+                <div class="h-full bg-brand-500 rounded-full" style="width: 96.5%"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Recent Orders Table -->
+      <div class="bg-white rounded-xl border border-gray-100 shadow-sm mb-6">
+        <div class="flex items-center justify-between p-5 border-b border-gray-100">
+          <div>
+            <h3 class="text-base font-semibold text-navy-900">Recent Orders</h3>
+            <p class="text-xs text-gray-400 mt-0.5">Latest orders from your store</p>
+          </div>
+          <div class="flex items-center gap-3">
+            <div class="relative">
+              <svg class="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+              <input type="text" placeholder="Search orders..." class="bg-gray-50 border border-gray-200 rounded-lg py-1.5 pl-8 pr-3 text-xs outline-none focus:border-brand-400 focus:ring-1 focus:ring-brand-100 w-40">
+            </div>
+            <button class="flex items-center gap-1.5 text-xs font-medium text-gray-500 bg-gray-50 px-3 py-1.5 rounded-lg hover:bg-gray-100 transition border border-gray-200">
+              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M12 3c2.755 0 5.455.232 8.083.678.533.09.917.556.917 1.096v1.044a2.25 2.25 0 01-.659 1.591l-5.432 5.432a2.25 2.25 0 00-.659 1.591v2.927a2.25 2.25 0 01-1.244 2.013L9.75 21v-6.568a2.25 2.25 0 00-.659-1.591L3.659 7.409A2.25 2.25 0 013 5.818V4.774c0-.54.384-1.006.917-1.096A48.32 48.32 0 0112 3z"/></svg>
+              Filter
+            </button>
+            <a href="seller-orders.html" class="text-xs font-medium text-brand-500 hover:text-brand-600">View All</a>
+          </div>
+        </div>
+        <div class="overflow-x-auto">
+          <table class="w-full">
+            <thead>
+              <tr class="bg-gray-50/80">
+                <th class="text-left text-[11px] font-semibold text-gray-500 uppercase tracking-wider px-5 py-3">Order ID</th>
+                <th class="text-left text-[11px] font-semibold text-gray-500 uppercase tracking-wider px-5 py-3">Customer</th>
+                <th class="text-left text-[11px] font-semibold text-gray-500 uppercase tracking-wider px-5 py-3">Product</th>
+                <th class="text-right text-[11px] font-semibold text-gray-500 uppercase tracking-wider px-5 py-3">Amount</th>
+                <th class="text-center text-[11px] font-semibold text-gray-500 uppercase tracking-wider px-5 py-3">Status</th>
+                <th class="text-right text-[11px] font-semibold text-gray-500 uppercase tracking-wider px-5 py-3">Date</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-50">
+              <!-- Row 1 -->
+              <tr class="table-row">
+                <td class="px-5 py-3.5">
+                  <span class="text-sm font-mono font-medium text-brand-600">#HB-78234</span>
+                </td>
+                <td class="px-5 py-3.5">
+                  <div class="flex items-center gap-2.5">
+                    <div class="w-7 h-7 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 text-xs font-bold shrink-0">AK</div>
+                    <span class="text-sm text-gray-800 font-medium">Ankit Kumar</span>
+                  </div>
+                </td>
+                <td class="px-5 py-3.5">
+                  <span class="text-sm text-gray-600">Wireless Bluetooth Speaker</span>
+                </td>
+                <td class="px-5 py-3.5 text-right">
+                  <span class="text-sm font-semibold text-navy-900">&#8377;3,499</span>
+                </td>
+                <td class="px-5 py-3.5 text-center">
+                  <span class="inline-flex items-center gap-1 text-[11px] font-semibold text-green-700 bg-green-50 px-2.5 py-1 rounded-full border border-green-100">
+                    <span class="w-1.5 h-1.5 rounded-full bg-green-500"></span>
+                    Delivered
+                  </span>
+                </td>
+                <td class="px-5 py-3.5 text-right">
+                  <span class="text-sm text-gray-500">27 Mar 2026</span>
+                </td>
+              </tr>
+              <!-- Row 2 -->
+              <tr class="table-row">
+                <td class="px-5 py-3.5">
+                  <span class="text-sm font-mono font-medium text-brand-600">#HB-78233</span>
+                </td>
+                <td class="px-5 py-3.5">
+                  <div class="flex items-center gap-2.5">
+                    <div class="w-7 h-7 rounded-full bg-purple-100 flex items-center justify-center text-purple-600 text-xs font-bold shrink-0">PS</div>
+                    <span class="text-sm text-gray-800 font-medium">Priya Sharma</span>
+                  </div>
+                </td>
+                <td class="px-5 py-3.5">
+                  <span class="text-sm text-gray-600">Cotton Kurti Set (Pack of 3)</span>
+                </td>
+                <td class="px-5 py-3.5 text-right">
+                  <span class="text-sm font-semibold text-navy-900">&#8377;1,899</span>
+                </td>
+                <td class="px-5 py-3.5 text-center">
+                  <span class="inline-flex items-center gap-1 text-[11px] font-semibold text-blue-700 bg-blue-50 px-2.5 py-1 rounded-full border border-blue-100">
+                    <span class="w-1.5 h-1.5 rounded-full bg-blue-500"></span>
+                    Shipped
+                  </span>
+                </td>
+                <td class="px-5 py-3.5 text-right">
+                  <span class="text-sm text-gray-500">27 Mar 2026</span>
+                </td>
+              </tr>
+              <!-- Row 3 -->
+              <tr class="table-row">
+                <td class="px-5 py-3.5">
+                  <span class="text-sm font-mono font-medium text-brand-600">#HB-78232</span>
+                </td>
+                <td class="px-5 py-3.5">
+                  <div class="flex items-center gap-2.5">
+                    <div class="w-7 h-7 rounded-full bg-orange-100 flex items-center justify-center text-orange-600 text-xs font-bold shrink-0">RG</div>
+                    <span class="text-sm text-gray-800 font-medium">Rohit Gupta</span>
+                  </div>
+                </td>
+                <td class="px-5 py-3.5">
+                  <span class="text-sm text-gray-600">Smart LED Desk Lamp</span>
+                </td>
+                <td class="px-5 py-3.5 text-right">
+                  <span class="text-sm font-semibold text-navy-900">&#8377;2,199</span>
+                </td>
+                <td class="px-5 py-3.5 text-center">
+                  <span class="inline-flex items-center gap-1 text-[11px] font-semibold text-orange-700 bg-orange-50 px-2.5 py-1 rounded-full border border-orange-100">
+                    <span class="w-1.5 h-1.5 rounded-full bg-orange-500"></span>
+                    Processing
+                  </span>
+                </td>
+                <td class="px-5 py-3.5 text-right">
+                  <span class="text-sm text-gray-500">26 Mar 2026</span>
+                </td>
+              </tr>
+              <!-- Row 4 -->
+              <tr class="table-row">
+                <td class="px-5 py-3.5">
+                  <span class="text-sm font-mono font-medium text-brand-600">#HB-78231</span>
+                </td>
+                <td class="px-5 py-3.5">
+                  <div class="flex items-center gap-2.5">
+                    <div class="w-7 h-7 rounded-full bg-green-100 flex items-center justify-center text-green-600 text-xs font-bold shrink-0">NJ</div>
+                    <span class="text-sm text-gray-800 font-medium">Neha Joshi</span>
+                  </div>
+                </td>
+                <td class="px-5 py-3.5">
+                  <span class="text-sm text-gray-600">Yoga Mat Premium (6mm)</span>
+                </td>
+                <td class="px-5 py-3.5 text-right">
+                  <span class="text-sm font-semibold text-navy-900">&#8377;1,299</span>
+                </td>
+                <td class="px-5 py-3.5 text-center">
+                  <span class="inline-flex items-center gap-1 text-[11px] font-semibold text-green-700 bg-green-50 px-2.5 py-1 rounded-full border border-green-100">
+                    <span class="w-1.5 h-1.5 rounded-full bg-green-500"></span>
+                    Delivered
+                  </span>
+                </td>
+                <td class="px-5 py-3.5 text-right">
+                  <span class="text-sm text-gray-500">26 Mar 2026</span>
+                </td>
+              </tr>
+              <!-- Row 5 -->
+              <tr class="table-row">
+                <td class="px-5 py-3.5">
+                  <span class="text-sm font-mono font-medium text-brand-600">#HB-78230</span>
+                </td>
+                <td class="px-5 py-3.5">
+                  <div class="flex items-center gap-2.5">
+                    <div class="w-7 h-7 rounded-full bg-red-100 flex items-center justify-center text-red-600 text-xs font-bold shrink-0">VM</div>
+                    <span class="text-sm text-gray-800 font-medium">Vikram Mehta</span>
+                  </div>
+                </td>
+                <td class="px-5 py-3.5">
+                  <span class="text-sm text-gray-600">Stainless Steel Water Bottle</span>
+                </td>
+                <td class="px-5 py-3.5 text-right">
+                  <span class="text-sm font-semibold text-navy-900">&#8377;899</span>
+                </td>
+                <td class="px-5 py-3.5 text-center">
+                  <span class="inline-flex items-center gap-1 text-[11px] font-semibold text-red-700 bg-red-50 px-2.5 py-1 rounded-full border border-red-100">
+                    <span class="w-1.5 h-1.5 rounded-full bg-red-500"></span>
+                    Cancelled
+                  </span>
+                </td>
+                <td class="px-5 py-3.5 text-right">
+                  <span class="text-sm text-gray-500">25 Mar 2026</span>
+                </td>
+              </tr>
+              <!-- Row 6 -->
+              <tr class="table-row">
+                <td class="px-5 py-3.5">
+                  <span class="text-sm font-mono font-medium text-brand-600">#HB-78229</span>
+                </td>
+                <td class="px-5 py-3.5">
+                  <div class="flex items-center gap-2.5">
+                    <div class="w-7 h-7 rounded-full bg-teal-100 flex items-center justify-center text-teal-600 text-xs font-bold shrink-0">SP</div>
+                    <span class="text-sm text-gray-800 font-medium">Sanjay Patel</span>
+                  </div>
+                </td>
+                <td class="px-5 py-3.5">
+                  <span class="text-sm text-gray-600">Organic Green Tea (250g)</span>
+                </td>
+                <td class="px-5 py-3.5 text-right">
+                  <span class="text-sm font-semibold text-navy-900">&#8377;549</span>
+                </td>
+                <td class="px-5 py-3.5 text-center">
+                  <span class="inline-flex items-center gap-1 text-[11px] font-semibold text-blue-700 bg-blue-50 px-2.5 py-1 rounded-full border border-blue-100">
+                    <span class="w-1.5 h-1.5 rounded-full bg-blue-500"></span>
+                    Shipped
+                  </span>
+                </td>
+                <td class="px-5 py-3.5 text-right">
+                  <span class="text-sm text-gray-500">25 Mar 2026</span>
+                </td>
+              </tr>
+              <!-- Row 7 -->
+              <tr class="table-row">
+                <td class="px-5 py-3.5">
+                  <span class="text-sm font-mono font-medium text-brand-600">#HB-78228</span>
+                </td>
+                <td class="px-5 py-3.5">
+                  <div class="flex items-center gap-2.5">
+                    <div class="w-7 h-7 rounded-full bg-pink-100 flex items-center justify-center text-pink-600 text-xs font-bold shrink-0">DR</div>
+                    <span class="text-sm text-gray-800 font-medium">Divya Rao</span>
+                  </div>
+                </td>
+                <td class="px-5 py-3.5">
+                  <span class="text-sm text-gray-600">Handmade Scented Candle Set</span>
+                </td>
+                <td class="px-5 py-3.5 text-right">
+                  <span class="text-sm font-semibold text-navy-900">&#8377;1,699</span>
+                </td>
+                <td class="px-5 py-3.5 text-center">
+                  <span class="inline-flex items-center gap-1 text-[11px] font-semibold text-orange-700 bg-orange-50 px-2.5 py-1 rounded-full border border-orange-100">
+                    <span class="w-1.5 h-1.5 rounded-full bg-orange-500"></span>
+                    Processing
+                  </span>
+                </td>
+                <td class="px-5 py-3.5 text-right">
+                  <span class="text-sm text-gray-500">24 Mar 2026</span>
+                </td>
+              </tr>
+              <!-- Row 8 -->
+              <tr class="table-row">
+                <td class="px-5 py-3.5">
+                  <span class="text-sm font-mono font-medium text-brand-600">#HB-78227</span>
+                </td>
+                <td class="px-5 py-3.5">
+                  <div class="flex items-center gap-2.5">
+                    <div class="w-7 h-7 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-600 text-xs font-bold shrink-0">AV</div>
+                    <span class="text-sm text-gray-800 font-medium">Arjun Verma</span>
+                  </div>
+                </td>
+                <td class="px-5 py-3.5">
+                  <span class="text-sm text-gray-600">USB-C Hub 7-in-1 Adapter</span>
+                </td>
+                <td class="px-5 py-3.5 text-right">
+                  <span class="text-sm font-semibold text-navy-900">&#8377;2,499</span>
+                </td>
+                <td class="px-5 py-3.5 text-center">
+                  <span class="inline-flex items-center gap-1 text-[11px] font-semibold text-green-700 bg-green-50 px-2.5 py-1 rounded-full border border-green-100">
+                    <span class="w-1.5 h-1.5 rounded-full bg-green-500"></span>
+                    Delivered
+                  </span>
+                </td>
+                <td class="px-5 py-3.5 text-right">
+                  <span class="text-sm text-gray-500">24 Mar 2026</span>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <!-- Table Footer / Pagination -->
+        <div class="flex items-center justify-between px-5 py-3.5 border-t border-gray-100">
+          <p class="text-xs text-gray-400">Showing 1 to 8 of 1,234 orders</p>
+          <div class="flex items-center gap-1">
+            <button class="w-8 h-8 rounded-lg border border-gray-200 text-gray-400 flex items-center justify-center hover:bg-gray-50 transition text-xs">
+              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M15.75 19.5L8.25 12l7.5-7.5"/></svg>
+            </button>
+            <button class="w-8 h-8 rounded-lg bg-brand-500 text-white flex items-center justify-center text-xs font-semibold">1</button>
+            <button class="w-8 h-8 rounded-lg border border-gray-200 text-gray-600 flex items-center justify-center hover:bg-gray-50 transition text-xs font-medium">2</button>
+            <button class="w-8 h-8 rounded-lg border border-gray-200 text-gray-600 flex items-center justify-center hover:bg-gray-50 transition text-xs font-medium">3</button>
+            <span class="text-gray-400 text-xs px-1">...</span>
+            <button class="w-8 h-8 rounded-lg border border-gray-200 text-gray-600 flex items-center justify-center hover:bg-gray-50 transition text-xs font-medium">155</button>
+            <button class="w-8 h-8 rounded-lg border border-gray-200 text-gray-400 flex items-center justify-center hover:bg-gray-50 transition text-xs">
+              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M8.25 4.5l7.5 7.5-7.5 7.5"/></svg>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Top Products Section -->
+      <div class="mb-6">
+        <div class="flex items-center justify-between mb-4">
+          <div>
+            <h3 class="text-base font-semibold text-navy-900">Top Selling Products</h3>
+            <p class="text-xs text-gray-400 mt-0.5">Best performers this month</p>
+          </div>
+          <a href="seller-products.html" class="text-xs font-medium text-brand-500 hover:text-brand-600">View All Products</a>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
+          <!-- Product Card 1 -->
+          <div class="product-card bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden">
+            <div class="bg-gradient-to-br from-gray-50 to-gray-100 h-44 flex items-center justify-center relative">
+              <span class="text-6xl">&#127911;</span>
+              <span class="absolute top-3 left-3 bg-brand-500 text-white text-[10px] font-bold px-2.5 py-1 rounded-full">Best Seller</span>
+              <span class="absolute top-3 right-3 bg-white/90 backdrop-blur-sm text-navy-900 text-[10px] font-bold px-2 py-1 rounded-lg shadow-sm">
+                &#9733; 4.8
+              </span>
+            </div>
+            <div class="p-4">
+              <h4 class="text-sm font-semibold text-navy-900 line-clamp-1">Pro Max Wireless Headphone</h4>
+              <p class="text-xs text-gray-400 mt-0.5">Electronics / Audio</p>
+              <div class="flex items-center justify-between mt-3">
+                <span class="text-lg font-bold text-brand-600">&#8377;4,999</span>
+                <div class="text-right">
+                  <p class="text-xs font-semibold text-navy-900">342 sold</p>
+                  <p class="text-[10px] text-gray-400">this month</p>
+                </div>
+              </div>
+              <div class="mt-3 h-1.5 bg-gray-100 rounded-full overflow-hidden">
+                <div class="h-full bg-brand-500 rounded-full" style="width: 85%"></div>
+              </div>
+              <p class="text-[10px] text-gray-400 mt-1">85% of monthly target</p>
+            </div>
+          </div>
+
+          <!-- Product Card 2 -->
+          <div class="product-card bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden">
+            <div class="bg-gradient-to-br from-gray-50 to-gray-100 h-44 flex items-center justify-center relative">
+              <span class="text-6xl">&#128084;</span>
+              <span class="absolute top-3 left-3 bg-blue-500 text-white text-[10px] font-bold px-2.5 py-1 rounded-full">Trending</span>
+              <span class="absolute top-3 right-3 bg-white/90 backdrop-blur-sm text-navy-900 text-[10px] font-bold px-2 py-1 rounded-lg shadow-sm">
+                &#9733; 4.5
+              </span>
+            </div>
+            <div class="p-4">
+              <h4 class="text-sm font-semibold text-navy-900 line-clamp-1">Cotton Kurti Set (Pack of 3)</h4>
+              <p class="text-xs text-gray-400 mt-0.5">Fashion / Women</p>
+              <div class="flex items-center justify-between mt-3">
+                <span class="text-lg font-bold text-brand-600">&#8377;1,899</span>
+                <div class="text-right">
+                  <p class="text-xs font-semibold text-navy-900">278 sold</p>
+                  <p class="text-[10px] text-gray-400">this month</p>
+                </div>
+              </div>
+              <div class="mt-3 h-1.5 bg-gray-100 rounded-full overflow-hidden">
+                <div class="h-full bg-blue-500 rounded-full" style="width: 72%"></div>
+              </div>
+              <p class="text-[10px] text-gray-400 mt-1">72% of monthly target</p>
+            </div>
+          </div>
+
+          <!-- Product Card 3 -->
+          <div class="product-card bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden">
+            <div class="bg-gradient-to-br from-gray-50 to-gray-100 h-44 flex items-center justify-center relative">
+              <span class="text-6xl">&#128161;</span>
+              <span class="absolute top-3 left-3 bg-green-500 text-white text-[10px] font-bold px-2.5 py-1 rounded-full">New</span>
+              <span class="absolute top-3 right-3 bg-white/90 backdrop-blur-sm text-navy-900 text-[10px] font-bold px-2 py-1 rounded-lg shadow-sm">
+                &#9733; 4.7
+              </span>
+            </div>
+            <div class="p-4">
+              <h4 class="text-sm font-semibold text-navy-900 line-clamp-1">Smart LED Desk Lamp</h4>
+              <p class="text-xs text-gray-400 mt-0.5">Home & Living / Lighting</p>
+              <div class="flex items-center justify-between mt-3">
+                <span class="text-lg font-bold text-brand-600">&#8377;2,199</span>
+                <div class="text-right">
+                  <p class="text-xs font-semibold text-navy-900">215 sold</p>
+                  <p class="text-[10px] text-gray-400">this month</p>
+                </div>
+              </div>
+              <div class="mt-3 h-1.5 bg-gray-100 rounded-full overflow-hidden">
+                <div class="h-full bg-green-500 rounded-full" style="width: 64%"></div>
+              </div>
+              <p class="text-[10px] text-gray-400 mt-1">64% of monthly target</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Footer -->
+      <footer class="border-t border-gray-200 pt-5 pb-2 mt-4">
+        <div class="flex items-center justify-between">
+          <div class="flex items-center gap-2">
+            <div class="w-6 h-6 rounded bg-brand-500 flex items-center justify-center">
+              <svg class="w-3.5 h-3.5 text-white" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-4 0a1 1 0 01-1-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 01-1 1"/></svg>
+            </div>
+            <span class="text-xs text-gray-400">HomeBase Seller Hub &copy; 2026. All rights reserved.</span>
+          </div>
+          <div class="flex items-center gap-4">
+            <a href="#" class="text-xs text-gray-400 hover:text-brand-500 transition">Help Center</a>
+            <a href="#" class="text-xs text-gray-400 hover:text-brand-500 transition">Seller Policy</a>
+            <a href="#" class="text-xs text-gray-400 hover:text-brand-500 transition">Privacy</a>
+            <a href="#" class="text-xs text-gray-400 hover:text-brand-500 transition">Terms</a>
+          </div>
+        </div>
+      </footer>
+
+    </main>
+  </div>
+
+  <script src="shared-layout.js"></script>
+  <script>renderSellerLayout('dashboard');</script>
+</body>
+</html>

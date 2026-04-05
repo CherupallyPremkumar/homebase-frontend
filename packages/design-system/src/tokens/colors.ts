@@ -1,35 +1,42 @@
 /**
  * HomeBase brand colors — used by ALL apps.
  * Apps are distinguished by name/icon in header, NOT by color.
+ * Primary: Orange (brand identity, CTAs, buttons)
+ * Navy: Dark backgrounds (sidebars, hero sections)
  */
 export const colors = {
-  // Brand
+  // Brand — Orange primary (matching prototype)
   primary: {
-    50: '#eff6ff',
-    100: '#dbeafe',
-    200: '#bfdbfe',
-    300: '#93c5fd',
-    400: '#60a5fa',
-    500: '#3b82f6',
-    600: '#2563eb',
-    700: '#1d4ed8',
-    800: '#1e40af',
-    900: '#1e3a8a',
-    950: '#172554',
-    DEFAULT: '#2563eb',
+    50: '#FFF7ED',
+    100: '#FFEDD5',
+    200: '#FED7AA',
+    300: '#FDBA74',
+    400: '#FB923C',
+    500: '#F97316',
+    600: '#EA580C',
+    700: '#C2410C',
+    800: '#9A3412',
+    900: '#7C2D12',
+    950: '#431407',
+    DEFAULT: '#F97316',
   },
 
-  // Accent — CTAs, sale badges, highlights
-  accent: {
-    50: '#fffbeb',
-    100: '#fef3c7',
-    200: '#fde68a',
-    300: '#fcd34d',
-    400: '#fbbf24',
-    500: '#f59e0b',
-    600: '#d97706',
-    700: '#b45309',
-    DEFAULT: '#f59e0b',
+  // Navy — dark backgrounds (sidebars, headers, hero)
+  navy: {
+    700: '#1E3A5F',
+    800: '#1A2E4A',
+    900: '#0F1B2D',
+    DEFAULT: '#0F1B2D',
+  },
+
+  // Admin — darker navy for platform admin
+  admin: {
+    DEFAULT: '#0A1628',
+  },
+
+  // Warehouse — dark teal for warehouse app
+  warehouse: {
+    DEFAULT: '#0F2027',
   },
 
   // Semantic

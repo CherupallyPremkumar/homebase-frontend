@@ -14,7 +14,8 @@
     "e2e:storefront": "playwright test --project=storefront",
     "e2e:seller": "playwright test --project=seller",
     "e2e:backoffice": "playwright test --project=backoffice",
-    "e2e:platform": "playwright test --project=platform"
+    "e2e:platform": "playwright test --project=platform",
+    "e2e:audit": "playwright test --project=audit"
   },
   "devDependencies": {
     "@playwright/test": "^1.58.2",

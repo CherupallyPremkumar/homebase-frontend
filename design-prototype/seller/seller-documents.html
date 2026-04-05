@@ -1,0 +1,592 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HomeBase — Seller Documents</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              50: '#FFF7ED',
+              100: '#FFEDD5',
+              200: '#FED7AA',
+              300: '#FDBA74',
+              400: '#FB923C',
+              500: '#F97316',
+              600: '#EA580C',
+              700: '#C2410C',
+            },
+            navy: {
+              700: '#1E3A5F',
+              800: '#1A2E4A',
+              900: '#0F1B2D',
+            },
+            success: '#16A34A',
+            warning: '#EAB308',
+            danger: '#DC2626',
+          },
+          fontFamily: {
+            sans: ['Inter', 'system-ui', 'sans-serif'],
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+    .scrollbar-hide::-webkit-scrollbar { display: none; }
+    .sidebar-link { transition: all 0.15s ease; }
+    .sidebar-link:hover { background: rgba(255,255,255,0.08); }
+    .sidebar-link.active { background: rgba(249,115,22,0.15); border-right: 3px solid #F97316; }
+    .doc-card { transition: all 0.2s ease; }
+    .doc-card:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,0.08); }
+    .tab-btn { transition: all 0.15s ease; }
+    .tab-btn.active { color: #F97316; border-color: #F97316; }
+    .dropdown-menu { display: none; }
+    .dropdown:hover .dropdown-menu { display: block; }
+    .drag-zone { transition: all 0.2s ease; }
+    .drag-zone:hover { border-color: #F97316; background: #FFF7ED; }
+    .drag-zone.dragover { border-color: #F97316; background: #FFF7ED; transform: scale(1.01); }
+
+    /* Custom scrollbar for sidebar */
+    .sidebar-scroll::-webkit-scrollbar { width: 4px; }
+    .sidebar-scroll::-webkit-scrollbar-track { background: transparent; }
+    .sidebar-scroll::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); border-radius: 2px; }
+  </style>
+</head>
+<body class="font-sans bg-gray-50 text-gray-900">
+
+  <!-- ===== TOP HEADER BAR ===== -->
+  <header id="seller-header" class="fixed top-0 left-0 right-0 z-50 bg-white border-b border-gray-200 h-16"></header>
+
+  <!-- ===== LAYOUT: SIDEBAR + MAIN ===== -->
+  <div class="flex pt-16 min-h-screen">
+
+    <!-- ===== LEFT SIDEBAR ===== -->
+    <aside id="seller-sidebar" class="fixed left-0 top-16 bottom-0 w-60 z-40 flex flex-col overflow-y-auto" style="background:#0F1B2D;"></aside>
+
+    <!-- ===== MAIN CONTENT ===== -->
+    <main class="flex-1 ml-60 p-6">
+
+      <!-- Page Header -->
+      <div class="flex items-center justify-between mb-6">
+        <div>
+          <h1 class="text-2xl font-bold text-navy-900">Documents</h1>
+          <p class="text-sm text-gray-400 mt-1">Manage your business verification documents and compliance records</p>
+        </div>
+        <button onclick="document.getElementById('uploadSection').scrollIntoView({behavior:'smooth'})" class="flex items-center gap-2 bg-brand-500 hover:bg-brand-600 text-white text-sm font-semibold px-5 py-2.5 rounded-lg transition shadow-sm">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5m-13.5-9L12 3m0 0l4.5 4.5M12 3v13.5"/></svg>
+          Upload Document
+        </button>
+      </div>
+
+      <!-- Document Stats Summary -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 mb-6">
+        <!-- Total Documents -->
+        <div class="doc-card bg-white rounded-xl p-5 border border-gray-100 shadow-sm">
+          <div class="flex items-center justify-between mb-3">
+            <div class="w-10 h-10 rounded-lg bg-blue-50 flex items-center justify-center">
+              <svg class="w-5 h-5 text-blue-500" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m2.25 0H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z"/></svg>
+            </div>
+          </div>
+          <p class="text-2xl font-bold text-navy-900">5</p>
+          <p class="text-xs text-gray-400 mt-1">Total Documents</p>
+        </div>
+        <!-- Verified -->
+        <div class="doc-card bg-white rounded-xl p-5 border border-gray-100 shadow-sm">
+          <div class="flex items-center justify-between mb-3">
+            <div class="w-10 h-10 rounded-lg bg-green-50 flex items-center justify-center">
+              <svg class="w-5 h-5 text-success" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+            </div>
+          </div>
+          <p class="text-2xl font-bold text-success">3</p>
+          <p class="text-xs text-gray-400 mt-1">Verified</p>
+        </div>
+        <!-- Pending -->
+        <div class="doc-card bg-white rounded-xl p-5 border border-gray-100 shadow-sm">
+          <div class="flex items-center justify-between mb-3">
+            <div class="w-10 h-10 rounded-lg bg-orange-50 flex items-center justify-center">
+              <svg class="w-5 h-5 text-brand-500" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+            </div>
+          </div>
+          <p class="text-2xl font-bold text-brand-500">1</p>
+          <p class="text-xs text-gray-400 mt-1">Pending Review</p>
+        </div>
+        <!-- Expired -->
+        <div class="doc-card bg-white rounded-xl p-5 border border-gray-100 shadow-sm">
+          <div class="flex items-center justify-between mb-3">
+            <div class="w-10 h-10 rounded-lg bg-red-50 flex items-center justify-center">
+              <svg class="w-5 h-5 text-danger" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z"/></svg>
+            </div>
+          </div>
+          <p class="text-2xl font-bold text-danger">1</p>
+          <p class="text-xs text-gray-400 mt-1">Expired</p>
+        </div>
+      </div>
+
+      <!-- Category Tabs -->
+      <div class="bg-white rounded-xl border border-gray-100 shadow-sm mb-6">
+        <div class="border-b border-gray-100 px-5">
+          <div class="flex items-center gap-1 overflow-x-auto scrollbar-hide -mb-px">
+            <button onclick="filterDocs('all')" class="tab-btn active text-sm font-medium px-4 py-3.5 border-b-2 border-brand-500 text-brand-500 whitespace-nowrap" data-tab="all">
+              All Documents
+              <span class="ml-1.5 bg-gray-100 text-gray-600 text-[10px] font-bold rounded-full px-2 py-0.5">5</span>
+            </button>
+            <button onclick="filterDocs('business')" class="tab-btn text-sm font-medium px-4 py-3.5 border-b-2 border-transparent text-gray-500 hover:text-gray-700 whitespace-nowrap" data-tab="business">
+              Business Registration
+            </button>
+            <button onclick="filterDocs('tax')" class="tab-btn text-sm font-medium px-4 py-3.5 border-b-2 border-transparent text-gray-500 hover:text-gray-700 whitespace-nowrap" data-tab="tax">
+              Tax Documents
+            </button>
+            <button onclick="filterDocs('bank')" class="tab-btn text-sm font-medium px-4 py-3.5 border-b-2 border-transparent text-gray-500 hover:text-gray-700 whitespace-nowrap" data-tab="bank">
+              Bank Verification
+            </button>
+            <button onclick="filterDocs('identity')" class="tab-btn text-sm font-medium px-4 py-3.5 border-b-2 border-transparent text-gray-500 hover:text-gray-700 whitespace-nowrap" data-tab="identity">
+              Identity Proof
+            </button>
+          </div>
+        </div>
+
+        <!-- Documents List -->
+        <div class="p-5">
+          <div class="space-y-4" id="documentsList">
+
+            <!-- Document 1: GST Registration Certificate -->
+            <div class="doc-card flex items-center gap-4 p-4 bg-white rounded-xl border border-gray-100 hover:border-gray-200" data-category="tax">
+              <!-- File Icon -->
+              <div class="w-12 h-14 rounded-lg bg-red-50 border border-red-100 flex flex-col items-center justify-center shrink-0">
+                <svg class="w-6 h-6 text-red-500" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m2.25 0H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z"/></svg>
+                <span class="text-[8px] font-bold text-red-500 mt-0.5 uppercase">PDF</span>
+              </div>
+              <!-- Details -->
+              <div class="flex-1 min-w-0">
+                <div class="flex items-center gap-2.5">
+                  <h4 class="text-sm font-semibold text-navy-900">GST Registration Certificate</h4>
+                  <span class="inline-flex items-center gap-1 text-[10px] font-semibold text-green-700 bg-green-50 px-2 py-0.5 rounded-full border border-green-100">
+                    <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                    Verified
+                  </span>
+                </div>
+                <div class="flex items-center gap-4 mt-1.5">
+                  <span class="text-xs text-gray-400 flex items-center gap-1">
+                    <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5"/></svg>
+                    Uploaded 15 Jan 2024
+                  </span>
+                  <span class="text-xs text-gray-400 flex items-center gap-1">
+                    <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m2.25 0H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z"/></svg>
+                    245 KB
+                  </span>
+                  <span class="text-xs text-gray-400">GSTIN: 29ABCDE1234F1Z5</span>
+                </div>
+              </div>
+              <!-- Actions -->
+              <div class="flex items-center gap-2 shrink-0">
+                <button class="flex items-center gap-1.5 text-xs font-medium text-gray-600 bg-gray-50 hover:bg-gray-100 px-3 py-2 rounded-lg transition border border-gray-200" title="View">
+                  <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z"/><path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                  View
+                </button>
+                <button class="flex items-center gap-1.5 text-xs font-medium text-gray-600 bg-gray-50 hover:bg-gray-100 px-3 py-2 rounded-lg transition border border-gray-200" title="Download">
+                  <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3"/></svg>
+                  Download
+                </button>
+                <button class="flex items-center gap-1.5 text-xs font-medium text-brand-600 bg-brand-50 hover:bg-brand-100 px-3 py-2 rounded-lg transition border border-brand-200" title="Replace">
+                  <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182"/></svg>
+                  Replace
+                </button>
+              </div>
+            </div>
+
+            <!-- Document 2: PAN Card -->
+            <div class="doc-card flex items-center gap-4 p-4 bg-white rounded-xl border border-gray-100 hover:border-gray-200" data-category="identity">
+              <div class="w-12 h-14 rounded-lg bg-red-50 border border-red-100 flex flex-col items-center justify-center shrink-0">
+                <svg class="w-6 h-6 text-red-500" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m2.25 0H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z"/></svg>
+                <span class="text-[8px] font-bold text-red-500 mt-0.5 uppercase">PDF</span>
+              </div>
+              <div class="flex-1 min-w-0">
+                <div class="flex items-center gap-2.5">
+                  <h4 class="text-sm font-semibold text-navy-900">PAN Card</h4>
+                  <span class="inline-flex items-center gap-1 text-[10px] font-semibold text-green-700 bg-green-50 px-2 py-0.5 rounded-full border border-green-100">
+                    <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                    Verified
+                  </span>
+                </div>
+                <div class="flex items-center gap-4 mt-1.5">
+                  <span class="text-xs text-gray-400 flex items-center gap-1">
+                    <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5"/></svg>
+                    Uploaded 15 Jan 2024
+                  </span>
+                  <span class="text-xs text-gray-400 flex items-center gap-1">
+                    <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m2.25 0H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z"/></svg>
+                    180 KB
+                  </span>
+                  <span class="text-xs text-gray-400">PAN: ABCDE1234F</span>
+                </div>
+              </div>
+              <div class="flex items-center gap-2 shrink-0">
+                <button class="flex items-center gap-1.5 text-xs font-medium text-gray-600 bg-gray-50 hover:bg-gray-100 px-3 py-2 rounded-lg transition border border-gray-200" title="View">
+                  <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z"/><path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                  View
+                </button>
+                <button class="flex items-center gap-1.5 text-xs font-medium text-gray-600 bg-gray-50 hover:bg-gray-100 px-3 py-2 rounded-lg transition border border-gray-200" title="Download">
+                  <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3"/></svg>
+                  Download
+                </button>
+                <button class="flex items-center gap-1.5 text-xs font-medium text-brand-600 bg-brand-50 hover:bg-brand-100 px-3 py-2 rounded-lg transition border border-brand-200" title="Replace">
+                  <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182"/></svg>
+                  Replace
+                </button>
+              </div>
+            </div>
+
+            <!-- Document 3: Business Registration -->
+            <div class="doc-card flex items-center gap-4 p-4 bg-white rounded-xl border border-gray-100 hover:border-gray-200" data-category="business">
+              <div class="w-12 h-14 rounded-lg bg-red-50 border border-red-100 flex flex-col items-center justify-center shrink-0">
+                <svg class="w-6 h-6 text-red-500" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m2.25 0H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z"/></svg>
+                <span class="text-[8px] font-bold text-red-500 mt-0.5 uppercase">PDF</span>
+              </div>
+              <div class="flex-1 min-w-0">
+                <div class="flex items-center gap-2.5">
+                  <h4 class="text-sm font-semibold text-navy-900">Business Registration Certificate</h4>
+                  <span class="inline-flex items-center gap-1 text-[10px] font-semibold text-green-700 bg-green-50 px-2 py-0.5 rounded-full border border-green-100">
+                    <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                    Verified
+                  </span>
+                </div>
+                <div class="flex items-center gap-4 mt-1.5">
+                  <span class="text-xs text-gray-400 flex items-center gap-1">
+                    <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5"/></svg>
+                    Uploaded 12 Jan 2024
+                  </span>
+                  <span class="text-xs text-gray-400 flex items-center gap-1">
+                    <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m2.25 0H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z"/></svg>
+                    512 KB
+                  </span>
+                  <span class="text-xs text-gray-400">CIN: U74120KA2020PTC123456</span>
+                </div>
+              </div>
+              <div class="flex items-center gap-2 shrink-0">
+                <button class="flex items-center gap-1.5 text-xs font-medium text-gray-600 bg-gray-50 hover:bg-gray-100 px-3 py-2 rounded-lg transition border border-gray-200" title="View">
+                  <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z"/><path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                  View
+                </button>
+                <button class="flex items-center gap-1.5 text-xs font-medium text-gray-600 bg-gray-50 hover:bg-gray-100 px-3 py-2 rounded-lg transition border border-gray-200" title="Download">
+                  <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3"/></svg>
+                  Download
+                </button>
+                <button class="flex items-center gap-1.5 text-xs font-medium text-brand-600 bg-brand-50 hover:bg-brand-100 px-3 py-2 rounded-lg transition border border-brand-200" title="Replace">
+                  <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182"/></svg>
+                  Replace
+                </button>
+              </div>
+            </div>
+
+            <!-- Document 4: Bank Statement — Pending Review -->
+            <div class="doc-card flex items-center gap-4 p-4 bg-orange-50/50 rounded-xl border border-orange-100" data-category="bank">
+              <div class="w-12 h-14 rounded-lg bg-red-50 border border-red-100 flex flex-col items-center justify-center shrink-0">
+                <svg class="w-6 h-6 text-red-500" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m2.25 0H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z"/></svg>
+                <span class="text-[8px] font-bold text-red-500 mt-0.5 uppercase">PDF</span>
+              </div>
+              <div class="flex-1 min-w-0">
+                <div class="flex items-center gap-2.5">
+                  <h4 class="text-sm font-semibold text-navy-900">Bank Statement</h4>
+                  <span class="inline-flex items-center gap-1 text-[10px] font-semibold text-orange-700 bg-orange-50 px-2 py-0.5 rounded-full border border-orange-200">
+                    <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                    Pending Review
+                  </span>
+                </div>
+                <div class="flex items-center gap-4 mt-1.5">
+                  <span class="text-xs text-gray-400 flex items-center gap-1">
+                    <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5"/></svg>
+                    Uploaded 20 Mar 2026
+                  </span>
+                  <span class="text-xs text-gray-400 flex items-center gap-1">
+                    <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m2.25 0H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z"/></svg>
+                    1.2 MB
+                  </span>
+                  <span class="text-xs text-orange-500 font-medium">Estimated review: 2-3 business days</span>
+                </div>
+              </div>
+              <div class="flex items-center gap-2 shrink-0">
+                <button class="flex items-center gap-1.5 text-xs font-medium text-gray-600 bg-white hover:bg-gray-50 px-3 py-2 rounded-lg transition border border-gray-200" title="View">
+                  <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z"/><path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                  View
+                </button>
+                <button class="flex items-center gap-1.5 text-xs font-medium text-gray-600 bg-white hover:bg-gray-50 px-3 py-2 rounded-lg transition border border-gray-200" title="Download">
+                  <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3"/></svg>
+                  Download
+                </button>
+                <button class="flex items-center gap-1.5 text-xs font-medium text-brand-600 bg-brand-50 hover:bg-brand-100 px-3 py-2 rounded-lg transition border border-brand-200" title="Replace">
+                  <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182"/></svg>
+                  Replace
+                </button>
+              </div>
+            </div>
+
+            <!-- Document 5: Trade License — Expired -->
+            <div class="doc-card flex items-center gap-4 p-4 bg-red-50/50 rounded-xl border border-red-100" data-category="business">
+              <div class="w-12 h-14 rounded-lg bg-red-50 border border-red-100 flex flex-col items-center justify-center shrink-0">
+                <svg class="w-6 h-6 text-red-500" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m2.25 0H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z"/></svg>
+                <span class="text-[8px] font-bold text-red-500 mt-0.5 uppercase">PDF</span>
+              </div>
+              <div class="flex-1 min-w-0">
+                <div class="flex items-center gap-2.5">
+                  <h4 class="text-sm font-semibold text-navy-900">Trade License</h4>
+                  <span class="inline-flex items-center gap-1 text-[10px] font-semibold text-red-700 bg-red-50 px-2 py-0.5 rounded-full border border-red-200">
+                    <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z"/></svg>
+                    Expired
+                  </span>
+                </div>
+                <div class="flex items-center gap-4 mt-1.5">
+                  <span class="text-xs text-gray-400 flex items-center gap-1">
+                    <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5"/></svg>
+                    Uploaded 10 Jan 2023
+                  </span>
+                  <span class="text-xs text-gray-400 flex items-center gap-1">
+                    <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m2.25 0H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z"/></svg>
+                    320 KB
+                  </span>
+                  <span class="text-xs text-red-500 font-medium">Expired on 10 Jan 2024 -- Renewal required</span>
+                </div>
+              </div>
+              <div class="flex items-center gap-2 shrink-0">
+                <button class="flex items-center gap-1.5 text-xs font-medium text-gray-600 bg-white hover:bg-gray-50 px-3 py-2 rounded-lg transition border border-gray-200" title="View">
+                  <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z"/><path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                  View
+                </button>
+                <button class="flex items-center gap-1.5 text-xs font-medium text-gray-600 bg-white hover:bg-gray-50 px-3 py-2 rounded-lg transition border border-gray-200" title="Download">
+                  <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3"/></svg>
+                  Download
+                </button>
+                <button class="flex items-center gap-1.5 text-xs font-medium text-white bg-danger hover:bg-red-700 px-3 py-2 rounded-lg transition" title="Upload Renewed">
+                  <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5m-13.5-9L12 3m0 0l4.5 4.5M12 3v13.5"/></svg>
+                  Upload Renewed
+                </button>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+      <!-- Upload Section + Compliance Status -->
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
+
+        <!-- Upload New Document -->
+        <div class="lg:col-span-2 bg-white rounded-xl border border-gray-100 shadow-sm" id="uploadSection">
+          <div class="p-5 border-b border-gray-100">
+            <h3 class="text-base font-semibold text-navy-900">Upload New Document</h3>
+            <p class="text-xs text-gray-400 mt-0.5">Upload your business verification documents for review</p>
+          </div>
+          <div class="p-5">
+            <!-- Document Type Selector -->
+            <div class="mb-5">
+              <label class="block text-sm font-medium text-gray-700 mb-2">Document Type</label>
+              <select class="w-full bg-gray-50 border border-gray-200 rounded-lg py-2.5 px-4 text-sm outline-none focus:border-brand-400 focus:ring-2 focus:ring-brand-100 transition text-gray-700">
+                <option value="">Select document type...</option>
+                <option value="gst">GST Registration Certificate</option>
+                <option value="pan">PAN Card</option>
+                <option value="business_reg">Business Registration Certificate</option>
+                <option value="bank_statement">Bank Statement / Cancelled Cheque</option>
+                <option value="trade_license">Trade License</option>
+                <option value="identity">Identity Proof (Aadhaar / Passport / Voter ID)</option>
+                <option value="address">Address Proof</option>
+                <option value="other">Other</option>
+              </select>
+            </div>
+
+            <!-- Drag & Drop Zone -->
+            <div class="drag-zone border-2 border-dashed border-gray-200 rounded-xl p-8 text-center cursor-pointer"
+                 id="dropZone"
+                 ondragover="event.preventDefault(); this.classList.add('dragover')"
+                 ondragleave="this.classList.remove('dragover')"
+                 ondrop="event.preventDefault(); this.classList.remove('dragover')"
+                 onclick="document.getElementById('fileInput').click()">
+              <input type="file" id="fileInput" class="hidden" accept=".pdf,.jpg,.jpeg,.png" multiple>
+              <div class="w-14 h-14 rounded-xl bg-brand-50 flex items-center justify-center mx-auto mb-4">
+                <svg class="w-7 h-7 text-brand-500" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5m-13.5-9L12 3m0 0l4.5 4.5M12 3v13.5"/></svg>
+              </div>
+              <p class="text-sm font-semibold text-navy-900 mb-1">Drag and drop files here, or click to browse</p>
+              <p class="text-xs text-gray-400 mb-4">Supported formats: PDF, JPG, PNG</p>
+              <div class="flex items-center justify-center gap-6">
+                <div class="flex items-center gap-2">
+                  <!-- PDF icon -->
+                  <div class="w-8 h-8 rounded-lg bg-red-50 flex items-center justify-center">
+                    <span class="text-[9px] font-bold text-red-500">PDF</span>
+                  </div>
+                  <!-- JPG icon -->
+                  <div class="w-8 h-8 rounded-lg bg-blue-50 flex items-center justify-center">
+                    <span class="text-[9px] font-bold text-blue-500">JPG</span>
+                  </div>
+                  <!-- PNG icon -->
+                  <div class="w-8 h-8 rounded-lg bg-purple-50 flex items-center justify-center">
+                    <span class="text-[9px] font-bold text-purple-500">PNG</span>
+                  </div>
+                </div>
+                <span class="text-xs text-gray-300">|</span>
+                <span class="text-xs text-gray-400">Max file size: 10 MB</span>
+              </div>
+            </div>
+
+            <!-- Upload Button -->
+            <div class="mt-5 flex items-center justify-between">
+              <p class="text-xs text-gray-400">Documents are reviewed within 2-3 business days after upload.</p>
+              <button class="flex items-center gap-2 bg-brand-500 hover:bg-brand-600 text-white text-sm font-semibold px-6 py-2.5 rounded-lg transition shadow-sm">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5m-13.5-9L12 3m0 0l4.5 4.5M12 3v13.5"/></svg>
+                Upload Document
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Compliance Status Card -->
+        <div class="bg-white rounded-xl border border-gray-100 shadow-sm">
+          <div class="p-5 border-b border-gray-100">
+            <div class="flex items-center justify-between">
+              <h3 class="text-base font-semibold text-navy-900">Compliance Status</h3>
+              <span class="inline-flex items-center gap-1.5 text-xs font-semibold text-green-700 bg-green-50 px-3 py-1 rounded-full border border-green-100">
+                <span class="w-2 h-2 rounded-full bg-green-500"></span>
+                Compliant
+              </span>
+            </div>
+            <p class="text-xs text-gray-400 mt-1">Your account meets minimum document requirements</p>
+          </div>
+          <div class="p-5">
+            <!-- Progress -->
+            <div class="mb-5">
+              <div class="flex items-center justify-between text-xs mb-2">
+                <span class="text-gray-500 font-medium">Documents Verified</span>
+                <span class="font-bold text-navy-900">3 / 5</span>
+              </div>
+              <div class="h-2 bg-gray-100 rounded-full overflow-hidden">
+                <div class="h-full bg-success rounded-full transition-all" style="width: 60%"></div>
+              </div>
+            </div>
+
+            <!-- Checklist -->
+            <ul class="space-y-3">
+              <!-- GST - Verified -->
+              <li class="flex items-center gap-3">
+                <div class="w-6 h-6 rounded-full bg-green-100 flex items-center justify-center shrink-0">
+                  <svg class="w-3.5 h-3.5 text-success" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M4.5 12.75l6 6 9-13.5"/></svg>
+                </div>
+                <span class="text-sm text-gray-700 font-medium">GST Registration Certificate</span>
+              </li>
+              <!-- PAN - Verified -->
+              <li class="flex items-center gap-3">
+                <div class="w-6 h-6 rounded-full bg-green-100 flex items-center justify-center shrink-0">
+                  <svg class="w-3.5 h-3.5 text-success" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M4.5 12.75l6 6 9-13.5"/></svg>
+                </div>
+                <span class="text-sm text-gray-700 font-medium">PAN Card</span>
+              </li>
+              <!-- Business Registration - Verified -->
+              <li class="flex items-center gap-3">
+                <div class="w-6 h-6 rounded-full bg-green-100 flex items-center justify-center shrink-0">
+                  <svg class="w-3.5 h-3.5 text-success" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M4.5 12.75l6 6 9-13.5"/></svg>
+                </div>
+                <span class="text-sm text-gray-700 font-medium">Business Registration</span>
+              </li>
+              <!-- Bank Verification - Pending -->
+              <li class="flex items-center gap-3">
+                <div class="w-6 h-6 rounded-full bg-orange-100 flex items-center justify-center shrink-0">
+                  <svg class="w-3.5 h-3.5 text-brand-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                </div>
+                <div class="flex-1">
+                  <span class="text-sm text-gray-700 font-medium">Bank Verification</span>
+                  <p class="text-[10px] text-orange-500">Under review</p>
+                </div>
+              </li>
+              <!-- Trade License - Expired -->
+              <li class="flex items-center gap-3">
+                <div class="w-6 h-6 rounded-full bg-red-100 flex items-center justify-center shrink-0">
+                  <svg class="w-3.5 h-3.5 text-danger" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M6 18L18 6M6 6l12 12"/></svg>
+                </div>
+                <div class="flex-1">
+                  <span class="text-sm text-gray-700 font-medium">Trade License</span>
+                  <p class="text-[10px] text-red-500">Expired -- upload renewed copy</p>
+                </div>
+              </li>
+            </ul>
+
+            <!-- Compliance Notes -->
+            <div class="mt-5 pt-4 border-t border-gray-100">
+              <div class="bg-blue-50 rounded-lg p-3.5 border border-blue-100">
+                <div class="flex items-start gap-2.5">
+                  <svg class="w-4 h-4 text-blue-500 mt-0.5 shrink-0" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M11.25 11.25l.041-.02a.75.75 0 011.063.852l-.708 2.836a.75.75 0 001.063.853l.041-.021M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9-3.75h.008v.008H12V8.25z"/></svg>
+                  <div>
+                    <p class="text-xs font-semibold text-blue-800 mb-1">Important</p>
+                    <p class="text-[11px] text-blue-600 leading-relaxed">Maintain all required documents in verified status to keep your seller account active. Expired documents must be renewed within 30 days.</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+    </main>
+  </div>
+
+  <!-- ===== JavaScript ===== -->
+  <script>
+    // Tab filtering
+    function filterDocs(category) {
+      // Update active tab
+      document.querySelectorAll('.tab-btn').forEach(btn => {
+        btn.classList.remove('active');
+        btn.classList.remove('text-brand-500');
+        btn.classList.remove('border-brand-500');
+        btn.classList.add('border-transparent');
+        btn.classList.add('text-gray-500');
+      });
+      const activeBtn = document.querySelector(`.tab-btn[data-tab="${category}"]`);
+      if (activeBtn) {
+        activeBtn.classList.add('active');
+        activeBtn.classList.add('text-brand-500');
+        activeBtn.classList.add('border-brand-500');
+        activeBtn.classList.remove('border-transparent');
+        activeBtn.classList.remove('text-gray-500');
+      }
+
+      // Filter documents
+      const docs = document.querySelectorAll('#documentsList > div[data-category]');
+      docs.forEach(doc => {
+        if (category === 'all' || doc.dataset.category === category) {
+          doc.style.display = 'flex';
+        } else {
+          doc.style.display = 'none';
+        }
+      });
+    }
+
+    // Drag and drop visual feedback
+    const dropZone = document.getElementById('dropZone');
+    const fileInput = document.getElementById('fileInput');
+
+    fileInput.addEventListener('change', function(e) {
+      if (e.target.files.length > 0) {
+        const names = Array.from(e.target.files).map(f => f.name).join(', ');
+        alert('Selected files: ' + names + '\n\nIn production, these would be uploaded to the server.');
+      }
+    });
+
+    dropZone.addEventListener('drop', function(e) {
+      e.preventDefault();
+      this.classList.remove('dragover');
+      const files = e.dataTransfer.files;
+      if (files.length > 0) {
+        const names = Array.from(files).map(f => f.name).join(', ');
+        alert('Dropped files: ' + names + '\n\nIn production, these would be uploaded to the server.');
+      }
+    });
+  </script>
+
+  <script src="shared-layout.js"></script>
+  <script>renderSellerLayout('documents');</script>
+</body>
+</html>

@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HomeBase — Legal Policies</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = { theme: { extend: { colors: { brand: { 50:'#FFF7ED',100:'#FFEDD5',200:'#FED7AA',300:'#FDBA74',400:'#FB923C',500:'#F97316',600:'#EA580C',700:'#C2410C' }, navy: { 700:'#1E3A5F',800:'#1A2E4A',900:'#0F1B2D' }, success:'#16A34A', warning:'#EAB308', danger:'#DC2626' }, fontFamily: { sans:['Inter','system-ui','sans-serif'] } } } }
+  </script>
+  <style>
+    .sidebar-link { transition: all 0.15s ease; }
+    .sidebar-link:hover { background: rgba(255,255,255,0.06); }
+    .sidebar-link.active { background: rgba(249,115,22,0.15); border-right: 3px solid #F97316; }
+    .dropdown-menu { display: none; }
+    .dropdown:hover .dropdown-menu { display: block; }
+    .policy-card:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,0.08); }
+    .policy-card { transition: all 0.2s ease; }
+  </style>
+</head>
+<body class="font-sans bg-gray-50 text-gray-900">
+  <header id="admin-header" class="fixed top-0 left-0 right-0 z-50 bg-white border-b border-gray-200 h-16"></header>
+  <aside id="admin-sidebar" class="fixed left-0 top-16 bottom-0 w-60 z-40 flex flex-col overflow-y-auto" style="background:#0A1628;"></aside>
+
+  <main class="ml-60 pt-16 p-6 min-h-screen">
+    <!-- Header -->
+    <div class="flex items-center justify-between mb-6">
+      <div>
+        <h1 class="text-2xl font-bold text-gray-900">Legal Policies</h1>
+        <p class="text-sm text-gray-500 mt-1">Manage platform terms, policies, and legal agreements</p>
+      </div>
+      <span class="text-xs text-gray-400 bg-gray-100 px-3 py-1.5 rounded-lg">Last published: 28 Mar 2026</span>
+    </div>
+
+    <!-- Policy Version Diff Hint -->
+    <div class="bg-blue-50 border border-blue-200 rounded-xl p-5 mb-6">
+      <div class="flex items-start gap-4">
+        <div class="w-10 h-10 rounded-lg bg-blue-100 flex items-center justify-center shrink-0">
+          <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M7.5 21L3 16.5m0 0L7.5 12M3 16.5h13.5m0-13.5L21 7.5m0 0L16.5 12M21 7.5H7.5"/></svg>
+        </div>
+        <div class="flex-1">
+          <h3 class="text-sm font-semibold text-blue-900">Recent Policy Change</h3>
+          <p class="text-sm text-blue-700 mt-1"><span class="font-bold">Terms &amp; Conditions</span> Version 3.2 &rarr; 3.3: <span class="font-semibold">12 words changed</span> in Section 4 (Returns Policy)</p>
+          <p class="text-xs text-blue-500 mt-1">Changed by Super Admin on 28 Mar 2026 at 2:15 PM</p>
+          <button onclick="alert('Showing diff between Version 3.2 and 3.3...\n\nSection 4.1:\n- Return requests must be made within 30 days of delivery.\n+ Return requests must be made within 15 days of delivery for electronics and 30 days for all other categories.')" class="mt-3 inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m5.231 13.481L15 17.25m-4.5-15H5.625c-.621 0-1.125.504-1.125 1.125v16.5c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9zm3.75 11.625a2.625 2.625 0 11-5.25 0 2.625 2.625 0 015.25 0z"/></svg>
+            View Diff
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Multi-Language Status -->
+    <div class="bg-white rounded-xl border border-gray-100 p-6 mb-6">
+      <div class="flex items-center justify-between mb-4">
+        <h3 class="font-semibold text-gray-900">Multi-Language Translation Status</h3>
+        <span class="text-xs text-gray-400">Across all 6 policies</span>
+      </div>
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <!-- English -->
+        <div class="border border-green-200 bg-green-50 rounded-lg p-4">
+          <div class="flex items-center justify-between mb-2">
+            <span class="text-sm font-semibold text-gray-900">English</span>
+            <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-medium bg-green-100 text-green-700">Published</span>
+          </div>
+          <div class="w-full bg-green-200 rounded-full h-1.5 mb-1.5">
+            <div class="bg-green-600 h-1.5 rounded-full" style="width:100%"></div>
+          </div>
+          <p class="text-xs text-green-700 font-medium">6/6 policies complete</p>
+        </div>
+        <!-- Hindi -->
+        <div class="border border-yellow-200 bg-yellow-50 rounded-lg p-4">
+          <div class="flex items-center justify-between mb-2">
+            <span class="text-sm font-semibold text-gray-900">Hindi</span>
+            <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-medium bg-yellow-100 text-yellow-700">Draft</span>
+          </div>
+          <div class="w-full bg-yellow-200 rounded-full h-1.5 mb-1.5">
+            <div class="bg-yellow-500 h-1.5 rounded-full" style="width:66%"></div>
+          </div>
+          <p class="text-xs text-yellow-700 font-medium">4/6 policies translated</p>
+        </div>
+        <!-- Tamil -->
+        <div class="border border-gray-200 bg-gray-50 rounded-lg p-4">
+          <div class="flex items-center justify-between mb-2">
+            <span class="text-sm font-semibold text-gray-900">Tamil</span>
+            <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-medium bg-gray-200 text-gray-600">Not Started</span>
+          </div>
+          <div class="w-full bg-gray-200 rounded-full h-1.5 mb-1.5">
+            <div class="bg-gray-400 h-1.5 rounded-full" style="width:0%"></div>
+          </div>
+          <p class="text-xs text-gray-500 font-medium">0/6 policies translated</p>
+        </div>
+        <!-- Marathi -->
+        <div class="border border-gray-200 bg-gray-50 rounded-lg p-4">
+          <div class="flex items-center justify-between mb-2">
+            <span class="text-sm font-semibold text-gray-900">Marathi</span>
+            <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-medium bg-gray-200 text-gray-600">Not Started</span>
+          </div>
+          <div class="w-full bg-gray-200 rounded-full h-1.5 mb-1.5">
+            <div class="bg-gray-400 h-1.5 rounded-full" style="width:0%"></div>
+          </div>
+          <p class="text-xs text-gray-500 font-medium">0/6 policies translated</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Policy Effectiveness -->
+    <div class="bg-white rounded-xl border border-gray-100 p-6 mb-8">
+      <div class="flex items-center justify-between mb-4">
+        <h3 class="font-semibold text-gray-900">Policy Effectiveness Analytics</h3>
+        <select class="text-xs border border-gray-200 rounded-lg px-3 py-1.5 bg-gray-50 text-gray-600 outline-none focus:border-brand-400">
+          <option>Last 30 days</option>
+          <option>Last 7 days</option>
+          <option>Last 90 days</option>
+        </select>
+      </div>
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        <div class="bg-purple-50 rounded-lg p-4 text-center">
+          <p class="text-2xl font-bold text-purple-700">2m 15s</p>
+          <p class="text-xs text-purple-600 font-medium mt-0.5">Avg Time on Page</p>
+          <p class="text-[10px] text-purple-400 mt-1">Industry avg: 1m 45s</p>
+        </div>
+        <div class="bg-brand-50 rounded-lg p-4 text-center">
+          <p class="text-2xl font-bold text-brand-700">34%</p>
+          <p class="text-xs text-brand-600 font-medium mt-0.5">Bounce Rate</p>
+          <p class="text-[10px] text-brand-400 mt-1">Down from 42% last month</p>
+        </div>
+        <div class="bg-green-50 rounded-lg p-4 text-center">
+          <p class="text-2xl font-bold text-green-700">67%</p>
+          <p class="text-xs text-green-600 font-medium mt-0.5">Read Completion</p>
+          <p class="text-[10px] text-green-400 mt-1">Up from 58% last month</p>
+        </div>
+      </div>
+      <p class="text-xs text-gray-400 mt-3">Most read policy: <span class="font-medium text-gray-600">Return &amp; Refund Policy</span> (3,420 views) &middot; Least read: <span class="font-medium text-gray-600">Cookie Policy</span> (240 views)</p>
+    </div>
+
+    <!-- Policy Cards Grid -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-5 mb-8">
+
+      <!-- Terms & Conditions -->
+      <div class="policy-card bg-white rounded-xl border border-gray-100 p-6 cursor-pointer" onclick="editPolicy('terms')">
+        <div class="flex items-start justify-between">
+          <div class="flex items-center gap-3">
+            <div class="w-11 h-11 rounded-lg bg-blue-50 flex items-center justify-center"><svg class="w-5 h-5 text-blue-500" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z"/></svg></div>
+            <div>
+              <h3 class="font-semibold text-gray-900">Terms & Conditions</h3>
+              <p class="text-xs text-gray-400 mt-0.5">Platform usage terms for customers</p>
+            </div>
+          </div>
+          <span class="text-[10px] font-medium bg-green-50 text-green-700 px-2 py-1 rounded-full">Published</span>
+        </div>
+        <div class="mt-4 pt-4 border-t border-gray-50 flex items-center justify-between text-xs text-gray-400">
+          <span>Version 3.2 · 4,250 words</span>
+          <span>Updated: 15 Mar 2026</span>
+        </div>
+      </div>
+
+      <!-- Privacy Policy -->
+      <div class="policy-card bg-white rounded-xl border border-gray-100 p-6 cursor-pointer" onclick="editPolicy('privacy')">
+        <div class="flex items-start justify-between">
+          <div class="flex items-center gap-3">
+            <div class="w-11 h-11 rounded-lg bg-purple-50 flex items-center justify-center"><svg class="w-5 h-5 text-purple-500" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z"/></svg></div>
+            <div>
+              <h3 class="font-semibold text-gray-900">Privacy Policy</h3>
+              <p class="text-xs text-gray-400 mt-0.5">Data collection and usage policy</p>
+            </div>
+          </div>
+          <span class="text-[10px] font-medium bg-green-50 text-green-700 px-2 py-1 rounded-full">Published</span>
+        </div>
+        <div class="mt-4 pt-4 border-t border-gray-50 flex items-center justify-between text-xs text-gray-400">
+          <span>Version 2.1 · 3,800 words</span>
+          <span>Updated: 10 Jan 2026</span>
+        </div>
+      </div>
+
+      <!-- Return & Refund Policy -->
+      <div class="policy-card bg-white rounded-xl border border-gray-100 p-6 cursor-pointer" onclick="editPolicy('returns')">
+        <div class="flex items-start justify-between">
+          <div class="flex items-center gap-3">
+            <div class="w-11 h-11 rounded-lg bg-brand-50 flex items-center justify-center"><svg class="w-5 h-5 text-brand-500" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M9 15L3 9m0 0l6-6M3 9h12a6 6 0 010 12h-3"/></svg></div>
+            <div>
+              <h3 class="font-semibold text-gray-900">Return & Refund Policy</h3>
+              <p class="text-xs text-gray-400 mt-0.5">Return window, refund rules, eligibility</p>
+            </div>
+          </div>
+          <span class="text-[10px] font-medium bg-green-50 text-green-700 px-2 py-1 rounded-full">Published</span>
+        </div>
+        <div class="mt-4 pt-4 border-t border-gray-50 flex items-center justify-between text-xs text-gray-400">
+          <span>Version 4.0 · 2,100 words</span>
+          <span>Updated: 20 Feb 2026</span>
+        </div>
+      </div>
+
+      <!-- Shipping Policy -->
+      <div class="policy-card bg-white rounded-xl border border-gray-100 p-6 cursor-pointer" onclick="editPolicy('shipping')">
+        <div class="flex items-start justify-between">
+          <div class="flex items-center gap-3">
+            <div class="w-11 h-11 rounded-lg bg-green-50 flex items-center justify-center"><svg class="w-5 h-5 text-green-500" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M8.25 18.75a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m3 0h6m-9 0H3.375a1.125 1.125 0 01-1.125-1.125V14.25m17.25 4.5a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m3 0H6.375m11.25 3V7.5a.375.375 0 00-.375-.375H14.25"/></svg></div>
+            <div>
+              <h3 class="font-semibold text-gray-900">Shipping Policy</h3>
+              <p class="text-xs text-gray-400 mt-0.5">Delivery timelines, charges, zones</p>
+            </div>
+          </div>
+          <span class="text-[10px] font-medium bg-green-50 text-green-700 px-2 py-1 rounded-full">Published</span>
+        </div>
+        <div class="mt-4 pt-4 border-t border-gray-50 flex items-center justify-between text-xs text-gray-400">
+          <span>Version 2.5 · 1,500 words</span>
+          <span>Updated: 5 Mar 2026</span>
+        </div>
+      </div>
+
+      <!-- Seller Agreement -->
+      <div class="policy-card bg-white rounded-xl border border-yellow-200 p-6 cursor-pointer" onclick="editPolicy('seller-agreement')">
+        <div class="flex items-start justify-between">
+          <div class="flex items-center gap-3">
+            <div class="w-11 h-11 rounded-lg bg-yellow-50 flex items-center justify-center"><svg class="w-5 h-5 text-yellow-600" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M13.5 21v-7.5a.75.75 0 01.75-.75h3a.75.75 0 01.75.75V21m-4.5 0H2.36m11.14 0H18"/></svg></div>
+            <div>
+              <h3 class="font-semibold text-gray-900">Seller Agreement</h3>
+              <p class="text-xs text-gray-400 mt-0.5">Terms for marketplace sellers</p>
+            </div>
+          </div>
+          <span class="text-[10px] font-medium bg-yellow-50 text-yellow-700 px-2 py-1 rounded-full">Draft</span>
+        </div>
+        <div class="mt-4 pt-4 border-t border-gray-50 flex items-center justify-between text-xs text-gray-400">
+          <span>Version 5.0-draft · 6,200 words</span>
+          <span>Updated: 28 Mar 2026</span>
+        </div>
+      </div>
+
+      <!-- Cookie Policy -->
+      <div class="policy-card bg-white rounded-xl border border-gray-100 p-6 cursor-pointer" onclick="editPolicy('cookies')">
+        <div class="flex items-start justify-between">
+          <div class="flex items-center gap-3">
+            <div class="w-11 h-11 rounded-lg bg-gray-100 flex items-center justify-center"><svg class="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M12 21a9.004 9.004 0 008.716-6.747M12 21a9.004 9.004 0 01-8.716-6.747M12 21c2.485 0 4.5-4.03 4.5-9S14.485 3 12 3m0 18c-2.485 0-4.5-4.03-4.5-9S9.515 3 12 3m0 0a8.997 8.997 0 017.843 4.582M12 3a8.997 8.997 0 00-7.843 4.582m15.686 0A11.953 11.953 0 0112 10.5c-2.998 0-5.74-1.1-7.843-2.918m15.686 0A8.959 8.959 0 0121 12c0 .778-.099 1.533-.284 2.253m0 0A17.919 17.919 0 0112 16.5c-3.162 0-6.133-.815-8.716-2.247m0 0A9.015 9.015 0 013 12c0-1.605.42-3.113 1.157-4.418"/></svg></div>
+            <div>
+              <h3 class="font-semibold text-gray-900">Cookie Policy</h3>
+              <p class="text-xs text-gray-400 mt-0.5">Cookie usage and consent</p>
+            </div>
+          </div>
+          <span class="text-[10px] font-medium bg-green-50 text-green-700 px-2 py-1 rounded-full">Published</span>
+        </div>
+        <div class="mt-4 pt-4 border-t border-gray-50 flex items-center justify-between text-xs text-gray-400">
+          <span>Version 1.0 · 800 words</span>
+          <span>Updated: 1 Jan 2026</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Editor (hidden by default, shown on click) -->
+    <div id="policyEditor" class="hidden">
+      <div class="bg-white rounded-xl border border-gray-100 shadow-sm">
+        <div class="flex items-center justify-between px-6 py-4 border-b border-gray-100">
+          <div>
+            <h2 id="editorTitle" class="text-lg font-bold text-gray-900">Editing: Terms & Conditions</h2>
+            <p class="text-xs text-gray-400 mt-0.5">Version 3.2 · Last saved 2 minutes ago</p>
+          </div>
+          <div class="flex items-center gap-2">
+            <button onclick="closeEditor()" class="px-4 py-2 border border-gray-200 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-50">Cancel</button>
+            <button onclick="alert('Draft saved')" class="px-4 py-2 border border-gray-200 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-50">Save Draft</button>
+            <button onclick="alert('Preview opened')" class="px-4 py-2 border border-brand-200 rounded-lg text-sm font-medium text-brand-600 hover:bg-brand-50">Preview</button>
+            <button onclick="if(confirm('Publish this policy? It will be visible to all users.')) alert('Published successfully')" class="px-4 py-2 bg-brand-500 rounded-lg text-sm font-semibold text-white hover:bg-brand-600">Publish</button>
+          </div>
+        </div>
+        <!-- Toolbar -->
+        <div class="px-6 py-2 border-b border-gray-100 flex items-center gap-1 bg-gray-50">
+          <button class="p-2 rounded hover:bg-white hover:shadow-sm text-gray-600 text-sm font-bold" title="Bold">B</button>
+          <button class="p-2 rounded hover:bg-white hover:shadow-sm text-gray-600 text-sm italic" title="Italic">I</button>
+          <button class="p-2 rounded hover:bg-white hover:shadow-sm text-gray-600 text-sm underline" title="Underline">U</button>
+          <span class="w-px h-5 bg-gray-300 mx-1"></span>
+          <select class="text-sm border border-gray-200 rounded px-2 py-1 bg-white">
+            <option>Paragraph</option><option>Heading 1</option><option>Heading 2</option><option>Heading 3</option>
+          </select>
+          <span class="w-px h-5 bg-gray-300 mx-1"></span>
+          <button class="p-2 rounded hover:bg-white hover:shadow-sm text-gray-600 text-xs" title="Bullet List">* List</button>
+          <button class="p-2 rounded hover:bg-white hover:shadow-sm text-gray-600 text-xs" title="Numbered List">1. List</button>
+          <button class="p-2 rounded hover:bg-white hover:shadow-sm text-gray-600 text-xs" title="Link">Link</button>
+          <button class="p-2 rounded hover:bg-white hover:shadow-sm text-gray-600 text-xs" title="Table">Table</button>
+        </div>
+        <!-- Content -->
+        <div class="p-6">
+          <textarea id="policyContent" class="w-full min-h-[400px] border border-gray-200 rounded-lg p-4 text-sm leading-relaxed outline-none focus:border-brand-400 focus:ring-1 focus:ring-brand-200 resize-y" placeholder="Start writing your policy...">1. INTRODUCTION
+
+These Terms and Conditions ("Terms") govern your use of the HomeBase marketplace platform ("Platform") operated by HomeBase Technologies Pvt. Ltd. ("Company", "we", "us"). By accessing or using our Platform, you agree to be bound by these Terms.
+
+2. DEFINITIONS
+
+"Buyer" means any person who purchases products through the Platform.
+"Seller" means any person or entity that lists products for sale on the Platform.
+"Products" means goods listed for sale by Sellers on the Platform.
+
+3. ACCOUNT REGISTRATION
+
+3.1 You must be at least 18 years old to create an account.
+3.2 You must provide accurate and complete information during registration.
+3.3 You are responsible for maintaining the confidentiality of your account credentials.
+
+4. BUYING ON HOMEBASE
+
+4.1 All purchases are subject to product availability.
+4.2 Prices are listed in Indian Rupees (INR) and include applicable taxes unless stated otherwise.
+4.3 We reserve the right to cancel orders if fraud or unauthorized activity is suspected.
+
+5. PAYMENTS
+
+5.1 We accept payments via UPI, Credit/Debit Cards, Net Banking, and Cash on Delivery.
+5.2 All payment information is processed securely through our payment partners.
+
+6. RETURNS AND REFUNDS
+
+6.1 Return requests must be made within 30 days of delivery.
+6.2 Products must be unused and in original packaging.
+6.3 Refunds are processed within 5-7 business days after return receipt.</textarea>
+        </div>
+        <!-- Version History -->
+        <div class="px-6 py-4 border-t border-gray-100 bg-gray-50">
+          <h4 class="text-sm font-semibold text-gray-700 mb-3">Version History</h4>
+          <div class="space-y-2">
+            <div class="flex items-center justify-between text-xs"><span class="text-gray-600">v3.2 — 15 Mar 2026</span><span class="text-gray-400">By Super Admin</span><button class="text-brand-500 hover:underline">Restore</button></div>
+            <div class="flex items-center justify-between text-xs"><span class="text-gray-600">v3.1 — 1 Feb 2026</span><span class="text-gray-400">By Super Admin</span><button class="text-brand-500 hover:underline">Restore</button></div>
+            <div class="flex items-center justify-between text-xs"><span class="text-gray-600">v3.0 — 15 Dec 2025</span><span class="text-gray-400">By Super Admin</span><button class="text-brand-500 hover:underline">Restore</button></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+<script src="../shared-layout.js"></script>
+<script>renderAdminLayout('cms', '../');</script>
+<script>
+  var policyNames = {
+    'terms': 'Terms & Conditions',
+    'privacy': 'Privacy Policy',
+    'returns': 'Return & Refund Policy',
+    'shipping': 'Shipping Policy',
+    'seller-agreement': 'Seller Agreement',
+    'cookies': 'Cookie Policy'
+  };
+
+  function editPolicy(type) {
+    document.getElementById('editorTitle').textContent = 'Editing: ' + (policyNames[type] || type);
+    document.getElementById('policyEditor').classList.remove('hidden');
+    window.scrollTo({ top: document.getElementById('policyEditor').offsetTop - 80, behavior: 'smooth' });
+  }
+
+  function closeEditor() {
+    document.getElementById('policyEditor').classList.add('hidden');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+</script>
+</body>
+</html>

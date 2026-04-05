@@ -1,0 +1,879 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HomeBase — Platform Configuration</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              50: '#FFF7ED',
+              100: '#FFEDD5',
+              200: '#FED7AA',
+              300: '#FDBA74',
+              400: '#FB923C',
+              500: '#F97316',
+              600: '#EA580C',
+              700: '#C2410C',
+            },
+            navy: {
+              700: '#1E3A5F',
+              800: '#0F1E30',
+              900: '#0A1628',
+            },
+            success: '#16A34A',
+            warning: '#EAB308',
+            danger: '#DC2626',
+          },
+          fontFamily: {
+            sans: ['Inter', 'system-ui', 'sans-serif'],
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+    .scrollbar-hide::-webkit-scrollbar { display: none; }
+    .sidebar-link { transition: all 0.15s ease; }
+    .sidebar-link:hover { background: rgba(255,255,255,0.06); }
+    .sidebar-link.active { background: rgba(249,115,22,0.15); border-right: 3px solid #F97316; color: #F97316; }
+    .toggle-track { transition: background 0.2s ease; }
+    .toggle-knob { transition: transform 0.2s ease; }
+    .upload-zone { border: 2px dashed #D1D5DB; transition: all 0.2s ease; }
+    .upload-zone:hover { border-color: #FB923C; background: #FFF7ED; }
+    .upload-zone.dragover { border-color: #F97316; background: #FFEDD5; }
+    .field-input { @apply w-full border border-gray-200 rounded-lg px-4 py-2.5 text-sm outline-none transition; }
+    .field-input:focus { border-color: #FB923C; box-shadow: 0 0 0 3px rgba(251,146,60,0.15); }
+    .field-input[readonly] { background: #F9FAFB; color: #6B7280; cursor: default; }
+    .verified-badge { display: inline-flex; align-items: center; gap: 4px; padding: 2px 8px; border-radius: 9999px; font-size: 11px; font-weight: 600; background: #DCFCE7; color: #15803D; }
+    .section-card { @apply bg-white rounded-xl border border-gray-200 shadow-sm; }
+    .section-header { @apply px-6 py-4 border-b border-gray-100; }
+    .section-body { @apply p-6; }
+    .form-row { @apply grid grid-cols-3 gap-4 items-start; }
+    .form-label { @apply text-sm font-medium text-gray-700 pt-2; }
+    .form-field { @apply col-span-2; }
+    .form-hint { @apply text-xs text-gray-400 mt-1; }
+    .lang-tag { transition: all 0.15s ease; }
+    .lang-tag:hover { transform: translateY(-1px); }
+  </style>
+</head>
+<body class="font-sans bg-gray-50 text-gray-900">
+
+  <!-- ===== TOP HEADER BAR ===== -->
+  <header id="admin-header" class="fixed top-0 left-0 right-0 z-50 bg-white border-b border-gray-200 h-16"></header>
+
+  <!-- ===== LAYOUT: SIDEBAR + MAIN ===== -->
+  <div class="flex pt-16 min-h-screen">
+
+    <!-- ===== LEFT SIDEBAR ===== -->
+    <aside id="admin-sidebar" class="fixed left-0 top-16 bottom-0 w-60 z-40 flex flex-col overflow-y-auto" style="background:#0A1628;"></aside>
+
+    <!-- ===== MAIN CONTENT ===== -->
+    <main class="flex-1 ml-60 p-6 lg:p-8 overflow-x-hidden">
+
+      <!-- ===== PAGE HEADER ===== -->
+      <div class="flex items-center justify-between mb-6">
+        <div class="min-w-0">
+          <div class="flex items-center gap-2 text-sm text-gray-400 mb-1">
+            <a href="index.html" class="hover:text-brand-500 transition">Settings</a>
+            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M8.25 4.5l7.5 7.5-7.5 7.5"/></svg>
+            <span class="text-gray-600 font-medium">General</span>
+          </div>
+          <h1 class="text-2xl font-bold text-gray-900">Platform Configuration</h1>
+          <p class="text-sm text-gray-500 mt-1">Core identity, business entity, locale, and operational settings for the entire marketplace</p>
+        </div>
+        <div class="flex items-center gap-3 shrink-0">
+          <span class="text-xs text-gray-400 hidden lg:block">Last saved: Mar 28, 2026 by admin@homebase.com</span>
+          <button onclick="discardChanges()" class="px-4 py-2.5 text-sm font-medium text-gray-600 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 transition">
+            Discard
+          </button>
+          <button onclick="saveChanges()" class="px-5 py-2.5 bg-brand-500 text-white text-sm font-semibold rounded-lg hover:bg-brand-600 transition shadow-sm">
+            <span class="flex items-center gap-2">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4.5 12.75l6 6 9-13.5"/></svg>
+              Save Changes
+            </span>
+          </button>
+        </div>
+      </div>
+
+      <!-- ===== UNSAVED CHANGES BANNER (hidden by default) ===== -->
+      <div id="unsavedBanner" class="hidden mb-4 px-4 py-3 rounded-lg bg-amber-50 border border-amber-200 flex items-center justify-between">
+        <div class="flex items-center gap-2">
+          <svg class="w-4 h-4 text-amber-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z"/></svg>
+          <span class="text-sm font-medium text-amber-800">You have unsaved changes</span>
+        </div>
+        <div class="flex items-center gap-2">
+          <button onclick="discardChanges()" class="text-xs font-medium text-amber-700 hover:text-amber-900 transition">Discard</button>
+          <button onclick="saveChanges()" class="px-3 py-1.5 text-xs font-semibold text-white bg-brand-500 rounded-md hover:bg-brand-600 transition">Save Now</button>
+        </div>
+      </div>
+
+
+      <!-- ================================================================ -->
+      <!-- SECTION 1: PLATFORM IDENTITY                                     -->
+      <!-- ================================================================ -->
+      <div class="section-card mb-6">
+        <div class="section-header">
+          <div class="flex items-center gap-3">
+            <div class="w-9 h-9 rounded-lg bg-brand-50 flex items-center justify-center">
+              <svg class="w-5 h-5 text-brand-600" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M3.75 21h16.5M4.5 3h15M5.25 3v18m13.5-18v18M9 6.75h1.5m-1.5 3h1.5m-1.5 3h1.5m3-6H15m-1.5 3H15m-1.5 3H15M9 21v-3.375c0-.621.504-1.125 1.125-1.125h3.75c.621 0 1.125.504 1.125 1.125V21"/></svg>
+            </div>
+            <div>
+              <h2 class="text-lg font-bold text-gray-900">Platform Identity</h2>
+              <p class="text-sm text-gray-500 mt-0.5">Brand, logos, and customer-facing contact information</p>
+            </div>
+          </div>
+        </div>
+        <div class="section-body space-y-6">
+
+          <!-- Platform Name -->
+          <div class="form-row">
+            <label class="form-label">Platform Name <span class="text-red-400">*</span></label>
+            <div class="form-field">
+              <input type="text" value="HomeBase" class="field-input max-w-md" onchange="markDirty()">
+              <p class="form-hint">Displayed across the storefront, emails, invoices, and mobile app</p>
+            </div>
+          </div>
+
+          <!-- Tagline -->
+          <div class="form-row">
+            <label class="form-label">Tagline</label>
+            <div class="form-field">
+              <input type="text" value="India's Home Improvement Marketplace" class="field-input max-w-md" onchange="markDirty()">
+              <p class="form-hint">Appears below the logo on the homepage and in meta descriptions</p>
+            </div>
+          </div>
+
+          <!-- Logo Upload -->
+          <div class="form-row">
+            <label class="form-label">Platform Logo</label>
+            <div class="form-field">
+              <div class="flex items-start gap-5">
+                <div class="shrink-0">
+                  <div class="w-20 h-20 rounded-xl bg-brand-500 flex items-center justify-center shadow-sm">
+                    <svg class="w-10 h-10 text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-4 0a1 1 0 01-1-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 01-1 1"/></svg>
+                  </div>
+                  <p class="text-[10px] text-gray-400 mt-1 text-center">Current</p>
+                </div>
+                <div class="flex-1 max-w-sm">
+                  <div class="upload-zone rounded-lg p-4 text-center cursor-pointer" onclick="document.getElementById('logoUpload').click()" ondragover="event.preventDefault();this.classList.add('dragover')" ondragleave="this.classList.remove('dragover')" ondrop="event.preventDefault();this.classList.remove('dragover');alert('Logo uploaded: '+event.dataTransfer.files[0].name)">
+                    <input type="file" id="logoUpload" accept=".png,.svg,.jpg,.jpeg" class="hidden" onchange="alert('Selected: '+this.files[0].name)">
+                    <svg class="w-8 h-8 mx-auto text-gray-300 mb-2" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5m-13.5-9L12 3m0 0l4.5 4.5M12 3v13.5"/></svg>
+                    <p class="text-sm font-medium text-gray-600">Drop file here or <span class="text-brand-500">browse</span></p>
+                    <p class="text-xs text-gray-400 mt-1">PNG or SVG, max 2 MB. Recommended: 200x60 px</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Favicon -->
+          <div class="form-row">
+            <label class="form-label">Favicon</label>
+            <div class="form-field">
+              <div class="flex items-center gap-4">
+                <div class="w-10 h-10 rounded-lg bg-brand-500 flex items-center justify-center shadow-sm">
+                  <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-4 0a1 1 0 01-1-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 01-1 1"/></svg>
+                </div>
+                <div>
+                  <button onclick="document.getElementById('faviconUpload').click()" class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 transition">Upload New Favicon</button>
+                  <input type="file" id="faviconUpload" accept=".ico,.png,.svg" class="hidden" onchange="alert('Selected: '+this.files[0].name)">
+                  <p class="form-hint mt-1">ICO or PNG, 32x32 px. Shown in browser tabs.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Primary Domain -->
+          <div class="form-row">
+            <label class="form-label">Primary Domain</label>
+            <div class="form-field">
+              <div class="flex items-center gap-3 max-w-md">
+                <div class="flex items-center flex-1">
+                  <span class="inline-flex items-center px-3 py-2.5 border border-r-0 border-gray-200 rounded-l-lg bg-gray-50 text-sm text-gray-400">https://</span>
+                  <input type="text" value="homebase.in" class="field-input rounded-l-none" readonly>
+                </div>
+                <span class="verified-badge">
+                  <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.704 4.153a.75.75 0 01.143 1.052l-8 10.5a.75.75 0 01-1.127.075l-4.5-4.5a.75.75 0 011.06-1.06l3.894 3.893 7.48-9.817a.75.75 0 011.05-.143z"/></svg>
+                  SSL Active
+                </span>
+              </div>
+              <p class="form-hint">Managed in DNS. Contact infrastructure team to change.</p>
+            </div>
+          </div>
+
+          <!-- Support Email -->
+          <div class="form-row">
+            <label class="form-label">Support Email <span class="text-red-400">*</span></label>
+            <div class="form-field">
+              <input type="email" value="support@homebase.in" class="field-input max-w-md" onchange="markDirty()">
+              <p class="form-hint">Shown on all customer-facing pages and in transactional emails</p>
+            </div>
+          </div>
+
+          <!-- Support Phone -->
+          <div class="form-row">
+            <label class="form-label">Support Phone</label>
+            <div class="form-field">
+              <div class="flex items-center max-w-md">
+                <span class="inline-flex items-center px-3 py-2.5 border border-r-0 border-gray-200 rounded-l-lg bg-gray-50 text-sm text-gray-500">+91</span>
+                <input type="tel" value="1800-123-4567" class="field-input rounded-l-none" placeholder="1800-XXX-XXXX" onchange="markDirty()">
+              </div>
+              <p class="form-hint">Toll-free number displayed in header, footer, and order confirmation</p>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+
+      <!-- ================================================================ -->
+      <!-- SECTION 2: BUSINESS ENTITY                                       -->
+      <!-- ================================================================ -->
+      <div class="section-card mb-6">
+        <div class="section-header">
+          <div class="flex items-center gap-3">
+            <div class="w-9 h-9 rounded-lg bg-blue-50 flex items-center justify-center">
+              <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M12 21v-8.25M15.75 21v-8.25M8.25 21v-8.25M3 9l9-6 9 6m-1.5 12V10.332A48.36 48.36 0 0012 9.75c-2.551 0-5.056.2-7.5.582V21M3 21h18M12 6.75h.008v.008H12V6.75z"/></svg>
+            </div>
+            <div>
+              <h2 class="text-lg font-bold text-gray-900">Business Entity</h2>
+              <p class="text-sm text-gray-500 mt-0.5">Legal registration, tax identifiers, and registered address</p>
+            </div>
+          </div>
+        </div>
+        <div class="section-body space-y-6">
+
+          <!-- Legal Name -->
+          <div class="form-row">
+            <label class="form-label">Legal Name <span class="text-red-400">*</span></label>
+            <div class="form-field">
+              <div class="flex items-center gap-3 max-w-lg">
+                <input type="text" value="HomeBase Technologies Pvt. Ltd." class="field-input" onchange="markDirty()">
+                <span class="verified-badge shrink-0">
+                  <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.704 4.153a.75.75 0 01.143 1.052l-8 10.5a.75.75 0 01-1.127.075l-4.5-4.5a.75.75 0 011.06-1.06l3.894 3.893 7.48-9.817a.75.75 0 011.05-.143z"/></svg>
+                  Verified
+                </span>
+              </div>
+              <p class="form-hint">As per MCA registration. Used on invoices and legal documents.</p>
+            </div>
+          </div>
+
+          <!-- CIN -->
+          <div class="form-row">
+            <label class="form-label">CIN (Corporate Identity Number)</label>
+            <div class="form-field">
+              <div class="flex items-center gap-3 max-w-lg">
+                <input type="text" value="U72200KA2024PTC182XXX" class="field-input font-mono text-sm tracking-wide" onchange="markDirty()">
+                <span class="verified-badge shrink-0">
+                  <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.704 4.153a.75.75 0 01.143 1.052l-8 10.5a.75.75 0 01-1.127.075l-4.5-4.5a.75.75 0 011.06-1.06l3.894 3.893 7.48-9.817a.75.75 0 011.05-.143z"/></svg>
+                  Verified
+                </span>
+              </div>
+              <p class="form-hint">21-digit alphanumeric issued by MCA, Ministry of Corporate Affairs</p>
+            </div>
+          </div>
+
+          <!-- GSTIN -->
+          <div class="form-row">
+            <label class="form-label">GSTIN</label>
+            <div class="form-field">
+              <div class="flex items-center gap-3 max-w-lg">
+                <input type="text" value="29AABCH1234N1Z5" class="field-input font-mono text-sm tracking-wide" onchange="markDirty()">
+                <span class="verified-badge shrink-0">
+                  <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.704 4.153a.75.75 0 01.143 1.052l-8 10.5a.75.75 0 01-1.127.075l-4.5-4.5a.75.75 0 011.06-1.06l3.894 3.893 7.48-9.817a.75.75 0 011.05-.143z"/></svg>
+                  Verified
+                </span>
+              </div>
+              <p class="form-hint">GST Identification Number for Karnataka (state code: 29)</p>
+            </div>
+          </div>
+
+          <!-- PAN -->
+          <div class="form-row">
+            <label class="form-label">PAN</label>
+            <div class="form-field">
+              <div class="flex items-center gap-3 max-w-lg">
+                <input type="text" value="AABCH1234N" class="field-input font-mono text-sm tracking-wide max-w-xs" onchange="markDirty()">
+                <span class="verified-badge shrink-0">
+                  <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.704 4.153a.75.75 0 01.143 1.052l-8 10.5a.75.75 0 01-1.127.075l-4.5-4.5a.75.75 0 011.06-1.06l3.894 3.893 7.48-9.817a.75.75 0 011.05-.143z"/></svg>
+                  Verified
+                </span>
+              </div>
+              <p class="form-hint">Permanent Account Number for TDS and tax compliance</p>
+            </div>
+          </div>
+
+          <!-- Registered Address -->
+          <div class="form-row">
+            <label class="form-label">Registered Address</label>
+            <div class="form-field">
+              <textarea rows="3" class="field-input max-w-lg" onchange="markDirty()">No. 45, 2nd Floor, 1st Cross Road,
+Koramangala 4th Block, Bangalore,
+Karnataka 560034, India</textarea>
+              <p class="form-hint">Official registered address as per MCA. Printed on invoices and legal correspondence.</p>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+
+      <!-- ================================================================ -->
+      <!-- SECTION 3: REGIONAL & LOCALE                                     -->
+      <!-- ================================================================ -->
+      <div class="section-card mb-6">
+        <div class="section-header">
+          <div class="flex items-center gap-3">
+            <div class="w-9 h-9 rounded-lg bg-purple-50 flex items-center justify-center">
+              <svg class="w-5 h-5 text-purple-600" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M12 21a9.004 9.004 0 008.716-6.747M12 21a9.004 9.004 0 01-8.716-6.747M12 21c2.485 0 4.5-4.03 4.5-9S14.485 3 12 3m0 18c-2.485 0-4.5-4.03-4.5-9S9.515 3 12 3m0 0a8.997 8.997 0 017.843 4.582M12 3a8.997 8.997 0 00-7.843 4.582m15.686 0A11.953 11.953 0 0112 10.5c-2.998 0-5.74-1.1-7.843-2.918m15.686 0A8.959 8.959 0 0121 12c0 .778-.099 1.533-.284 2.253m0 0A17.919 17.919 0 0112 16.5c-3.162 0-6.133-.815-8.716-2.247m0 0A9.015 9.015 0 013 12c0-1.605.42-3.113 1.157-4.418"/></svg>
+            </div>
+            <div>
+              <h2 class="text-lg font-bold text-gray-900">Regional & Locale</h2>
+              <p class="text-sm text-gray-500 mt-0.5">Currency, language, timezone, and number formatting preferences</p>
+            </div>
+          </div>
+        </div>
+        <div class="section-body space-y-6">
+
+          <!-- Default Currency -->
+          <div class="form-row">
+            <label class="form-label">Default Currency <span class="text-red-400">*</span></label>
+            <div class="form-field">
+              <select class="field-input max-w-md bg-white" onchange="markDirty()">
+                <option selected>INR - Indian Rupee (&#8377;)</option>
+                <option>USD - US Dollar ($)</option>
+                <option>EUR - Euro (&euro;)</option>
+                <option>GBP - British Pound (&pound;)</option>
+                <option>AED - UAE Dirham (AED)</option>
+              </select>
+              <p class="form-hint">Base currency for all pricing, settlements, and financial reports</p>
+            </div>
+          </div>
+
+          <!-- Default Language -->
+          <div class="form-row">
+            <label class="form-label">Default Language <span class="text-red-400">*</span></label>
+            <div class="form-field">
+              <select class="field-input max-w-md bg-white" onchange="markDirty()">
+                <option selected>English</option>
+                <option>Hindi</option>
+                <option>Tamil</option>
+                <option>Telugu</option>
+                <option>Kannada</option>
+                <option>Malayalam</option>
+                <option>Bengali</option>
+                <option>Marathi</option>
+              </select>
+              <p class="form-hint">Fallback language when user's preferred language is unavailable</p>
+            </div>
+          </div>
+
+          <!-- Timezone -->
+          <div class="form-row">
+            <label class="form-label">Timezone</label>
+            <div class="form-field">
+              <select class="field-input max-w-md bg-white" onchange="markDirty()">
+                <option selected>Asia/Kolkata (IST +5:30)</option>
+                <option>UTC (Coordinated Universal Time)</option>
+                <option>America/New_York (EST -5:00)</option>
+                <option>America/Los_Angeles (PST -8:00)</option>
+                <option>Europe/London (GMT +0:00)</option>
+                <option>Asia/Dubai (GST +4:00)</option>
+              </select>
+              <p class="form-hint">All timestamps, scheduled jobs, and reports use this timezone</p>
+            </div>
+          </div>
+
+          <!-- Date Format -->
+          <div class="form-row">
+            <label class="form-label">Date Format</label>
+            <div class="form-field">
+              <select class="field-input max-w-md bg-white" onchange="markDirty()">
+                <option selected>DD/MM/YYYY (02/04/2026)</option>
+                <option>MM/DD/YYYY (04/02/2026)</option>
+                <option>YYYY-MM-DD (2026-04-02)</option>
+                <option>DD MMM YYYY (02 Apr 2026)</option>
+              </select>
+              <p class="form-hint">Used across order details, invoices, and admin dashboard</p>
+            </div>
+          </div>
+
+          <!-- Number Format -->
+          <div class="form-row">
+            <label class="form-label">Number Format</label>
+            <div class="form-field">
+              <select class="field-input max-w-md bg-white" onchange="markDirty()">
+                <option selected>Indian (1,00,000.00)</option>
+                <option>International (100,000.00)</option>
+                <option>European (100.000,00)</option>
+              </select>
+              <p class="form-hint">Determines grouping of digits in prices and financial figures</p>
+            </div>
+          </div>
+
+          <!-- Available Languages -->
+          <div class="form-row">
+            <label class="form-label">Available Languages</label>
+            <div class="form-field">
+              <p class="text-xs text-gray-500 mb-3">Toggle languages available to customers on the storefront</p>
+              <div class="grid grid-cols-2 gap-3 max-w-lg">
+                <!-- English -->
+                <div class="lang-tag flex items-center justify-between px-4 py-3 rounded-lg border border-green-200 bg-green-50">
+                  <div class="flex items-center gap-2.5">
+                    <span class="text-lg">EN</span>
+                    <div>
+                      <p class="text-sm font-semibold text-gray-800">English</p>
+                      <p class="text-[10px] text-green-600 font-medium">100% translated</p>
+                    </div>
+                  </div>
+                  <button onclick="toggleSwitch(this)" class="relative inline-flex h-6 w-11 items-center rounded-full toggle-track bg-green-500" data-on="true">
+                    <span class="toggle-knob inline-block h-4 w-4 rounded-full bg-white shadow translate-x-6"></span>
+                  </button>
+                </div>
+                <!-- Hindi -->
+                <div class="lang-tag flex items-center justify-between px-4 py-3 rounded-lg border border-green-200 bg-green-50">
+                  <div class="flex items-center gap-2.5">
+                    <span class="text-lg">HI</span>
+                    <div>
+                      <p class="text-sm font-semibold text-gray-800">Hindi</p>
+                      <p class="text-[10px] text-green-600 font-medium">92% translated</p>
+                    </div>
+                  </div>
+                  <button onclick="toggleSwitch(this)" class="relative inline-flex h-6 w-11 items-center rounded-full toggle-track bg-green-500" data-on="true">
+                    <span class="toggle-knob inline-block h-4 w-4 rounded-full bg-white shadow translate-x-6"></span>
+                  </button>
+                </div>
+                <!-- Tamil -->
+                <div class="lang-tag flex items-center justify-between px-4 py-3 rounded-lg border border-gray-200 bg-gray-50">
+                  <div class="flex items-center gap-2.5">
+                    <span class="text-lg">TA</span>
+                    <div>
+                      <p class="text-sm font-semibold text-gray-800">Tamil</p>
+                      <p class="text-[10px] text-gray-400 font-medium">45% translated</p>
+                    </div>
+                  </div>
+                  <button onclick="toggleSwitch(this)" class="relative inline-flex h-6 w-11 items-center rounded-full toggle-track bg-gray-200" data-on="false">
+                    <span class="toggle-knob inline-block h-4 w-4 rounded-full bg-white shadow translate-x-1"></span>
+                  </button>
+                </div>
+                <!-- Telugu -->
+                <div class="lang-tag flex items-center justify-between px-4 py-3 rounded-lg border border-gray-200 bg-gray-50">
+                  <div class="flex items-center gap-2.5">
+                    <span class="text-lg">TE</span>
+                    <div>
+                      <p class="text-sm font-semibold text-gray-800">Telugu</p>
+                      <p class="text-[10px] text-gray-400 font-medium">38% translated</p>
+                    </div>
+                  </div>
+                  <button onclick="toggleSwitch(this)" class="relative inline-flex h-6 w-11 items-center rounded-full toggle-track bg-gray-200" data-on="false">
+                    <span class="toggle-knob inline-block h-4 w-4 rounded-full bg-white shadow translate-x-1"></span>
+                  </button>
+                </div>
+                <!-- Kannada -->
+                <div class="lang-tag flex items-center justify-between px-4 py-3 rounded-lg border border-gray-200 bg-gray-50">
+                  <div class="flex items-center gap-2.5">
+                    <span class="text-lg">KN</span>
+                    <div>
+                      <p class="text-sm font-semibold text-gray-800">Kannada</p>
+                      <p class="text-[10px] text-gray-400 font-medium">22% translated</p>
+                    </div>
+                  </div>
+                  <button onclick="toggleSwitch(this)" class="relative inline-flex h-6 w-11 items-center rounded-full toggle-track bg-gray-200" data-on="false">
+                    <span class="toggle-knob inline-block h-4 w-4 rounded-full bg-white shadow translate-x-1"></span>
+                  </button>
+                </div>
+                <!-- Bengali -->
+                <div class="lang-tag flex items-center justify-between px-4 py-3 rounded-lg border border-gray-200 bg-gray-50">
+                  <div class="flex items-center gap-2.5">
+                    <span class="text-lg">BN</span>
+                    <div>
+                      <p class="text-sm font-semibold text-gray-800">Bengali</p>
+                      <p class="text-[10px] text-gray-400 font-medium">15% translated</p>
+                    </div>
+                  </div>
+                  <button onclick="toggleSwitch(this)" class="relative inline-flex h-6 w-11 items-center rounded-full toggle-track bg-gray-200" data-on="false">
+                    <span class="toggle-knob inline-block h-4 w-4 rounded-full bg-white shadow translate-x-1"></span>
+                  </button>
+                </div>
+              </div>
+              <p class="form-hint mt-2">Languages below 80% translation will display English as fallback for missing strings</p>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+
+      <!-- ================================================================ -->
+      <!-- SECTION 4: PLATFORM OPERATIONS                                   -->
+      <!-- ================================================================ -->
+      <div class="section-card mb-6">
+        <div class="section-header">
+          <div class="flex items-center gap-3">
+            <div class="w-9 h-9 rounded-lg bg-red-50 flex items-center justify-center">
+              <svg class="w-5 h-5 text-red-600" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M11.42 15.17l-5.1-5.1m0 0L11.42 5l5.1 5.07m-5.1 5.1V3.78m0 0h9.38M5.32 20.22h13.36"/><path d="M5.636 5.636a9 9 0 1012.728 12.728A9 9 0 005.636 5.636z"/></svg>
+            </div>
+            <div>
+              <h2 class="text-lg font-bold text-gray-900">Platform Operations</h2>
+              <p class="text-sm text-gray-500 mt-0.5">Maintenance mode, deployment status, and environment info</p>
+            </div>
+          </div>
+        </div>
+        <div class="section-body space-y-6">
+
+          <!-- Maintenance Mode -->
+          <div class="form-row">
+            <label class="form-label">Maintenance Mode</label>
+            <div class="form-field">
+              <div class="flex items-center gap-3 mb-2">
+                <button id="maintenanceToggle" onclick="toggleMaintenanceMode(this)" class="relative inline-flex h-6 w-11 items-center rounded-full toggle-track bg-gray-200" data-on="false">
+                  <span class="toggle-knob inline-block h-4 w-4 rounded-full bg-white shadow translate-x-1"></span>
+                </button>
+                <span class="text-sm font-medium text-gray-700">OFF</span>
+                <span class="px-2 py-0.5 text-[10px] font-bold rounded-full bg-green-100 text-green-700">ALL SYSTEMS OPERATIONAL</span>
+              </div>
+              <div class="max-w-lg p-3 rounded-lg bg-red-50 border border-red-200">
+                <div class="flex items-start gap-2">
+                  <svg class="w-4 h-4 text-red-500 mt-0.5 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z"/></svg>
+                  <div>
+                    <p class="text-xs font-semibold text-red-700">Critical Impact Warning</p>
+                    <p class="text-xs text-red-600 mt-0.5">Enabling maintenance mode will show a maintenance page to ALL users and block ALL transactions including in-flight checkouts. Sellers will be unable to manage inventory.</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Read-Only Mode -->
+          <div class="form-row">
+            <label class="form-label">Read-Only Mode</label>
+            <div class="form-field">
+              <div class="flex items-center gap-3 mb-1">
+                <button onclick="toggleSwitch(this)" class="relative inline-flex h-6 w-11 items-center rounded-full toggle-track bg-gray-200" data-on="false">
+                  <span class="toggle-knob inline-block h-4 w-4 rounded-full bg-white shadow translate-x-1"></span>
+                </button>
+                <span class="text-sm font-medium text-gray-700">OFF</span>
+              </div>
+              <p class="form-hint">Users can browse and search but cannot place orders, add to cart, or modify account settings</p>
+            </div>
+          </div>
+
+          <!-- Divider -->
+          <div class="border-t border-gray-100"></div>
+
+          <!-- Status Grid -->
+          <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+            <!-- Marketplace Status -->
+            <div class="px-4 py-3 rounded-lg border border-gray-200 bg-gray-50">
+              <p class="text-xs font-medium text-gray-500 uppercase tracking-wider mb-1">Marketplace Status</p>
+              <div class="flex items-center gap-2">
+                <span class="w-2.5 h-2.5 rounded-full bg-green-500 animate-pulse"></span>
+                <span class="text-sm font-bold text-green-700">LIVE</span>
+              </div>
+            </div>
+            <!-- Platform Version -->
+            <div class="px-4 py-3 rounded-lg border border-gray-200 bg-gray-50">
+              <p class="text-xs font-medium text-gray-500 uppercase tracking-wider mb-1">Platform Version</p>
+              <span class="text-sm font-bold text-gray-900">v2.4.1</span>
+            </div>
+            <!-- Last Deployment -->
+            <div class="px-4 py-3 rounded-lg border border-gray-200 bg-gray-50">
+              <p class="text-xs font-medium text-gray-500 uppercase tracking-wider mb-1">Last Deployment</p>
+              <span class="text-sm font-bold text-gray-900">Apr 2, 2026</span>
+              <span class="text-xs text-gray-500 block">at 2:15 AM IST</span>
+            </div>
+            <!-- Environment -->
+            <div class="px-4 py-3 rounded-lg border border-gray-200 bg-gray-50">
+              <p class="text-xs font-medium text-gray-500 uppercase tracking-wider mb-1">Environment</p>
+              <span class="px-2 py-0.5 text-xs font-bold rounded bg-green-100 text-green-700">PRODUCTION</span>
+            </div>
+          </div>
+
+          <!-- System Health Summary -->
+          <div class="border-t border-gray-100 pt-4">
+            <p class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3">System Health</p>
+            <div class="grid grid-cols-2 lg:grid-cols-5 gap-3">
+              <div class="flex items-center gap-2 px-3 py-2 rounded-lg bg-green-50 border border-green-200">
+                <span class="w-2 h-2 rounded-full bg-green-500"></span>
+                <span class="text-xs font-medium text-green-700">API Gateway</span>
+              </div>
+              <div class="flex items-center gap-2 px-3 py-2 rounded-lg bg-green-50 border border-green-200">
+                <span class="w-2 h-2 rounded-full bg-green-500"></span>
+                <span class="text-xs font-medium text-green-700">PostgreSQL</span>
+              </div>
+              <div class="flex items-center gap-2 px-3 py-2 rounded-lg bg-green-50 border border-green-200">
+                <span class="w-2 h-2 rounded-full bg-green-500"></span>
+                <span class="text-xs font-medium text-green-700">Redis Cache</span>
+              </div>
+              <div class="flex items-center gap-2 px-3 py-2 rounded-lg bg-green-50 border border-green-200">
+                <span class="w-2 h-2 rounded-full bg-green-500"></span>
+                <span class="text-xs font-medium text-green-700">Kafka</span>
+              </div>
+              <div class="flex items-center gap-2 px-3 py-2 rounded-lg bg-green-50 border border-green-200">
+                <span class="w-2 h-2 rounded-full bg-green-500"></span>
+                <span class="text-xs font-medium text-green-700">Keycloak</span>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+
+      <!-- ================================================================ -->
+      <!-- SECTION 5: SOCIAL & EXTERNAL LINKS                               -->
+      <!-- ================================================================ -->
+      <div class="section-card mb-6">
+        <div class="section-header">
+          <div class="flex items-center gap-3">
+            <div class="w-9 h-9 rounded-lg bg-indigo-50 flex items-center justify-center">
+              <svg class="w-5 h-5 text-indigo-600" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M13.19 8.688a4.5 4.5 0 011.242 7.244l-4.5 4.5a4.5 4.5 0 01-6.364-6.364l1.757-1.757m9.86-2.06a4.5 4.5 0 00-1.242-7.244l-4.5-4.5a4.5 4.5 0 00-6.364 6.364L4.25 8.81"/></svg>
+            </div>
+            <div>
+              <h2 class="text-lg font-bold text-gray-900">Social & External Links</h2>
+              <p class="text-sm text-gray-500 mt-0.5">Social media profiles and third-party tracking integrations</p>
+            </div>
+          </div>
+        </div>
+        <div class="section-body space-y-6">
+
+          <!-- Social Media Section -->
+          <div>
+            <p class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-4">Social Media Profiles</p>
+            <div class="space-y-4">
+
+              <!-- Facebook -->
+              <div class="form-row">
+                <label class="form-label">
+                  <span class="flex items-center gap-2">
+                    <svg class="w-4 h-4 text-blue-600" viewBox="0 0 24 24" fill="currentColor"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+                    Facebook
+                  </span>
+                </label>
+                <div class="form-field">
+                  <div class="flex items-center max-w-lg">
+                    <span class="inline-flex items-center px-3 py-2.5 border border-r-0 border-gray-200 rounded-l-lg bg-gray-50 text-xs text-gray-400 font-mono">facebook.com/</span>
+                    <input type="text" value="homebaseindia" class="field-input rounded-l-none" onchange="markDirty()">
+                  </div>
+                </div>
+              </div>
+
+              <!-- Instagram -->
+              <div class="form-row">
+                <label class="form-label">
+                  <span class="flex items-center gap-2">
+                    <svg class="w-4 h-4 text-pink-600" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C16.67.014 16.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/></svg>
+                    Instagram
+                  </span>
+                </label>
+                <div class="form-field">
+                  <div class="flex items-center max-w-lg">
+                    <span class="inline-flex items-center px-3 py-2.5 border border-r-0 border-gray-200 rounded-l-lg bg-gray-50 text-xs text-gray-400 font-mono">instagram.com/</span>
+                    <input type="text" value="homebase.in" class="field-input rounded-l-none" onchange="markDirty()">
+                  </div>
+                </div>
+              </div>
+
+              <!-- Twitter/X -->
+              <div class="form-row">
+                <label class="form-label">
+                  <span class="flex items-center gap-2">
+                    <svg class="w-4 h-4 text-gray-800" viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+                    Twitter / X
+                  </span>
+                </label>
+                <div class="form-field">
+                  <div class="flex items-center max-w-lg">
+                    <span class="inline-flex items-center px-3 py-2.5 border border-r-0 border-gray-200 rounded-l-lg bg-gray-50 text-xs text-gray-400 font-mono">x.com/</span>
+                    <input type="text" value="homebaseindia" class="field-input rounded-l-none" onchange="markDirty()">
+                  </div>
+                </div>
+              </div>
+
+              <!-- YouTube -->
+              <div class="form-row">
+                <label class="form-label">
+                  <span class="flex items-center gap-2">
+                    <svg class="w-4 h-4 text-red-600" viewBox="0 0 24 24" fill="currentColor"><path d="M23.498 6.186a3.016 3.016 0 00-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 00.502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 002.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 002.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
+                    YouTube
+                  </span>
+                </label>
+                <div class="form-field">
+                  <div class="flex items-center max-w-lg">
+                    <span class="inline-flex items-center px-3 py-2.5 border border-r-0 border-gray-200 rounded-l-lg bg-gray-50 text-xs text-gray-400 font-mono">youtube.com/</span>
+                    <input type="text" value="@homebaseindia" class="field-input rounded-l-none" onchange="markDirty()">
+                  </div>
+                </div>
+              </div>
+
+              <!-- LinkedIn -->
+              <div class="form-row">
+                <label class="form-label">
+                  <span class="flex items-center gap-2">
+                    <svg class="w-4 h-4 text-blue-700" viewBox="0 0 24 24" fill="currentColor"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
+                    LinkedIn
+                  </span>
+                </label>
+                <div class="form-field">
+                  <div class="flex items-center max-w-lg">
+                    <span class="inline-flex items-center px-3 py-2.5 border border-r-0 border-gray-200 rounded-l-lg bg-gray-50 text-xs text-gray-400 font-mono">linkedin.com/company/</span>
+                    <input type="text" value="homebase-technologies" class="field-input rounded-l-none" onchange="markDirty()">
+                  </div>
+                </div>
+              </div>
+
+            </div>
+          </div>
+
+          <!-- Divider -->
+          <div class="border-t border-gray-100"></div>
+
+          <!-- Analytics & Tracking -->
+          <div>
+            <p class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-4">Analytics & Tracking</p>
+            <div class="space-y-4">
+
+              <!-- Google Analytics -->
+              <div class="form-row">
+                <label class="form-label">Google Analytics (GA4)</label>
+                <div class="form-field">
+                  <input type="text" value="G-XXXXXXXXXX" class="field-input max-w-md font-mono text-sm" placeholder="G-XXXXXXXXXX" onchange="markDirty()">
+                  <p class="form-hint">GA4 Measurement ID. Found in Google Analytics > Admin > Data Streams.</p>
+                </div>
+              </div>
+
+              <!-- Facebook Pixel -->
+              <div class="form-row">
+                <label class="form-label">Facebook Pixel ID</label>
+                <div class="form-field">
+                  <input type="text" value="" class="field-input max-w-md font-mono text-sm" placeholder="Enter your Pixel ID" onchange="markDirty()">
+                  <p class="form-hint">Used for conversion tracking and retargeting on Facebook and Instagram</p>
+                </div>
+              </div>
+
+              <!-- Google Tag Manager -->
+              <div class="form-row">
+                <label class="form-label">Google Tag Manager</label>
+                <div class="form-field">
+                  <input type="text" value="GTM-XXXXXXX" class="field-input max-w-md font-mono text-sm" placeholder="GTM-XXXXXXX" onchange="markDirty()">
+                  <p class="form-hint">Container ID for managing all marketing and analytics tags</p>
+                </div>
+              </div>
+
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+
+      <!-- ===== FOOTER NOTE ===== -->
+      <div class="mb-8 px-4 py-3 rounded-lg bg-gray-100 border border-gray-200 flex items-center gap-3">
+        <svg class="w-4 h-4 text-gray-400 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M11.25 11.25l.041-.02a.75.75 0 011.063.852l-.708 2.836a.75.75 0 001.063.853l.041-.021M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9-3.75h.008v.008H12V8.25z"/></svg>
+        <p class="text-xs text-gray-500">Changes require admin approval and take effect immediately after save. All configuration changes are recorded in the <a href="../system/audit-log.html" class="text-brand-500 hover:text-brand-600 font-medium">audit log</a>.</p>
+      </div>
+
+    </main>
+  </div>
+
+<script>
+  /* ===== Toggle Switch ===== */
+  function toggleSwitch(btn) {
+    var isOn = btn.dataset.on === 'true';
+    if (isOn) {
+      btn.dataset.on = 'false';
+      btn.classList.remove('bg-green-500');
+      btn.classList.add('bg-gray-200');
+      btn.querySelector('.toggle-knob').classList.remove('translate-x-6');
+      btn.querySelector('.toggle-knob').classList.add('translate-x-1');
+    } else {
+      btn.dataset.on = 'true';
+      btn.classList.remove('bg-gray-200');
+      btn.classList.add('bg-green-500');
+      btn.querySelector('.toggle-knob').classList.remove('translate-x-1');
+      btn.querySelector('.toggle-knob').classList.add('translate-x-6');
+    }
+    markDirty();
+  }
+
+  /* ===== Maintenance Mode Toggle (special handling) ===== */
+  function toggleMaintenanceMode(btn) {
+    var isOn = btn.dataset.on === 'true';
+    if (!isOn) {
+      var confirmed = confirm(
+        'WARNING: Enabling maintenance mode will:\n\n' +
+        '- Show a maintenance page to ALL users\n' +
+        '- Block ALL new transactions\n' +
+        '- Interrupt in-flight checkouts\n' +
+        '- Prevent sellers from managing inventory\n\n' +
+        'Are you sure you want to proceed?'
+      );
+      if (!confirmed) return;
+    }
+    toggleSwitch(btn);
+    var label = btn.nextElementSibling;
+    var badge = label.nextElementSibling;
+    if (btn.dataset.on === 'true') {
+      label.textContent = 'ON';
+      label.classList.add('text-red-600');
+      label.classList.remove('text-gray-700');
+      badge.textContent = 'MAINTENANCE ACTIVE';
+      badge.classList.remove('bg-green-100', 'text-green-700');
+      badge.classList.add('bg-red-100', 'text-red-700');
+    } else {
+      label.textContent = 'OFF';
+      label.classList.remove('text-red-600');
+      label.classList.add('text-gray-700');
+      badge.textContent = 'ALL SYSTEMS OPERATIONAL';
+      badge.classList.add('bg-green-100', 'text-green-700');
+      badge.classList.remove('bg-red-100', 'text-red-700');
+    }
+  }
+
+  /* ===== Dirty State Tracking ===== */
+  var isDirty = false;
+  function markDirty() {
+    if (!isDirty) {
+      isDirty = true;
+      document.getElementById('unsavedBanner').classList.remove('hidden');
+    }
+  }
+
+  /* ===== Save Changes ===== */
+  function saveChanges() {
+    isDirty = false;
+    document.getElementById('unsavedBanner').classList.add('hidden');
+    alert('Configuration saved successfully. Changes are now live.');
+  }
+
+  /* ===== Discard Changes ===== */
+  function discardChanges() {
+    if (isDirty) {
+      var confirmed = confirm('Discard all unsaved changes? This cannot be undone.');
+      if (!confirmed) return;
+    }
+    isDirty = false;
+    document.getElementById('unsavedBanner').classList.add('hidden');
+    location.reload();
+  }
+
+  /* ===== Warn on Navigation with Unsaved Changes ===== */
+  window.addEventListener('beforeunload', function(e) {
+    if (isDirty) {
+      e.preventDefault();
+      e.returnValue = '';
+    }
+  });
+</script>
+
+<script src="../shared-layout.js"></script>
+<script>renderAdminLayout('settings', '../');</script>
+</body>
+</html>

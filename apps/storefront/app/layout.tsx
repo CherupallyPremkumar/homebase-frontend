@@ -2,10 +2,8 @@ import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
 import './globals.css';
 import { Providers } from './providers';
-import { Navbar } from '@/components/navbar';
-import { Footer } from '@/components/footer';
 import { MobileBottomNav } from '@/components/mobile-bottom-nav';
-import { Toaster } from '@homebase/ui';
+import { StorefrontHeader, StorefrontFooter, Toaster } from '@homebase/ui';
 import { auth } from '@/auth';
 
 const inter = Inter({
@@ -36,9 +34,9 @@ export default async function RootLayout({ children }: { children: React.ReactNo
     <html lang="en" className={inter.variable}>
       <body className="flex min-h-screen flex-col">
         <Providers>
-          <Navbar />
+          <StorefrontHeader cartCount={0} isAuthenticated={isAuthenticated} />
           <main className="flex-1 pb-14 md:pb-0">{children}</main>
-          <Footer />
+          <StorefrontFooter />
           <MobileBottomNav isAuthenticated={isAuthenticated} />
           <Toaster position="top-right" />
         </Providers>

@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HomeBase — Seller SLA Performance</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brand: { 50:'#FFF7ED',100:'#FFEDD5',200:'#FED7AA',300:'#FDBA74',400:'#FB923C',500:'#F97316',600:'#EA580C',700:'#C2410C' },
+            navy: { 700:'#1E3A5F',800:'#1A2E4A',900:'#0A1628' },
+            success:'#16A34A', warning:'#EAB308', danger:'#DC2626',
+          },
+          fontFamily: { sans:['Inter','system-ui','sans-serif'] }
+        }
+      }
+    }
+  </script>
+  <style>
+    .sidebar-link{transition:all .15s ease}.sidebar-link:hover{background:rgba(255,255,255,.08)}.sidebar-link.active{background:rgba(249,115,22,.15);border-right:3px solid #F97316}
+    .stat-card{transition:all .2s ease}.stat-card:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(0,0,0,.08)}
+    .table-row{transition:background .15s ease}.table-row:hover{background:#FFF7ED}
+    .dropdown-menu{display:none}.dropdown:hover .dropdown-menu{display:block}
+    .mini-bar { border-radius: 2px; }
+  </style>
+</head>
+<body class="font-sans bg-gray-50 text-gray-900">
+
+  <header id="admin-header" class="fixed top-0 left-0 right-0 z-50 bg-white border-b border-gray-200 h-16"></header>
+
+  <div class="flex pt-16 min-h-screen">
+    <aside id="admin-sidebar" class="fixed left-0 top-16 bottom-0 w-60 z-40 flex flex-col overflow-y-auto" style="background:#0A1628;"></aside>
+
+    <main class="flex-1 ml-60 p-6 lg:p-8">
+
+      <!-- Page Header -->
+      <div class="flex items-center justify-between mb-8">
+        <div>
+          <h1 class="text-2xl font-bold text-gray-900">Seller SLA Performance</h1>
+          <p class="text-sm text-gray-500 mt-1">Monitor dispatch, delivery, and response SLAs across all sellers</p>
+        </div>
+        <div class="flex items-center gap-3">
+          <select class="border border-gray-200 rounded-lg px-3 py-2 text-sm bg-white">
+            <option>Last 30 Days</option><option>Last 7 Days</option><option>Last 90 Days</option>
+          </select>
+          <button onclick="alert('Export SLA report')" class="flex items-center gap-2 border border-gray-200 bg-white rounded-lg px-4 py-2.5 text-sm font-semibold hover:bg-gray-50 transition">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3"/></svg>
+            Export Report
+          </button>
+        </div>
+      </div>
+
+      <!-- Stats -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        <div class="stat-card bg-white rounded-xl border border-gray-100 p-5">
+          <div class="flex items-center justify-between mb-3">
+            <span class="text-xs font-semibold text-gray-400 uppercase tracking-wide">Avg Dispatch SLA</span>
+            <div class="w-9 h-9 rounded-lg bg-green-50 flex items-center justify-center"><svg class="w-5 h-5 text-green-500" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M8.25 18.75a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m3 0h6m-9 0H3.375a1.125 1.125 0 01-1.125-1.125V14.25m17.25 4.5a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m3 0h1.125c.621 0 1.129-.504 1.09-1.124a17.902 17.902 0 00-3.213-9.193 2.056 2.056 0 00-1.58-.86H14.25M16.5 18.75h-2.25m0-11.177v-.958c0-.568-.422-1.048-.987-1.106a48.554 48.554 0 00-10.026 0 1.106 1.106 0 00-.987 1.106v7.635m12-6.677v6.677m0 4.5v-4.5m0 0h-12"/></svg></div>
+          </div>
+          <p class="text-2xl font-bold text-green-600">96.4%</p>
+          <p class="text-xs text-green-600 font-medium mt-1">+1.2% vs last month</p>
+        </div>
+        <div class="stat-card bg-white rounded-xl border border-gray-100 p-5">
+          <div class="flex items-center justify-between mb-3">
+            <span class="text-xs font-semibold text-gray-400 uppercase tracking-wide">Avg Delivery SLA</span>
+            <div class="w-9 h-9 rounded-lg bg-blue-50 flex items-center justify-center"><svg class="w-5 h-5 text-blue-500" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg></div>
+          </div>
+          <p class="text-2xl font-bold text-blue-600">94.2%</p>
+          <p class="text-xs text-green-600 font-medium mt-1">+0.8% vs last month</p>
+        </div>
+        <div class="stat-card bg-white rounded-xl border border-gray-100 p-5">
+          <div class="flex items-center justify-between mb-3">
+            <span class="text-xs font-semibold text-gray-400 uppercase tracking-wide">Avg Response Time</span>
+            <div class="w-9 h-9 rounded-lg bg-orange-50 flex items-center justify-center"><svg class="w-5 h-5 text-orange-500" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z"/></svg></div>
+          </div>
+          <p class="text-2xl font-bold text-gray-900">3.2 hrs</p>
+          <p class="text-xs text-green-600 font-medium mt-1">-0.5 hrs improvement</p>
+        </div>
+        <div class="stat-card bg-white rounded-xl border border-gray-100 p-5">
+          <div class="flex items-center justify-between mb-3">
+            <span class="text-xs font-semibold text-gray-400 uppercase tracking-wide">Total Violations</span>
+            <div class="w-9 h-9 rounded-lg bg-red-50 flex items-center justify-center"><svg class="w-5 h-5 text-red-500" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z"/></svg></div>
+          </div>
+          <p class="text-2xl font-bold text-red-600">23</p>
+          <p class="text-xs text-gray-400 font-medium mt-1">This month</p>
+        </div>
+      </div>
+
+      <!-- SLA Trend + Violation Breakdown -->
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+
+        <!-- Dispatch SLA Trend -->
+        <div class="bg-white rounded-xl border border-gray-100 p-5">
+          <h3 class="text-sm font-semibold text-gray-900 mb-4">Dispatch SLA Trend (Last 6 Months)</h3>
+          <div class="flex items-end gap-3 h-32">
+            <div class="flex-1 flex flex-col items-center gap-1">
+              <div class="w-full bg-blue-200 rounded-t" style="height:68%"></div>
+              <span class="text-[10px] text-gray-400">Oct</span>
+              <span class="text-[10px] font-semibold text-gray-600">91.2%</span>
+            </div>
+            <div class="flex-1 flex flex-col items-center gap-1">
+              <div class="w-full bg-blue-300 rounded-t" style="height:74%"></div>
+              <span class="text-[10px] text-gray-400">Nov</span>
+              <span class="text-[10px] font-semibold text-gray-600">92.8%</span>
+            </div>
+            <div class="flex-1 flex flex-col items-center gap-1">
+              <div class="w-full bg-blue-300 rounded-t" style="height:76%"></div>
+              <span class="text-[10px] text-gray-400">Dec</span>
+              <span class="text-[10px] font-semibold text-gray-600">93.5%</span>
+            </div>
+            <div class="flex-1 flex flex-col items-center gap-1">
+              <div class="w-full bg-blue-400 rounded-t" style="height:82%"></div>
+              <span class="text-[10px] text-gray-400">Jan</span>
+              <span class="text-[10px] font-semibold text-gray-600">94.6%</span>
+            </div>
+            <div class="flex-1 flex flex-col items-center gap-1">
+              <div class="w-full bg-blue-500 rounded-t" style="height:88%"></div>
+              <span class="text-[10px] text-gray-400">Feb</span>
+              <span class="text-[10px] font-semibold text-gray-600">95.2%</span>
+            </div>
+            <div class="flex-1 flex flex-col items-center gap-1">
+              <div class="w-full bg-green-500 rounded-t" style="height:94%"></div>
+              <span class="text-[10px] text-gray-400">Mar</span>
+              <span class="text-[10px] font-semibold text-green-600">96.4%</span>
+            </div>
+          </div>
+          <p class="text-xs text-green-600 font-medium mt-3 text-center">Trending up +5.2% over 6 months</p>
+        </div>
+
+        <!-- Violation Breakdown -->
+        <div class="bg-white rounded-xl border border-gray-100 p-5">
+          <h3 class="text-sm font-semibold text-gray-900 mb-4">Violation Breakdown (This Month)</h3>
+          <div class="space-y-4">
+            <div>
+              <div class="flex items-center justify-between mb-1.5">
+                <div class="flex items-center gap-2">
+                  <div class="w-2.5 h-2.5 rounded-full bg-red-500"></div>
+                  <span class="text-sm font-medium text-gray-700">Late Dispatch</span>
+                </div>
+                <span class="text-sm font-bold text-gray-900">12</span>
+              </div>
+              <div class="w-full bg-gray-100 rounded-full h-2"><div class="bg-red-500 h-2 rounded-full" style="width:52%"></div></div>
+            </div>
+            <div>
+              <div class="flex items-center justify-between mb-1.5">
+                <div class="flex items-center gap-2">
+                  <div class="w-2.5 h-2.5 rounded-full bg-yellow-500"></div>
+                  <span class="text-sm font-medium text-gray-700">Slow Response</span>
+                </div>
+                <span class="text-sm font-bold text-gray-900">6</span>
+              </div>
+              <div class="w-full bg-gray-100 rounded-full h-2"><div class="bg-yellow-500 h-2 rounded-full" style="width:26%"></div></div>
+            </div>
+            <div>
+              <div class="flex items-center justify-between mb-1.5">
+                <div class="flex items-center gap-2">
+                  <div class="w-2.5 h-2.5 rounded-full bg-orange-500"></div>
+                  <span class="text-sm font-medium text-gray-700">High Return Rate</span>
+                </div>
+                <span class="text-sm font-bold text-gray-900">3</span>
+              </div>
+              <div class="w-full bg-gray-100 rounded-full h-2"><div class="bg-orange-500 h-2 rounded-full" style="width:13%"></div></div>
+            </div>
+            <div>
+              <div class="flex items-center justify-between mb-1.5">
+                <div class="flex items-center gap-2">
+                  <div class="w-2.5 h-2.5 rounded-full bg-purple-500"></div>
+                  <span class="text-sm font-medium text-gray-700">Quality Issues</span>
+                </div>
+                <span class="text-sm font-bold text-gray-900">2</span>
+              </div>
+              <div class="w-full bg-gray-100 rounded-full h-2"><div class="bg-purple-500 h-2 rounded-full" style="width:9%"></div></div>
+            </div>
+          </div>
+          <div class="mt-4 pt-3 border-t border-gray-100 flex items-center justify-between">
+            <span class="text-xs text-gray-400">Total violations this month</span>
+            <span class="text-sm font-bold text-red-600">23</span>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Sellers at Risk -->
+      <div class="bg-white rounded-xl border border-red-200 mb-8">
+        <div class="px-6 py-4 border-b border-red-100 flex items-center justify-between bg-red-50/50 rounded-t-xl">
+          <div class="flex items-center gap-2">
+            <svg class="w-4 h-4 text-red-500" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z"/></svg>
+            <h2 class="text-base font-semibold text-red-800">Sellers at Risk</h2>
+            <span class="px-2 py-0.5 text-[10px] font-bold rounded-full bg-red-100 text-red-700">5 Approaching Threshold</span>
+          </div>
+        </div>
+        <div class="overflow-x-auto">
+          <table class="w-full text-sm">
+            <thead><tr class="text-left text-xs font-semibold text-gray-400 uppercase tracking-wide border-b border-gray-50">
+              <th class="px-6 py-3">Seller</th><th class="px-4 py-3">Dispatch SLA</th><th class="px-4 py-3">Delivery SLA</th><th class="px-4 py-3">Violations</th><th class="px-4 py-3">Risk Level</th><th class="px-4 py-3">Action</th>
+            </tr></thead>
+            <tbody>
+              <tr class="table-row border-b border-gray-50">
+                <td class="px-6 py-3.5 font-medium">Delhi Spice Market</td>
+                <td class="px-4 py-3.5 text-red-600 font-semibold">72%</td>
+                <td class="px-4 py-3.5 text-red-600 font-semibold">68%</td>
+                <td class="px-4 py-3.5 font-semibold">9</td>
+                <td class="px-4 py-3.5"><span class="px-2 py-1 rounded-full text-xs font-semibold bg-red-50 text-red-600">Critical</span></td>
+                <td class="px-4 py-3.5"><button onclick="alert('Sending warning to Delhi Spice Market')" class="px-3 py-1.5 text-xs font-semibold text-white bg-red-500 hover:bg-red-600 rounded-lg transition">Send Warning</button></td>
+              </tr>
+              <tr class="table-row border-b border-gray-50">
+                <td class="px-6 py-3.5 font-medium">Urban Essentials</td>
+                <td class="px-4 py-3.5 text-red-600 font-semibold">65%</td>
+                <td class="px-4 py-3.5 text-red-600 font-semibold">60%</td>
+                <td class="px-4 py-3.5 font-semibold">12</td>
+                <td class="px-4 py-3.5"><span class="px-2 py-1 rounded-full text-xs font-semibold bg-red-50 text-red-600">Critical</span></td>
+                <td class="px-4 py-3.5"><button onclick="alert('Sending warning to Urban Essentials')" class="px-3 py-1.5 text-xs font-semibold text-white bg-red-500 hover:bg-red-600 rounded-lg transition">Send Warning</button></td>
+              </tr>
+              <tr class="table-row border-b border-gray-50">
+                <td class="px-6 py-3.5 font-medium">Craft Corner</td>
+                <td class="px-4 py-3.5 text-yellow-600 font-semibold">80%</td>
+                <td class="px-4 py-3.5 text-yellow-600 font-semibold">78%</td>
+                <td class="px-4 py-3.5 font-semibold">5</td>
+                <td class="px-4 py-3.5"><span class="px-2 py-1 rounded-full text-xs font-semibold bg-yellow-50 text-yellow-600">Warning</span></td>
+                <td class="px-4 py-3.5"><button onclick="alert('Sending warning to Craft Corner')" class="px-3 py-1.5 text-xs font-semibold text-yellow-700 bg-yellow-100 hover:bg-yellow-200 rounded-lg transition">Send Warning</button></td>
+              </tr>
+              <tr class="table-row border-b border-gray-50">
+                <td class="px-6 py-3.5 font-medium">Fashion Hub India</td>
+                <td class="px-4 py-3.5 text-yellow-600 font-semibold">85%</td>
+                <td class="px-4 py-3.5 text-yellow-600 font-semibold">82%</td>
+                <td class="px-4 py-3.5 font-semibold">4</td>
+                <td class="px-4 py-3.5"><span class="px-2 py-1 rounded-full text-xs font-semibold bg-yellow-50 text-yellow-600">Warning</span></td>
+                <td class="px-4 py-3.5"><button onclick="alert('Sending warning to Fashion Hub India')" class="px-3 py-1.5 text-xs font-semibold text-yellow-700 bg-yellow-100 hover:bg-yellow-200 rounded-lg transition">Send Warning</button></td>
+              </tr>
+              <tr class="table-row">
+                <td class="px-6 py-3.5 font-medium">QuickMart Supplies</td>
+                <td class="px-4 py-3.5 text-yellow-600 font-semibold">87%</td>
+                <td class="px-4 py-3.5 text-yellow-600 font-semibold">84%</td>
+                <td class="px-4 py-3.5 font-semibold">3</td>
+                <td class="px-4 py-3.5"><span class="px-2 py-1 rounded-full text-xs font-semibold bg-yellow-50 text-yellow-600">Warning</span></td>
+                <td class="px-4 py-3.5"><button onclick="alert('Sending warning to QuickMart Supplies')" class="px-3 py-1.5 text-xs font-semibold text-yellow-700 bg-yellow-100 hover:bg-yellow-200 rounded-lg transition">Send Warning</button></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Seller Ranking Table -->
+      <div class="bg-white rounded-xl border border-gray-100 mb-8">
+        <div class="px-6 py-4 border-b border-gray-100 flex items-center justify-between">
+          <h2 class="text-base font-semibold text-gray-900">Seller SLA Rankings</h2>
+          <input type="text" placeholder="Search sellers..." class="border border-gray-200 rounded-lg px-3 py-1.5 text-sm w-56">
+        </div>
+        <div class="overflow-x-auto">
+          <table class="w-full text-sm">
+            <thead><tr class="text-left text-xs font-semibold text-gray-400 uppercase tracking-wide border-b border-gray-50">
+              <th class="px-6 py-3">Seller Name</th><th class="px-4 py-3">Dispatch SLA</th><th class="px-4 py-3">Delivery SLA</th><th class="px-4 py-3">Response Time</th><th class="px-4 py-3">Rating</th><th class="px-4 py-3">Violations</th><th class="px-4 py-3">Status</th>
+            </tr></thead>
+            <tbody>
+              <tr class="table-row border-b border-gray-50"><td class="px-6 py-3.5 font-medium">Sharma Electronics</td><td class="px-4 py-3.5 text-green-600 font-semibold">98%</td><td class="px-4 py-3.5 text-green-600 font-semibold">96%</td><td class="px-4 py-3.5">2 hrs</td><td class="px-4 py-3.5 font-semibold">4.8</td><td class="px-4 py-3.5">0</td><td class="px-4 py-3.5"><span class="px-2 py-1 rounded-full text-xs font-semibold bg-green-50 text-green-600">Good</span></td></tr>
+              <tr class="table-row border-b border-gray-50"><td class="px-6 py-3.5 font-medium">Patel Home Store</td><td class="px-4 py-3.5 text-green-600 font-semibold">95%</td><td class="px-4 py-3.5 text-green-600 font-semibold">93%</td><td class="px-4 py-3.5">4 hrs</td><td class="px-4 py-3.5 font-semibold">4.6</td><td class="px-4 py-3.5">1</td><td class="px-4 py-3.5"><span class="px-2 py-1 rounded-full text-xs font-semibold bg-green-50 text-green-600">Good</span></td></tr>
+              <tr class="table-row border-b border-gray-50"><td class="px-6 py-3.5 font-medium">GreenLeaf Organics</td><td class="px-4 py-3.5 text-green-600 font-semibold">92%</td><td class="px-4 py-3.5 text-green-600 font-semibold">91%</td><td class="px-4 py-3.5">3 hrs</td><td class="px-4 py-3.5 font-semibold">4.5</td><td class="px-4 py-3.5">2</td><td class="px-4 py-3.5"><span class="px-2 py-1 rounded-full text-xs font-semibold bg-green-50 text-green-600">Good</span></td></tr>
+              <tr class="table-row border-b border-gray-50"><td class="px-6 py-3.5 font-medium">Fashion Hub India</td><td class="px-4 py-3.5 text-yellow-600 font-semibold">85%</td><td class="px-4 py-3.5 text-yellow-600 font-semibold">82%</td><td class="px-4 py-3.5">8 hrs</td><td class="px-4 py-3.5 font-semibold">4.1</td><td class="px-4 py-3.5">4</td><td class="px-4 py-3.5"><span class="px-2 py-1 rounded-full text-xs font-semibold bg-yellow-50 text-yellow-600">Warning</span></td></tr>
+              <tr class="table-row border-b border-gray-50"><td class="px-6 py-3.5 font-medium">TechZone Gadgets</td><td class="px-4 py-3.5 text-green-600 font-semibold">94%</td><td class="px-4 py-3.5 text-green-600 font-semibold">90%</td><td class="px-4 py-3.5">5 hrs</td><td class="px-4 py-3.5 font-semibold">4.3</td><td class="px-4 py-3.5">1</td><td class="px-4 py-3.5"><span class="px-2 py-1 rounded-full text-xs font-semibold bg-green-50 text-green-600">Good</span></td></tr>
+              <tr class="table-row border-b border-gray-50"><td class="px-6 py-3.5 font-medium">Delhi Spice Market</td><td class="px-4 py-3.5 text-red-600 font-semibold">72%</td><td class="px-4 py-3.5 text-red-600 font-semibold">68%</td><td class="px-4 py-3.5">18 hrs</td><td class="px-4 py-3.5 font-semibold">3.4</td><td class="px-4 py-3.5">9</td><td class="px-4 py-3.5"><span class="px-2 py-1 rounded-full text-xs font-semibold bg-red-50 text-red-600">Critical</span></td></tr>
+              <tr class="table-row border-b border-gray-50"><td class="px-6 py-3.5 font-medium">Craft Corner</td><td class="px-4 py-3.5 text-yellow-600 font-semibold">80%</td><td class="px-4 py-3.5 text-yellow-600 font-semibold">78%</td><td class="px-4 py-3.5">12 hrs</td><td class="px-4 py-3.5 font-semibold">3.8</td><td class="px-4 py-3.5">5</td><td class="px-4 py-3.5"><span class="px-2 py-1 rounded-full text-xs font-semibold bg-yellow-50 text-yellow-600">Warning</span></td></tr>
+              <tr class="table-row"><td class="px-6 py-3.5 font-medium">Urban Essentials</td><td class="px-4 py-3.5 text-red-600 font-semibold">65%</td><td class="px-4 py-3.5 text-red-600 font-semibold">60%</td><td class="px-4 py-3.5">24 hrs</td><td class="px-4 py-3.5 font-semibold">3.1</td><td class="px-4 py-3.5">12</td><td class="px-4 py-3.5"><span class="px-2 py-1 rounded-full text-xs font-semibold bg-red-50 text-red-600">Critical</span></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Recent SLA Violations -->
+      <div class="bg-white rounded-xl border border-gray-100">
+        <div class="px-6 py-4 border-b border-gray-100">
+          <h2 class="text-base font-semibold text-gray-900">Recent SLA Violations</h2>
+        </div>
+        <div class="divide-y divide-gray-50">
+          <div class="px-6 py-4 flex items-center justify-between">
+            <div class="flex items-center gap-3">
+              <div class="w-8 h-8 rounded-full bg-red-100 flex items-center justify-center"><svg class="w-4 h-4 text-red-600" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126z"/></svg></div>
+              <div><p class="text-sm font-medium text-gray-900">Urban Essentials - Late Dispatch</p><p class="text-xs text-gray-500">Order #HB-89234 dispatched 48 hrs late</p></div>
+            </div>
+            <span class="text-xs text-gray-400">2 hrs ago</span>
+          </div>
+          <div class="px-6 py-4 flex items-center justify-between">
+            <div class="flex items-center gap-3">
+              <div class="w-8 h-8 rounded-full bg-red-100 flex items-center justify-center"><svg class="w-4 h-4 text-red-600" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126z"/></svg></div>
+              <div><p class="text-sm font-medium text-gray-900">Delhi Spice Market - No Response</p><p class="text-xs text-gray-500">Customer query unanswered for 36 hrs</p></div>
+            </div>
+            <span class="text-xs text-gray-400">5 hrs ago</span>
+          </div>
+          <div class="px-6 py-4 flex items-center justify-between">
+            <div class="flex items-center gap-3">
+              <div class="w-8 h-8 rounded-full bg-yellow-100 flex items-center justify-center"><svg class="w-4 h-4 text-yellow-600" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126z"/></svg></div>
+              <div><p class="text-sm font-medium text-gray-900">Craft Corner - Late Delivery</p><p class="text-xs text-gray-500">Order #HB-88912 delivered 3 days late</p></div>
+            </div>
+            <span class="text-xs text-gray-400">1 day ago</span>
+          </div>
+          <div class="px-6 py-4 flex items-center justify-between">
+            <div class="flex items-center gap-3">
+              <div class="w-8 h-8 rounded-full bg-yellow-100 flex items-center justify-center"><svg class="w-4 h-4 text-yellow-600" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126z"/></svg></div>
+              <div><p class="text-sm font-medium text-gray-900">Fashion Hub India - Late Dispatch</p><p class="text-xs text-gray-500">Order #HB-88501 dispatched 24 hrs late</p></div>
+            </div>
+            <span class="text-xs text-gray-400">1 day ago</span>
+          </div>
+          <div class="px-6 py-4 flex items-center justify-between">
+            <div class="flex items-center gap-3">
+              <div class="w-8 h-8 rounded-full bg-red-100 flex items-center justify-center"><svg class="w-4 h-4 text-red-600" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126z"/></svg></div>
+              <div><p class="text-sm font-medium text-gray-900">Urban Essentials - Quality Complaint</p><p class="text-xs text-gray-500">3 quality complaints in one week</p></div>
+            </div>
+            <span class="text-xs text-gray-400">2 days ago</span>
+          </div>
+        </div>
+      </div>
+
+    </main>
+  </div>
+
+<script src="../shared-layout.js"></script>
+<script>renderAdminLayout('sla', '../');</script>
+</body>
+</html>

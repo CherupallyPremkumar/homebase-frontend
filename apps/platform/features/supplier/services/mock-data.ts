@@ -1,0 +1,207 @@
+/**
+ * Mock data for the Seller/Supplier Management list page.
+ *
+ * Each export matches the shape returned by the real API contract.
+ * When backend endpoints are ready, swap the mock imports in
+ * queries.ts for real fetch calls -- no component changes needed.
+ */
+
+import type {
+  Supplier,
+  SupplierStats,
+  SupplierSecondaryStats,
+  SupplierTab,
+  SupplierListResponse,
+} from '../types';
+
+export type {
+  SupplierStatus,
+  ComplianceStatus,
+  Supplier,
+  SupplierStats,
+  SupplierSecondaryStats,
+  SupplierTab,
+  SupplierListResponse,
+} from '../types';
+
+// ----------------------------------------------------------------
+// Mock Data
+// ----------------------------------------------------------------
+
+export const mockSupplierStats: SupplierStats = {
+  totalSellers: { value: '234', trend: 12, trendDirection: 'up' },
+  active: { value: '198', subtitle: '84.6% of total' },
+  pendingApproval: { value: '18', subtitle: 'Requires review' },
+  suspended: { value: '12', subtitle: 'Policy violations' },
+  inactive: { value: '6', subtitle: 'No activity 30+ days' },
+};
+
+export const mockSupplierSecondaryStats: SupplierSecondaryStats = {
+  totalGmv: { value: '\u20B98.6Cr', trend: '+18.3% vs last quarter' },
+  avgRating: { value: '4.3', subtitle: 'Across all active sellers' },
+  complianceIssues: { value: '7', subtitle: '3 critical, 4 warnings' },
+  pendingPayouts: { value: '\u20B912.4L', subtitle: 'Due within 7 days' },
+};
+
+export const mockSupplierTabs: SupplierTab[] = [
+  { key: 'all', label: 'All', count: '234' },
+  { key: 'active', label: 'Active', count: '198' },
+  { key: 'pending', label: 'Pending Approval', count: '18' },
+  { key: 'suspended', label: 'Suspended', count: '12' },
+  { key: 'inactive', label: 'Inactive', count: '6' },
+];
+
+export const mockSuppliers: Supplier[] = [
+  {
+    id: 1,
+    initials: 'RS',
+    gradient: 'from-blue-400 to-blue-600',
+    name: 'Rajesh Sharma',
+    email: 'rajesh.sharma@email.com',
+    store: 'Rajesh Electronics',
+    healthScore: 872,
+    products: 342,
+    orders: '1,847',
+    revenue: '$284,320',
+    rating: 4.8,
+    fulfillmentPct: 96.2,
+    disputes: 3,
+    compliance: 'ok',
+    status: 'Active',
+    joined: 'Jan 15, 2024',
+  },
+  {
+    id: 2,
+    initials: 'AP',
+    gradient: 'from-purple-400 to-purple-600',
+    name: 'Anita Patel',
+    email: 'anita.patel@email.com',
+    store: "Anita's Fashion Hub",
+    healthScore: 945,
+    products: 187,
+    orders: '2,340',
+    revenue: '$412,890',
+    rating: 4.9,
+    fulfillmentPct: 98.7,
+    disputes: 1,
+    compliance: 'ok',
+    status: 'Active',
+    joined: 'Mar 08, 2024',
+  },
+  {
+    id: 3,
+    initials: 'VK',
+    gradient: 'from-amber-400 to-amber-600',
+    name: 'Vikram Kumar',
+    email: 'vikram.kumar@email.com',
+    store: 'Kumar Home Decor',
+    healthScore: 0,
+    products: 0,
+    orders: '0',
+    revenue: '$0',
+    rating: 0,
+    fulfillmentPct: 0,
+    disputes: 0,
+    compliance: 'review',
+    status: 'Pending',
+    joined: 'Mar 22, 2026',
+  },
+  {
+    id: 4,
+    initials: 'SM',
+    gradient: 'from-teal-400 to-teal-600',
+    name: 'Sunita Menon',
+    email: 'sunita.menon@email.com',
+    store: 'Spice & Soul Kitchen',
+    healthScore: 780,
+    products: 94,
+    orders: '3,120',
+    revenue: '$178,540',
+    rating: 4.7,
+    fulfillmentPct: 94.1,
+    disputes: 5,
+    compliance: 'ok',
+    status: 'Active',
+    joined: 'Sep 04, 2023',
+  },
+  {
+    id: 5,
+    initials: 'DG',
+    gradient: 'from-red-400 to-red-600',
+    name: 'Deepak Gupta',
+    email: 'deepak.gupta@email.com',
+    store: 'Gupta General Store',
+    healthScore: 210,
+    products: 56,
+    orders: '412',
+    revenue: '$34,210',
+    rating: 2.3,
+    fulfillmentPct: 62.4,
+    disputes: 18,
+    compliance: 'violation',
+    status: 'Suspended',
+    joined: 'Jun 12, 2024',
+  },
+  {
+    id: 6,
+    initials: 'PD',
+    gradient: 'from-pink-400 to-pink-600',
+    name: 'Priya Desai',
+    email: 'priya.desai@email.com',
+    store: "Priya's Handmade Crafts",
+    healthScore: 0,
+    products: 0,
+    orders: '0',
+    revenue: '$0',
+    rating: 0,
+    fulfillmentPct: 0,
+    disputes: 0,
+    compliance: 'review',
+    status: 'Pending',
+    joined: 'Mar 25, 2026',
+  },
+  {
+    id: 7,
+    initials: 'MR',
+    gradient: 'from-indigo-400 to-indigo-600',
+    name: 'Mohammed Rashid',
+    email: 'm.rashid@email.com',
+    store: 'Rashid Sports World',
+    healthScore: 620,
+    products: 218,
+    orders: '967',
+    revenue: '$145,780',
+    rating: 4.5,
+    fulfillmentPct: 88.3,
+    disputes: 8,
+    compliance: 'warning',
+    status: 'Active',
+    joined: 'Nov 28, 2023',
+  },
+  {
+    id: 8,
+    initials: 'KN',
+    gradient: 'from-gray-400 to-gray-600',
+    name: 'Kavita Nair',
+    email: 'kavita.nair@email.com',
+    store: 'Nair Beauty Essentials',
+    healthScore: 340,
+    products: 128,
+    orders: '654',
+    revenue: '$67,430',
+    rating: 3.1,
+    fulfillmentPct: 71.8,
+    disputes: 12,
+    compliance: 'violation',
+    status: 'Suspended',
+    joined: 'Apr 19, 2024',
+  },
+];
+
+export const mockSupplierListResponse: SupplierListResponse = {
+  suppliers: mockSuppliers,
+  total: 234,
+  page: 1,
+  pageSize: 10,
+  totalPages: 24,
+};
